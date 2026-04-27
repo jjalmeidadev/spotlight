@@ -99,7 +99,30 @@ _conteúdo_
 _conteúdo_
 
 ## 2.1 Contexto da Indústria do Parceiro
-_conteúdo_
+
+
+O setor de entretenimento cultural e produção de espetáculos no Brasil, especialmente o segmento de teatro musical e experiências ao vivo, vem se consolidando como um dos principais pilares da economia criativa nacional. Nos últimos anos, esse mercado tem apresentado crescimento impulsionado pela retomada do público pós-pandemia, pela valorização de experiências presenciais e pelo aumento do consumo de cultura como forma de lazer. Empresas como a Aventura Teatros se destacam nesse cenário ao combinar produção artística de alto nível com gestão estratégica de venues e parcerias comerciais, alcançando milhões de espectadores e movimentando cadeias econômicas relevantes.
+
+Apesar desse crescimento, o setor enfrenta desafios relacionados à digitalização da experiência do usuário. Diferentemente de plataformas de streaming, que utilizam algoritmos avançados para recomendação de conteúdo, muitos portais de espetáculos ainda operam de forma estática, limitando a descoberta de novas experiências e reduzindo o potencial de engajamento e conversão. Nesse contexto, a implementação de sistemas de recomendação surge como uma oportunidade estratégica para aumentar o tempo de permanência do usuário, estimular a navegação e impulsionar a venda de ingressos.
+
+A análise do setor por meio do modelo das 5 Forças de Porter permite compreender melhor a dinâmica competitiva e os desafios enfrentados pela Aventura:
+
+1. Rivalidade entre concorrentes existentes (Alta):
+O mercado de entretenimento é altamente competitivo, envolvendo não apenas outras produtoras de teatro, mas também cinemas, shows, plataformas de streaming e eventos ao vivo. Além disso, empresas que oferecem experiências digitais, como Netflix e Spotify, disputam diretamente o tempo e a atenção do consumidor. Isso exige que empresas como a Aventura invistam em diferenciação e em estratégias que aumentem o engajamento do público dentro de seus próprios canais.
+
+2. Poder de barganha dos clientes (Alto):
+Os consumidores possuem ampla variedade de opções de entretenimento e baixo custo de troca entre elas. A decisão de compra é fortemente influenciada por preço, conveniência e relevância do conteúdo. A ausência de recomendações personalizadas reduz a capacidade de retenção do usuário, tornando essencial a criação de experiências digitais mais inteligentes e direcionadas.
+
+3. Ameaça de novos entrantes (Moderada):
+Embora a produção de espetáculos envolva altos custos e barreiras operacionais, a entrada de novas plataformas digitais e iniciativas independentes de divulgação cultural tem reduzido essas barreiras. Startups e plataformas online podem atuar como intermediárias na descoberta de conteúdo, diminuindo o controle das produtoras sobre a jornada do usuário.
+
+4. Poder de barganha dos fornecedores (Moderado):
+Os principais fornecedores incluem artistas, produtores, teatros e parceiros comerciais. Como esses recursos são limitados e altamente especializados, eles possuem certo poder de negociação. Além disso, parcerias com marcas e patrocinadores são fundamentais para viabilizar grandes produções, influenciando diretamente a oferta de conteúdo.
+
+5. Ameaça de produtos substitutos (Alta):
+O principal substituto dos espetáculos presenciais são as plataformas digitais de entretenimento, como streaming de vídeo, redes sociais e jogos online. Essas alternativas oferecem conveniência e, muitas vezes, menor custo, competindo diretamente com o teatro pelo tempo do consumidor.
+
+Diante desse cenário, observa-se que o setor exige cada vez mais a integração entre experiência presencial e digital. A capacidade de recomendar conteúdos de forma personalizada torna-se um diferencial competitivo essencial, permitindo que empresas como a Aventura ampliem o engajamento do público, fortaleçam seu ecossistema de produções e aumentem a conversão de vendas. Assim, a adoção de soluções tecnológicas, como sistemas de recomendação, não é apenas uma inovação, mas uma necessidade estratégica para se manter relevante em um mercado altamente competitivo e em constante transformação.
 
 ## 2.2 Problema
 _conteúdo_
