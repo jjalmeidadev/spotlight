@@ -157,6 +157,14 @@ A proposta central é transformar atenção em descoberta e descoberta em conver
 - Disponibiliza um protótipo navegável demonstrando as recomendações
 - Simula uma jornada de descoberta de novos espetáculos
 
+## O que o produto não faz
+ 
+- Não é um sistema final em produção
+- Não utiliza Machine Learning avançado ou modelos treinados com grandes volumes de dados
+- Não realiza venda ou reserva de ingressos
+- Não possui atualização em tempo real das recomendações
+- Não implementa autenticação ou gestão de usuários
+- Não possui dashboard analítico para gestores
 
 ---
 
