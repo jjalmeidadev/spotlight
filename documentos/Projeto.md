@@ -145,6 +145,19 @@ A proposta central é transformar atenção em descoberta e descoberta em conver
 
 ### 2.3.3 O que o Produto Faz e Não Faz
 
+## O que o produto faz
+ 
+- Recomenda espetáculos relacionados dentro do Portal Aventura
+- Sugere conteúdos com base em similaridade (gênero, título, região, tipo de produção)
+- Exibe recomendações na página de cada espetáculo
+- Considera interações básicas do usuário (ex: páginas visitadas)
+- Organiza espetáculos por categorias e relações entre eles
+- Apresenta listas de recomendados, como: "Você também pode gostar" ou "Espetáculos similares"
+- Implementa um algoritmo de recomendação funcional (baseado em regras do SVD)
+- Disponibiliza um protótipo navegável demonstrando as recomendações
+- Simula uma jornada de descoberta de novos espetáculos
+
+
 ---
 
 ### 2.3.4 Objetivos Estratégicos e Mensuráveis
