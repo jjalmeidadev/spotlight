@@ -87,7 +87,12 @@
 
 
 # 1. Introdução
-_conteúdo_
+
+&emsp;Este documento foi elaborado com o objetivo de servir como um guia completo para o leitor, 
+fornecendo uma visão ampla de todas as etapas e aspectos do projeto desenvolvido em parceria 
+com a Aventura Teatros. Nele, são apresentadas desde a descrição do parceiro envolvido e o 
+problema proposto, até as decisões estratégicas tomadas, as análises de negócio realizadas e 
+a documentação técnica relacionada à solução desenvolvida.
 
 ## 1.1 Termos e Abreviações
 _conteúdo_
