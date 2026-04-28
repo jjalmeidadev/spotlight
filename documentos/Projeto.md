@@ -85,7 +85,6 @@
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
 - [Referências](#referências)
 
-
 # 1. Introdução
 
 &emsp;Este documento foi elaborado com o objetivo de servir como um guia completo para o leitor, 
@@ -95,7 +94,22 @@ problema proposto, até as decisões estratégicas tomadas, as análises de neg�
 a documentação técnica relacionada à solução desenvolvida.
 
 ## 1.1 Termos e Abreviações
-_conteúdo_
+
+Abreviações utilizadas na elaboração desta documentação:
+
+| Abreviação | Significado |
+|---|---|
+| API | Application Programming Interface (Interface de Programação de Aplicação) |
+| MVP | Minimum Viable Product (Produto Mínimo Viável) |
+| UI | User Interface (Interface do Usuário) |
+| UX | User Experience (Experiência do Usuário) |
+| RF | Requisito Funcional |
+| RNF | Requisito Não Funcional |
+| REST | Representational State Transfer (Transferência de Estado Representacional) |
+| RACI | Responsible, Accountable, Consulted, Informed |
+| Sprint | Ciclo de desenvolvimento ágil |
+| SOA | Service-Oriented Architecture (Arquitetura Orientada a Serviços) |
+| Portal | Plataforma digital da Aventura Teatros voltada ao público externo |
 
 ## 1.2 Objetivo do Documento
 _conteúdo_
