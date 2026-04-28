@@ -141,7 +141,13 @@ para uma plataforma cultural completa, atuando na produção de festivais, gest�
 equipamentos culturais e formação de parcerias estratégicas com marcas de grande expressão, 
 como BTG Pactual, YouTube, Nubank, Ri Happy e TotalEnergies.
 
-&emsp;
+&emsp;O setor de entretenimento cultural no Brasil tem passado por uma transformação significativa 
+nos últimos anos, impulsionada pela retomada do consumo pós-pandemia e pela crescente 
+digitalização dos canais de relacionamento com o público. Nesse cenário, plataformas digitais 
+tornaram-se protagonistas na descoberta e no consumo de conteúdo cultural, exigindo das 
+produtoras uma presença online estruturada e capaz de engajar o usuário além do momento da 
+compra do ingresso.
+
 
 &emsp;
 
