@@ -122,7 +122,15 @@ a melhoria da experiência do usuário, o aumento do engajamento com o ecossiste
 e o fortalecimento da presença digital da Aventura Teatros como plataforma cultural completa.
 
 # 2. Entendimento do Projeto e do Negócio
-_conteúdo_
+
+&emsp;O projeto consiste no desenvolvimento de uma solução digital de recomendação inteligente 
+integrada ao Portal Aventura, com o objetivo de conectar o usuário a espetáculos, conteúdos 
+e experiências culturais relevantes ao seu perfil de interesse. A iniciativa responde a uma 
+lacuna identificada na jornada digital do usuário, que atualmente não recebe sugestões ao 
+navegar pelo portal, o que reduz as oportunidades de descoberta de novos conteúdos e de 
+conversão em vendas. A solução proposta permitirá a geração de recomendações contextualizadas 
+ao comportamento e às preferências do usuário, criando uma jornada mais fluida e conectada 
+entre as produções da Aventura.
 
 ## 2.1 Contexto da Indústria do Parceiro
 _conteúdo_
