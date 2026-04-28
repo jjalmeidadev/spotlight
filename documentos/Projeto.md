@@ -112,7 +112,14 @@ Abreviações utilizadas na elaboração desta documentação:
 | Portal | Plataforma digital da Aventura Teatros voltada ao público externo |
 
 ## 1.2 Objetivo do Documento
-_conteúdo_
+
+&emsp;Este documento tem como objetivo apresentar o escopo e o propósito do projeto voltado ao 
+desenvolvimento de uma solução de recomendação de espetáculos no Portal Aventura. A principal 
+função da solução é sugerir, de forma inteligente, espetáculos, conteúdos e experiências 
+culturais alinhados ao interesse do usuário, estimulando a navegação dentro do portal e 
+aumentando o potencial de conversão em vendas de ingressos. A proposta visa contribuir para 
+a melhoria da experiência do usuário, o aumento do engajamento com o ecossistema da produtora 
+e o fortalecimento da presença digital da Aventura Teatros como plataforma cultural completa.
 
 # 2. Entendimento do Projeto e do Negócio
 _conteúdo_
