@@ -31,6 +31,13 @@
   - [2.1 Contexto da Indústria do Parceiro](#21-contexto-da-indústria-do-parceiro)
   - [2.2 Problema](#22-problema)
   - [2.3 Visão do Projeto e do Produto](#23-visão-do-projeto-e-do-produto)
+    - [2.3.1 Visão do Produto](#231-visão-do-produto)
+    - [2.3.2 Proposta de Valor](#232-proposta-de-valor)
+    - [2.3.3 O que o Produto Faz e Não Faz](#233-o-que-o-produto-faz-e-não-faz)
+    - [2.3.4 Objetivos Estratégicos e Mensuráveis](#234-objetivos-estratégicos-e-mensuráveis)
+    - [2.3.5 Impacto e Abrangência](#235-impacto-e-abrangência)
+    - [2.3.6 Ownership e Accountability Estratégico](#236-ownership-e-accountability-estratégico)
+    - [2.3.7 Alinhamento com o Problema](#237-alinhamento-com-o-problema)
   - [2.4 Personas e Jornada do Usuário](#24-personas-e-jornada-do-usuário)
   - [2.5 Modelagem do Fluxo de Negócio](#25-modelagem-do-fluxo-de-negócio)
     - [2.5.1 Cadeia de Valor](#251-cadeia-de-valor)
@@ -105,9 +112,149 @@ _conteúdo_
 _conteúdo_
 
 ## 2.3 Visão do Projeto e do Produto
-  _conteúdo_
 
-  **Nota**: _Insira aqui informações sobre o que se trata o projeto e que valor ele vai entregar, Objetivos do Produto e O que o produto faz e não faz._
+Este tópico apresenta a visão estratégica do produto proposto, bem como seus objetivos mensuráveis, alinhando a solução ao problema identificado, às necessidades do negócio da Aventura e ao valor esperado para os usuários. A definição desses elementos é fundamental para orientar o desenvolvimento da solução, garantir coerência nas decisões de produto e estabelecer critérios claros de sucesso com base em resultados mensuráveis.
+
+A partir desse direcionamento, busca-se não apenas descrever o que será desenvolvido, mas explicitar o papel estratégico do produto dentro do ecossistema digital da Aventura, evidenciando seu impacto potencial em engajamento, descoberta de conteúdo e conversão:
+
+### 2.3.1 Visão do Produto
+
+A visão do produto é transformar o Portal Aventura de uma plataforma estática de navegação em um ambiente digital inteligente, personalizado e orientado à descoberta, capaz de conectar usuários a experiências culturais relevantes de forma contínua, contextualizada e escalável.
+
+Atualmente, a experiência do portal é fragmentada e limitada à navegação direta por páginas específicas, sem mecanismos que incentivem a exploração ou ampliem a jornada do usuário. O produto propõe uma reengenharia dessa dinâmica, introduzindo um sistema de recomendação que atua como uma camada estratégica de curadoria, responsável por guiar o usuário ao longo de uma experiência mais fluida, conectada e orientada à decisão.
+
+A solução conceitualmente funciona como uma camada de inteligência sobre o conteúdo existente, estruturando e relacionando espetáculos, conteúdos e experiências com base em critérios de relevância, contexto e comportamento. Ao fazer isso, transforma a navegação em uma jornada progressiva de descoberta, reduzindo fricções e ampliando oportunidades de engajamento.
+
+Mais do que melhorar a navegação, o produto reposiciona o Portal Aventura como um hub digital de experiências culturais, fortalecendo seu papel dentro do ecossistema da empresa e aumentando sua capacidade de gerar valor tanto para usuários quanto para o negócio.
+
+---
+
+### 2.3.2 Proposta de Valor
+
+O produto entrega valor ao:
+
+- Reduzir o esforço do usuário na descoberta de experiências culturais  
+- Aumentar a relevância do conteúdo apresentado  
+- Expandir a jornada de navegação dentro do portal  
+- Potencializar a exposição de todo o portfólio da Aventura  
+- Converter engajamento em oportunidades reais de negócio  
+
+A proposta central é transformar atenção em descoberta e descoberta em conversão.
+
+---
+
+### 2.3.3 O que o Produto Faz e Não Faz
+## O que o produto faz
+
+O produto implementa um sistema de recomendação focado na descoberta de espetáculos dentro do Portal Aventura, com aplicação direta nas telas em que a recomendação agrega valor à navegação:
+
+- Na `Tela principal de descoberta`, exibe listas e carrosséis de espetáculos recomendados, organizados por relações com o perfil e o comportamento do usuário.
+- Na `Sub-tela de cada espetáculo`, apresenta um carrossel de sugestões como `Espetáculos similares` ou `Você também pode gostar`, ampliando a exploração de conteúdos relacionados.
+- No `Login/Cadastro` e `Seleção de tags`, evita o cold start com coleta mínima de informações e preferências iniciais, sem sobrecarregar essas etapas com recomendações, porém garantindo que o usuário tenha acesso à peças que se encaixem nos gêneros escolhidos.
+
+As recomendações seguem esta ordem de prioridade no MVP:
+
+1. Filtragem colaborativa, baseada em similaridade entre usuários e regras inspiradas em SVD.
+2. Sinais de navegação, considerando tempo de permanência nas páginas e cliques.
+3. Histórico de interações, reforçando conteúdos já acessados pelo usuário.
+
+Além disso, o produto disponibiliza um protótipo navegável com fluxo de descoberta entre a tela principal e as páginas de espetáculo, permitindo validar a experiência e o comportamento das recomendações.
+
+## O que o produto não faz
+
+- Não cobre, neste MVP, processos transacionais, operacionais ou administrativos que extrapolem a jornada de descoberta de espetáculos.
+- Não entrega, nesta etapa, uma solução completa de gestão, análise ou automação do ecossistema do portal.
+- Não pretende substituir integralmente a curadoria humana nem eliminar a necessidade de revisão manual das recomendações quando necessário.
+
+---
+
+### 2.3.4 Objetivos Estratégicos e Mensuráveis
+
+O sucesso do produto será medido por indicadores de impacto real no comportamento do usuário e nos resultados de negócio.
+
+Esses objetivos refletem não apenas melhorias na experiência do usuário, mas também impactos diretos nos resultados de negócio, especialmente em engajamento, retenção e conversão de vendas:
+
+#### Engajamento e Experiência
+
+- Aumentar em **20%** o tempo médio de sessão  
+- Aumentar em **25%** o número de páginas por sessão  
+- Aumentar a taxa de interação com recomendações  
+
+#### Descoberta de Conteúdo
+
+- Aumentar em **30%** a navegação entre diferentes espetáculos  
+- Aumentar a diversidade de conteúdos acessados por usuário  
+- Reduzir a dependência de acessos concentrados em poucos conteúdos  
+
+#### Conversão e Valor de Negócio
+
+- Aumentar em **10% a 15%** a taxa de conversão associada a recomendações  
+- Aumentar o número de sessões que evoluem para intenção de compra  
+- Estimular a venda cruzada entre espetáculos  
+
+#### Retenção e Recorrência
+
+- Aumentar a taxa de retorno de usuários ao portal  
+- Melhorar a continuidade da jornada entre sessões  
+
+---
+
+### 2.3.5 Impacto e Abrangência
+
+A solução foi concebida para atender uma base ampla e heterogênea de usuários, com diferentes níveis de familiaridade, objetivos e contextos de uso.
+
+Ao introduzir recomendações contextualizadas, o produto:
+- Reduz barreiras de entrada para novos usuários  
+- Amplia a relevância para usuários recorrentes  
+- Adapta a experiência a diferentes momentos de navegação  
+- Garante acessibilidade e clareza na exploração de conteúdos  
+- Atende à diversidade de perfis de usuários e suas diferentes expectativas  
+
+Isso amplia significativamente o alcance e o impacto do portal como plataforma digital.
+
+---
+
+### 2.3.6 Ownership e Accountability Estratégico
+
+A responsabilidade estratégica do produto é compartilhada em duas camadas:
+
+**Stakeholders da Aventura:**
+- Validam alinhamento com objetivos de negócio  
+- Aprovam mudanças de escopo relevantes  
+- Avaliam impacto em métricas de negócio  
+
+**Equipe do Projeto:**
+- Define e prioriza funcionalidades dentro do MVP  
+- Traduz objetivos estratégicos em decisões de produto  
+- Documenta trade-offs e decisões técnicas  
+- Conduz validação da solução proposta  
+
+**Tomada de decisão:**
+- Estratégia e escopo macro -> Stakeholders Aventura  
+- Execução e priorização -> Equipe do projeto  
+- Validação de valor -> Compartilhada  
+
+Essa estrutura garante alinhamento com o negócio sem comprometer a agilidade de execução.
+
+---
+
+### 2.3.7 Alinhamento com o Problema
+
+O produto responde diretamente à ausência de um sistema estruturado de recomendação no Portal Aventura, que atualmente limita:
+
+- A descoberta de novos conteúdos  
+- O engajamento contínuo do usuário  
+- O potencial de conversão  
+
+A solução resolve esse cenário ao introduzir inteligência, conexão e orientação na jornada do usuário.
+
+---
+
+O produto posiciona o Portal Aventura como uma plataforma orientada à descoberta, capaz de transformar a forma como usuários exploram experiências culturais.
+
+Ao conectar inteligência de recomendação com objetivos de negócio, a solução não apenas melhora a experiência do usuário, mas também cria impacto direto em engajamento, retenção e conversão, consolidando o portal como um ativo estratégico da Aventura.
+
+---
 
 ## 2.4 Personas e Jornada do Usuário
 _conteúdo_
@@ -153,9 +300,32 @@ _conteúdo_
 _conteúdo_
 
 ## 4.1 Especificação da Base de Dados para Modelo de Recomendação
-_conteúdo_
-Obs.: Insira aqui informações sobre a construção do artefato da Sprint 1. 
+Este item reaproveita e formaliza as fontes de dados necessárias para o MVP de recomendações (apenas telas essenciais).
 
+Tabelas mínimas propostas:
+
+- `espetaculos` (catálogo):
+  - `id` (PK), `titulo`, `genero`, `regiao`, `tipo_producao`, `descricao_curta`, `datas_exibicao`, `imagens`, `tags` (campo para keywords/metadados).
+- `interacoes` (eventos de navegação):
+  - `event_id` (PK), `anon_user_id` (quando houver), `session_id`, `espetaculo_id` (FK), `evento` (view/click), `duracao` (segundos), `timestamp`.
+- `preferencias_iniciais` (onboarding):
+  - `anon_user_id`, `tag`, `peso` — registro das escolhas na tela de seleção de tags.
+- `agregados_item` (materialized/denormalized, apoio ao read):
+  - `espetaculo_id`, `views_total`, `avg_duracao`, `ultimo_update`.
+
+Notas de pré-processamento e uso (Sprint 1):
+
+- ETL em batch para consolidar logs de navegação e popular `interacoes` e `agregados_item` (rotina diária ou conforme necessidade).
+- Normalização de títulos e tags; extração de tokens para matching por similaridade de conteúdo.
+- Geração de matriz esparsa usuário×item (ou item×item) a partir de `interacoes` e `preferencias_iniciais` para cálculo de similaridade; aplicar SVD leve ou heurísticas de similaridade conforme escopo.
+- Privacidade: usar `anon_user_id` e evitar PII no MVP.
+
+Artefatos entregáveis nesta Sprint:
+
+- Scripts SQL de criação e carga inicial: [database/01_create_database.sql](database/01_create_database.sql) e [database/02_initial_data.sql](database/02_initial_data.sql).
+- Script/notebook de pré-processamento para geração de agregados e matrizes de similaridade.
+
+Esta especificação está alinhada com o escopo mínimo definido para as telas essenciais; melhorias (analytics, pipelines ML, integrações transacionais) ficam para fases posteriores.
 ## 4.2 Modelo Conceitual de Dados
 _conteúdo_
 
