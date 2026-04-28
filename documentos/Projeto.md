@@ -144,27 +144,27 @@ A proposta central é transformar atenção em descoberta e descoberta em conver
 ---
 
 ### 2.3.3 O que o Produto Faz e Não Faz
-
 ## O que o produto faz
- 
-- Recomenda espetáculos relacionados dentro do Portal Aventura
-- Sugere conteúdos com base em similaridade (gênero, título, região, tipo de produção)
-- Exibe recomendações na página de cada espetáculo
-- Considera interações básicas do usuário (ex: páginas visitadas)
-- Organiza espetáculos por categorias e relações entre eles
-- Apresenta listas de recomendados, como: "Você também pode gostar" ou "Espetáculos similares"
-- Implementa um algoritmo de recomendação funcional (baseado em regras do SVD)
-- Disponibiliza um protótipo navegável demonstrando as recomendações
-- Simula uma jornada de descoberta de novos espetáculos
+
+O produto implementa um sistema de recomendação focado na descoberta de espetáculos dentro do Portal Aventura, com aplicação direta nas telas em que a recomendação agrega valor à navegação:
+
+- Na `Tela principal de descoberta`, exibe listas e carrosséis de espetáculos recomendados, organizados por relações com o perfil e o comportamento do usuário.
+- Na `Sub-tela de cada espetáculo`, apresenta um carrossel de sugestões como `Espetáculos similares` ou `Você também pode gostar`, ampliando a exploração de conteúdos relacionados.
+- No `Login/Cadastro` e `Seleção de tags`, evita o cold start com coleta mínima de informações e preferências iniciais, sem sobrecarregar essas etapas com recomendações, porém garantindo que o usuário tenha acesso à peças que se encaixem nos gêneros escolhidos.
+
+As recomendações seguem esta ordem de prioridade no MVP:
+
+1. Filtragem colaborativa, baseada em similaridade entre usuários e regras inspiradas em SVD.
+2. Sinais de navegação, considerando tempo de permanência nas páginas e cliques.
+3. Histórico de interações, reforçando conteúdos já acessados pelo usuário.
+
+Além disso, o produto disponibiliza um protótipo navegável com fluxo de descoberta entre a tela principal e as páginas de espetáculo, permitindo validar a experiência e o comportamento das recomendações.
 
 ## O que o produto não faz
- 
-- Não é um sistema final em produção
-- Não utiliza Machine Learning avançado ou modelos treinados com grandes volumes de dados
-- Não realiza venda ou reserva de ingressos
-- Não possui atualização em tempo real das recomendações
-- Não implementa autenticação ou gestão de usuários
-- Não possui dashboard analítico para gestores
+
+- Não cobre, neste MVP, processos transacionais, operacionais ou administrativos que extrapolem a jornada de descoberta de espetáculos.
+- Não entrega, nesta etapa, uma solução completa de gestão, análise ou automação do ecossistema do portal.
+- Não pretende substituir integralmente a curadoria humana nem eliminar a necessidade de revisão manual das recomendações quando necessário.
 
 ---
 
@@ -300,9 +300,32 @@ _conteúdo_
 _conteúdo_
 
 ## 4.1 Especificação da Base de Dados para Modelo de Recomendação
-_conteúdo_
-Obs.: Insira aqui informações sobre a construção do artefato da Sprint 1. 
+Este item reaproveita e formaliza as fontes de dados necessárias para o MVP de recomendações (apenas telas essenciais).
 
+Tabelas mínimas propostas:
+
+- `espetaculos` (catálogo):
+  - `id` (PK), `titulo`, `genero`, `regiao`, `tipo_producao`, `descricao_curta`, `datas_exibicao`, `imagens`, `tags` (campo para keywords/metadados).
+- `interacoes` (eventos de navegação):
+  - `event_id` (PK), `anon_user_id` (quando houver), `session_id`, `espetaculo_id` (FK), `evento` (view/click), `duracao` (segundos), `timestamp`.
+- `preferencias_iniciais` (onboarding):
+  - `anon_user_id`, `tag`, `peso` — registro das escolhas na tela de seleção de tags.
+- `agregados_item` (materialized/denormalized, apoio ao read):
+  - `espetaculo_id`, `views_total`, `avg_duracao`, `ultimo_update`.
+
+Notas de pré-processamento e uso (Sprint 1):
+
+- ETL em batch para consolidar logs de navegação e popular `interacoes` e `agregados_item` (rotina diária ou conforme necessidade).
+- Normalização de títulos e tags; extração de tokens para matching por similaridade de conteúdo.
+- Geração de matriz esparsa usuário×item (ou item×item) a partir de `interacoes` e `preferencias_iniciais` para cálculo de similaridade; aplicar SVD leve ou heurísticas de similaridade conforme escopo.
+- Privacidade: usar `anon_user_id` e evitar PII no MVP.
+
+Artefatos entregáveis nesta Sprint:
+
+- Scripts SQL de criação e carga inicial: [database/01_create_database.sql](database/01_create_database.sql) e [database/02_initial_data.sql](database/02_initial_data.sql).
+- Script/notebook de pré-processamento para geração de agregados e matrizes de similaridade.
+
+Esta especificação está alinhada com o escopo mínimo definido para as telas essenciais; melhorias (analytics, pipelines ML, integrações transacionais) ficam para fases posteriores.
 ## 4.2 Modelo Conceitual de Dados
 _conteúdo_
 
