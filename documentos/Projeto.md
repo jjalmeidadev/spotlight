@@ -149,7 +149,14 @@ produtoras uma presença online estruturada e capaz de engajar o usuário além 
 compra do ingresso.
 
 
-&emsp;
+&emsp;A Aventura acumula mais de 50 produções, entre espetáculos inéditos e versões da Broadway, 
+além de parcerias com a Disney-Pixar e a responsabilidade pela produção da Cia de Ballet 
+Dallal Achcar. Com mais de 5 mil apresentações realizadas, 5 milhões de espectadores e 
+aproximadamente 16 mil empregos diretos e indiretos gerados, a empresa se consolidou também 
+como a maior gestora de naming rights em equipamentos culturais do Brasil. Esse porte e essa 
+diversidade de portfólio tornam a ausência de um sistema de recomendação digital uma lacuna 
+estratégica relevante, tanto do ponto de vista da experiência do usuário quanto do potencial 
+de geração de receita.
 
 ## 2.2 Problema
 _conteúdo_
