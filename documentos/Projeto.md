@@ -159,7 +159,19 @@ estratégica relevante, tanto do ponto de vista da experiência do usuário quan
 de geração de receita.
 
 ## 2.2 Problema
-_conteúdo_
+
+&emsp;O Portal Aventura, principal canal digital da Aventura Teatros, não conta com um sistema 
+estruturado de recomendação de espetáculos e conteúdos. Atualmente, um usuário que acessa 
+a página de um espetáculo específico encerra sua jornada naquele ponto, sem receber sugestões 
+de outras produções, sem ser conduzido a experiências relacionadas e sem estímulo para 
+explorar o ecossistema cultural que a Aventura oferece. Isso representa uma ruptura 
+significativa na jornada do usuário e uma oportunidade de conversão desperdiçada.
+
+&emsp;
+
+&emsp;
+
+&emsp;
 
 ## 2.3 Visão do Projeto e do Produto
   _conteúdo_
