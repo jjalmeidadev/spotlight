@@ -167,9 +167,16 @@ de outras produções, sem ser conduzido a experiências relacionadas e sem est�
 explorar o ecossistema cultural que a Aventura oferece. Isso representa uma ruptura 
 significativa na jornada do usuário e uma oportunidade de conversão desperdiçada.
 
-&emsp;
+&emsp;A relevância desse problema se amplifica quando considerado o porte da empresa: com mais de 
+50 produções e uma plataforma cultural diversificada, a Aventura possui um catálogo rico e 
+variado, porém subaproveitado digitalmente. A ausência de recomendações impede que esse 
+catálogo trabalhe de forma ativa na geração de novas descobertas e vendas.
 
-&emsp;
+&emsp;Os principais desafios associados ao problema incluem a heterogeneidade do público, que 
+abrange desde frequentadores assíduos de teatro até visitantes casuais sem histórico no 
+portal, a potencial escassez de dados comportamentais estruturados sobre os usuários e a 
+necessidade de que as recomendações sejam relevantes tanto para quem compra para si quanto 
+para quem adquire ingressos para terceiros.
 
 &emsp;
 
