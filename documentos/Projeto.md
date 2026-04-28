@@ -178,7 +178,12 @@ portal, a potencial escassez de dados comportamentais estruturados sobre os usu�
 necessidade de que as recomendações sejam relevantes tanto para quem compra para si quanto 
 para quem adquire ingressos para terceiros.
 
-&emsp;
+&emsp;Um sistema de recomendação bem construído pode aumentar o tempo de permanência no portal, 
+fortalecer o engajamento com o ecossistema Aventura, criar uma jornada mais fluida entre 
+produções e impulsionar a venda de ingressos, uma prioridade estratégica declarada pela 
+empresa. Além disso, o projeto se insere em um momento de rebranding da Aventura, tornando-se 
+uma ferramenta com potencial de reforçar a identidade da produtora como plataforma cultural 
+completa.
 
 ## 2.3 Visão do Projeto e do Produto
   _conteúdo_
