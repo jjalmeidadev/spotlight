@@ -133,7 +133,17 @@ ao comportamento e às preferências do usuário, criando uma jornada mais fluid
 entre as produções da Aventura.
 
 ## 2.1 Contexto da Indústria do Parceiro
-_conteúdo_
+
+&emsp;A Aventura Teatros, fundada em 2008, é referência na produção de espetáculos de teatro 
+musical no Brasil e uma das principais forças da economia criativa nacional. Liderada por 
+Aniela Jordan, Luiz Calainho e Giulia Jordan, a empresa evoluiu de produtora de espetáculos 
+para uma plataforma cultural completa, atuando na produção de festivais, gestão de 
+equipamentos culturais e formação de parcerias estratégicas com marcas de grande expressão, 
+como BTG Pactual, YouTube, Nubank, Ri Happy e TotalEnergies.
+
+&emsp;
+
+&emsp;
 
 ## 2.2 Problema
 _conteúdo_
