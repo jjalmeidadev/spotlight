@@ -92,24 +92,105 @@
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
 - [Referências](#referências)
 
-
 # 1. Introdução
-_conteúdo_
+
+&emsp;Este documento foi elaborado com o objetivo de servir como um guia completo para o leitor, 
+fornecendo uma visão ampla de todas as etapas e aspectos do projeto desenvolvido em parceria 
+com a Aventura Teatros. Nele, são apresentadas desde a descrição do parceiro envolvido e o 
+problema proposto, até as decisões estratégicas tomadas, as análises de negócio realizadas e 
+a documentação técnica relacionada à solução desenvolvida.
 
 ## 1.1 Termos e Abreviações
-_conteúdo_
+
+Abreviações utilizadas na elaboração desta documentação:
+
+| Abreviação | Significado |
+|---|---|
+| API | Application Programming Interface (Interface de Programação de Aplicação) |
+| MVP | Minimum Viable Product (Produto Mínimo Viável) |
+| UI | User Interface (Interface do Usuário) |
+| UX | User Experience (Experiência do Usuário) |
+| RF | Requisito Funcional |
+| RNF | Requisito Não Funcional |
+| REST | Representational State Transfer (Transferência de Estado Representacional) |
+| RACI | Responsible, Accountable, Consulted, Informed |
+| Sprint | Ciclo de desenvolvimento ágil |
+| SOA | Service-Oriented Architecture (Arquitetura Orientada a Serviços) |
+| Portal | Plataforma digital da Aventura Teatros voltada ao público externo |
 
 ## 1.2 Objetivo do Documento
-_conteúdo_
+
+&emsp;Este documento tem como objetivo apresentar o escopo e o propósito do projeto voltado ao 
+desenvolvimento de uma solução de recomendação de espetáculos no Portal Aventura. A principal 
+função da solução é sugerir, de forma inteligente, espetáculos, conteúdos e experiências 
+culturais alinhados ao interesse do usuário, estimulando a navegação dentro do portal e 
+aumentando o potencial de conversão em vendas de ingressos. A proposta visa contribuir para 
+a melhoria da experiência do usuário, o aumento do engajamento com o ecossistema da produtora 
+e o fortalecimento da presença digital da Aventura Teatros como plataforma cultural completa.
 
 # 2. Entendimento do Projeto e do Negócio
-_conteúdo_
+
+&emsp;O projeto consiste no desenvolvimento de uma solução digital de recomendação inteligente 
+integrada ao Portal Aventura, com o objetivo de conectar o usuário a espetáculos, conteúdos 
+e experiências culturais relevantes ao seu perfil de interesse. A iniciativa responde a uma 
+lacuna identificada na jornada digital do usuário, que atualmente não recebe sugestões ao 
+navegar pelo portal, o que reduz as oportunidades de descoberta de novos conteúdos e de 
+conversão em vendas. A solução proposta permitirá a geração de recomendações contextualizadas 
+ao comportamento e às preferências do usuário, criando uma jornada mais fluida e conectada 
+entre as produções da Aventura.
 
 ## 2.1 Contexto da Indústria do Parceiro
-_conteúdo_
+
+&emsp;A Aventura Teatros, fundada em 2008, é referência na produção de espetáculos de teatro 
+musical no Brasil e uma das principais forças da economia criativa nacional. Liderada por 
+Aniela Jordan, Luiz Calainho e Giulia Jordan, a empresa evoluiu de produtora de espetáculos 
+para uma plataforma cultural completa, atuando na produção de festivais, gestão de 
+equipamentos culturais e formação de parcerias estratégicas com marcas de grande expressão, 
+como BTG Pactual, YouTube, Nubank, Ri Happy e TotalEnergies.
+
+&emsp;O setor de entretenimento cultural no Brasil tem passado por uma transformação significativa 
+nos últimos anos, impulsionada pela retomada do consumo pós-pandemia e pela crescente 
+digitalização dos canais de relacionamento com o público. Nesse cenário, plataformas digitais 
+tornaram-se protagonistas na descoberta e no consumo de conteúdo cultural, exigindo das 
+produtoras uma presença online estruturada e capaz de engajar o usuário além do momento da 
+compra do ingresso.
+
+
+&emsp;A Aventura acumula mais de 50 produções, entre espetáculos inéditos e versões da Broadway, 
+além de parcerias com a Disney-Pixar e a responsabilidade pela produção da Cia de Ballet 
+Dallal Achcar. Com mais de 5 mil apresentações realizadas, 5 milhões de espectadores e 
+aproximadamente 16 mil empregos diretos e indiretos gerados, a empresa se consolidou também 
+como a maior gestora de naming rights em equipamentos culturais do Brasil. Esse porte e essa 
+diversidade de portfólio tornam a ausência de um sistema de recomendação digital uma lacuna 
+estratégica relevante, tanto do ponto de vista da experiência do usuário quanto do potencial 
+de geração de receita.
 
 ## 2.2 Problema
-_conteúdo_
+
+&emsp;O Portal Aventura, principal canal digital da Aventura Teatros, não conta com um sistema 
+estruturado de recomendação de espetáculos e conteúdos. Atualmente, um usuário que acessa 
+a página de um espetáculo específico encerra sua jornada naquele ponto, sem receber sugestões 
+de outras produções, sem ser conduzido a experiências relacionadas e sem estímulo para 
+explorar o ecossistema cultural que a Aventura oferece. Isso representa uma ruptura 
+significativa na jornada do usuário e uma oportunidade de conversão desperdiçada.
+
+&emsp;A relevância desse problema se amplifica quando considerado o porte da empresa: com mais de 
+50 produções e uma plataforma cultural diversificada, a Aventura possui um catálogo rico e 
+variado, porém subaproveitado digitalmente. A ausência de recomendações impede que esse 
+catálogo trabalhe de forma ativa na geração de novas descobertas e vendas.
+
+&emsp;Os principais desafios associados ao problema incluem a heterogeneidade do público, que 
+abrange desde frequentadores assíduos de teatro até visitantes casuais sem histórico no 
+portal, a potencial escassez de dados comportamentais estruturados sobre os usuários e a 
+necessidade de que as recomendações sejam relevantes tanto para quem compra para si quanto 
+para quem adquire ingressos para terceiros.
+
+&emsp;Um sistema de recomendação bem construído pode aumentar o tempo de permanência no portal, 
+fortalecer o engajamento com o ecossistema Aventura, criar uma jornada mais fluida entre 
+produções e impulsionar a venda de ingressos, uma prioridade estratégica declarada pela 
+empresa. Além disso, o projeto se insere em um momento de rebranding da Aventura, tornando-se 
+uma ferramenta com potencial de reforçar a identidade da produtora como plataforma cultural 
+completa.
 
 ## 2.3 Visão do Projeto e do Produto
 
