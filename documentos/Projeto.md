@@ -287,6 +287,26 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
+### 2.4.1.2 Mariana Lacerda Souza – Mãe em busca de experiências culturais infantis
+
+  Mariana Lacerda Souza foi desenvolvida como uma persona que representa responsáveis que desejam proporcionar experiências culturais para seus filhos, mas que possuem pouco hábito de frequentar teatros e apresentações culturais. Com 34 anos, Mariana trabalha em período integral e busca atividades de lazer que possam ser aproveitadas em família durante os finais de semana.
+
+  Apesar de utilizar aplicativos e plataformas digitais no cotidiano, Mariana prefere experiências simples, organizadas e objetivas. Sua principal dificuldade está em encontrar apresentações infantis adequadas para a idade do filho, com informações claras sobre classificação etária, duração, localização e proposta educativa do espetáculo. Muitas vezes, sente insegurança durante o processo de escolha por não conhecer previamente as peças ou não encontrar avaliações confiáveis de outros pais.
+
+  Seu comportamento de navegação é mais analítico e cauteloso, já que costuma comparar opções antes de tomar uma decisão. Mariana valoriza principalmente recomendações confiáveis, avaliações positivas e descrições claras que ajudem a identificar rapidamente se a experiência será apropriada e interessante para a criança.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao centralizar informações relevantes sobre peças infantis e oferecer recomendações personalizadas com base em faixa etária, preferências familiares e popularidade entre outros responsáveis. Além disso, a organização intuitiva das informações contribui para tornar o processo de descoberta e decisão mais rápido, seguro e confortável para usuários familiares.
+
+<div align="center">
+
+### Figura X – Persona 2 – Mariana Lacerda Souza – Mãe e usuária familiar
+
+![Persona Mariana](./img/persona2-MarianaLSouza.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
 ## 2.5 Modelagem do Fluxo de Negócio
 _conteúdo_
 
