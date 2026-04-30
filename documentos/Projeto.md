@@ -141,29 +141,30 @@ entre as produções da Aventura.
 
 ## 2.1 Contexto da Indústria do Parceiro
 
-&emsp;A Aventura Teatros, fundada em 2008, é referência na produção de espetáculos de teatro 
-musical no Brasil e uma das principais forças da economia criativa nacional. Liderada por 
-Aniela Jordan, Luiz Calainho e Giulia Jordan, a empresa evoluiu de produtora de espetáculos 
-para uma plataforma cultural completa, atuando na produção de festivais, gestão de 
-equipamentos culturais e formação de parcerias estratégicas com marcas de grande expressão, 
-como BTG Pactual, YouTube, Nubank, Ri Happy e TotalEnergies.
+A Aventura Teatros, fundada em 2008, é referência na produção de espetáculos de teatro musical no Brasil e uma das principais forças da economia criativa nacional. Liderada por Aniela Jordan, Luiz Calainho e Giulia Jordan, a empresa evoluiu de produtora de espetáculos para uma plataforma cultural completa, atuando na realização de festivais, na gestão de equipamentos culturais e na construção de parcerias estratégicas com marcas de grande expressão. Ao longo de sua trajetória, acumula mais de 50 produções, mais de 5 mil apresentações e um público superior a 5 milhões de espectadores, consolidando-se também como a maior gestora de naming rights em equipamentos culturais do país.
 
-&emsp;O setor de entretenimento cultural no Brasil tem passado por uma transformação significativa 
-nos últimos anos, impulsionada pela retomada do consumo pós-pandemia e pela crescente 
-digitalização dos canais de relacionamento com o público. Nesse cenário, plataformas digitais 
-tornaram-se protagonistas na descoberta e no consumo de conteúdo cultural, exigindo das 
-produtoras uma presença online estruturada e capaz de engajar o usuário além do momento da 
-compra do ingresso.
+Inserida nesse contexto, a Aventura atua em um setor que vem se fortalecendo nos últimos anos. O mercado de entretenimento cultural e produção de espetáculos no Brasil, especialmente no segmento de teatro musical e experiências ao vivo, tem apresentado crescimento impulsionado pela retomada do público no período pós-pandemia, pela valorização de experiências presenciais e pelo aumento do consumo de cultura como forma de lazer. Esse cenário reforça o papel estratégico de empresas que conseguem integrar produção artística de qualidade com gestão eficiente e posicionamento de mercado.
 
+Apesar desse crescimento, o setor enfrenta desafios relevantes relacionados à digitalização da experiência do usuário. Diferentemente de plataformas de streaming, que utilizam algoritmos avançados para recomendação de conteúdo, muitos portais de espetáculos ainda operam de forma estática, limitando a descoberta de novas experiências e reduzindo o potencial de engajamento e conversão. Para uma empresa com o porte e a diversidade de portfólio da Aventura, essa lacuna representa uma oportunidade estratégica clara de aprimorar a jornada do usuário e potencializar resultados de negócio por meio de soluções inteligentes de recomendação.
 
-&emsp;A Aventura acumula mais de 50 produções, entre espetáculos inéditos e versões da Broadway, 
-além de parcerias com a Disney-Pixar e a responsabilidade pela produção da Cia de Ballet 
-Dallal Achcar. Com mais de 5 mil apresentações realizadas, 5 milhões de espectadores e 
-aproximadamente 16 mil empregos diretos e indiretos gerados, a empresa se consolidou também 
-como a maior gestora de naming rights em equipamentos culturais do Brasil. Esse porte e essa 
-diversidade de portfólio tornam a ausência de um sistema de recomendação digital uma lacuna 
-estratégica relevante, tanto do ponto de vista da experiência do usuário quanto do potencial 
-de geração de receita.
+Nesse contexto, a análise do setor por meio do modelo das 5 Forças de Porter permite compreender de forma estruturada a dinâmica competitiva e os desafios enfrentados pela empresa.
+
+1. Rivalidade entre concorrentes existentes (Alta):
+O mercado de entretenimento é altamente competitivo, envolvendo não apenas outras produtoras de teatro, mas também cinemas, shows, plataformas de streaming e eventos ao vivo. Além disso, empresas que oferecem experiências digitais, como Netflix e Spotify, disputam diretamente o tempo e a atenção do consumidor. Isso exige que empresas como a Aventura invistam em diferenciação e em estratégias que aumentem o engajamento do público dentro de seus próprios canais.
+
+2. Poder de barganha dos clientes (Alto):
+Os consumidores possuem ampla variedade de opções de entretenimento e baixo custo de troca entre elas. A decisão de compra é fortemente influenciada por preço, conveniência e relevância do conteúdo. A ausência de recomendações personalizadas reduz a capacidade de retenção do usuário, tornando essencial a criação de experiências digitais mais inteligentes e direcionadas.
+
+3. Ameaça de novos entrantes (Moderada):
+Embora a produção de espetáculos envolva altos custos e barreiras operacionais, a entrada de novas plataformas digitais e iniciativas independentes de divulgação cultural tem reduzido essas barreiras. Startups e plataformas online podem atuar como intermediárias na descoberta de conteúdo, diminuindo o controle das produtoras sobre a jornada do usuário.
+
+4. Poder de barganha dos fornecedores (Moderado):
+Os principais fornecedores incluem artistas, produtores, teatros e parceiros comerciais. Como esses recursos são limitados e altamente especializados, eles possuem certo poder de negociação. Além disso, parcerias com marcas e patrocinadores são fundamentais para viabilizar grandes produções, influenciando diretamente a oferta de conteúdo.
+
+5. Ameaça de produtos substitutos (Alta):
+O principal substituto dos espetáculos presenciais são as plataformas digitais de entretenimento, como streaming de vídeo, redes sociais e jogos online. Essas alternativas oferecem conveniência e, muitas vezes, menor custo, competindo diretamente com o teatro pelo tempo do consumidor.
+
+Diante desse cenário, observa-se que o setor exige cada vez mais a integração entre experiência presencial e digital. A capacidade de recomendar conteúdos de forma personalizada torna-se um diferencial competitivo essencial, permitindo que empresas como a Aventura ampliem o engajamento do público, fortaleçam seu ecossistema de produções e aumentem a conversão de vendas. Assim, a adoção de soluções tecnológicas, como sistemas de recomendação, não é apenas uma inovação, mas uma necessidade estratégica para se manter relevante em um mercado altamente competitivo e em constante transformação.
 
 ## 2.2 Problema
 
