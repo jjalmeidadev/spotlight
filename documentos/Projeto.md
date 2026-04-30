@@ -356,8 +356,116 @@ _conteúdo_
 _conteúdo_
 Obs.: Seção dedicada a discussão sobre ideias e priorização de features.
 
-## 2.8 Canvas do Projeto
-_conteúdo_
+## 2.8 Business Model Canvas
+
+Esta seção detalha o modelo de negócios desenvolvido para o **Spotlight**, **sistema inteligente de recomendação** no **Portal Aventura**. A solução atua em duas frentes: aprimorar a experiência do usuário final e fornecer inteligência de dados para a equipe interna.
+
+<div align="center">
+
+<sub>Figura X - Business Model Canvas</sub><br>
+
+  <img src="../documentos/img/bmn.png" width="100%" alt="Business Model Canvas"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+
+### 2.8.1 Parceiros-Chave 
+
+Os parceiros estratégicos essenciais para a operação, fornecimento de dados e viabilidade do projeto:
+
+- **Aventura Teatros**: A parceira principal e dona do ecossistema. Fornece o portal, o catálogo de espetáculos e o direcionamento de negócios.
+- **Ticketeiras parceiras**: Plataformas parceiras de emissão de ingressos.
+- **Equipe de Marketing da Aventura**: Parceiro interno vital para a validação das campanhas. Atuam tanto como co-criadores das regras de negócio quanto como validadores da eficácia da segmentação gerada pelo sistema.
+
+---
+
+### 2.8.2 Atividades Principais
+
+As ações técnicas e operacionais contínuas que o sistema e a equipe devem executar para entregar a proposta de valor:
+
+- **Coleta e processamento de dados de comportamento do usuário**: Criação de pipelines de dados para capturar cliques, tempo de tela, buscas e histórico de compras. Envolve processos de ETL e higienização dos dados para garantir a qualidade das entradas.
+- **Treinamento e atualização do modelo de recomendação**: Rotinas de MLOps para retreinar os algoritmos de Machine Learning periodicamente, garantindo que as recomendações não fiquem defasadas e se adaptem a novos espetáculos e tendências de consumo.
+
+---
+
+### 2.8.3 Principais Recursos 
+
+Os ativos tecnológicos e de informação indispensáveis para o funcionamento da plataforma:
+
+- **Dados de interação do usuário**: O principal combustível do motor de recomendação. Sem um volume adequado de dados comportamentais (logs, sessões, cliques), o modelo não consegue inferir preferências.
+- **Motor de ML (Machine Learning)**: A infraestrutura de algoritmos (como filtragem colaborativa ou baseada em conteúdo) responsável por calcular a similaridade entre usuários e espetáculos, gerando as predições.
+- **Catálogo de espetáculos e metadados da Aventura**: O banco de dados estruturado contendo descrições, gêneros, elenco, datas, classificação indicativa e tags de cada peça teatral.
+
+---
+
+### 2.8.4 Propostas Principais 
+
+O valor entregue para os diferentes segmentos de clientes (espectadores e equipe interna):
+
+- **Descoberta personalizada de espetáculos**: Supera o problema da "página em branco", sugerindo peças que o usuário não procuraria ativamente, mas que se alinham perfeitamente ao seu gosto.
+- **Aumento do tempo de permanência no Portal Aventura**: Ao oferecer um feed contínuo e relevante, o usuário consome mais conteúdo sobre as produções antes de decidir.
+- **Estímulo à compra de ingressos por recomendação contextual**: Inserção de "gatilhos" de compra no momento exato de maior interesse, aumentando a taxa de conversão.
+- **Jornada cultural contínua**: Transforma uma compra isolada em um ciclo de consumo recorrente, fidelizando o cliente ao selo Aventura.
+- **Segmentação inteligente de público (B2B)**: Permite que o marketing abandone o anúncios genéricos e faça campanhas ultra-segmentadas baseadas nos clusters gerados pelo ML.
+- **Explicabilidade das recomendações**: Transparência para o usuário ("Recomendado porque você assistiu X") e para os gestores, aumentando a confiança nas predições do sistema.
+
+---
+
+### 2.8.5 Relacionamento com o Consumidor
+
+Como o sistema interage e cria laços com os usuários para melhorar a coleta de dados e a experiência:
+
+- **Onboarding de preferências**: Um formulário rápido e gamificado no primeiro acesso ou criação de conta para mitigar o problema de Cold Start.
+- **Recomendação personalizada em tempo real**: A interface do portal se molda dinamicamente conforme o usuário navega, gerando uma sensação de atendimento exclusivo.
+- **Notificações de novos espetáculos por cluster**: Engajamento ativo informando aos usuários que uma peça do seu nicho de interesse entrou em cartaz.
+
+---
+
+### 2.8.6 Canais 
+
+- **Portal Aventura**: O ponto de contato exclusivo e centralizado. Toda a inteligência do motor de recomendação será exposta no front-end deste portal, seja na home page, páginas de detalhes de peças ou no carrinho de compras.
+
+---
+
+### 2.8.7 Segmentos de Clientes 
+
+Os grupos de pessoas que a solução visa atender, divididos em perfis de consumo e usuários internos:
+
+### Consumidores Finais
+
+- Famílias com crianças (buscam classificação livre e horários diurnos).
+- Adultos fãs de musical (ticket médio maior, alta recorrência).
+- Público de ballet e clássicos (nicho específico e tradicional).
+- Jovens e público experimental (abertos a novas linguagens teatrais).
+- Visitantes esporádicos do portal (usuários não logados que precisam ser convertidos rapidamente).
+
+### Clientes Internos 
+
+- Gestores e analistas de marketing da Aventura.
+
+---
+
+### 2.8.8 Estrutura de Custos 
+
+Os principais direcionadores de despesas para manter o projeto rodando:
+
+- **Infraestrutura de nuvem**: Custos com servidores para hospedar o portal, bancos de dados para armazenar logs massivos e instâncias de computação otimizadas para treinar os modelos de Machine Learning.
+- **Desenvolvimento e manutenção do modelo de ML**: Esforço contínuo para refinar algoritmos, evitar degradação do modelo e realizar testes A/B.
+- **Horas de desenvolvimento**: Custo da equipe de engenharia de software envolvida na criação de APIs, integração com o Sympla, estruturação de banco de dados e rotinas de deploy.
+
+---
+
+### 2.8.9 Fluxos de Receita
+
+Como a solução gera valor financeiro ou reduz custos, justificando o investimento:
+
+- **Aumento de conversão em venda de ingressos**: O impacto direto das recomendações personalizadas na jornada, diminuindo a taxa de abandono do carrinho.
+- **Maior ticket médio por sessão**: Consequência de cross-sell e up-sell bem-sucedidos.
+- **Campanhas pagas eficientes**: Redução do Custo de Aquisição de Clientes e aumento do Retorno sobre Investimento em mídias pagas, utilizando os dados de segmentação para criar públicos personalizados e mais assertivos.
+
+--
 
 # 3. Requisitos do Projeto
 _conteúdo_
