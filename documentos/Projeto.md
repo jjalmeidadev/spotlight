@@ -340,14 +340,283 @@ Ao conectar inteligência de recomendação com objetivos de negócio, a soluç�
 ## 2.4 Personas e Jornada do Usuário
 _conteúdo_
 
-## 2.5 Modelagem do Fluxo de Negócio
-_conteúdo_
+## 2.5 Modelagem do Fluxo de Negócio BPMN
 
-## 2.5.1 Cadeia de Valor
-_conteúdo_
+Este documento descreve o **fluxo de negócio** modelado em **BPMN 2.0** para o sistema **Spotlight**, solução de **recomendação inteligente de espetáculos** desenvolvida para o **Portal Aventura**. O diagrama é composto por três pools que representam os três atores principais do processo: o **Cliente**, o **Sistema de Recomendação** e os **Gestores de Dados**.
+O fluxo modela a jornada completa, desde o primeiro acesso ao portal até a compra do ingresso ou avaliação do evento, integrando o **motor de ML** e o pipeline de dados que sustenta as recomendações.
 
-## 2.5.2 Fluxo de Negócio Proposto (AS-IS e TO-BE)
-_conteúdo_
+---
+
+### 2.5.1. Análise As Is / To Be — Antes e Depois do Spotlight
+
+Esta seção descreve como o processo de navegação e descoberta de espetáculos funciona **hoje** no Portal Aventura (As Is) e como ele passará a funcionar **após a implementação do Spotlight** (To Be). A comparação justifica a existência do projeto e fundamenta as decisões de design do fluxo modelado no BPMN.
+
+---
+
+#### 2.5.1.1 As Is — Como o processo funciona hoje
+
+O Portal Aventura, em seu estado atual, não possui qualquer mecanismo estruturado de recomendação ou personalização. A jornada do usuário é inteiramente linear e passiva: o visitante acessa o portal, busca ou encontra um espetáculo específico por conta própria, visualiza sua página e decide — de forma isolada e sem apoio contextual — se compra o ingresso ou abandona o portal.
+
+**Fluxo atual (As Is):**
+
+```
+Usuário acessa o portal
+        ↓
+Busca ou navega manualmente pelo catálogo
+        ↓
+Encontra (ou não) um espetáculo de interesse
+        ↓
+Visualiza a página do espetáculo
+        ↓
+Decide sozinho: compra o ingresso ou sai do portal
+```
+
+**Problemas identificados no processo atual:**
+
+| Problema | Impacto para a Aventura |
+|---|---|
+| Ausência de recomendações personalizadas | O usuário vê apenas o que buscou e não descobre outros espetáculos do catálogo |
+| Nenhuma coleta estruturada de preferências | A Aventura não sabe quais gêneros ou faixas de preço interessam a cada usuário |
+| Interações não são registradas nem aproveitadas | Cliques, visualizações e compras não geram inteligência sobre o comportamento do público |
+| Catálogo sem metadados para recomendação | Espetáculos não possuem tags, similaridades ou scores que permitam comparações automáticas |
+| Jornada encerra sem reengajamento | Após ver um espetáculo, o usuário não recebe estímulo para explorar outros e sai do portal |
+| Sem segmentação de público | A equipe de marketing não tem visibilidade sobre perfis distintos de espectadores |
+| Baixo tempo de permanência | Sem descoberta guiada, as sessões são curtas e a taxa de conversão em vendas é reduzida |
+
+---
+
+#### 2.5.1.2 To Be — Como o processo funcionará com o Spotlight
+
+Com a implementação do Spotlight, o Portal Aventura passa a operar com um sistema inteligente de recomendação que transforma a navegação passiva em uma **jornada de descoberta cultural contínua e personalizada**. O processo deixa de ser linear e passa a ser orientado a dados, com três atores integrados — Cliente, Sistema de Recomendação e Gestores de Dados — operando de forma coordenada.
+
+**Fluxo futuro (To Be) — representado no diagrama BPMN:**
+
+```
+Usuário acessa o portal
+        ↓
+Realiza cadastro (se necessário) e efetua login
+        ↓
+Declara preferências de gênero e faixa de preço
+        ↓
+Recebe recomendações personalizadas geradas pelo motor de ML
+        ↓
+Interage com as sugestões (clique, favorito, avaliação)
+        ↓
+Cada interação retroalimenta o modelo → recomendações ficam mais precisas
+        ↓
+Compra ingresso ou avalia o evento
+```
+
+**Melhorias entregues pelo Spotlight (To Be):**
+
+| Dimensão | As Is (hoje) | To Be (com Spotlight) |
+|---|---|---|
+| **Descoberta de espetáculos** | Manual, sem sugestões | Personalizada, baseada em perfil e histórico do usuário |
+| **Coleta de preferências** | Inexistente | Onboarding estruturado: gênero favorito e faixa de preço |
+| **Uso de dados comportamentais** | Não coletados | Cliques, avaliações e compras alimentam o motor de ML continuamente |
+| **Jornada no portal** | Linear e curta | Contínua — o sistema sugere o próximo espetáculo, aumentando o tempo de permanência |
+| **Apoio à decisão de compra** | Nenhum | Recomendações contextuais com justificativa ("Porque você gosta de musicais") |
+| **Catálogo de espetáculos** | Sem metadados para recomendação | Enriquecido com tags, scores de popularidade e atributos de similaridade |
+| **Segmentação de público** | Sem visibilidade | k-means agrupa automaticamente o público em clusters (Famílias, Musical Adulto, etc.) |
+| **Reengajamento pós-visita** | Inexistente | Avaliações retroalimentam o modelo e sustentam o ciclo de melhoria contínua |
+| **Inteligência de marketing** | Sem dados estruturados | Relatórios de segmentos entregues à equipe de marketing para campanhas direcionadas |
+
+---
+
+#### 2.5.1.3 Síntese da Transformação
+
+O processo **As Is** representa uma navegação passiva onde o usuário é o único responsável pela descoberta de conteúdo. A Aventura não participa ativamente dessa jornada e perde oportunidades de venda a cada sessão encerrada sem conversão.
+
+O processo **To Be**, modelado no diagrama BPMN do Spotlight, inverte essa lógica: o sistema passa a guiar ativamente o usuário, conectando preferências declaradas, comportamento real e catálogo estruturado para entregar recomendações que aumentam o engajamento, o tempo de permanência e a conversão em vendas de ingressos, transformando cada acesso ao portal em uma oportunidade de descoberta cultural.
+
+---
+
+### 2.5.2. Fluxo de Negócios BPMN
+
+Este documento descreve o fluxo de negócio modelado em BPMN 2.0 para o sistema **Spotlight**, solução de recomendação inteligente de espetáculos desenvolvida para o Portal Aventura. O diagrama é composto por **três pools** que representam os três atores principais do processo: o **Cliente**, o **Sistema de Recomendação** e os **Gestores de Dados**.
+
+O fluxo modela a jornada completa, desde o primeiro acesso ao portal até a compra do ingresso ou avaliação do evento, integrando o motor de ML e o pipeline de dados que sustenta as recomendações.
+
+Para visualizar o diagrama completo, basta acessar o [Diagrama BPMN](../documentos/img/BPMN.pdf) no repositório.
+
+---
+
+#### 2.5.2.1 Pools
+
+| Pool | Ator | Responsabilidade |
+|---|---|---|
+| **Pool 1** | Cliente | Representa toda a jornada do usuário no portal: cadastro, preferências, visualização de recomendações e interação com os espetáculos |
+| **Pool 2** | Sistema de Recomendação | Motor de ML responsável por capturar interações, analisar o perfil do usuário, gerar e exibir recomendações personalizadas |
+| **Pool 3** | Gestores de Dados | Equipe interna responsável por coletar dados de novos espetáculos, popular o banco de dados e disponibilizar o catálogo atualizado para o motor |
+
+---
+
+#### 2.5.2.2. Descrição Detalhada dos Fluxos
+
+#### Pool 1 — Cliente
+
+Este pool representa a experiência do usuário no Portal Aventura. O fluxo é iniciado quando o usuário acessa o portal e segue até uma das três ações finais possíveis: compra de ingresso, avaliação do evento ou encerramento da sessão sem engajamento.
+
+<div align="center">
+
+<sub>Figura X - Cliente </sub><br>
+ 
+  <img src="../documentos/img/pool1.png" width="100%" alt="Cliente"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Acesso ao Portal**
+O processo tem início com um evento de start representando o momento em que o usuário acessa o Portal Aventura. Este é o ponto de entrada de toda a jornada.
+
+**2. Gateway — Possui cadastro?**
+Imediatamente após o acesso, um gateway XOR verifica se o usuário já possui cadastro na plataforma:
+- **Sim** → o usuário segue diretamente para a etapa de login.
+- **Não** → o usuário é direcionado para preencher o cadastro, retornando ao fluxo principal após a conclusão.
+
+**3. Efetuar Login**
+Usuários já cadastrados realizam o login na plataforma para ter acesso ao ambiente personalizado e às recomendações vinculadas ao seu perfil.
+
+**4. Inserir Preferências**
+Após autenticado, o usuário declara suas preferências culturais, como gêneros de espetáculo de interesse. Essa etapa é fundamental para o motor de recomendação, especialmente para usuários que ainda não possuem histórico de interações (cold start).
+
+**5. Inserir Faixa de Preço**
+O usuário informa a faixa de preço que está disposto a pagar pelos ingressos. Esse filtro é utilizado pelo sistema para calibrar as recomendações geradas, garantindo que apenas espetáculos dentro do orçamento declarado sejam sugeridos.
+
+**6. Visualizar Recomendações**
+Com o perfil declarado completo, o sistema exibe as recomendações personalizadas na tela de descoberta, em formato de carrossel, com a justificativa de cada sugestão para tornar o sistema transparente ao usuário.
+
+**7. Gateway — Houve interação?**
+Um segundo gateway XOR avalia se o usuário interagiu com alguma recomendação exibida:
+- **Não** → a sessão é encerrada sem engajamento.
+- **Sim** → o usuário é direcionado para a tela de detalhes do evento.
+
+**8. Ver Detalhes do Evento**
+O usuário acessa a página descritiva do espetáculo selecionado, contendo informações como sinopse, elenco, datas, local e preço do ingresso.
+
+**9. Gateway Inclusivo**
+Um terceiro gateway inclusivo captura a decisão do usuário após visualizar os detalhes do evento:
+- **Clicar no link da ticketeira** → o usuário é redirecionado para a plataforma de venda de ingressos, onde finaliza a compra. O fluxo termina com o evento de end "Ingresso Comprado".
+- **Avaliar evento** → o usuário registra uma avaliação do espetáculo, que retroalimenta o sistema de recomendação com dados de satisfação.
+
+---
+
+#### Pool 2 — Sistema de Recomendação
+
+Este pool representa o motor de ML do Spotlight. Ele é ativado pelas interações do usuário no Pool 1 e é responsável por transformar dados de comportamento e perfil em recomendações personalizadas.
+
+<div align="center">
+
+<sub>Figura X - Sistema de Recomendação</sub><br>
+
+  <img src="../documentos/img/pool2.png" width="100%" alt="Sistema de Recomendação"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Motor ML (Start)**
+O fluxo do sistema é iniciado pelo evento de start "Motor LM", acionado quando o usuário conclui o preenchimento de suas preferências e dados de perfil no Pool 1.
+
+**2. Captura de Interações**
+O sistema captura e registra todos os eventos de comportamento do usuário: visualizações de espetáculos, cliques, tempo de permanência na página, avaliações e compras. Cada tipo de interação contribui para a construção do perfil comportamental do usuário.
+
+**3. Análise de Interações**
+Os eventos capturados são processados e classificados por tipo e relevância. Essa etapa transforma os dados brutos de comportamento em sinais estruturados que alimentam a etapa seguinte de análise de perfil.
+
+**4. Análise de Perfil**
+Com base nas interações processadas e nas preferências declaradas, o sistema constrói ou atualiza o perfil do usuário. Para novos usuários (sem histórico), a análise utiliza as preferências declaradas. Para usuários recorrentes, o perfil é enriquecido com dados comportamentais acumulados ao longo das sessões.
+
+**5. Gerar Recomendações**
+Com o perfil consolidado, o motor gera uma lista rankeada de recomendações personalizadas, acompanhada da justificativa de cada sugestão para tornar o sistema explicável ao usuário.
+
+**6. Exibir Recomendações na Tela de Descoberta**
+As recomendações geradas são entregues ao Pool 1 (tela "Visualizar Recomendações"), exibidas na interface do portal. O fluxo retorna ao controle do usuário a partir deste ponto.
+
+---
+
+#### Pool 3 — Gestores de Dados
+
+Este pool representa o processo interno da equipe de gestão de dados da Aventura, responsável por manter o catálogo de espetáculos atualizado e disponível para o motor de recomendação.
+
+<div align="center">
+
+<sub>Figura X - Gestores de Dados</sub><br>
+
+  <img src="../documentos/img/pool3.png" width="100%" alt="Gestores de Dados"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Novo Espetáculo**
+O fluxo é iniciado pelo evento de start "Novo espetáculo", acionado sempre que um novo espetáculo é produzido ou anunciado pela Aventura Teatros.
+
+**2. Coletar Dados de um Novo Espetáculo**
+A equipe realiza a coleta de todas as informações relevantes sobre o espetáculo: título, gênero, sinopse, elenco, teatro, datas de apresentação, faixa de preço e classificação etária.
+
+**3. Popular no Banco de Dados**
+Os dados coletados são inseridos e organizados no banco de dados relacional, respeitando o modelo de entidades do sistema.
+
+**4. Inserir Metadados do Espetáculo**
+Além dos dados básicos, são inseridos os metadados que alimentam o motor de recomendação: tags de categoria, palavras-chave, score de popularidade inicial e atributos de similaridade com outros espetáculos do catálogo.
+
+**5. Disponibilizar o Novo Espetáculo no Catálogo**
+O espetáculo é publicado e disponibilizado no catálogo ativo do portal. A partir deste momento, ele passa a ser elegível para aparecer nas recomendações geradas pelo motor de ML.
+
+**6. Catálogo Disponível (End)**
+O fluxo encerra com o evento de end "Catálogo disponível", sinalizando que o novo espetáculo está pronto para ser consumido pelo Pool 2.
+
+---
+
+#### 2.5.2.3. Eventos de Início e Fim
+
+| Pool | Evento de Start | Evento(s) de End |
+|---|---|---|
+| Cliente | Acesso ao Portal | Ingresso Comprado (fim positivo) / Sem engajamento (fim sem conversão) |
+| Sistema de Recomendação | Motor LM | Exibição de recomendações na tela de descoberta (entrega ao Pool 1) |
+| Gestores de Dados | Novo evento | Catálogo disponível (fim de processo interno) |
+
+---
+
+#### 2.5.2.4. Conexões Entre Pools 
+
+As conexões entre pools representam a troca de informações entre atores distintos do processo. Na notação BPMN 2.0, essas conexões são representadas por linhas tracejadas (message flows) e nunca por sequence flows, que são exclusivos de cada pool.
+
+| Origem | Destino | Informação Trafegada |
+|---|---|---|
+| Pool 1 — Cliente | Pool 2 — Sistema | Preferências declaradas e faixa de preço do usuário |
+| Pool 1 — Cliente | Pool 2 — Sistema | Eventos de interação (clique, avaliação, tempo de permanência) |
+| Pool 2 — Sistema | Pool 1 — Cliente | Lista de recomendações personalizadas com justificativas |
+| Pool 3 — Gestores de Dados | Pool 2 — Sistema | Notificação de novo espetáculo disponível no catálogo |
+
+---
+
+#### 2.5.2.5. Dados e Armazenamento
+
+| Dado | Origem | Utilização |
+|---|---|---|
+| Preferências declaradas | Pool 1 — Usuário | Alimenta a análise de perfil para usuários sem histórico (cold start) |
+| Faixa de preço | Pool 1 — Usuário | Filtro aplicado antes da geração das recomendações |
+| Interações comportamentais | Pool 1 — Usuário | Alimenta a análise de interações e enriquece o perfil do usuário |
+| Avaliações dos eventos | Pool 1 — Usuário | Retroalimenta o modelo de recomendação com dados de satisfação |
+| Metadados dos espetáculos | Pool 3 — Gestores de Dados | Base do catálogo consumida pelo motor de ML para gerar recomendações |
+
+---
+
+#### 2.5.2.6. Observações Finais
+
+- O diagrama segue a notação BPMN 2.0 com uso correto de **pools separados por ator**, **gateways XOR para decisões exclusivas** e **eventos de start e end** distintos por pool.
+- O Pool 2 apresenta uma separação clara entre **captura**, **análise de interações**, **análise de perfil** e **geração de recomendações**, o que demonstra maturidade no design do fluxo e facilita a implementação modular do motor de ML.
+- O **Pool 3 opera de forma assíncrona** em relação aos outros dois: ele é acionado sempre que há um novo espetáculo, independentemente do fluxo de navegação do usuário no portal.
+- O diagrama representa o **fluxo principal (happy path)** do sistema. Fluxos de exceção podem ser detalhados em subprocessos futuros.
+- A etapa de **Avaliar evento** no Pool 1 cria um ciclo virtuoso de retroalimentação: as avaliações dos usuários enriquecem o modelo de recomendação ao longo do tempo, tornando as sugestões progressivamente mais precisas e relevantes.
+
+---
 
 ## 2.6 Matriz de Risco do Projeto
 _conteúdo_
