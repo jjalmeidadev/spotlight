@@ -31,6 +31,13 @@
   - [2.1 Contexto da Indústria do Parceiro](#21-contexto-da-indústria-do-parceiro)
   - [2.2 Problema](#22-problema)
   - [2.3 Visão do Projeto e do Produto](#23-visão-do-projeto-e-do-produto)
+    - [2.3.1 Visão do Produto](#231-visão-do-produto)
+    - [2.3.2 Proposta de Valor](#232-proposta-de-valor)
+    - [2.3.3 O que o Produto Faz e Não Faz](#233-o-que-o-produto-faz-e-não-faz)
+    - [2.3.4 Objetivos Estratégicos e Mensuráveis](#234-objetivos-estratégicos-e-mensuráveis)
+    - [2.3.5 Impacto e Abrangência](#235-impacto-e-abrangência)
+    - [2.3.6 Ownership e Accountability Estratégico](#236-ownership-e-accountability-estratégico)
+    - [2.3.7 Alinhamento com o Problema](#237-alinhamento-com-o-problema)
   - [2.4 Personas e Jornada do Usuário](#24-personas-e-jornada-do-usuário)
   - [2.5 Modelagem do Fluxo de Negócio](#25-modelagem-do-fluxo-de-negócio)
     - [2.5.1 Cadeia de Valor](#251-cadeia-de-valor)
@@ -85,27 +92,62 @@
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
 - [Referências](#referências)
 
-
 # 1. Introdução
-_conteúdo_
+
+&emsp;Este documento foi elaborado com o objetivo de servir como um guia completo para o leitor, 
+fornecendo uma visão ampla de todas as etapas e aspectos do projeto desenvolvido em parceria 
+com a Aventura Teatros. Nele, são apresentadas desde a descrição do parceiro envolvido e o 
+problema proposto, até as decisões estratégicas tomadas, as análises de negócio realizadas e 
+a documentação técnica relacionada à solução desenvolvida.
 
 ## 1.1 Termos e Abreviações
-_conteúdo_
+
+Abreviações utilizadas na elaboração desta documentação:
+
+| Abreviação | Significado |
+|---|---|
+| API | Application Programming Interface (Interface de Programação de Aplicação) |
+| MVP | Minimum Viable Product (Produto Mínimo Viável) |
+| UI | User Interface (Interface do Usuário) |
+| UX | User Experience (Experiência do Usuário) |
+| RF | Requisito Funcional |
+| RNF | Requisito Não Funcional |
+| REST | Representational State Transfer (Transferência de Estado Representacional) |
+| RACI | Responsible, Accountable, Consulted, Informed |
+| Sprint | Ciclo de desenvolvimento ágil |
+| SOA | Service-Oriented Architecture (Arquitetura Orientada a Serviços) |
+| Portal | Plataforma digital da Aventura Teatros voltada ao público externo |
 
 ## 1.2 Objetivo do Documento
-_conteúdo_
+
+&emsp;Este documento tem como objetivo apresentar o escopo e o propósito do projeto voltado ao 
+desenvolvimento de uma solução de recomendação de espetáculos no Portal Aventura. A principal 
+função da solução é sugerir, de forma inteligente, espetáculos, conteúdos e experiências 
+culturais alinhados ao interesse do usuário, estimulando a navegação dentro do portal e 
+aumentando o potencial de conversão em vendas de ingressos. A proposta visa contribuir para 
+a melhoria da experiência do usuário, o aumento do engajamento com o ecossistema da produtora 
+e o fortalecimento da presença digital da Aventura Teatros como plataforma cultural completa.
 
 # 2. Entendimento do Projeto e do Negócio
-_conteúdo_
+
+&emsp;O projeto consiste no desenvolvimento de uma solução digital de recomendação inteligente 
+integrada ao Portal Aventura, com o objetivo de conectar o usuário a espetáculos, conteúdos 
+e experiências culturais relevantes ao seu perfil de interesse. A iniciativa responde a uma 
+lacuna identificada na jornada digital do usuário, que atualmente não recebe sugestões ao 
+navegar pelo portal, o que reduz as oportunidades de descoberta de novos conteúdos e de 
+conversão em vendas. A solução proposta permitirá a geração de recomendações contextualizadas 
+ao comportamento e às preferências do usuário, criando uma jornada mais fluida e conectada 
+entre as produções da Aventura.
 
 ## 2.1 Contexto da Indústria do Parceiro
 
+A Aventura Teatros, fundada em 2008, é referência na produção de espetáculos de teatro musical no Brasil e uma das principais forças da economia criativa nacional. Liderada por Aniela Jordan, Luiz Calainho e Giulia Jordan, a empresa evoluiu de produtora de espetáculos para uma plataforma cultural completa, atuando na realização de festivais, na gestão de equipamentos culturais e na construção de parcerias estratégicas com marcas de grande expressão. Ao longo de sua trajetória, acumula mais de 50 produções, mais de 5 mil apresentações e um público superior a 5 milhões de espectadores, consolidando-se também como a maior gestora de naming rights em equipamentos culturais do país.
 
-O setor de entretenimento cultural e produção de espetáculos no Brasil, especialmente o segmento de teatro musical e experiências ao vivo, vem se consolidando como um dos principais pilares da economia criativa nacional. Nos últimos anos, esse mercado tem apresentado crescimento impulsionado pela retomada do público pós-pandemia, pela valorização de experiências presenciais e pelo aumento do consumo de cultura como forma de lazer. Empresas como a Aventura Teatros se destacam nesse cenário ao combinar produção artística de alto nível com gestão estratégica de venues e parcerias comerciais, alcançando milhões de espectadores e movimentando cadeias econômicas relevantes.
+Inserida nesse contexto, a Aventura atua em um setor que vem se fortalecendo nos últimos anos. O mercado de entretenimento cultural e produção de espetáculos no Brasil, especialmente no segmento de teatro musical e experiências ao vivo, tem apresentado crescimento impulsionado pela retomada do público no período pós-pandemia, pela valorização de experiências presenciais e pelo aumento do consumo de cultura como forma de lazer. Esse cenário reforça o papel estratégico de empresas que conseguem integrar produção artística de qualidade com gestão eficiente e posicionamento de mercado.
 
-Apesar desse crescimento, o setor enfrenta desafios relacionados à digitalização da experiência do usuário. Diferentemente de plataformas de streaming, que utilizam algoritmos avançados para recomendação de conteúdo, muitos portais de espetáculos ainda operam de forma estática, limitando a descoberta de novas experiências e reduzindo o potencial de engajamento e conversão. Nesse contexto, a implementação de sistemas de recomendação surge como uma oportunidade estratégica para aumentar o tempo de permanência do usuário, estimular a navegação e impulsionar a venda de ingressos.
+Apesar desse crescimento, o setor enfrenta desafios relevantes relacionados à digitalização da experiência do usuário. Diferentemente de plataformas de streaming, que utilizam algoritmos avançados para recomendação de conteúdo, muitos portais de espetáculos ainda operam de forma estática, limitando a descoberta de novas experiências e reduzindo o potencial de engajamento e conversão. Para uma empresa com o porte e a diversidade de portfólio da Aventura, essa lacuna representa uma oportunidade estratégica clara de aprimorar a jornada do usuário e potencializar resultados de negócio por meio de soluções inteligentes de recomendação.
 
-A análise do setor por meio do modelo das 5 Forças de Porter permite compreender melhor a dinâmica competitiva e os desafios enfrentados pela Aventura:
+Nesse contexto, a análise do setor por meio do modelo das 5 Forças de Porter permite compreender de forma estruturada a dinâmica competitiva e os desafios enfrentados pela empresa.
 
 1. Rivalidade entre concorrentes existentes (Alta):
 O mercado de entretenimento é altamente competitivo, envolvendo não apenas outras produtoras de teatro, mas também cinemas, shows, plataformas de streaming e eventos ao vivo. Além disso, empresas que oferecem experiências digitais, como Netflix e Spotify, disputam diretamente o tempo e a atenção do consumidor. Isso exige que empresas como a Aventura invistam em diferenciação e em estratégias que aumentem o engajamento do público dentro de seus próprios canais.
@@ -125,24 +167,457 @@ O principal substituto dos espetáculos presenciais são as plataformas digitais
 Diante desse cenário, observa-se que o setor exige cada vez mais a integração entre experiência presencial e digital. A capacidade de recomendar conteúdos de forma personalizada torna-se um diferencial competitivo essencial, permitindo que empresas como a Aventura ampliem o engajamento do público, fortaleçam seu ecossistema de produções e aumentem a conversão de vendas. Assim, a adoção de soluções tecnológicas, como sistemas de recomendação, não é apenas uma inovação, mas uma necessidade estratégica para se manter relevante em um mercado altamente competitivo e em constante transformação.
 
 ## 2.2 Problema
-_conteúdo_
+
+&emsp;O Portal Aventura, principal canal digital da Aventura Teatros, não conta com um sistema 
+estruturado de recomendação de espetáculos e conteúdos. Atualmente, um usuário que acessa 
+a página de um espetáculo específico encerra sua jornada naquele ponto, sem receber sugestões 
+de outras produções, sem ser conduzido a experiências relacionadas e sem estímulo para 
+explorar o ecossistema cultural que a Aventura oferece. Isso representa uma ruptura 
+significativa na jornada do usuário e uma oportunidade de conversão desperdiçada.
+
+&emsp;A relevância desse problema se amplifica quando considerado o porte da empresa: com mais de 
+50 produções e uma plataforma cultural diversificada, a Aventura possui um catálogo rico e 
+variado, porém subaproveitado digitalmente. A ausência de recomendações impede que esse 
+catálogo trabalhe de forma ativa na geração de novas descobertas e vendas.
+
+&emsp;Os principais desafios associados ao problema incluem a heterogeneidade do público, que 
+abrange desde frequentadores assíduos de teatro até visitantes casuais sem histórico no 
+portal, a potencial escassez de dados comportamentais estruturados sobre os usuários e a 
+necessidade de que as recomendações sejam relevantes tanto para quem compra para si quanto 
+para quem adquire ingressos para terceiros.
+
+&emsp;Um sistema de recomendação bem construído pode aumentar o tempo de permanência no portal, 
+fortalecer o engajamento com o ecossistema Aventura, criar uma jornada mais fluida entre 
+produções e impulsionar a venda de ingressos, uma prioridade estratégica declarada pela 
+empresa. Além disso, o projeto se insere em um momento de rebranding da Aventura, tornando-se 
+uma ferramenta com potencial de reforçar a identidade da produtora como plataforma cultural 
+completa.
 
 ## 2.3 Visão do Projeto e do Produto
-  _conteúdo_
 
-  **Nota**: _Insira aqui informações sobre o que se trata o projeto e que valor ele vai entregar, Objetivos do Produto e O que o produto faz e não faz._
+Este tópico apresenta a visão estratégica do produto proposto, bem como seus objetivos mensuráveis, alinhando a solução ao problema identificado, às necessidades do negócio da Aventura e ao valor esperado para os usuários. A definição desses elementos é fundamental para orientar o desenvolvimento da solução, garantir coerência nas decisões de produto e estabelecer critérios claros de sucesso com base em resultados mensuráveis.
+
+A partir desse direcionamento, busca-se não apenas descrever o que será desenvolvido, mas explicitar o papel estratégico do produto dentro do ecossistema digital da Aventura, evidenciando seu impacto potencial em engajamento, descoberta de conteúdo e conversão:
+
+### 2.3.1 Visão do Produto
+
+A visão do produto é transformar o Portal Aventura de uma plataforma estática de navegação em um ambiente digital inteligente, personalizado e orientado à descoberta, capaz de conectar usuários a experiências culturais relevantes de forma contínua, contextualizada e escalável.
+
+Atualmente, a experiência do portal é fragmentada e limitada à navegação direta por páginas específicas, sem mecanismos que incentivem a exploração ou ampliem a jornada do usuário. O produto propõe uma reengenharia dessa dinâmica, introduzindo um sistema de recomendação que atua como uma camada estratégica de curadoria, responsável por guiar o usuário ao longo de uma experiência mais fluida, conectada e orientada à decisão.
+
+A solução conceitualmente funciona como uma camada de inteligência sobre o conteúdo existente, estruturando e relacionando espetáculos, conteúdos e experiências com base em critérios de relevância, contexto e comportamento. Ao fazer isso, transforma a navegação em uma jornada progressiva de descoberta, reduzindo fricções e ampliando oportunidades de engajamento.
+
+Mais do que melhorar a navegação, o produto reposiciona o Portal Aventura como um hub digital de experiências culturais, fortalecendo seu papel dentro do ecossistema da empresa e aumentando sua capacidade de gerar valor tanto para usuários quanto para o negócio.
+
+---
+
+### 2.3.2 Proposta de Valor
+
+O produto entrega valor ao:
+
+- Reduzir o esforço do usuário na descoberta de experiências culturais  
+- Aumentar a relevância do conteúdo apresentado  
+- Expandir a jornada de navegação dentro do portal  
+- Potencializar a exposição de todo o portfólio da Aventura  
+- Converter engajamento em oportunidades reais de negócio  
+
+A proposta central é transformar atenção em descoberta e descoberta em conversão.
+
+---
+
+### 2.3.3 O que o Produto Faz e Não Faz
+## O que o produto faz
+
+O produto implementa um sistema de recomendação focado na descoberta de espetáculos dentro do Portal Aventura, com aplicação direta nas telas em que a recomendação agrega valor à navegação:
+
+- Na `Tela principal de descoberta`, exibe listas e carrosséis de espetáculos recomendados, organizados por relações com o perfil e o comportamento do usuário.
+- Na `Sub-tela de cada espetáculo`, apresenta um carrossel de sugestões como `Espetáculos similares` ou `Você também pode gostar`, ampliando a exploração de conteúdos relacionados.
+- No `Login/Cadastro` e `Seleção de tags`, evita o cold start com coleta mínima de informações e preferências iniciais, sem sobrecarregar essas etapas com recomendações, porém garantindo que o usuário tenha acesso à peças que se encaixem nos gêneros escolhidos.
+
+As recomendações seguem esta ordem de prioridade no MVP:
+
+1. Filtragem colaborativa, baseada em similaridade entre usuários e regras inspiradas em SVD.
+2. Sinais de navegação, considerando tempo de permanência nas páginas e cliques.
+3. Histórico de interações, reforçando conteúdos já acessados pelo usuário.
+
+Além disso, o produto disponibiliza um protótipo navegável com fluxo de descoberta entre a tela principal e as páginas de espetáculo, permitindo validar a experiência e o comportamento das recomendações.
+
+## O que o produto não faz
+
+- Não cobre, neste MVP, processos transacionais, operacionais ou administrativos que extrapolem a jornada de descoberta de espetáculos.
+- Não entrega, nesta etapa, uma solução completa de gestão, análise ou automação do ecossistema do portal.
+- Não pretende substituir integralmente a curadoria humana nem eliminar a necessidade de revisão manual das recomendações quando necessário.
+
+---
+
+### 2.3.4 Objetivos Estratégicos e Mensuráveis
+
+O sucesso do produto será medido por indicadores de impacto real no comportamento do usuário e nos resultados de negócio.
+
+Esses objetivos refletem não apenas melhorias na experiência do usuário, mas também impactos diretos nos resultados de negócio, especialmente em engajamento, retenção e conversão de vendas:
+
+#### Engajamento e Experiência
+
+- Aumentar em **20%** o tempo médio de sessão  
+- Aumentar em **25%** o número de páginas por sessão  
+- Aumentar a taxa de interação com recomendações  
+
+#### Descoberta de Conteúdo
+
+- Aumentar em **30%** a navegação entre diferentes espetáculos  
+- Aumentar a diversidade de conteúdos acessados por usuário  
+- Reduzir a dependência de acessos concentrados em poucos conteúdos  
+
+#### Conversão e Valor de Negócio
+
+- Aumentar em **10% a 15%** a taxa de conversão associada a recomendações  
+- Aumentar o número de sessões que evoluem para intenção de compra  
+- Estimular a venda cruzada entre espetáculos  
+
+#### Retenção e Recorrência
+
+- Aumentar a taxa de retorno de usuários ao portal  
+- Melhorar a continuidade da jornada entre sessões  
+
+---
+
+### 2.3.5 Impacto e Abrangência
+
+A solução foi concebida para atender uma base ampla e heterogênea de usuários, com diferentes níveis de familiaridade, objetivos e contextos de uso.
+
+Ao introduzir recomendações contextualizadas, o produto:
+- Reduz barreiras de entrada para novos usuários  
+- Amplia a relevância para usuários recorrentes  
+- Adapta a experiência a diferentes momentos de navegação  
+- Garante acessibilidade e clareza na exploração de conteúdos  
+- Atende à diversidade de perfis de usuários e suas diferentes expectativas  
+
+Isso amplia significativamente o alcance e o impacto do portal como plataforma digital.
+
+---
+
+### 2.3.6 Ownership e Accountability Estratégico
+
+A responsabilidade estratégica do produto é compartilhada em duas camadas:
+
+**Stakeholders da Aventura:**
+- Validam alinhamento com objetivos de negócio  
+- Aprovam mudanças de escopo relevantes  
+- Avaliam impacto em métricas de negócio  
+
+**Equipe do Projeto:**
+- Define e prioriza funcionalidades dentro do MVP  
+- Traduz objetivos estratégicos em decisões de produto  
+- Documenta trade-offs e decisões técnicas  
+- Conduz validação da solução proposta  
+
+**Tomada de decisão:**
+- Estratégia e escopo macro -> Stakeholders Aventura  
+- Execução e priorização -> Equipe do projeto  
+- Validação de valor -> Compartilhada  
+
+Essa estrutura garante alinhamento com o negócio sem comprometer a agilidade de execução.
+
+---
+
+### 2.3.7 Alinhamento com o Problema
+
+O produto responde diretamente à ausência de um sistema estruturado de recomendação no Portal Aventura, que atualmente limita:
+
+- A descoberta de novos conteúdos  
+- O engajamento contínuo do usuário  
+- O potencial de conversão  
+
+A solução resolve esse cenário ao introduzir inteligência, conexão e orientação na jornada do usuário.
+
+---
+
+O produto posiciona o Portal Aventura como uma plataforma orientada à descoberta, capaz de transformar a forma como usuários exploram experiências culturais.
+
+Ao conectar inteligência de recomendação com objetivos de negócio, a solução não apenas melhora a experiência do usuário, mas também cria impacto direto em engajamento, retenção e conversão, consolidando o portal como um ativo estratégico da Aventura.
+
+---
 
 ## 2.4 Personas e Jornada do Usuário
 _conteúdo_
 
-## 2.5 Modelagem do Fluxo de Negócio
-_conteúdo_
+## 2.5 Modelagem do Fluxo de Negócio BPMN
 
-## 2.5.1 Cadeia de Valor
-_conteúdo_
+Este documento descreve o **fluxo de negócio** modelado em **BPMN 2.0** para o sistema **Spotlight**, solução de **recomendação inteligente de espetáculos** desenvolvida para o **Portal Aventura**. O diagrama é composto por três pools que representam os três atores principais do processo: o **Cliente**, o **Sistema de Recomendação** e os **Gestores de Dados**.
+O fluxo modela a jornada completa, desde o primeiro acesso ao portal até a compra do ingresso ou avaliação do evento, integrando o **motor de ML** e o pipeline de dados que sustenta as recomendações.
 
-## 2.5.2 Fluxo de Negócio Proposto (AS-IS e TO-BE)
-_conteúdo_
+---
+
+### 2.5.1. Análise As Is / To Be — Antes e Depois do Spotlight
+
+Esta seção descreve como o processo de navegação e descoberta de espetáculos funciona **hoje** no Portal Aventura (As Is) e como ele passará a funcionar **após a implementação do Spotlight** (To Be). A comparação justifica a existência do projeto e fundamenta as decisões de design do fluxo modelado no BPMN.
+
+---
+
+#### 2.5.1.1 As Is — Como o processo funciona hoje
+
+O Portal Aventura, em seu estado atual, não possui qualquer mecanismo estruturado de recomendação ou personalização. A jornada do usuário é inteiramente linear e passiva: o visitante acessa o portal, busca ou encontra um espetáculo específico por conta própria, visualiza sua página e decide — de forma isolada e sem apoio contextual — se compra o ingresso ou abandona o portal.
+
+**Fluxo atual (As Is):**
+
+```
+Usuário acessa o portal
+        ↓
+Busca ou navega manualmente pelo catálogo
+        ↓
+Encontra (ou não) um espetáculo de interesse
+        ↓
+Visualiza a página do espetáculo
+        ↓
+Decide sozinho: compra o ingresso ou sai do portal
+```
+
+**Problemas identificados no processo atual:**
+
+| Problema | Impacto para a Aventura |
+|---|---|
+| Ausência de recomendações personalizadas | O usuário vê apenas o que buscou e não descobre outros espetáculos do catálogo |
+| Nenhuma coleta estruturada de preferências | A Aventura não sabe quais gêneros ou faixas de preço interessam a cada usuário |
+| Interações não são registradas nem aproveitadas | Cliques, visualizações e compras não geram inteligência sobre o comportamento do público |
+| Catálogo sem metadados para recomendação | Espetáculos não possuem tags, similaridades ou scores que permitam comparações automáticas |
+| Jornada encerra sem reengajamento | Após ver um espetáculo, o usuário não recebe estímulo para explorar outros e sai do portal |
+| Sem segmentação de público | A equipe de marketing não tem visibilidade sobre perfis distintos de espectadores |
+| Baixo tempo de permanência | Sem descoberta guiada, as sessões são curtas e a taxa de conversão em vendas é reduzida |
+
+---
+
+#### 2.5.1.2 To Be — Como o processo funcionará com o Spotlight
+
+Com a implementação do Spotlight, o Portal Aventura passa a operar com um sistema inteligente de recomendação que transforma a navegação passiva em uma **jornada de descoberta cultural contínua e personalizada**. O processo deixa de ser linear e passa a ser orientado a dados, com três atores integrados — Cliente, Sistema de Recomendação e Gestores de Dados — operando de forma coordenada.
+
+**Fluxo futuro (To Be) — representado no diagrama BPMN:**
+
+```
+Usuário acessa o portal
+        ↓
+Realiza cadastro (se necessário) e efetua login
+        ↓
+Declara preferências de gênero e faixa de preço
+        ↓
+Recebe recomendações personalizadas geradas pelo motor de ML
+        ↓
+Interage com as sugestões (clique, favorito, avaliação)
+        ↓
+Cada interação retroalimenta o modelo → recomendações ficam mais precisas
+        ↓
+Compra ingresso ou avalia o evento
+```
+
+**Melhorias entregues pelo Spotlight (To Be):**
+
+| Dimensão | As Is (hoje) | To Be (com Spotlight) |
+|---|---|---|
+| **Descoberta de espetáculos** | Manual, sem sugestões | Personalizada, baseada em perfil e histórico do usuário |
+| **Coleta de preferências** | Inexistente | Onboarding estruturado: gênero favorito e faixa de preço |
+| **Uso de dados comportamentais** | Não coletados | Cliques, avaliações e compras alimentam o motor de ML continuamente |
+| **Jornada no portal** | Linear e curta | Contínua — o sistema sugere o próximo espetáculo, aumentando o tempo de permanência |
+| **Apoio à decisão de compra** | Nenhum | Recomendações contextuais com justificativa ("Porque você gosta de musicais") |
+| **Catálogo de espetáculos** | Sem metadados para recomendação | Enriquecido com tags, scores de popularidade e atributos de similaridade |
+| **Segmentação de público** | Sem visibilidade | k-means agrupa automaticamente o público em clusters (Famílias, Musical Adulto, etc.) |
+| **Reengajamento pós-visita** | Inexistente | Avaliações retroalimentam o modelo e sustentam o ciclo de melhoria contínua |
+| **Inteligência de marketing** | Sem dados estruturados | Relatórios de segmentos entregues à equipe de marketing para campanhas direcionadas |
+
+---
+
+#### 2.5.1.3 Síntese da Transformação
+
+O processo **As Is** representa uma navegação passiva onde o usuário é o único responsável pela descoberta de conteúdo. A Aventura não participa ativamente dessa jornada e perde oportunidades de venda a cada sessão encerrada sem conversão.
+
+O processo **To Be**, modelado no diagrama BPMN do Spotlight, inverte essa lógica: o sistema passa a guiar ativamente o usuário, conectando preferências declaradas, comportamento real e catálogo estruturado para entregar recomendações que aumentam o engajamento, o tempo de permanência e a conversão em vendas de ingressos, transformando cada acesso ao portal em uma oportunidade de descoberta cultural.
+
+---
+
+### 2.5.2. Fluxo de Negócios BPMN
+
+Este documento descreve o fluxo de negócio modelado em BPMN 2.0 para o sistema **Spotlight**, solução de recomendação inteligente de espetáculos desenvolvida para o Portal Aventura. O diagrama é composto por **três pools** que representam os três atores principais do processo: o **Cliente**, o **Sistema de Recomendação** e os **Gestores de Dados**.
+
+O fluxo modela a jornada completa, desde o primeiro acesso ao portal até a compra do ingresso ou avaliação do evento, integrando o motor de ML e o pipeline de dados que sustenta as recomendações.
+
+Para visualizar o diagrama completo, basta acessar o [Diagrama BPMN](../documentos/img/BPMN.pdf) no repositório.
+
+---
+
+#### 2.5.2.1 Pools
+
+| Pool | Ator | Responsabilidade |
+|---|---|---|
+| **Pool 1** | Cliente | Representa toda a jornada do usuário no portal: cadastro, preferências, visualização de recomendações e interação com os espetáculos |
+| **Pool 2** | Sistema de Recomendação | Motor de ML responsável por capturar interações, analisar o perfil do usuário, gerar e exibir recomendações personalizadas |
+| **Pool 3** | Gestores de Dados | Equipe interna responsável por coletar dados de novos espetáculos, popular o banco de dados e disponibilizar o catálogo atualizado para o motor |
+
+---
+
+#### 2.5.2.2. Descrição Detalhada dos Fluxos
+
+#### Pool 1 — Cliente
+
+Este pool representa a experiência do usuário no Portal Aventura. O fluxo é iniciado quando o usuário acessa o portal e segue até uma das três ações finais possíveis: compra de ingresso, avaliação do evento ou encerramento da sessão sem engajamento.
+
+<div align="center">
+
+<sub>Figura X - Cliente </sub><br>
+ 
+  <img src="../documentos/img/pool1.png" width="100%" alt="Cliente"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Acesso ao Portal**
+O processo tem início com um evento de start representando o momento em que o usuário acessa o Portal Aventura. Este é o ponto de entrada de toda a jornada.
+
+**2. Gateway — Possui cadastro?**
+Imediatamente após o acesso, um gateway XOR verifica se o usuário já possui cadastro na plataforma:
+- **Sim** → o usuário segue diretamente para a etapa de login.
+- **Não** → o usuário é direcionado para preencher o cadastro, retornando ao fluxo principal após a conclusão.
+
+**3. Efetuar Login**
+Usuários já cadastrados realizam o login na plataforma para ter acesso ao ambiente personalizado e às recomendações vinculadas ao seu perfil.
+
+**4. Inserir Preferências**
+Após autenticado, o usuário declara suas preferências culturais, como gêneros de espetáculo de interesse. Essa etapa é fundamental para o motor de recomendação, especialmente para usuários que ainda não possuem histórico de interações (cold start).
+
+**5. Inserir Faixa de Preço**
+O usuário informa a faixa de preço que está disposto a pagar pelos ingressos. Esse filtro é utilizado pelo sistema para calibrar as recomendações geradas, garantindo que apenas espetáculos dentro do orçamento declarado sejam sugeridos.
+
+**6. Visualizar Recomendações**
+Com o perfil declarado completo, o sistema exibe as recomendações personalizadas na tela de descoberta, em formato de carrossel, com a justificativa de cada sugestão para tornar o sistema transparente ao usuário.
+
+**7. Gateway — Houve interação?**
+Um segundo gateway XOR avalia se o usuário interagiu com alguma recomendação exibida:
+- **Não** → a sessão é encerrada sem engajamento.
+- **Sim** → o usuário é direcionado para a tela de detalhes do evento.
+
+**8. Ver Detalhes do Evento**
+O usuário acessa a página descritiva do espetáculo selecionado, contendo informações como sinopse, elenco, datas, local e preço do ingresso.
+
+**9. Gateway Inclusivo**
+Um terceiro gateway inclusivo captura a decisão do usuário após visualizar os detalhes do evento:
+- **Clicar no link da ticketeira** → o usuário é redirecionado para a plataforma de venda de ingressos, onde finaliza a compra. O fluxo termina com o evento de end "Ingresso Comprado".
+- **Avaliar evento** → o usuário registra uma avaliação do espetáculo, que retroalimenta o sistema de recomendação com dados de satisfação.
+
+---
+
+#### Pool 2 — Sistema de Recomendação
+
+Este pool representa o motor de ML do Spotlight. Ele é ativado pelas interações do usuário no Pool 1 e é responsável por transformar dados de comportamento e perfil em recomendações personalizadas.
+
+<div align="center">
+
+<sub>Figura X - Sistema de Recomendação</sub><br>
+
+  <img src="../documentos/img/pool2.png" width="100%" alt="Sistema de Recomendação"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Motor ML (Start)**
+O fluxo do sistema é iniciado pelo evento de start "Motor LM", acionado quando o usuário conclui o preenchimento de suas preferências e dados de perfil no Pool 1.
+
+**2. Captura de Interações**
+O sistema captura e registra todos os eventos de comportamento do usuário: visualizações de espetáculos, cliques, tempo de permanência na página, avaliações e compras. Cada tipo de interação contribui para a construção do perfil comportamental do usuário.
+
+**3. Análise de Interações**
+Os eventos capturados são processados e classificados por tipo e relevância. Essa etapa transforma os dados brutos de comportamento em sinais estruturados que alimentam a etapa seguinte de análise de perfil.
+
+**4. Análise de Perfil**
+Com base nas interações processadas e nas preferências declaradas, o sistema constrói ou atualiza o perfil do usuário. Para novos usuários (sem histórico), a análise utiliza as preferências declaradas. Para usuários recorrentes, o perfil é enriquecido com dados comportamentais acumulados ao longo das sessões.
+
+**5. Gerar Recomendações**
+Com o perfil consolidado, o motor gera uma lista rankeada de recomendações personalizadas, acompanhada da justificativa de cada sugestão para tornar o sistema explicável ao usuário.
+
+**6. Exibir Recomendações na Tela de Descoberta**
+As recomendações geradas são entregues ao Pool 1 (tela "Visualizar Recomendações"), exibidas na interface do portal. O fluxo retorna ao controle do usuário a partir deste ponto.
+
+---
+
+#### Pool 3 — Gestores de Dados
+
+Este pool representa o processo interno da equipe de gestão de dados da Aventura, responsável por manter o catálogo de espetáculos atualizado e disponível para o motor de recomendação.
+
+<div align="center">
+
+<sub>Figura X - Gestores de Dados</sub><br>
+
+  <img src="../documentos/img/pool3.png" width="100%" alt="Gestores de Dados"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Novo Espetáculo**
+O fluxo é iniciado pelo evento de start "Novo espetáculo", acionado sempre que um novo espetáculo é produzido ou anunciado pela Aventura Teatros.
+
+**2. Coletar Dados de um Novo Espetáculo**
+A equipe realiza a coleta de todas as informações relevantes sobre o espetáculo: título, gênero, sinopse, elenco, teatro, datas de apresentação, faixa de preço e classificação etária.
+
+**3. Popular no Banco de Dados**
+Os dados coletados são inseridos e organizados no banco de dados relacional, respeitando o modelo de entidades do sistema.
+
+**4. Inserir Metadados do Espetáculo**
+Além dos dados básicos, são inseridos os metadados que alimentam o motor de recomendação: tags de categoria, palavras-chave, score de popularidade inicial e atributos de similaridade com outros espetáculos do catálogo.
+
+**5. Disponibilizar o Novo Espetáculo no Catálogo**
+O espetáculo é publicado e disponibilizado no catálogo ativo do portal. A partir deste momento, ele passa a ser elegível para aparecer nas recomendações geradas pelo motor de ML.
+
+**6. Catálogo Disponível (End)**
+O fluxo encerra com o evento de end "Catálogo disponível", sinalizando que o novo espetáculo está pronto para ser consumido pelo Pool 2.
+
+---
+
+#### 2.5.2.3. Eventos de Início e Fim
+
+| Pool | Evento de Start | Evento(s) de End |
+|---|---|---|
+| Cliente | Acesso ao Portal | Ingresso Comprado (fim positivo) / Sem engajamento (fim sem conversão) |
+| Sistema de Recomendação | Motor LM | Exibição de recomendações na tela de descoberta (entrega ao Pool 1) |
+| Gestores de Dados | Novo evento | Catálogo disponível (fim de processo interno) |
+
+---
+
+#### 2.5.2.4. Conexões Entre Pools 
+
+As conexões entre pools representam a troca de informações entre atores distintos do processo. Na notação BPMN 2.0, essas conexões são representadas por linhas tracejadas (message flows) e nunca por sequence flows, que são exclusivos de cada pool.
+
+| Origem | Destino | Informação Trafegada |
+|---|---|---|
+| Pool 1 — Cliente | Pool 2 — Sistema | Preferências declaradas e faixa de preço do usuário |
+| Pool 1 — Cliente | Pool 2 — Sistema | Eventos de interação (clique, avaliação, tempo de permanência) |
+| Pool 2 — Sistema | Pool 1 — Cliente | Lista de recomendações personalizadas com justificativas |
+| Pool 3 — Gestores de Dados | Pool 2 — Sistema | Notificação de novo espetáculo disponível no catálogo |
+
+---
+
+#### 2.5.2.5. Dados e Armazenamento
+
+| Dado | Origem | Utilização |
+|---|---|---|
+| Preferências declaradas | Pool 1 — Usuário | Alimenta a análise de perfil para usuários sem histórico (cold start) |
+| Faixa de preço | Pool 1 — Usuário | Filtro aplicado antes da geração das recomendações |
+| Interações comportamentais | Pool 1 — Usuário | Alimenta a análise de interações e enriquece o perfil do usuário |
+| Avaliações dos eventos | Pool 1 — Usuário | Retroalimenta o modelo de recomendação com dados de satisfação |
+| Metadados dos espetáculos | Pool 3 — Gestores de Dados | Base do catálogo consumida pelo motor de ML para gerar recomendações |
+
+---
+
+#### 2.5.2.6. Observações Finais
+
+- O diagrama segue a notação BPMN 2.0 com uso correto de **pools separados por ator**, **gateways XOR para decisões exclusivas** e **eventos de start e end** distintos por pool.
+- O Pool 2 apresenta uma separação clara entre **captura**, **análise de interações**, **análise de perfil** e **geração de recomendações**, o que demonstra maturidade no design do fluxo e facilita a implementação modular do motor de ML.
+- O **Pool 3 opera de forma assíncrona** em relação aos outros dois: ele é acionado sempre que há um novo espetáculo, independentemente do fluxo de navegação do usuário no portal.
+- O diagrama representa o **fluxo principal (happy path)** do sistema. Fluxos de exceção podem ser detalhados em subprocessos futuros.
+- A etapa de **Avaliar evento** no Pool 1 cria um ciclo virtuoso de retroalimentação: as avaliações dos usuários enriquecem o modelo de recomendação ao longo do tempo, tornando as sugestões progressivamente mais precisas e relevantes.
+
+---
 
 ## 2.6 Matriz de Risco do Projeto
 _conteúdo_
@@ -151,14 +626,192 @@ _conteúdo_
 _conteúdo_
 Obs.: Seção dedicada a discussão sobre ideias e priorização de features.
 
-## 2.8 Canvas do Projeto
-_conteúdo_
+## 2.8 Business Model Canvas
+
+Esta seção detalha o modelo de negócios desenvolvido para o **Spotlight**, **sistema inteligente de recomendação** no **Portal Aventura**. A solução atua em duas frentes: aprimorar a experiência do usuário final e fornecer inteligência de dados para a equipe interna.
+
+<div align="center">
+
+<sub>Figura X - Business Model Canvas</sub><br>
+
+  <img src="../documentos/img/bmn.png" width="100%" alt="Business Model Canvas"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+
+### 2.8.1 Parceiros-Chave 
+
+Os parceiros estratégicos essenciais para a operação, fornecimento de dados e viabilidade do projeto:
+
+- **Aventura Teatros**: A parceira principal e dona do ecossistema. Fornece o portal, o catálogo de espetáculos e o direcionamento de negócios.
+- **Ticketeiras parceiras**: Plataformas parceiras de emissão de ingressos.
+- **Equipe de Marketing da Aventura**: Parceiro interno vital para a validação das campanhas. Atuam tanto como co-criadores das regras de negócio quanto como validadores da eficácia da segmentação gerada pelo sistema.
+
+---
+
+### 2.8.2 Atividades Principais
+
+As ações técnicas e operacionais contínuas que o sistema e a equipe devem executar para entregar a proposta de valor:
+
+- **Coleta e processamento de dados de comportamento do usuário**: Criação de pipelines de dados para capturar cliques, tempo de tela, buscas e histórico de compras. Envolve processos de ETL e higienização dos dados para garantir a qualidade das entradas.
+- **Treinamento e atualização do modelo de recomendação**: Rotinas de MLOps para retreinar os algoritmos de Machine Learning periodicamente, garantindo que as recomendações não fiquem defasadas e se adaptem a novos espetáculos e tendências de consumo.
+
+---
+
+### 2.8.3 Principais Recursos 
+
+Os ativos tecnológicos e de informação indispensáveis para o funcionamento da plataforma:
+
+- **Dados de interação do usuário**: O principal combustível do motor de recomendação. Sem um volume adequado de dados comportamentais (logs, sessões, cliques), o modelo não consegue inferir preferências.
+- **Motor de ML (Machine Learning)**: A infraestrutura de algoritmos (como filtragem colaborativa ou baseada em conteúdo) responsável por calcular a similaridade entre usuários e espetáculos, gerando as predições.
+- **Catálogo de espetáculos e metadados da Aventura**: O banco de dados estruturado contendo descrições, gêneros, elenco, datas, classificação indicativa e tags de cada peça teatral.
+
+---
+
+### 2.8.4 Propostas Principais 
+
+O valor entregue para os diferentes segmentos de clientes (espectadores e equipe interna):
+
+- **Descoberta personalizada de espetáculos**: Supera o problema da "página em branco", sugerindo peças que o usuário não procuraria ativamente, mas que se alinham perfeitamente ao seu gosto.
+- **Aumento do tempo de permanência no Portal Aventura**: Ao oferecer um feed contínuo e relevante, o usuário consome mais conteúdo sobre as produções antes de decidir.
+- **Estímulo à compra de ingressos por recomendação contextual**: Inserção de "gatilhos" de compra no momento exato de maior interesse, aumentando a taxa de conversão.
+- **Jornada cultural contínua**: Transforma uma compra isolada em um ciclo de consumo recorrente, fidelizando o cliente ao selo Aventura.
+- **Segmentação inteligente de público (B2B)**: Permite que o marketing abandone o anúncios genéricos e faça campanhas ultra-segmentadas baseadas nos clusters gerados pelo ML.
+- **Explicabilidade das recomendações**: Transparência para o usuário ("Recomendado porque você assistiu X") e para os gestores, aumentando a confiança nas predições do sistema.
+
+---
+
+### 2.8.5 Relacionamento com o Consumidor
+
+Como o sistema interage e cria laços com os usuários para melhorar a coleta de dados e a experiência:
+
+- **Onboarding de preferências**: Um formulário rápido e gamificado no primeiro acesso ou criação de conta para mitigar o problema de Cold Start.
+- **Recomendação personalizada em tempo real**: A interface do portal se molda dinamicamente conforme o usuário navega, gerando uma sensação de atendimento exclusivo.
+- **Notificações de novos espetáculos por cluster**: Engajamento ativo informando aos usuários que uma peça do seu nicho de interesse entrou em cartaz.
+
+---
+
+### 2.8.6 Canais 
+
+- **Portal Aventura**: O ponto de contato exclusivo e centralizado. Toda a inteligência do motor de recomendação será exposta no front-end deste portal, seja na home page, páginas de detalhes de peças ou no carrinho de compras.
+
+---
+
+### 2.8.7 Segmentos de Clientes 
+
+Os grupos de pessoas que a solução visa atender, divididos em perfis de consumo e usuários internos:
+
+### Consumidores Finais
+
+- Famílias com crianças (buscam classificação livre e horários diurnos).
+- Adultos fãs de musical (ticket médio maior, alta recorrência).
+- Público de ballet e clássicos (nicho específico e tradicional).
+- Jovens e público experimental (abertos a novas linguagens teatrais).
+- Visitantes esporádicos do portal (usuários não logados que precisam ser convertidos rapidamente).
+
+### Clientes Internos 
+
+- Gestores e analistas de marketing da Aventura.
+
+---
+
+### 2.8.8 Estrutura de Custos 
+
+Os principais direcionadores de despesas para manter o projeto rodando:
+
+- **Infraestrutura de nuvem**: Custos com servidores para hospedar o portal, bancos de dados para armazenar logs massivos e instâncias de computação otimizadas para treinar os modelos de Machine Learning.
+- **Desenvolvimento e manutenção do modelo de ML**: Esforço contínuo para refinar algoritmos, evitar degradação do modelo e realizar testes A/B.
+- **Horas de desenvolvimento**: Custo da equipe de engenharia de software envolvida na criação de APIs, integração com o Sympla, estruturação de banco de dados e rotinas de deploy.
+
+---
+
+### 2.8.9 Fluxos de Receita
+
+Como a solução gera valor financeiro ou reduz custos, justificando o investimento:
+
+- **Aumento de conversão em venda de ingressos**: O impacto direto das recomendações personalizadas na jornada, diminuindo a taxa de abandono do carrinho.
+- **Maior ticket médio por sessão**: Consequência de cross-sell e up-sell bem-sucedidos.
+- **Campanhas pagas eficientes**: Redução do Custo de Aquisição de Clientes e aumento do Retorno sobre Investimento em mídias pagas, utilizando os dados de segmentação para criar públicos personalizados e mais assertivos.
+
+--
 
 # 3. Requisitos do Projeto
 _conteúdo_
 
 ## 3.1 Requisitos Funcionais (RFs)
-_conteúdo_ 
+
+ &emsp; Os requisitos funcionais representam as funcionalidades que o sistema deverá oferecer para atender os objetivos e necessidades dos usuários da plataforma de recomendação de espetáculos da Aventura. Cada requisito define uma funcionalidade essencial do sistema, considerando tanto a experiência do usuário quanto os mecanismos de recomendação e gestão administrativa. Os testes descritos incluem pré-condição, procedimento, resultado esperado e pós-condição, garantindo a validação das funcionalidades implementadas.
+
+<div align="center"> <sub>Tabela X - Requisitos funcionais</sub>
+
+
+## Requisitos Funcionais
+
+### Autenticação e Perfil
+
+| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------|---------------|
+| RF01 | Como usuário, eu quero me cadastrar na plataforma informando meus dados pessoais (como nome, email e senha) para acessar funcionalidades personalizadas e utilizar o sistema de recomendação. | Usuário não autenticado. | Inserir dados válidos e inválidos e submeter cadastro. | Usuário cadastrado com sucesso quando dados são válidos; mensagens de erro exibidas para campos inválidos. | Usuário registrado no sistema. |
+| RF02 | Como usuário, eu quero realizar login informando meu email e senha para acessar minha conta e meus dados personalizados. | Usuário previamente cadastrado. | Inserir credenciais válidas e inválidas. | Acesso permitido com credenciais válidas; erro exibido para dados incorretos. | Sessão autenticada iniciada. |
+| RF03 | Como usuário, eu quero definir minhas preferências (como gênero, faixa de preço e localização) para receber recomendações mais relevantes e alinhadas ao meu perfil. | Usuário autenticado. | Selecionar preferências e salvar. | Preferências armazenadas corretamente no sistema. | Perfil do usuário atualizado. |
+
+---
+
+### Exploração e Navegação
+
+| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------|---------------|
+| RF04 | Como usuário, eu quero visualizar recomendações personalizadas com base no meu perfil e comportamento na plataforma para descobrir espetáculos alinhados aos meus interesses. | Usuário autenticado com ou sem histórico de interações. | Acessar tela inicial do sistema. | Lista com no mínimo 5 recomendações exibida, ordenada por relevância, contendo título, categoria, data e indicação de personalização (ex: “baseado nas suas preferências”). | Recomendações exibidas ao usuário. |
+| RF05 | Como usuário, eu quero pesquisar espetáculos por nome ou palavra-chave para encontrar conteúdos específicos. | Base de espetáculos disponível. | Inserir termo de busca válido e inválido. | Lista de resultados correspondente ao termo pesquisado ou mensagem de “nenhum resultado encontrado”. | Lista filtrada exibida. |
+| RF06 | Como usuário, eu quero filtrar espetáculos por categoria, data e faixa de preço para refinar minha busca. | Lista de espetáculos carregada. | Aplicar diferentes combinações de filtros. | Lista atualizada conforme filtros selecionados. | Lista refinada exibida ao usuário. |
+
+---
+
+### Conteúdo
+
+| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------|---------------|
+| RF07 | Como usuário, eu quero visualizar detalhes completos de um espetáculo para avaliar se tenho interesse em assisti-lo. | Espetáculo disponível no sistema. | Acessar página de detalhes do espetáculo. | Exibição de informações completas como descrição, categoria, data, horário, preço e local. | Dados apresentados ao usuário. |
+| RF08 | Como usuário, eu quero visualizar avaliações de outros usuários para apoiar minha decisão sobre assistir ou não a um espetáculo. | Avaliações cadastradas para o espetáculo. | Acessar seção de avaliações. | Lista de avaliações exibida corretamente, contendo nota e comentário. | Avaliações visíveis ao usuário. |
+
+---
+
+### Engajamento
+
+| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------|---------------|
+| RF09 | Como usuário, eu quero avaliar espetáculos atribuindo uma nota para expressar minha opinião e contribuir com o sistema. | Usuário autenticado. | Inserir nota válida e submeter. | Avaliação registrada corretamente no sistema. | Avaliação armazenada. |
+| RF10 | Como usuário, eu quero comentar sobre espetáculos para compartilhar minha experiência com outros usuários. | Usuário autenticado. | Inserir comentário válido e enviar. | Comentário exibido corretamente na página do espetáculo. | Comentário registrado no sistema. |
+
+---
+
+### Coleta de Dados
+
+| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------|---------------|
+| RF11 | Como sistema, eu quero registrar interações dos usuários (como cliques, buscas, visualizações e avaliações) para alimentar e melhorar continuamente o algoritmo de recomendação. | Usuário interagindo com a plataforma. | Realizar diferentes tipos de interação no sistema. | Registro contendo ID do usuário, ID do espetáculo, tipo de ação e timestamp, sem impacto perceptível na navegação. | Dados armazenados para uso no algoritmo. |
+
+---
+
+### Recomendação
+
+| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------|---------------|
+| RF12 | Como sistema, eu quero gerar recomendações personalizadas com base nas preferências declaradas e no histórico de interações do usuário para oferecer sugestões relevantes e contextualizadas. | Dados de preferências e histórico disponíveis. | Gerar recomendações para usuário com histórico. | Lista de recomendações personalizada exibida corretamente. | Recomendações geradas. |
+| RF13 | Como sistema, eu quero atualizar as recomendações após novas interações do usuário para tornar as sugestões progressivamente mais precisas ao longo do uso. | Novas interações registradas. | Realizar nova interação e atualizar recomendações. | Recomendações ajustadas conforme comportamento recente do usuário. | Recomendações atualizadas. |
+| RF14 | Como sistema, eu quero recomendar conteúdos com base em usuários com perfis e comportamentos semelhantes (filtragem colaborativa). | Base de usuários com interações registrada. | Comparar perfis e gerar recomendações. | Itens recomendados com base na similaridade entre usuários. | Recomendações exibidas. |
+| RF15 | Como sistema, eu quero recomendar conteúdos populares para usuários com pouco ou nenhum histórico de interação. | Usuário novo ou com baixa interação. | Acessar sistema com usuário sem histórico. | Lista de recomendações baseada em popularidade exibida. | Recomendações exibidas ao usuário. |
+
+---
+
+### Administração
+
+| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------|---------------|
+| RF16 | Como administrador, eu quero gerenciar conteúdos da plataforma (espetáculos, categorias e avaliações) para garantir a atualização, consistência e qualidade das informações exibidas aos usuários. | Administrador autenticado. | Criar, editar e remover conteúdos no sistema. | Alterações refletidas corretamente na plataforma. | Sistema atualizado. |
+</div>
 
 ## 3.2 Requisitos Não Funcionais (RNFs)
 _conteúdo_
@@ -176,9 +829,32 @@ _conteúdo_
 _conteúdo_
 
 ## 4.1 Especificação da Base de Dados para Modelo de Recomendação
-_conteúdo_
-Obs.: Insira aqui informações sobre a construção do artefato da Sprint 1. 
+Este item reaproveita e formaliza as fontes de dados necessárias para o MVP de recomendações (apenas telas essenciais).
 
+Tabelas mínimas propostas:
+
+- `espetaculos` (catálogo):
+  - `id` (PK), `titulo`, `genero`, `regiao`, `tipo_producao`, `descricao_curta`, `datas_exibicao`, `imagens`, `tags` (campo para keywords/metadados).
+- `interacoes` (eventos de navegação):
+  - `event_id` (PK), `anon_user_id` (quando houver), `session_id`, `espetaculo_id` (FK), `evento` (view/click), `duracao` (segundos), `timestamp`.
+- `preferencias_iniciais` (onboarding):
+  - `anon_user_id`, `tag`, `peso` — registro das escolhas na tela de seleção de tags.
+- `agregados_item` (materialized/denormalized, apoio ao read):
+  - `espetaculo_id`, `views_total`, `avg_duracao`, `ultimo_update`.
+
+Notas de pré-processamento e uso (Sprint 1):
+
+- ETL em batch para consolidar logs de navegação e popular `interacoes` e `agregados_item` (rotina diária ou conforme necessidade).
+- Normalização de títulos e tags; extração de tokens para matching por similaridade de conteúdo.
+- Geração de matriz esparsa usuário×item (ou item×item) a partir de `interacoes` e `preferencias_iniciais` para cálculo de similaridade; aplicar SVD leve ou heurísticas de similaridade conforme escopo.
+- Privacidade: usar `anon_user_id` e evitar PII no MVP.
+
+Artefatos entregáveis nesta Sprint:
+
+- Scripts SQL de criação e carga inicial: [database/01_create_database.sql](database/01_create_database.sql) e [database/02_initial_data.sql](database/02_initial_data.sql).
+- Script/notebook de pré-processamento para geração de agregados e matrizes de similaridade.
+
+Esta especificação está alinhada com o escopo mínimo definido para as telas essenciais; melhorias (analytics, pipelines ML, integrações transacionais) ficam para fases posteriores.
 ## 4.2 Modelo Conceitual de Dados
 _conteúdo_
 
