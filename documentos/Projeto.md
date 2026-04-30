@@ -367,6 +367,26 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
+### 2.4.1.6 Carlos Nóbrega – Idoso interessado em teatro
+
+  Carlos Nóbrega foi desenvolvido como uma persona que representa usuários idosos interessados em atividades culturais, especialmente teatro, mas que possuem baixa familiaridade com tecnologias digitais mais complexas. Aos 67 anos e já aposentado, Carlos valoriza experiências culturais, porém prefere soluções práticas que facilitem o acesso a essas atividades.
+
+  Embora reconheça a conveniência das plataformas online para compra de ingressos, Carlos enfrenta dificuldades ao lidar com interfaces confusas, excesso de informações e fluxos de navegação complexos. Esse cenário gera insegurança, principalmente no momento da escolha do espetáculo e da finalização da compra, aumentando o receio de cometer erros.
+
+  Seu comportamento de navegação é mais cauteloso e gradual, priorizando clareza, simplicidade e organização. Carlos tende a evitar explorar muitas opções e prefere tomar decisões com base em informações diretas e fáceis de compreender.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao oferecer uma experiência simplificada, com navegação intuitiva, recomendações claras e informações objetivas sobre os espetáculos. A redução da complexidade e o foco na acessibilidade contribuem para que Carlos consiga encontrar uma peça com segurança e concluir sua jornada de compra de maneira tranquila e eficiente.
+
+<div align="center">
+
+### Figura X – Persona 6 – Carlos Nóbrega – Idoso interessado em teatro
+
+![Persona Carlos](./img/persona6-CarlosNobrega.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
 ## 2.5 Modelagem do Fluxo de Negócio
 _conteúdo_
 
