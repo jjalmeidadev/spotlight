@@ -347,6 +347,26 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
+### 2.4.1.5 Cintia Araújo Sena – Administradora da plataforma
+
+  Cintia Araújo Sena foi desenvolvida como uma persona que representa o perfil administrativo responsável pela gestão e análise de desempenho da plataforma Aventura. Atuando como administradora do sistema, Cintia tem como principal objetivo avaliar se as recomendações oferecidas estão impactando positivamente na conversão de vendas e na descoberta de novos espetáculos pelos usuários.
+
+  Com nível técnico médio a alto, Cintia possui familiaridade com ferramentas digitais e análise de dados, utilizando métricas e relatórios com frequência para embasar suas decisões. No entanto, enfrenta dificuldades relacionadas à falta de clareza e organização dessas informações, o que dificulta a visualização do impacto real das recomendações e do comportamento dos usuários dentro da plataforma.
+
+  Seu comportamento é orientado por dados, priorizando dashboards objetivos, diretos e de fácil interpretação. Cintia valoriza especialmente a agilidade na obtenção de insights, pois isso influencia diretamente sua capacidade de tomada de decisão estratégica.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao oferecer dashboards claros, com métricas bem definidas e visualizações intuitivas. A disponibilização de indicadores de conversão, engajamento e ეფექტividade das recomendações permite que Cintia acompanhe o desempenho do sistema de forma eficiente, identifique oportunidades de melhoria e valide o impacto das funcionalidades implementadas.
+
+<div align="center">
+
+### Figura X – Persona 5 – Cintia Araújo Sena – Administradora da plataforma
+
+![Persona Cintia](./img/persona5-CintiaASena.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
 ## 2.5 Modelagem do Fluxo de Negócio
 _conteúdo_
 
