@@ -377,6 +377,20 @@ Fonte: Material produzido pelos autores (2026).
 
   Nesse contexto, elementos como avaliações, classificação etária e organização das informações desempenham papel essencial para aumentar sua confiança e facilitar o planejamento de atividades culturais em família.
 
+### 2.4.2.3 Ronaldo Benito Soares
+
+Abaixo a imagem da jornada da persona Ronaldo Benito Soares (turista cultural):
+
+### Figura X – Jornada do Usuário (Ronaldo Benito Soares)
+
+![Jornada Ronaldo](./img/UJ-Ronaldo-Soares.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Ronaldo busca praticidade e clareza na navegação, apresentando menor tolerância a interfaces complexas. Seu principal objetivo é encontrar rapidamente apresentações culturais alinhadas ao seu perfil e disponíveis durante sua estadia.
+
+  Suas dificuldades estão relacionadas à sobrecarga de informações e à falta de direcionamento claro, o que pode comprometer sua experiência. Assim, a organização da plataforma e a relevância das recomendações são fatores essenciais para garantir uma navegação eficiente e satisfatória.
+
 ---
 
 ## 2.5 Modelagem do Fluxo de Negócio
