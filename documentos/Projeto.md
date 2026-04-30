@@ -363,6 +363,21 @@ Fonte: Material produzido pelos autores (2026).
 
 ---
 
+### 2.4.2.2 Mariana Lacerda Souza
+
+Abaixo a imagem da jornada da persona Mariana Lacerda Souza (usuária familiar):
+
+### Figura X – Jornada do Usuário (Mariana Lacerda Souza)
+
+![Jornada Mariana](./img/UJ-Mariana-Souza.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Ao longo de sua jornada, Mariana apresenta um comportamento mais cauteloso e orientado à decisão segura, priorizando informações claras e confiáveis sobre as apresentações infantis. Suas principais dificuldades estão relacionadas à identificação rápida de conteúdos adequados para crianças e à falta de informações objetivas que garantam segurança na escolha.
+
+  Nesse contexto, elementos como avaliações, classificação etária e organização das informações desempenham papel essencial para aumentar sua confiança e facilitar o planejamento de atividades culturais em família.
+
+---
 
 ## 2.5 Modelagem do Fluxo de Negócio
 _conteúdo_
