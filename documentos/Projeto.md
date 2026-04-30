@@ -338,7 +338,31 @@ Ao conectar inteligência de recomendação com objetivos de negócio, a soluç�
 ---
 
 ## 2.4 Personas e Jornada do Usuário
-_conteúdo_
+
+## 2.4.2 Jornada do Usuário
+
+  A seguir, são apresentadas as jornadas do usuário desenvolvidas para as personas do projeto. As jornadas foram construídas com o objetivo de mapear a experiência dos usuários durante o processo de descoberta, análise e decisão de consumo de apresentações teatrais dentro da plataforma.
+
+  As jornadas permitem identificar pontos de fricção, dificuldades na busca por informações e oportunidades de melhoria relacionadas à recomendação de conteúdo, organização das informações e tomada de decisão. Além disso, evidenciam como diferentes perfis de usuários interagem com o sistema, considerando seus níveis de familiaridade tecnológica, objetivos e comportamentos.
+
+---
+
+### 2.4.2.1 Ana Clara Amaral
+
+Abaixo a imagem da jornada da persona Ana Clara Amaral (usuária jovem interessada em teatro):
+
+### Figura X – Jornada do Usuário (Ana Clara Amaral)
+
+![Jornada Ana Clara](./img/UJ-Ana-Amaral.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Ana Clara demonstra um comportamento exploratório e dinâmico, navegando rapidamente pela plataforma em busca de conteúdos que estejam alinhados aos seus interesses. Suas principais dificuldades estão relacionadas à descoberta de peças relevantes e à necessidade de compreender rapidamente as informações para compartilhar com amigos ou familiares.
+
+  A experiência da usuária é fortemente impactada pela qualidade das recomendações e pela clareza das descrições dos espetáculos, sendo esses fatores determinantes para seu engajamento e tomada de decisão.
+
+---
+
 
 ## 2.5 Modelagem do Fluxo de Negócio
 _conteúdo_
