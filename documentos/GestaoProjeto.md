@@ -1,26 +1,19 @@
-<Table>
-  <tr>
-    <td><a href= "https://www.btgpactual.com/"><img src="img/logo-btg.png" alt="Centro Paula Souza" border="0"></td>
-    <td>
-      <a href= "https://www.inteli.edu.br/"><img src="img/logo-Inteli.png" alt="Inteli - Instituto de Tecnologia e Liderança" border="0"></a>
-    </td>
-  </tr>
-</table>
 
-# Nome do Projeto: <nome do projeto>
 
-## Nome do Grupo: <nome do grupo>
+# Nome do Projeto: SpotLight <nome do projeto>
+
+## Nome do Grupo: <nome do grupo> Dora
 
 ## Integrantes:
 
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
+- <a href="https://www.linkedin.com/in/celsojwnior/">Celso</a>
+- <a href="https://www.linkedin.com/in/jaimeandradedealmeida/">Jaime</a>
+- <a href="https://www.linkedin.com/in/leonardoramosvieira/">Leonardo</a>
+- <a href="https://www.linkedin.com/in/marianalacerdareis/">Mariana Lacerda</a>
+- <a href="https://www.linkedin.com/in/mariana-pereira-de-souza1/">Mariana Pereira</a>
+- <a href="https://www.linkedin.com/in/rafael-figueiredo-campos-72131735b/">Rafael</a>
+- <a href="https://www.linkedin.com/in/vitor-ribeiro-ms/">Vitor</a>
+
 
 
 # Sumário
@@ -113,7 +106,7 @@ O backlog da Sprint 2 foi estruturado seguindo uma lógica de dependência técn
 | T2   | Diagrama UML |  | M | Alta | A Fazer |
 | T3   | Definição de Tecnologias |  | M | Alta | A Fazer |
 | T4   | Implementação do Modelo de Recomendação |  | G | Média | A Fazer |
-| T5   | Wireframes |  | P | Média | A Fazer |
+| T5   | Wireframes |  | M | Média | A Fazer |
 | T6   | Mockups |  | M | Média | A Fazer |
 | T7   | Revisão e documentação |  | P | Alta | A Fazer |
 
