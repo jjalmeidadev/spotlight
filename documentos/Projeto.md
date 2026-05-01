@@ -141,29 +141,30 @@ entre as produções da Aventura.
 
 ## 2.1 Contexto da Indústria do Parceiro
 
-&emsp;A Aventura Teatros, fundada em 2008, é referência na produção de espetáculos de teatro 
-musical no Brasil e uma das principais forças da economia criativa nacional. Liderada por 
-Aniela Jordan, Luiz Calainho e Giulia Jordan, a empresa evoluiu de produtora de espetáculos 
-para uma plataforma cultural completa, atuando na produção de festivais, gestão de 
-equipamentos culturais e formação de parcerias estratégicas com marcas de grande expressão, 
-como BTG Pactual, YouTube, Nubank, Ri Happy e TotalEnergies.
+A Aventura Teatros, fundada em 2008, é referência na produção de espetáculos de teatro musical no Brasil e uma das principais forças da economia criativa nacional. Liderada por Aniela Jordan, Luiz Calainho e Giulia Jordan, a empresa evoluiu de produtora de espetáculos para uma plataforma cultural completa, atuando na realização de festivais, na gestão de equipamentos culturais e na construção de parcerias estratégicas com marcas de grande expressão. Ao longo de sua trajetória, acumula mais de 50 produções, mais de 5 mil apresentações e um público superior a 5 milhões de espectadores, consolidando-se também como a maior gestora de naming rights em equipamentos culturais do país.
 
-&emsp;O setor de entretenimento cultural no Brasil tem passado por uma transformação significativa 
-nos últimos anos, impulsionada pela retomada do consumo pós-pandemia e pela crescente 
-digitalização dos canais de relacionamento com o público. Nesse cenário, plataformas digitais 
-tornaram-se protagonistas na descoberta e no consumo de conteúdo cultural, exigindo das 
-produtoras uma presença online estruturada e capaz de engajar o usuário além do momento da 
-compra do ingresso.
+Inserida nesse contexto, a Aventura atua em um setor que vem se fortalecendo nos últimos anos. O mercado de entretenimento cultural e produção de espetáculos no Brasil, especialmente no segmento de teatro musical e experiências ao vivo, tem apresentado crescimento impulsionado pela retomada do público no período pós-pandemia, pela valorização de experiências presenciais e pelo aumento do consumo de cultura como forma de lazer. Esse cenário reforça o papel estratégico de empresas que conseguem integrar produção artística de qualidade com gestão eficiente e posicionamento de mercado.
 
+Apesar desse crescimento, o setor enfrenta desafios relevantes relacionados à digitalização da experiência do usuário. Diferentemente de plataformas de streaming, que utilizam algoritmos avançados para recomendação de conteúdo, muitos portais de espetáculos ainda operam de forma estática, limitando a descoberta de novas experiências e reduzindo o potencial de engajamento e conversão. Para uma empresa com o porte e a diversidade de portfólio da Aventura, essa lacuna representa uma oportunidade estratégica clara de aprimorar a jornada do usuário e potencializar resultados de negócio por meio de soluções inteligentes de recomendação.
 
-&emsp;A Aventura acumula mais de 50 produções, entre espetáculos inéditos e versões da Broadway, 
-além de parcerias com a Disney-Pixar e a responsabilidade pela produção da Cia de Ballet 
-Dallal Achcar. Com mais de 5 mil apresentações realizadas, 5 milhões de espectadores e 
-aproximadamente 16 mil empregos diretos e indiretos gerados, a empresa se consolidou também 
-como a maior gestora de naming rights em equipamentos culturais do Brasil. Esse porte e essa 
-diversidade de portfólio tornam a ausência de um sistema de recomendação digital uma lacuna 
-estratégica relevante, tanto do ponto de vista da experiência do usuário quanto do potencial 
-de geração de receita.
+Nesse contexto, a análise do setor por meio do modelo das 5 Forças de Porter permite compreender de forma estruturada a dinâmica competitiva e os desafios enfrentados pela empresa.
+
+1. Rivalidade entre concorrentes existentes (Alta):
+O mercado de entretenimento é altamente competitivo, envolvendo não apenas outras produtoras de teatro, mas também cinemas, shows, plataformas de streaming e eventos ao vivo. Além disso, empresas que oferecem experiências digitais, como Netflix e Spotify, disputam diretamente o tempo e a atenção do consumidor. Isso exige que empresas como a Aventura invistam em diferenciação e em estratégias que aumentem o engajamento do público dentro de seus próprios canais.
+
+2. Poder de barganha dos clientes (Alto):
+Os consumidores possuem ampla variedade de opções de entretenimento e baixo custo de troca entre elas. A decisão de compra é fortemente influenciada por preço, conveniência e relevância do conteúdo. A ausência de recomendações personalizadas reduz a capacidade de retenção do usuário, tornando essencial a criação de experiências digitais mais inteligentes e direcionadas.
+
+3. Ameaça de novos entrantes (Moderada):
+Embora a produção de espetáculos envolva altos custos e barreiras operacionais, a entrada de novas plataformas digitais e iniciativas independentes de divulgação cultural tem reduzido essas barreiras. Startups e plataformas online podem atuar como intermediárias na descoberta de conteúdo, diminuindo o controle das produtoras sobre a jornada do usuário.
+
+4. Poder de barganha dos fornecedores (Moderado):
+Os principais fornecedores incluem artistas, produtores, teatros e parceiros comerciais. Como esses recursos são limitados e altamente especializados, eles possuem certo poder de negociação. Além disso, parcerias com marcas e patrocinadores são fundamentais para viabilizar grandes produções, influenciando diretamente a oferta de conteúdo.
+
+5. Ameaça de produtos substitutos (Alta):
+O principal substituto dos espetáculos presenciais são as plataformas digitais de entretenimento, como streaming de vídeo, redes sociais e jogos online. Essas alternativas oferecem conveniência e, muitas vezes, menor custo, competindo diretamente com o teatro pelo tempo do consumidor.
+
+Diante desse cenário, observa-se que o setor exige cada vez mais a integração entre experiência presencial e digital. A capacidade de recomendar conteúdos de forma personalizada torna-se um diferencial competitivo essencial, permitindo que empresas como a Aventura ampliem o engajamento do público, fortaleçam seu ecossistema de produções e aumentem a conversão de vendas. Assim, a adoção de soluções tecnológicas, como sistemas de recomendação, não é apenas uma inovação, mas uma necessidade estratégica para se manter relevante em um mercado altamente competitivo e em constante transformação.
 
 ## 2.2 Problema
 
@@ -441,14 +442,411 @@ Fonte: Material produzido pelos autores (2026).
 
 ---
 
-## 2.5 Modelagem do Fluxo de Negócio
-_conteúdo_
+  Considerando a diversidade de públicos que consomem apresentações culturais e utilizam plataformas digitais para descoberta de eventos, foram desenvolvidas diferentes personas para o projeto. Essas personas representam perfis variados de usuários, permitindo compreender comportamentos, necessidades, dificuldades e expectativas relacionadas ao processo de descoberta e escolha de apresentações teatrais.
 
-## 2.5.1 Cadeia de Valor
-_conteúdo_
+  A construção das personas teve como objetivo auxiliar nas decisões de experiência do usuário, personalização das recomendações e definição das funcionalidades da plataforma. Além disso, os perfis desenvolvidos ajudam a identificar diferentes níveis de familiaridade tecnológica e padrões de navegação, garantindo que o sistema seja acessível e relevante para públicos distintos.
 
-## 2.5.2 Fluxo de Negócio Proposto (AS-IS e TO-BE)
-_conteúdo_
+  Dessa forma, as personas representam usuários reais em potencial da plataforma, contribuindo para o desenvolvimento de uma experiência mais intuitiva, personalizada e alinhada às necessidades do público-alvo do projeto.
+
+---
+
+### 2.4.1.1 Ana Clara Amaral – Estudante e interessada em teatro
+
+  Ana Clara Amaral foi desenvolvida como uma das principais personas do projeto, representando um perfil jovem, conectado digitalmente e interessado em arte e teatro. Estudante do segundo ano do ensino médio e aluna de uma escola de teatro, Ana Clara já teve contato com apresentações culturais anteriormente, mas ainda enfrenta dificuldades para encontrar espetáculos alinhados aos seus gostos pessoais.
+
+  Por estar constantemente conectada às redes sociais, especialmente por meio do celular, Ana Clara possui alta familiaridade com ambientes digitais e espera experiências rápidas, intuitivas e visualmente atrativas. Seu comportamento é fortemente influenciado por tendências culturais, indicações de amigos e conteúdos compartilhados online. Apesar disso, sente frustração ao precisar procurar informações em diferentes plataformas ou descobrir peças interessantes apenas após saírem de cartaz.
+
+  Outro fator importante em seu perfil é a dependência de amigos ou familiares para frequentar apresentações. Dessa forma, Ana Clara valoriza descrições claras, avaliações e informações objetivas sobre os espetáculos, pois frequentemente precisa convencer outras pessoas a acompanhá-la. Isso faz com que a confiança nas recomendações e a facilidade de compartilhamento sejam aspectos fundamentais em sua experiência.
+
+  Assim, a plataforma busca atender diretamente às necessidades dessa persona ao centralizar informações culturais, oferecer recomendações personalizadas com base em seus interesses e facilitar a descoberta de novas apresentações de maneira dinâmica e acessível. Dessa forma, o sistema contribui para aumentar o engajamento cultural da usuária e tornar o processo de escolha de peças mais simples, rápido e alinhado ao seu perfil.
+
+<div align="center">
+
+### Figura X – Persona 1 – Ana Clara Amaral – Estudante e interessada em teatro
+
+![Persona Ana Clara](./img/persona1-AnaAmaral.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+### 2.4.1.2 Mariana Lacerda Souza – Mãe em busca de experiências culturais infantis
+
+  Mariana Lacerda Souza foi desenvolvida como uma persona que representa responsáveis que desejam proporcionar experiências culturais para seus filhos, mas que possuem pouco hábito de frequentar teatros e apresentações culturais. Com 34 anos, Mariana trabalha em período integral e busca atividades de lazer que possam ser aproveitadas em família durante os finais de semana.
+
+  Apesar de utilizar aplicativos e plataformas digitais no cotidiano, Mariana prefere experiências simples, organizadas e objetivas. Sua principal dificuldade está em encontrar apresentações infantis adequadas para a idade do filho, com informações claras sobre classificação etária, duração, localização e proposta educativa do espetáculo. Muitas vezes, sente insegurança durante o processo de escolha por não conhecer previamente as peças ou não encontrar avaliações confiáveis de outros pais.
+
+  Seu comportamento de navegação é mais analítico e cauteloso, já que costuma comparar opções antes de tomar uma decisão. Mariana valoriza principalmente recomendações confiáveis, avaliações positivas e descrições claras que ajudem a identificar rapidamente se a experiência será apropriada e interessante para a criança.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao centralizar informações relevantes sobre peças infantis e oferecer recomendações personalizadas com base em faixa etária, preferências familiares e popularidade entre outros responsáveis. Além disso, a organização intuitiva das informações contribui para tornar o processo de descoberta e decisão mais rápido, seguro e confortável para usuários familiares.
+
+<div align="center">
+
+### Figura X – Persona 2 – Mariana Lacerda Souza – Mãe e usuária familiar
+
+![Persona Mariana](./img/persona2-MarianaLSouza.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+### 2.4.1.3 Ronaldo Benito Soares – Turista cultural interessado em teatro
+
+  Ronaldo Benito Soares foi desenvolvido como uma persona que representa usuários interessados em experiências culturais durante viagens e períodos de turismo. Aos 36 anos, Ronaldo possui grande interesse por arte, teatro e atividades culturais, enxergando essas experiências como uma forma de conhecer melhor os locais que visita e enriquecer sua vivência turística.
+
+  Apesar de seu forte interesse cultural, Ronaldo possui baixa familiaridade com plataformas digitais mais complexas. Utiliza aplicativos básicos no cotidiano, mas demonstra dificuldade e insegurança diante de interfaces com excesso de informações, muitos passos ou navegação pouco intuitiva. Por esse motivo, tende a abandonar rapidamente plataformas que dificultam a busca por informações relevantes.
+
+  Durante suas viagens, Ronaldo procura apresentações alinhadas aos seus gostos pessoais, como peças dramáticas, clássicas e produções culturalmente reconhecidas. Seu processo de decisão é fortemente influenciado por descrições claras, avaliações de outros usuários e recomendações que demonstrem relevância cultural. Além disso, valoriza praticidade ao organizar seus passeios, buscando opções compatíveis com sua localização e disponibilidade de tempo.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao oferecer recomendações personalizadas com base em preferências culturais, localização e disponibilidade de sessões. A organização simplificada das informações e a facilidade de navegação contribuem para que Ronaldo consiga descobrir apresentações relevantes de maneira rápida e segura, melhorando sua experiência turística e cultural na cidade.
+
+<div align="center">
+
+### Figura X – Persona 3 – Ronaldo Benito Soares – Turista cultural interessado em teatro
+
+![Persona Ronaldo](./img/persona3-RonaldoSoares.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+### 2.4.1.4 Pedro Henrique Lima – Universitário iniciante no teatro
+
+  Pedro Henrique Lima foi desenvolvido como uma persona que representa jovens universitários com alto nível de familiaridade digital, mas que ainda não possuem experiência prévia com o universo teatral. Com 21 anos e estudante de Engenharia de Software no Inteli, Pedro está constantemente inserido em ambientes tecnológicos e acostumado a consumir conteúdo digital de forma rápida e objetiva.
+
+  Apesar de já ter recebido indicações de amigos sobre peças teatrais como forma de estimular a criatividade, Pedro encontra dificuldades em dar o primeiro passo nesse universo. Sua principal barreira está na ausência de direcionamento claro e na dificuldade em identificar quais espetáculos são mais adequados para iniciantes. O excesso de opções disponíveis, sem uma curadoria eficiente, gera indecisão e insegurança, aumentando o receio de ter uma primeira experiência negativa.
+
+  Seu comportamento de navegação é dinâmico e superficial, priorizando conteúdos visuais, objetivos e de fácil compreensão. Pedro raramente consome textos longos e tende a tomar decisões com base em validação social, como avaliações, लोकप्रियidade e recomendações de outros usuários.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao oferecer recomendações personalizadas com base em seus interesses — como tecnologia, criatividade e humor — além de apresentar uma curadoria específica para iniciantes. A disponibilização de informações rápidas, objetivas e com forte validação social contribui para aumentar sua confiança na escolha e incentivar sua entrada no universo teatral.
+
+<div align="center">
+
+### Figura X – Persona 4 – Pedro Henrique Lima – Universitário iniciante no teatro
+
+![Persona Pedro](./img/persona4-PedroHLima.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+### 2.4.1.5 Cintia Araújo Sena – Administradora da plataforma
+
+  Cintia Araújo Sena foi desenvolvida como uma persona que representa o perfil administrativo responsável pela gestão e análise de desempenho da plataforma Aventura. Atuando como administradora do sistema, Cintia tem como principal objetivo avaliar se as recomendações oferecidas estão impactando positivamente na conversão de vendas e na descoberta de novos espetáculos pelos usuários.
+
+  Com nível técnico médio a alto, Cintia possui familiaridade com ferramentas digitais e análise de dados, utilizando métricas e relatórios com frequência para embasar suas decisões. No entanto, enfrenta dificuldades relacionadas à falta de clareza e organização dessas informações, o que dificulta a visualização do impacto real das recomendações e do comportamento dos usuários dentro da plataforma.
+
+  Seu comportamento é orientado por dados, priorizando dashboards objetivos, diretos e de fácil interpretação. Cintia valoriza especialmente a agilidade na obtenção de insights, pois isso influencia diretamente sua capacidade de tomada de decisão estratégica.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao oferecer dashboards claros, com métricas bem definidas e visualizações intuitivas. A disponibilização de indicadores de conversão, engajamento e ეფექტividade das recomendações permite que Cintia acompanhe o desempenho do sistema de forma eficiente, identifique oportunidades de melhoria e valide o impacto das funcionalidades implementadas.
+
+<div align="center">
+
+### Figura X – Persona 5 – Cintia Araújo Sena – Administradora da plataforma
+
+![Persona Cintia](./img/persona5-CintiaASena.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+### 2.4.1.6 Carlos Nóbrega – Idoso interessado em teatro
+
+  Carlos Nóbrega foi desenvolvido como uma persona que representa usuários idosos interessados em atividades culturais, especialmente teatro, mas que possuem baixa familiaridade com tecnologias digitais mais complexas. Aos 67 anos e já aposentado, Carlos valoriza experiências culturais, porém prefere soluções práticas que facilitem o acesso a essas atividades.
+
+  Embora reconheça a conveniência das plataformas online para compra de ingressos, Carlos enfrenta dificuldades ao lidar com interfaces confusas, excesso de informações e fluxos de navegação complexos. Esse cenário gera insegurança, principalmente no momento da escolha do espetáculo e da finalização da compra, aumentando o receio de cometer erros.
+
+  Seu comportamento de navegação é mais cauteloso e gradual, priorizando clareza, simplicidade e organização. Carlos tende a evitar explorar muitas opções e prefere tomar decisões com base em informações diretas e fáceis de compreender.
+
+  Dessa forma, a plataforma busca atender às necessidades dessa persona ao oferecer uma experiência simplificada, com navegação intuitiva, recomendações claras e informações objetivas sobre os espetáculos. A redução da complexidade e o foco na acessibilidade contribuem para que Carlos consiga encontrar uma peça com segurança e concluir sua jornada de compra de maneira tranquila e eficiente.
+
+<div align="center">
+
+### Figura X – Persona 6 – Carlos Nóbrega – Idoso interessado em teatro
+
+![Persona Carlos](./img/persona6-CarlosNobrega.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+## 2.5 Modelagem do Fluxo de Negócio BPMN
+
+Este documento descreve o **fluxo de negócio** modelado em **BPMN 2.0** para o sistema **Spotlight**, solução de **recomendação inteligente de espetáculos** desenvolvida para o **Portal Aventura**. O diagrama é composto por três pools que representam os três atores principais do processo: o **Cliente**, o **Sistema de Recomendação** e os **Gestores de Dados**.
+O fluxo modela a jornada completa, desde o primeiro acesso ao portal até a compra do ingresso ou avaliação do evento, integrando o **motor de ML** e o pipeline de dados que sustenta as recomendações.
+
+---
+
+### 2.5.1. Análise As Is / To Be — Antes e Depois do Spotlight
+
+Esta seção descreve como o processo de navegação e descoberta de espetáculos funciona **hoje** no Portal Aventura (As Is) e como ele passará a funcionar **após a implementação do Spotlight** (To Be). A comparação justifica a existência do projeto e fundamenta as decisões de design do fluxo modelado no BPMN.
+
+---
+
+#### 2.5.1.1 As Is — Como o processo funciona hoje
+
+O Portal Aventura, em seu estado atual, não possui qualquer mecanismo estruturado de recomendação ou personalização. A jornada do usuário é inteiramente linear e passiva: o visitante acessa o portal, busca ou encontra um espetáculo específico por conta própria, visualiza sua página e decide — de forma isolada e sem apoio contextual — se compra o ingresso ou abandona o portal.
+
+**Fluxo atual (As Is):**
+
+```
+Usuário acessa o portal
+        ↓
+Busca ou navega manualmente pelo catálogo
+        ↓
+Encontra (ou não) um espetáculo de interesse
+        ↓
+Visualiza a página do espetáculo
+        ↓
+Decide sozinho: compra o ingresso ou sai do portal
+```
+
+**Problemas identificados no processo atual:**
+
+| Problema | Impacto para a Aventura |
+|---|---|
+| Ausência de recomendações personalizadas | O usuário vê apenas o que buscou e não descobre outros espetáculos do catálogo |
+| Nenhuma coleta estruturada de preferências | A Aventura não sabe quais gêneros ou faixas de preço interessam a cada usuário |
+| Interações não são registradas nem aproveitadas | Cliques, visualizações e compras não geram inteligência sobre o comportamento do público |
+| Catálogo sem metadados para recomendação | Espetáculos não possuem tags, similaridades ou scores que permitam comparações automáticas |
+| Jornada encerra sem reengajamento | Após ver um espetáculo, o usuário não recebe estímulo para explorar outros e sai do portal |
+| Sem segmentação de público | A equipe de marketing não tem visibilidade sobre perfis distintos de espectadores |
+| Baixo tempo de permanência | Sem descoberta guiada, as sessões são curtas e a taxa de conversão em vendas é reduzida |
+
+---
+
+#### 2.5.1.2 To Be — Como o processo funcionará com o Spotlight
+
+Com a implementação do Spotlight, o Portal Aventura passa a operar com um sistema inteligente de recomendação que transforma a navegação passiva em uma **jornada de descoberta cultural contínua e personalizada**. O processo deixa de ser linear e passa a ser orientado a dados, com três atores integrados — Cliente, Sistema de Recomendação e Gestores de Dados — operando de forma coordenada.
+
+**Fluxo futuro (To Be) — representado no diagrama BPMN:**
+
+```
+Usuário acessa o portal
+        ↓
+Realiza cadastro (se necessário) e efetua login
+        ↓
+Declara preferências de gênero e faixa de preço
+        ↓
+Recebe recomendações personalizadas geradas pelo motor de ML
+        ↓
+Interage com as sugestões (clique, favorito, avaliação)
+        ↓
+Cada interação retroalimenta o modelo → recomendações ficam mais precisas
+        ↓
+Compra ingresso ou avalia o evento
+```
+
+**Melhorias entregues pelo Spotlight (To Be):**
+
+| Dimensão | As Is (hoje) | To Be (com Spotlight) |
+|---|---|---|
+| **Descoberta de espetáculos** | Manual, sem sugestões | Personalizada, baseada em perfil e histórico do usuário |
+| **Coleta de preferências** | Inexistente | Onboarding estruturado: gênero favorito e faixa de preço |
+| **Uso de dados comportamentais** | Não coletados | Cliques, avaliações e compras alimentam o motor de ML continuamente |
+| **Jornada no portal** | Linear e curta | Contínua — o sistema sugere o próximo espetáculo, aumentando o tempo de permanência |
+| **Apoio à decisão de compra** | Nenhum | Recomendações contextuais com justificativa ("Porque você gosta de musicais") |
+| **Catálogo de espetáculos** | Sem metadados para recomendação | Enriquecido com tags, scores de popularidade e atributos de similaridade |
+| **Segmentação de público** | Sem visibilidade | k-means agrupa automaticamente o público em clusters (Famílias, Musical Adulto, etc.) |
+| **Reengajamento pós-visita** | Inexistente | Avaliações retroalimentam o modelo e sustentam o ciclo de melhoria contínua |
+| **Inteligência de marketing** | Sem dados estruturados | Relatórios de segmentos entregues à equipe de marketing para campanhas direcionadas |
+
+---
+
+#### 2.5.1.3 Síntese da Transformação
+
+O processo **As Is** representa uma navegação passiva onde o usuário é o único responsável pela descoberta de conteúdo. A Aventura não participa ativamente dessa jornada e perde oportunidades de venda a cada sessão encerrada sem conversão.
+
+O processo **To Be**, modelado no diagrama BPMN do Spotlight, inverte essa lógica: o sistema passa a guiar ativamente o usuário, conectando preferências declaradas, comportamento real e catálogo estruturado para entregar recomendações que aumentam o engajamento, o tempo de permanência e a conversão em vendas de ingressos, transformando cada acesso ao portal em uma oportunidade de descoberta cultural.
+
+---
+
+### 2.5.2. Fluxo de Negócios BPMN
+
+Este documento descreve o fluxo de negócio modelado em BPMN 2.0 para o sistema **Spotlight**, solução de recomendação inteligente de espetáculos desenvolvida para o Portal Aventura. O diagrama é composto por **três pools** que representam os três atores principais do processo: o **Cliente**, o **Sistema de Recomendação** e os **Gestores de Dados**.
+
+O fluxo modela a jornada completa, desde o primeiro acesso ao portal até a compra do ingresso ou avaliação do evento, integrando o motor de ML e o pipeline de dados que sustenta as recomendações.
+
+Para visualizar o diagrama completo, basta acessar o [Diagrama BPMN](../documentos/img/BPMN.pdf) no repositório.
+
+---
+
+#### 2.5.2.1 Pools
+
+| Pool | Ator | Responsabilidade |
+|---|---|---|
+| **Pool 1** | Cliente | Representa toda a jornada do usuário no portal: cadastro, preferências, visualização de recomendações e interação com os espetáculos |
+| **Pool 2** | Sistema de Recomendação | Motor de ML responsável por capturar interações, analisar o perfil do usuário, gerar e exibir recomendações personalizadas |
+| **Pool 3** | Gestores de Dados | Equipe interna responsável por coletar dados de novos espetáculos, popular o banco de dados e disponibilizar o catálogo atualizado para o motor |
+
+---
+
+#### 2.5.2.2. Descrição Detalhada dos Fluxos
+
+#### Pool 1 — Cliente
+
+Este pool representa a experiência do usuário no Portal Aventura. O fluxo é iniciado quando o usuário acessa o portal e segue até uma das três ações finais possíveis: compra de ingresso, avaliação do evento ou encerramento da sessão sem engajamento.
+
+<div align="center">
+
+<sub>Figura X - Cliente </sub><br>
+ 
+  <img src="../documentos/img/pool1.png" width="100%" alt="Cliente"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Acesso ao Portal**
+O processo tem início com um evento de start representando o momento em que o usuário acessa o Portal Aventura. Este é o ponto de entrada de toda a jornada.
+
+**2. Gateway — Possui cadastro?**
+Imediatamente após o acesso, um gateway XOR verifica se o usuário já possui cadastro na plataforma:
+- **Sim** → o usuário segue diretamente para a etapa de login.
+- **Não** → o usuário é direcionado para preencher o cadastro, retornando ao fluxo principal após a conclusão.
+
+**3. Efetuar Login**
+Usuários já cadastrados realizam o login na plataforma para ter acesso ao ambiente personalizado e às recomendações vinculadas ao seu perfil.
+
+**4. Inserir Preferências**
+Após autenticado, o usuário declara suas preferências culturais, como gêneros de espetáculo de interesse. Essa etapa é fundamental para o motor de recomendação, especialmente para usuários que ainda não possuem histórico de interações (cold start).
+
+**5. Inserir Faixa de Preço**
+O usuário informa a faixa de preço que está disposto a pagar pelos ingressos. Esse filtro é utilizado pelo sistema para calibrar as recomendações geradas, garantindo que apenas espetáculos dentro do orçamento declarado sejam sugeridos.
+
+**6. Visualizar Recomendações**
+Com o perfil declarado completo, o sistema exibe as recomendações personalizadas na tela de descoberta, em formato de carrossel, com a justificativa de cada sugestão para tornar o sistema transparente ao usuário.
+
+**7. Gateway — Houve interação?**
+Um segundo gateway XOR avalia se o usuário interagiu com alguma recomendação exibida:
+- **Não** → a sessão é encerrada sem engajamento.
+- **Sim** → o usuário é direcionado para a tela de detalhes do evento.
+
+**8. Ver Detalhes do Evento**
+O usuário acessa a página descritiva do espetáculo selecionado, contendo informações como sinopse, elenco, datas, local e preço do ingresso.
+
+**9. Gateway Inclusivo**
+Um terceiro gateway inclusivo captura a decisão do usuário após visualizar os detalhes do evento:
+- **Clicar no link da ticketeira** → o usuário é redirecionado para a plataforma de venda de ingressos, onde finaliza a compra. O fluxo termina com o evento de end "Ingresso Comprado".
+- **Avaliar evento** → o usuário registra uma avaliação do espetáculo, que retroalimenta o sistema de recomendação com dados de satisfação.
+
+---
+
+#### Pool 2 — Sistema de Recomendação
+
+Este pool representa o motor de ML do Spotlight. Ele é ativado pelas interações do usuário no Pool 1 e é responsável por transformar dados de comportamento e perfil em recomendações personalizadas.
+
+<div align="center">
+
+<sub>Figura X - Sistema de Recomendação</sub><br>
+
+  <img src="../documentos/img/pool2.png" width="100%" alt="Sistema de Recomendação"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Motor ML (Start)**
+O fluxo do sistema é iniciado pelo evento de start "Motor LM", acionado quando o usuário conclui o preenchimento de suas preferências e dados de perfil no Pool 1.
+
+**2. Captura de Interações**
+O sistema captura e registra todos os eventos de comportamento do usuário: visualizações de espetáculos, cliques, tempo de permanência na página, avaliações e compras. Cada tipo de interação contribui para a construção do perfil comportamental do usuário.
+
+**3. Análise de Interações**
+Os eventos capturados são processados e classificados por tipo e relevância. Essa etapa transforma os dados brutos de comportamento em sinais estruturados que alimentam a etapa seguinte de análise de perfil.
+
+**4. Análise de Perfil**
+Com base nas interações processadas e nas preferências declaradas, o sistema constrói ou atualiza o perfil do usuário. Para novos usuários (sem histórico), a análise utiliza as preferências declaradas. Para usuários recorrentes, o perfil é enriquecido com dados comportamentais acumulados ao longo das sessões.
+
+**5. Gerar Recomendações**
+Com o perfil consolidado, o motor gera uma lista rankeada de recomendações personalizadas, acompanhada da justificativa de cada sugestão para tornar o sistema explicável ao usuário.
+
+**6. Exibir Recomendações na Tela de Descoberta**
+As recomendações geradas são entregues ao Pool 1 (tela "Visualizar Recomendações"), exibidas na interface do portal. O fluxo retorna ao controle do usuário a partir deste ponto.
+
+---
+
+#### Pool 3 — Gestores de Dados
+
+Este pool representa o processo interno da equipe de gestão de dados da Aventura, responsável por manter o catálogo de espetáculos atualizado e disponível para o motor de recomendação.
+
+<div align="center">
+
+<sub>Figura X - Gestores de Dados</sub><br>
+
+  <img src="../documentos/img/pool3.png" width="100%" alt="Gestores de Dados"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+</div>
+
+**Passo a passo:**
+
+**1. Novo Espetáculo**
+O fluxo é iniciado pelo evento de start "Novo espetáculo", acionado sempre que um novo espetáculo é produzido ou anunciado pela Aventura Teatros.
+
+**2. Coletar Dados de um Novo Espetáculo**
+A equipe realiza a coleta de todas as informações relevantes sobre o espetáculo: título, gênero, sinopse, elenco, teatro, datas de apresentação, faixa de preço e classificação etária.
+
+**3. Popular no Banco de Dados**
+Os dados coletados são inseridos e organizados no banco de dados relacional, respeitando o modelo de entidades do sistema.
+
+**4. Inserir Metadados do Espetáculo**
+Além dos dados básicos, são inseridos os metadados que alimentam o motor de recomendação: tags de categoria, palavras-chave, score de popularidade inicial e atributos de similaridade com outros espetáculos do catálogo.
+
+**5. Disponibilizar o Novo Espetáculo no Catálogo**
+O espetáculo é publicado e disponibilizado no catálogo ativo do portal. A partir deste momento, ele passa a ser elegível para aparecer nas recomendações geradas pelo motor de ML.
+
+**6. Catálogo Disponível (End)**
+O fluxo encerra com o evento de end "Catálogo disponível", sinalizando que o novo espetáculo está pronto para ser consumido pelo Pool 2.
+
+---
+
+#### 2.5.2.3. Eventos de Início e Fim
+
+| Pool | Evento de Start | Evento(s) de End |
+|---|---|---|
+| Cliente | Acesso ao Portal | Ingresso Comprado (fim positivo) / Sem engajamento (fim sem conversão) |
+| Sistema de Recomendação | Motor LM | Exibição de recomendações na tela de descoberta (entrega ao Pool 1) |
+| Gestores de Dados | Novo evento | Catálogo disponível (fim de processo interno) |
+
+---
+
+#### 2.5.2.4. Conexões Entre Pools 
+
+As conexões entre pools representam a troca de informações entre atores distintos do processo. Na notação BPMN 2.0, essas conexões são representadas por linhas tracejadas (message flows) e nunca por sequence flows, que são exclusivos de cada pool.
+
+| Origem | Destino | Informação Trafegada |
+|---|---|---|
+| Pool 1 — Cliente | Pool 2 — Sistema | Preferências declaradas e faixa de preço do usuário |
+| Pool 1 — Cliente | Pool 2 — Sistema | Eventos de interação (clique, avaliação, tempo de permanência) |
+| Pool 2 — Sistema | Pool 1 — Cliente | Lista de recomendações personalizadas com justificativas |
+| Pool 3 — Gestores de Dados | Pool 2 — Sistema | Notificação de novo espetáculo disponível no catálogo |
+
+---
+
+#### 2.5.2.5. Dados e Armazenamento
+
+| Dado | Origem | Utilização |
+|---|---|---|
+| Preferências declaradas | Pool 1 — Usuário | Alimenta a análise de perfil para usuários sem histórico (cold start) |
+| Faixa de preço | Pool 1 — Usuário | Filtro aplicado antes da geração das recomendações |
+| Interações comportamentais | Pool 1 — Usuário | Alimenta a análise de interações e enriquece o perfil do usuário |
+| Avaliações dos eventos | Pool 1 — Usuário | Retroalimenta o modelo de recomendação com dados de satisfação |
+| Metadados dos espetáculos | Pool 3 — Gestores de Dados | Base do catálogo consumida pelo motor de ML para gerar recomendações |
+
+---
+
+#### 2.5.2.6. Observações Finais
+
+- O diagrama segue a notação BPMN 2.0 com uso correto de **pools separados por ator**, **gateways XOR para decisões exclusivas** e **eventos de start e end** distintos por pool.
+- O Pool 2 apresenta uma separação clara entre **captura**, **análise de interações**, **análise de perfil** e **geração de recomendações**, o que demonstra maturidade no design do fluxo e facilita a implementação modular do motor de ML.
+- O **Pool 3 opera de forma assíncrona** em relação aos outros dois: ele é acionado sempre que há um novo espetáculo, independentemente do fluxo de navegação do usuário no portal.
+- O diagrama representa o **fluxo principal (happy path)** do sistema. Fluxos de exceção podem ser detalhados em subprocessos futuros.
+- A etapa de **Avaliar evento** no Pool 1 cria um ciclo virtuoso de retroalimentação: as avaliações dos usuários enriquecem o modelo de recomendação ao longo do tempo, tornando as sugestões progressivamente mais precisas e relevantes.
+
+---
 
 ## 2.6 Matriz de Risco do Projeto
 _conteúdo_
@@ -457,8 +855,116 @@ _conteúdo_
 _conteúdo_
 Obs.: Seção dedicada a discussão sobre ideias e priorização de features.
 
-## 2.8 Canvas do Projeto
-_conteúdo_
+## 2.8 Business Model Canvas
+
+Esta seção detalha o modelo de negócios desenvolvido para o **Spotlight**, **sistema inteligente de recomendação** no **Portal Aventura**. A solução atua em duas frentes: aprimorar a experiência do usuário final e fornecer inteligência de dados para a equipe interna.
+
+<div align="center">
+
+<sub>Figura X - Business Model Canvas</sub><br>
+
+  <img src="../documentos/img/bmn.png" width="100%" alt="Business Model Canvas"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+
+### 2.8.1 Parceiros-Chave 
+
+Os parceiros estratégicos essenciais para a operação, fornecimento de dados e viabilidade do projeto:
+
+- **Aventura Teatros**: A parceira principal e dona do ecossistema. Fornece o portal, o catálogo de espetáculos e o direcionamento de negócios.
+- **Ticketeiras parceiras**: Plataformas parceiras de emissão de ingressos.
+- **Equipe de Marketing da Aventura**: Parceiro interno vital para a validação das campanhas. Atuam tanto como co-criadores das regras de negócio quanto como validadores da eficácia da segmentação gerada pelo sistema.
+
+---
+
+### 2.8.2 Atividades Principais
+
+As ações técnicas e operacionais contínuas que o sistema e a equipe devem executar para entregar a proposta de valor:
+
+- **Coleta e processamento de dados de comportamento do usuário**: Criação de pipelines de dados para capturar cliques, tempo de tela, buscas e histórico de compras. Envolve processos de ETL e higienização dos dados para garantir a qualidade das entradas.
+- **Treinamento e atualização do modelo de recomendação**: Rotinas de MLOps para retreinar os algoritmos de Machine Learning periodicamente, garantindo que as recomendações não fiquem defasadas e se adaptem a novos espetáculos e tendências de consumo.
+
+---
+
+### 2.8.3 Principais Recursos 
+
+Os ativos tecnológicos e de informação indispensáveis para o funcionamento da plataforma:
+
+- **Dados de interação do usuário**: O principal combustível do motor de recomendação. Sem um volume adequado de dados comportamentais (logs, sessões, cliques), o modelo não consegue inferir preferências.
+- **Motor de ML (Machine Learning)**: A infraestrutura de algoritmos (como filtragem colaborativa ou baseada em conteúdo) responsável por calcular a similaridade entre usuários e espetáculos, gerando as predições.
+- **Catálogo de espetáculos e metadados da Aventura**: O banco de dados estruturado contendo descrições, gêneros, elenco, datas, classificação indicativa e tags de cada peça teatral.
+
+---
+
+### 2.8.4 Propostas Principais 
+
+O valor entregue para os diferentes segmentos de clientes (espectadores e equipe interna):
+
+- **Descoberta personalizada de espetáculos**: Supera o problema da "página em branco", sugerindo peças que o usuário não procuraria ativamente, mas que se alinham perfeitamente ao seu gosto.
+- **Aumento do tempo de permanência no Portal Aventura**: Ao oferecer um feed contínuo e relevante, o usuário consome mais conteúdo sobre as produções antes de decidir.
+- **Estímulo à compra de ingressos por recomendação contextual**: Inserção de "gatilhos" de compra no momento exato de maior interesse, aumentando a taxa de conversão.
+- **Jornada cultural contínua**: Transforma uma compra isolada em um ciclo de consumo recorrente, fidelizando o cliente ao selo Aventura.
+- **Segmentação inteligente de público (B2B)**: Permite que o marketing abandone o anúncios genéricos e faça campanhas ultra-segmentadas baseadas nos clusters gerados pelo ML.
+- **Explicabilidade das recomendações**: Transparência para o usuário ("Recomendado porque você assistiu X") e para os gestores, aumentando a confiança nas predições do sistema.
+
+---
+
+### 2.8.5 Relacionamento com o Consumidor
+
+Como o sistema interage e cria laços com os usuários para melhorar a coleta de dados e a experiência:
+
+- **Onboarding de preferências**: Um formulário rápido e gamificado no primeiro acesso ou criação de conta para mitigar o problema de Cold Start.
+- **Recomendação personalizada em tempo real**: A interface do portal se molda dinamicamente conforme o usuário navega, gerando uma sensação de atendimento exclusivo.
+- **Notificações de novos espetáculos por cluster**: Engajamento ativo informando aos usuários que uma peça do seu nicho de interesse entrou em cartaz.
+
+---
+
+### 2.8.6 Canais 
+
+- **Portal Aventura**: O ponto de contato exclusivo e centralizado. Toda a inteligência do motor de recomendação será exposta no front-end deste portal, seja na home page, páginas de detalhes de peças ou no carrinho de compras.
+
+---
+
+### 2.8.7 Segmentos de Clientes 
+
+Os grupos de pessoas que a solução visa atender, divididos em perfis de consumo e usuários internos:
+
+### Consumidores Finais
+
+- Famílias com crianças (buscam classificação livre e horários diurnos).
+- Adultos fãs de musical (ticket médio maior, alta recorrência).
+- Público de ballet e clássicos (nicho específico e tradicional).
+- Jovens e público experimental (abertos a novas linguagens teatrais).
+- Visitantes esporádicos do portal (usuários não logados que precisam ser convertidos rapidamente).
+
+### Clientes Internos 
+
+- Gestores e analistas de marketing da Aventura.
+
+---
+
+### 2.8.8 Estrutura de Custos 
+
+Os principais direcionadores de despesas para manter o projeto rodando:
+
+- **Infraestrutura de nuvem**: Custos com servidores para hospedar o portal, bancos de dados para armazenar logs massivos e instâncias de computação otimizadas para treinar os modelos de Machine Learning.
+- **Desenvolvimento e manutenção do modelo de ML**: Esforço contínuo para refinar algoritmos, evitar degradação do modelo e realizar testes A/B.
+- **Horas de desenvolvimento**: Custo da equipe de engenharia de software envolvida na criação de APIs, integração com o Sympla, estruturação de banco de dados e rotinas de deploy.
+
+---
+
+### 2.8.9 Fluxos de Receita
+
+Como a solução gera valor financeiro ou reduz custos, justificando o investimento:
+
+- **Aumento de conversão em venda de ingressos**: O impacto direto das recomendações personalizadas na jornada, diminuindo a taxa de abandono do carrinho.
+- **Maior ticket médio por sessão**: Consequência de cross-sell e up-sell bem-sucedidos.
+- **Campanhas pagas eficientes**: Redução do Custo de Aquisição de Clientes e aumento do Retorno sobre Investimento em mídias pagas, utilizando os dados de segmentação para criar públicos personalizados e mais assertivos.
+
+--
 
 # 3. Requisitos do Projeto
 _conteúdo_
