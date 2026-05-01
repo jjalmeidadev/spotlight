@@ -817,7 +817,23 @@ _conteúdo_
 _conteúdo_
 
 ## 3.3 Correlação RFs e RNFs
-_conteúdo_
+
+A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNFs) com os requisitos funcionais (RFs) que possuem dependência direta ou impacto relevante.
+
+| ID RNF | Requisito Não Funcional | RFs Associados | Relação |
+|--------|--------------------------|----------------|----------|
+| RNF01 | Tempo de carregamento das telas em até 2 segundos | RF04, RF05, RF06, RF07, RF08 | A experiência de navegação e acesso às funcionalidades principais depende diretamente da performance das telas. |
+| RNF02 | Geração de recomendações em até 3 segundos | RF04, RF12, RF13, RF14, RF15 | A exibição e atualização das recomendações depende do tempo de processamento do sistema de recomendação. |
+| RNF03 | Disponibilidade mínima de 99% | RF01, RF02, RF04, RF05, RF06, RF07, RF08 | Todas as funcionalidades do sistema dependem da disponibilidade contínua da aplicação. |
+| RNF04 | Abordagem mobile first | RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10 | A definição de preferências, navegação, visualização e interação são impactadas pela experiência mobile. |
+| RNF05 | Segurança com JWT, bcrypt e HTTPS | RF01, RF02, RF09, RF10, RF11 | Cadastro, autenticação e interações do usuário dependem da proteção de dados e controle de acesso seguro. |
+| RNF06 | Suporte a 200 usuários simultâneos | RF04, RF05, RF06, RF07, RF12 | Funcionalidades de navegação e recomendação devem permanecer estáveis sob carga. |
+| RNF07 | Registro de logs estruturados | RF11, RF12, RF13 | A coleta de dados e funcionamento do algoritmo dependem de rastreabilidade e monitoramento das interações. |
+| RNF08 | Deploy independente de serviços SOA | RF04, RF05, RF06, RF12 | Funcionalidades devem permanecer disponíveis mesmo durante atualizações de partes do sistema. |
+| RNF09 | Processamento assíncrono com fila | RF11, RF12, RF13, RF14 | A coleta e processamento de dados para recomendação dependem de comunicação assíncrona entre serviços. |
+| RNF10 | Usabilidade (máx. 3 toques) | RF04, RF05, RF06, RF07 | A descoberta de conteúdos e navegação depende da facilidade de uso da interface. |
+| RNF11 | Compatibilidade com dispositivos mobile | RF01, RF02, RF04, RF05, RF06, RF07, RF08, RF09, RF10 | Todas as funcionalidades devem operar corretamente nos dispositivos alvo. |
+| RNF12 | Execução em containers Docker | RF01, RF02, RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10, RF11, RF12, RF13, RF14, RF15, RF16 | Requisito transversal que impacta toda a arquitetura e execução do sistema. |
 
 ## 3.4 Casos de Uso
 _conteúdo_
