@@ -407,6 +407,23 @@ Fonte: Material produzido pelos autores (2026).
 
   Nesse contexto, a qualidade das recomendações, a presença de categorias específicas para iniciantes e a validação social são fatores determinantes para aumentar sua confiança, engajamento e satisfação com a plataforma.
 
+### 2.4.2.5 Cintia Araújo Sena
+
+Abaixo a imagem da jornada da persona Cintia Araújo Sena (administradora da plataforma):
+
+### Figura X – Jornada do Usuário (Cintia Araújo Sena)
+
+![Jornada Cintia](./img/UJ-Cintia.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Ao longo de sua jornada, Cintia demonstra um comportamento analítico e orientado a dados, focado em compreender o desempenho da plataforma e o impacto das recomendações no comportamento dos usuários. Sua navegação é objetiva, priorizando acesso rápido a métricas e informações estratégicas.
+
+  Suas principais dificuldades estão relacionadas à falta de clareza e organização dos dados apresentados, à dificuldade em mensurar o impacto real das recomendações na conversão e à ausência de insights diretos que apoiem a tomada de decisão.
+
+  Dessa forma, a experiência da administradora depende diretamente da qualidade dos dashboards, da visualização clara dos indicadores-chave e da capacidade da plataforma em gerar insights acionáveis, permitindo decisões mais assertivas e eficientes.
+
+
 ---
 
 ## 2.5 Modelagem do Fluxo de Negócio
