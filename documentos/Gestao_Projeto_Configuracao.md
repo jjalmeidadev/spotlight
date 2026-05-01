@@ -34,11 +34,30 @@ GitFlow é um modelo de branching projetado para organizar e estruturar o desenv
 
 Esse modelo melhora a colaboração, aumenta a visibilidade das mudanças e garante maior rastreabilidade, permitindo que a equipe trabalhe simultaneamente em novas funcionalidades, correções e releases sem comprometer a estabilidade do código principal.
 
+### Estrutura operacional do Gitflow
+
+| Branch | Finalidade | Origem | Destino |
+|--------|----------|--------|--------|
+| main | Versão estável em produção | release / hotfix | - |
+| develop | Integração das funcionalidades | main | main |
+| feature/* | Desenvolvimento de novas funcionalidades | develop | develop |
+| release/* | Preparação para entrega | develop | main e develop |
+| hotfix/* | Correções urgentes em produção | main | main e develop |
+
+### Regras de uso
+
+- Nenhuma alteração deve ser feita diretamente na branch main
+- Todas as funcionalidades devem ser desenvolvidas em branches do tipo feature/*
+- Toda integração deve ocorrer via Merge Request (MR)
+- Após aprovação, a branch deve ser mesclada na develop
+- Após o merge, a branch deve ser excluída
+- Correções emergenciais devem ser feitas via hotfix/*
+
 ## 3. Fluxo Gitflow e Políticas de Código
 
 ### 3.1 Estrutura e Regras de Branches
 
-#### 3.1.1 Branche Principais
+#### 3.1.1 Branches Principais
 
 - **main**: Representa o código estável e pronto para produção. Recebe apenas merges de branches de release ou hotfix. *Pushes diretos são estritamente proibidos.*
 - **develop**: Branch de integração principal. Todas as funcionalidades são integradas aqui. *Pushes diretos são estritamente proibidos.*
@@ -75,23 +94,43 @@ Todas as branches devem ser escritas em **lowercase**, separando palavras com h�
 
 #### Passos para Criar uma Branch
 
-1. Atualize o repositório local:
-   ```bash
+O fluxo de criação e utilização das branches segue as seguintes etapas:
+
+1. Atualizar a branch base (develop):
    git checkout develop
    git pull origin develop
-   ```
 
-2. Crie a nova branch:
-   ```bash
-   git checkout -b feature/T12-integracao-rabbitmq
-   ```
+2. Criar uma nova branch de trabalho:
+   git checkout -b feature/nome-da-funcionalidade
 
-3. Desenvolva, faça commits frequentes e faça push:
-   ```bash
-   git push origin feature/T12-integracao-rabbitmq
-   ```
+3. Realizar commits seguindo padrão semântico:
+   feat: descrição da funcionalidade
 
-4. Abra um Pull Request para a branch develop.
+4. Enviar a branch para o repositório remoto:
+   git push origin feature/nome-da-funcionalidade
+
+5. Abrir um Merge Request (MR) para a branch develop
+
+6. Após revisão e aprovação:
+   - Realizar o merge
+   - Excluir a branch utilizada
+
+#### Exemplo de aplicação
+
+A seguir, um exemplo prático da criação de uma funcionalidade no projeto:
+
+git checkout develop  
+git checkout -b feature/recomendacao  
+
+git add .  
+git commit -m "feat: implementação inicial do sistema de recomendação"  
+
+git push origin feature/recomendacao  
+
+→ abertura de Merge Request  
+→ revisão por outro integrante  
+→ merge na develop  
+→ exclusão da branch  
 
 ## 3.4 Política de Merge Request
 
