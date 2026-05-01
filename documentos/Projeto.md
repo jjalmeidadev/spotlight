@@ -1043,7 +1043,32 @@ _conteúdo_
 </div>
 
 ## 3.2 Requisitos Não Funcionais (RNFs)
-_conteúdo_
+
+ &emsp; Os requisitos não funcionais do sistema desempenham um papel fundamental na definição das características de qualidade da plataforma de recomendação de espetáculos da Aventura. Esses requisitos garantem que o sistema apresente desempenho adequado, segurança, escalabilidade e uma experiência de uso consistente para diferentes perfis de usuários. A seguir, são apresentados os requisitos não funcionais identificados:
+
+<div align="center"> <sub>Tabela X - Requisitos não funcionais</sub>
+
+# Requisitos Não Funcionais
+
+<div align="center"> <sub>Tabela X - Requisitos não funcionais</sub>
+
+# Requisitos Não Funcionais
+
+| RNF   | Requisito Não Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição | Aspecto de Qualidade |
+| ----- | ---------------------- | ------------ | ---------------------- | ------------------ | ------------ | -------------------- |
+| RNF01 | O sistema deve carregar todas as telas principais (home, detalhes de espetáculo, categorias e calendário) em no máximo **2 segundos** em dispositivos mobile com conexão 4G (mínimo 20 Mbps de download), sendo este o cenário de referência prioritário. Em desktop, o limite se mantém. | Sistema disponível em produção, testado prioritariamente em dispositivo mobile físico (Android ou iOS) com conexão 4G ativa. | Utilizar ferramenta de medição de performance (ex: Lighthouse no modo mobile) para acessar cada tela principal e registrar FCP e TTI. Repetir o teste **5 vezes por tela** em horários distintos. | Todas as telas carregam completamente em até **2 segundos em 100% das execuções** no cenário mobile 4G. | Métricas de performance mobile registradas. | Desempenho |
+| RNF02 | O sistema deve gerar e exibir recomendações personalizadas em no máximo **2 segundos** após interação do usuário em dispositivo mobile com conexão 4G. | Usuário logado com histórico e preferências configurados. | Registrar timestamp da interação e da exibição da recomendação. Executar com **3 perfis de usuário** e repetir **10 vezes por perfil**. | Diferença entre timestamps ≤ **2 segundos em 100% das execuções**. Spinner exibido em caso de atraso. | Tempo registrado em logs. | Desempenho |
+| RNF03 | O sistema deve estar disponível no mínimo **99% do tempo mensal**, equivalente a no máximo **7h18min de indisponibilidade**. | Sistema em produção com monitoramento ativo. | Executar monitoramento com ping a cada **5 minutos durante 30 dias**. | Disponibilidade ≥ **99%** com incidentes registrados. | Relatório mensal gerado. | Confiabilidade |
+| RNF04 | O sistema deve seguir abordagem mobile first com elementos de interface com tamanho mínimo de **44x44px** para interação por toque. | Sistema acessado em dispositivos mobile físicos. | Validar interface em dispositivos Android e iOS e verificar dimensões dos elementos. | 100% dos elementos interativos com no mínimo **44x44px** e funcionamento completo em mobile. | Experiência mobile validada. | Usabilidade |
+| RNF05 | O sistema deve garantir segurança com autenticação JWT, senhas com bcrypt (custo ≥ **10**) e uso obrigatório de HTTPS (**100% das requisições**). | Sistema com autenticação implementada. | Testar requisições HTTP, acesso sem token e armazenamento de senha. | 100% das requisições via HTTPS, 0 senhas em texto plano e acesso inválido retorna **HTTP 401**. | Dados protegidos. | Segurança |
+| RNF06 | O sistema deve suportar no mínimo **200 usuários simultâneos** com tempo médio de resposta ≤ **3 segundos** e taxa de erro ≤ **1%**. | Ambiente com ferramenta de carga configurada. | Simular **200 usuários simultâneos** por **10 minutos contínuos**. | Tempo médio ≤ **3s**, erro ≤ **1%**, sem falhas críticas. | Relatório de carga gerado. | Escalabilidade |
+| RNF07 | O sistema deve gerar logs estruturados em até **1 segundo** após cada evento, contendo no mínimo **5 campos obrigatórios** (timestamp, nível, serviço, sessão, dispositivo). | Sistema com logging configurado. | Executar ações e validar logs gerados. | 100% dos logs registrados em até **1s** com todos os campos obrigatórios. | Logs armazenados. | Manutenibilidade |
+| RNF08 | Cada serviço SOA deve ser atualizado de forma independente com no máximo **5 minutos de indisponibilidade** por serviço. | Pipeline de CI/CD configurado. | Executar deploy de um serviço isolado. | Instabilidade ≤ **5 minutos** e 100% dos demais serviços operacionais. | Serviço atualizado. | Manutenibilidade |
+| RNF09 | O sistema deve processar eventos de forma assíncrona sem aumentar o tempo de resposta em mais de **500ms** e com taxa de processamento ≥ **100 eventos/segundo**. | Sistema com fila configurada. | Simular **100 eventos simultâneos** e medir impacto na resposta. | Aumento de tempo ≤ **500ms** e processamento de ≥ **100 eventos/segundo** sem perda. | Sistema estável. | Desempenho |
+| RNF10 | O sistema deve permitir execução das ações principais em no máximo **3 toques** com taxa de sucesso ≥ **85%** em testes com usuários. | Sistema disponível para testes de usabilidade. | Testar com **mínimo 5 usuários reais**. | ≥ **85% de sucesso** e ≤ **3 toques** por tarefa. | Relatório gerado. | Usabilidade |
+| RNF11 | O sistema deve operar corretamente em **Android 10+ e iOS 15+** com taxa de erro ≤ **1%** nos fluxos principais. | Sistema acessado em dispositivos físicos. | Executar fluxo completo em **2 dispositivos por plataforma**. | Funcionalidades com ≤ **1% de erro**. | Sistema validado. | Compatibilidade |
+| RNF12 | Cada serviço deve executar em container Docker com tempo de reinicialização ≤ **30 segundos** após falha. | Ambiente Docker configurado. | Derrubar container e medir tempo de recuperação. | Reinicialização ≤ **30s** e 100% dos serviços isolados. | Infraestrutura documentada. | Manutenibilidade |
+</div>
 
 ## 3.3 Correlação RFs e RNFs
 
