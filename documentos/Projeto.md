@@ -339,7 +339,108 @@ Ao conectar inteligência de recomendação com objetivos de negócio, a soluç�
 ---
 
 ## 2.4 Personas e Jornada do Usuário
-## 2.4.1 Personas
+
+## 2.4.2 Jornada do Usuário
+
+  A seguir, são apresentadas as jornadas do usuário desenvolvidas para as personas do projeto. As jornadas foram construídas com o objetivo de mapear a experiência dos usuários durante o processo de descoberta, análise e decisão de consumo de apresentações teatrais dentro da plataforma.
+
+  As jornadas permitem identificar pontos de fricção, dificuldades na busca por informações e oportunidades de melhoria relacionadas à recomendação de conteúdo, organização das informações e tomada de decisão. Além disso, evidenciam como diferentes perfis de usuários interagem com o sistema, considerando seus níveis de familiaridade tecnológica, objetivos e comportamentos.
+
+---
+
+### 2.4.2.1 Ana Clara Amaral
+
+Abaixo a imagem da jornada da persona Ana Clara Amaral (usuária jovem interessada em teatro):
+
+### Figura X – Jornada do Usuário (Ana Clara Amaral)
+
+![Jornada Ana Clara](./img/UJ-Ana-Amaral.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Ana Clara demonstra um comportamento exploratório e dinâmico, navegando rapidamente pela plataforma em busca de conteúdos que estejam alinhados aos seus interesses. Suas principais dificuldades estão relacionadas à descoberta de peças relevantes e à necessidade de compreender rapidamente as informações para compartilhar com amigos ou familiares.
+
+  A experiência da usuária é fortemente impactada pela qualidade das recomendações e pela clareza das descrições dos espetáculos, sendo esses fatores determinantes para seu engajamento e tomada de decisão.
+
+---
+
+### 2.4.2.2 Mariana Lacerda Souza
+
+Abaixo a imagem da jornada da persona Mariana Lacerda Souza (usuária familiar):
+
+### Figura X – Jornada do Usuário (Mariana Lacerda Souza)
+
+![Jornada Mariana](./img/UJ-Mariana-Souza.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Ao longo de sua jornada, Mariana apresenta um comportamento mais cauteloso e orientado à decisão segura, priorizando informações claras e confiáveis sobre as apresentações infantis. Suas principais dificuldades estão relacionadas à identificação rápida de conteúdos adequados para crianças e à falta de informações objetivas que garantam segurança na escolha.
+
+  Nesse contexto, elementos como avaliações, classificação etária e organização das informações desempenham papel essencial para aumentar sua confiança e facilitar o planejamento de atividades culturais em família.
+
+### 2.4.2.3 Ronaldo Benito Soares
+
+Abaixo a imagem da jornada da persona Ronaldo Benito Soares (turista cultural):
+
+### Figura X – Jornada do Usuário (Ronaldo Benito Soares)
+
+![Jornada Ronaldo](./img/UJ-Ronaldo-Soares.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Ronaldo busca praticidade e clareza na navegação, apresentando menor tolerância a interfaces complexas. Seu principal objetivo é encontrar rapidamente apresentações culturais alinhadas ao seu perfil e disponíveis durante sua estadia.
+
+  Suas dificuldades estão relacionadas à sobrecarga de informações e à falta de direcionamento claro, o que pode comprometer sua experiência. Assim, a organização da plataforma e a relevância das recomendações são fatores essenciais para garantir uma navegação eficiente e satisfatória.
+
+### 2.4.2.4 Pedro Henrique Lima
+
+Abaixo a imagem da jornada da persona Pedro Henrique Lima (jovem universitário iniciante em teatro):
+
+### Figura X – Jornada do Usuário (Pedro Henrique Lima)
+
+![Jornada Pedro](./img/UJ-Pedro.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Pedro apresenta um comportamento exploratório e orientado por recomendações, buscando referências que o ajudem a tomar sua primeira decisão dentro do universo teatral. Por nunca ter tido contato com esse tipo de experiência, ele depende fortemente de validações externas, como avaliações e indicações da própria plataforma.
+
+  Suas principais dificuldades estão relacionadas à falta de direcionamento para iniciantes, ao excesso de opções disponíveis e à insegurança em escolher uma peça adequada para sua primeira experiência. O receio de não gostar impacta diretamente sua tomada de decisão.
+
+  Nesse contexto, a qualidade das recomendações, a presença de categorias específicas para iniciantes e a validação social são fatores determinantes para aumentar sua confiança, engajamento e satisfação com a plataforma.
+
+### 2.4.2.5 Cintia Araújo Sena
+
+Abaixo a imagem da jornada da persona Cintia Araújo Sena (administradora da plataforma):
+
+### Figura X – Jornada do Usuário (Cintia Araújo Sena)
+
+![Jornada Cintia](./img/UJ-Cintia.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Ao longo de sua jornada, Cintia demonstra um comportamento analítico e orientado a dados, focado em compreender o desempenho da plataforma e o impacto das recomendações no comportamento dos usuários. Sua navegação é objetiva, priorizando acesso rápido a métricas e informações estratégicas.
+
+  Suas principais dificuldades estão relacionadas à falta de clareza e organização dos dados apresentados, à dificuldade em mensurar o impacto real das recomendações na conversão e à ausência de insights diretos que apoiem a tomada de decisão.
+
+  Dessa forma, a experiência da administradora depende diretamente da qualidade dos dashboards, da visualização clara dos indicadores-chave e da capacidade da plataforma em gerar insights acionáveis, permitindo decisões mais assertivas e eficientes.
+
+### 2.4.2.6 Carlos Nóbrega
+
+Abaixo a imagem da jornada da persona Carlos Nóbrega (usuário idoso interessado em teatro):
+
+### Figura X – Jornada do Usuário (Carlos Nóbrega)
+
+![Jornada Carlos](./img/UJ-Carlos.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Carlos apresenta um comportamento cauteloso e mais lento na navegação, priorizando simplicidade e clareza em cada etapa do processo. Mesmo tendo interesse por teatro, sua baixa familiaridade com tecnologia faz com que ele evite explorar muitas opções e busque caminhos mais diretos.
+
+  Suas principais dificuldades estão relacionadas ao excesso de informações, à complexidade da interface e à insegurança durante o processo de escolha e compra. O medo de cometer erros pode comprometer sua experiência e até impedir a finalização da ação.
+
+  Nesse cenário, uma interface simples, informações objetivas e um fluxo de compra reduzido são essenciais para garantir uma experiência positiva, aumentando sua confiança e permitindo que ele conclua suas ações com segurança e satisfação.
+
+---
 
   Considerando a diversidade de públicos que consomem apresentações culturais e utilizam plataformas digitais para descoberta de eventos, foram desenvolvidas diferentes personas para o projeto. Essas personas representam perfis variados de usuários, permitindo compreender comportamentos, necessidades, dificuldades e expectativas relacionadas ao processo de descoberta e escolha de apresentações teatrais.
 
