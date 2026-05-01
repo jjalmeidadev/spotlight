@@ -423,6 +423,21 @@ Fonte: Material produzido pelos autores (2026).
 
   Dessa forma, a experiência da administradora depende diretamente da qualidade dos dashboards, da visualização clara dos indicadores-chave e da capacidade da plataforma em gerar insights acionáveis, permitindo decisões mais assertivas e eficientes.
 
+### 2.4.2.6 Carlos Nóbrega
+
+Abaixo a imagem da jornada da persona Carlos Nóbrega (usuário idoso interessado em teatro):
+
+### Figura X – Jornada do Usuário (Carlos Nóbrega)
+
+![Jornada Carlos](./img/UJ-Carlos.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Carlos apresenta um comportamento cauteloso e mais lento na navegação, priorizando simplicidade e clareza em cada etapa do processo. Mesmo tendo interesse por teatro, sua baixa familiaridade com tecnologia faz com que ele evite explorar muitas opções e busque caminhos mais diretos.
+
+  Suas principais dificuldades estão relacionadas ao excesso de informações, à complexidade da interface e à insegurança durante o processo de escolha e compra. O medo de cometer erros pode comprometer sua experiência e até impedir a finalização da ação.
+
+  Nesse cenário, uma interface simples, informações objetivas e um fluxo de compra reduzido são essenciais para garantir uma experiência positiva, aumentando sua confiança e permitindo que ele conclua suas ações com segurança e satisfação.
 
 ---
 
