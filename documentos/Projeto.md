@@ -391,6 +391,22 @@ Fonte: Material produzido pelos autores (2026).
 
   Suas dificuldades estão relacionadas à sobrecarga de informações e à falta de direcionamento claro, o que pode comprometer sua experiência. Assim, a organização da plataforma e a relevância das recomendações são fatores essenciais para garantir uma navegação eficiente e satisfatória.
 
+### 2.4.2.4 Pedro Henrique Lima
+
+Abaixo a imagem da jornada da persona Pedro Henrique Lima (jovem universitário iniciante em teatro):
+
+### Figura X – Jornada do Usuário (Pedro Henrique Lima)
+
+![Jornada Pedro](./img/UJ-Pedro.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+  Durante sua jornada, Pedro apresenta um comportamento exploratório e orientado por recomendações, buscando referências que o ajudem a tomar sua primeira decisão dentro do universo teatral. Por nunca ter tido contato com esse tipo de experiência, ele depende fortemente de validações externas, como avaliações e indicações da própria plataforma.
+
+  Suas principais dificuldades estão relacionadas à falta de direcionamento para iniciantes, ao excesso de opções disponíveis e à insegurança em escolher uma peça adequada para sua primeira experiência. O receio de não gostar impacta diretamente sua tomada de decisão.
+
+  Nesse contexto, a qualidade das recomendações, a presença de categorias específicas para iniciantes e a validação social são fatores determinantes para aumentar sua confiança, engajamento e satisfação com a plataforma.
+
 ---
 
 ## 2.5 Modelagem do Fluxo de Negócio
