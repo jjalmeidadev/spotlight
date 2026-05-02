@@ -64,7 +64,7 @@
 
 <td align="center" style="border: none; padding: 5px;">
       <a href="https://www.linkedin.com/in/afonsolelis/">
-        <img src="documentos/img/Afonso.png" width="100" alt="Afonso Brandão">
+        <img src="documentos/img/afonso.png" width="100" alt="Afonso Brandão">
       </a>
     </td>
 
@@ -82,7 +82,7 @@
 
 <td align="center" style="border: none; padding: 5px;">
       <a href="https://www.linkedin.com/in/rafael-jacomossi-6135b0a1/">
-        <img src="documentos/img/rafaelj.png" width="100" alt="Rafael Jacomossi">
+        <img src="documentos/img/rafaelJ.png" width="100" alt="Rafael Jacomossi">
       </a>
     </td>
 
