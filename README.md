@@ -1,93 +1,194 @@
-# G04
+<p align="center">
+  <img src="documentos/img/header.png" alt="header">
+</p>
+
+<table align="center" style="border: none; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/celsojwnior/">
+        <img src="documentos/img/celso.png" width="90" alt="Celso Rodrigues">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/jaimeandradedealmeida/">
+        <img src="documentos/img/jaime.png" width="90" alt="Jaime Almeida">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/leonardoramosvieira/">
+        <img src="documentos/img/leonardo.png" width="90" alt="Leonardo Ramos">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/marianalacerdareis/">
+        <img src="documentos/img/mariana_lacerda.png" width="90" alt="Mariana Lacerda">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/mariana-pereira-de-souza1/">
+        <img src="documentos/img/marianap.png" width="90" alt="Mariana Pereira">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/rafael-figueiredo-campos-72131735b/">
+        <img src="documentos/img/rafael.png" width="90" alt="Rafael Campos">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/vitor-ribeiro-ms/">
+        <img src="documentos/img/vitor.png" width="90" alt="Vitor Ribeiro">
+      </a>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<p align="center">
+  <img src="documentos/img/professores.png" alt="professores">
+</p>
+
+<table align="center" style="border: none; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/vanunes/">
+        <img src="documentos/img/vanessa.png" width="100" alt="Vanessa Nunes">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/afonsolelis/">
+        <img src="documentos/img/afonso.png" width="100" alt="Afonso Brandão">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/hermano-peixoto-1091796/">
+        <img src="documentos/img/hermano.png" width="100" alt="Hermano Peixoto">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/luciano-galdino-26191b36/">
+        <img src="documentos/img/luciano.png" width="100" alt="Luciano Galdino">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/rafael-jacomossi-6135b0a1/">
+        <img src="documentos/img/rafaelJ.png" width="100" alt="Rafael Jacomossi">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/francisco-escobar/">
+        <img src="documentos/img/francisco.png" width="100" alt="Francisco Escobar">
+      </a>
+    </td>
+
+<td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/filipe-gon%C3%A7alves-08a55015b/">
+        <img src="documentos/img/filipe.png" width="100" alt="Filipe Gonçalves">
+      </a>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<p align="center">
+  <img src="documentos/img/bottom.png" alt="bottom">
+</p>
+
+# Spotlight <nome do projeto>
+
+## Dora <nome do grupo>
+
+## 📝 Descrição
+
+O Portal Aventura reúne um dos maiores catálogos de espetáculos do Brasil: musicais, ballet, teatro infantil e produções premiadas. Mas por muito tempo, quem entrava no portal via apenas o que já havia buscado. Um visitante que chegava para ver "Mamma Mia!" saía sem saber que "Elis, a musical" existia.
+Cada sessão encerrava com oportunidades de descoberta desperdiçadas.
+
+O **Spotlight** nasceu para mudar isso.
+
+Um sistema de recomendação inteligente integrado ao Portal Aventura que, a partir das preferências declaradas pelo usuário e do seu comportamento de navegação, sugere espetáculos relevantes no momento certo da jornada, transformando uma visita pontual em uma experiência de descoberta cultural contínua.
+
+O resultado é uma jornada mais conectada: o público descobre produções que combinam com seu gosto, a Aventura amplia seu alcance dentro do próprio portal, e cada acesso se torna uma nova oportunidade de aproximar pessoas
+da cultura.
 
 
+## A solução
 
-## Getting started
+O Spotlight analisa as preferências e interações de cada usuário para gerar
+recomendações personalizadas de espetáculos, conteúdos e experiências
+culturais. A plataforma estimula a navegação dentro do portal, aumenta o
+tempo de permanência e cria uma jornada mais conectada entre as produções
+da Aventura — levando o público certo ao espetáculo certo.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 📝 Links
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+<a href="/documentos/Projeto.md">Link para a documentação geral</a> do projeto.
 
-## Add your files
+## 📁 Estrutura de pastas
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+```text
+📦g04
+ ┣ 📂documentos
+ ┃ ┣ 📂img
+ ┃ ┣ 📜Gestao_Projeto_Configuracao.md
+ ┃ ┣ 📜GestaoProjeto.md
+ ┃ ┣ 📜Index.md
+ ┃ ┣ 📜Manual-instalacao.md
+ ┃ ┗ 📜Projeto.md
+ ┣ 📂src
+ ┃ ┣ 📂aad
+ ┃ ┃ ┣ 📜distribuicao_antes.png
+ ┃ ┃ ┣ 📜interacoes_usuario.png
+ ┃ ┃ ┣ 📜top_espetaculos.png
+ ┃ ┃ ┗ 📜tratamento-dados.ipynb
+ ┃ ┗ 📂database
+ ┣ 📜.gitignore
+ ┗ 📜README.md
+ ```
 
-```
-cd existing_repo
-git remote add origin https://git.inteli.edu.br/graduacao/2026-1b/t17/g04.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
+Dentre os arquivos presentes na raiz do projeto, definem-se:
 
-- [ ] [Set up project integrations](https://git.inteli.edu.br/graduacao/2026-1b/t17/g04/-/settings/integrations)
+- <b>readme.md</b>: arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
 
-## Collaborate with your team
+- <b>documentos</b>: aqui estarão todos os documentos do projeto. Há também uma pasta denominada <b>outros</b> onde podem estar presentes documentos complementares à documentação principal.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+- <b>imagens</b>: imagens relacionadas ao projeto como um todo (por exemplo imagens do sistema, do grupo, logotipos e afins).
 
-## Test and Deploy
+- <b>src</b>: nesta pasta encontra-se todo o código fonte do sistema (circuito e eventuais sistemas complementares).
 
-Use the built-in continuous integration in GitLab.
+## 🗃 Histórico de lançamentos
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+* 0.1.0 - 30/04/2024
+    * Entendimento do projeto e do negócio
+    * Especificação de requisitos funcionais e não funcionais
+    * Base de dados para modelo de recomendação
+    * Gestão de projeto e configuração
+* 0.2.0 - DD/MM/2024
+    * Artefato
+    * Artefato
+* 0.3.0 - DD/MM/2024
+    * Artefato
+    * Artefato
+* 0.4.0 - DD/MM/2024
+    * Artefato
+    * Artefato
+* 0.5.0 - DD/MM/2024
+    * Artefato
+    * Artefato
 
-***
+## 📋 Licença/License
 
-# Editing this README
+<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="#">Spotlight</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.inteli.edu.br/">Inteli</a>, <a href="ttps://www.linkedin.com/in/celsojwnior/">Celso Rodrigues</a>, <a href="https://www.linkedin.com/in/jaimeandradedealmeida/">Jaime Almeida</a>, <a href="https://www.linkedin.com/in/leonardoramosvieira/">Leonardo Ramos</a>, <a href="https://www.linkedin.com/in/marianalacerdareis/">Mariana Lacerda</a>, <a href="https://www.linkedin.com/in/mariana-pereira-de-souza1/">Mariana Pereira</a>, <a href="https://www.linkedin.com/in/rafael-figueiredo-campos-72131735b/">Rafael Campos</a>, <a href="https://www.linkedin.com/in/vitor-ribeiro-ms/">Vitor Ribeiro</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
