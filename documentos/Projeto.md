@@ -59,11 +59,11 @@
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
   - [5.2 Diagrama de Componentes da UML](#52-diagrama-de-componentes-da-uml)
-  - [5.3 Diagramas de Sequência da UML](#53-diagramas-de-sequência-da-uml)
+  - [5.3 Justificativas das escolhas tecnológicas](#54-justificativa-das-escolhas-tecnológicas)
+  - [5.4 Diagramas de Sequência da UML](#53-diagramas-de-sequência-da-uml)
 - [6. Mapeamento Técnico de Infraestrutura e Implantação](#6-mapeamento-técnico-de-infraestrutura-e-implantação)
   - [6.1 Diagrama de Implantação da UML](#61-diagrama-de-implantação-da-uml)
-  - [6.2 Justificativa das Escolhas de Implantação](#62-justificativa-das-escolhas-de-implantação)
-  - [6.3 Considerações sobre Desempenho e Segurança](#63-considerações-sobre-desempenho-e-segurança)
+  - [6.2 Justificativa das escolhas de implantação](#62-justificativa-das-escolhas-de-implantação)
 - [7. Projeto Visual da Solução](#7-projeto-visual-da-solução)
   - [7.1 Desenvolvimento de Wireframes](#71-desenvolvimento-de-wireframes)
   - [7.2 Desenvolvimento de Mockups](#72-desenvolvimento-de-mockups)
@@ -1145,7 +1145,72 @@ _conteúdo_
 ## 5.2 Diagrama de Componentes da UML
 _conteúdo_
 
-## 5.3 Diagramas de Sequência da UML
+## 5.3 Justificativa das escolhas tecnológicas
+
+Esta seção apresenta o stack tecnológico escolhido para o desenvolvimento do projeto, destacando as principais ferramentas, frameworks e serviços utilizados em cada camada da aplicação.
+
+O foco está em justificar as escolhas técnicas com base em requisitos do projeto, como performance, manutenibilidade, escalabilidade, integração entre serviços e obrigatoriedade de determinadas tecnologias.
+
+### 5.3.1 Autenticação, Banco de Dados e Armazenamento: Supabase
+
+O Supabase é utilizado nos três eixos principais da infraestrutura de dados:
+
+- **Autenticação**: Supabase Auth fornece JWT nativamente, integrado ao fluxo de login do app. O token é validado no API Gateway antes de qualquer roteamento de requisição.
+- **Banco de Dados**: PostgreSQL provisionado pelo Supabase (localmente via Docker). Armazena catálogo de espetáculos, perfis de usuários e a matriz de interações ponderadas (view=1pt, clique=2pt, favorito=3pt, compra=5pt) consumida pelo motor de ML.
+- **Armazenamento**: Supabase Storage gerencia imagens e assets dos espetáculos, servindo as URLs diretamente ao frontend via CDN interno.
+
+### 5.3.2 Backend de APIs: ASP.NET Core Web API (C#, .NET 9)
+
+A API de negócio é organizada em três serviços independentes, seguindo a arquitetura orientada a serviços (**SOA**):
+
+| Serviço                | Responsabilidade |
+|------------------------|------------------|
+| **Serviço de catálogo**    | CRUD de espetáculos, metadados, gêneros e faixas de preço |
+| **Serviço do usuário**       | Preferências declaradas, histórico e registro ponderado de interações |
+| **Serviço de recomendação** | Recebe requisições do frontend e orquestra chamadas ao motor de ML |
+
+O **ASP.NET Core Web API** foi escolhido por ser o framework mais maduro do ecossistema .NET para APIs RESTful, com suporte robusto a middleware de autenticação JWT, injeção de dependência nativa e compatibilidade total com .NET 9. O .NET 10 foi descartado por ainda estar em preview no período de desenvolvimento.
+
+Um **API Gateway** centraliza o roteamento entre os três serviços, valida o JWT emitido pelo Supabase Auth e aplica rate limiting.
+
+### 5.3.3 Frontend: React Native + TypeScript
+
+O React Native foi adotado como framework de desenvolvimento mobile por permitir base de código única para Android e iOS, reduzindo o esforço de manutenção sem abrir mão de performance nativa. 
+
+TypeScript adiciona tipagem estática, especialmente relevante num contexto com múltiplas interfaces de serviços distintos. O padrão arquitetural **MVVM** (Model-View-ViewModel) separa a lógica de apresentação da lógica de negócio, facilitando testes unitários de ViewModels de forma isolada.
+
+O gerenciamento de estado é feito com **Redux Toolkit** e **RTK Query**, que eliminam boilerplate e tratam o caching de requisições de forma declarativa.
+
+### 5.3.4 Comunicação Assíncrona: RabbitMQ
+
+A comunicação entre os serviços de negócio e o motor de recomendação é feita via fila de mensagens com **RabbitMQ**. Cada interação do usuário (clique, favorito, compra) gera um evento publicado na fila. O motor de ML consome esses eventos de forma assíncrona, atualizando os modelos incrementalmente sem bloquear a resposta ao usuário.
+
+Essa abordagem garante desacoplamento temporal entre os serviços e suporta picos de carga sem degradação.
+
+### 5.3.5 Motor de Recomendação: C# + ML.NET
+
+O motor de recomendação é implementado como um serviço C# separado utilizando **ML.NET**, a biblioteca oficial da Microsoft para machine learning em .NET. Três algoritmos são empregados conforme a maturidade do perfil do usuário:
+
+- **k-NN**: para cold start (usuários sem histórico suficiente). A similaridade é calculada sobre os gêneros declarados no onboarding e a popularidade dos espetáculos.
+- **SVD**: para usuários com histórico. Fatora a matriz usuário × espetáculo e gera predições de afinidade latente.
+- **k-means**: para segmentação de público. Agrupa espectadores em clusters comportamentais (ex.: Famílias, Musical Adulto, Ballet Clássico, Experimental), alimentando relatórios de marketing.
+
+A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à capacidade de rodar os três algoritmos de forma nativa, sem dependências externas. O serviço expõe uma API interna consumida pelo serviço de recomendação via RabbitMQ.
+
+### 5.3.6 Tabela de Stacks
+
+| Camada              | Tecnologia                          | Justificativa principal |
+|---------------------|-------------------------------------|--------------------------|
+| Frontend            | React Native + TypeScript           | Multiplataforma · MVVM · Redux |
+| Autenticação        | Supabase Auth                       | JWT nativo · integração direta com o app |
+| Banco de dados      | Supabase (PostgreSQL)               | Provisionamento local via Docker |
+| Armazenamento       | Supabase Storage                    | Assets de espetáculos via CDN |
+| API Gateway         | ASP.NET Core (.NET 9)               | Roteamento · validação JWT · rate limiting |
+| Serviços SOA        | ASP.NET Core Web API (C#)           | Obrigatoriedade · maturidade · DI nativa |
+| Mensageria          | RabbitMQ                            | Desacoplamento assíncrono entre serviços |
+| Motor de ML         | C# + ML.NET                         | Obrigatoriedade C# · k-NN, SVD, k-means nativos |
+
+## 5.4 Diagramas de Sequência da UML
 _conteúdo_
 
 # 6. Mapeamento Técnico de Infraestrutura e Implantação
