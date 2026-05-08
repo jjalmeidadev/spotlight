@@ -1115,8 +1115,9 @@ A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNF
 | Visualizar avaliações de espetáculos | Como usuário, quero visualizar as avaliações de outros usuários sobre os espetáculos disponíveis, para que eu possa embasar minha escolha com base na experiência da comunidade do portal. | RF08 |
 |
 
-## 3.5 Diagrama de Casos de Uso
-_conteúdo_
+## 3.5. Diagrama de Casos de Uso
+
+O diagrama de casos de uso a seguir representa as interações entre os atores do sistema — **Usuário**, **Administrador** e **Sistema de Recomendação** — e as funcionalidades disponíveis na plataforma Portal Aventura. Ele oferece uma visão estruturada dos requisitos funcionais do sistema, evidenciando as responsabilidades de cada ator e os fluxos de interação previstos para o MVP do projeto.
 
 # 4. Modelagem de Dados
 _conteúdo_
