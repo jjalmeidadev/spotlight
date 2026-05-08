@@ -1103,7 +1103,17 @@ A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNF
 
 ### 3.4.2. Casos de Uso Definidos
 
-
+| Nome do Caso de Uso | User Story | RF(s) Associado(s) |
+|---------------------|------------|--------------------|
+| Cadastrar-se na plataforma | Como usuário, quero me cadastrar na plataforma Portal Aventura, para que eu possa acessar funcionalidades personalizadas como recomendações, avaliações e comentários. | RF01 |
+| Realizar login | Como usuário, quero realizar login na plataforma Portal Aventura, para que eu possa acessar minha conta e usufruir das funcionalidades personalizadas disponíveis. | RF02 |
+| Definir preferências de perfil | Como usuário, quero definir minhas preferências de perfil na plataforma, para que o sistema de recomendação possa sugerir espetáculos mais alinhados aos meus gostos desde o início. | RF03 |
+| Visualizar recomendações personalizadas | Como usuário, quero visualizar recomendações personalizadas de espetáculos no portal, para que eu possa descobrir apresentações relevantes ao meu perfil de forma prática e eficiente. | RF04 |
+| Pesquisar espetáculos | Como usuário, quero pesquisar espetáculos dentro da plataforma Portal Aventura, para que eu possa encontrar apresentações de meu interesse de forma rápida e direta. | RF05 |
+| Filtrar espetáculos | Como usuário, quero filtrar os espetáculos disponíveis na plataforma por critérios como categoria, data e avaliação, para que eu possa refinar minha busca e encontrar apresentações mais adequadas às minhas preferências. | RF06 |
+| Visualizar detalhes de espetáculo | Como usuário, quero visualizar os detalhes de um espetáculo no portal, para que eu possa obter informações completas sobre a apresentação antes de tomar minha decisão de compra. | RF07 |
+| Visualizar avaliações de espetáculos | Como usuário, quero visualizar as avaliações de outros usuários sobre os espetáculos disponíveis, para que eu possa embasar minha escolha com base na experiência da comunidade do portal. | RF08 |
+|
 
 ## 3.5 Diagrama de Casos de Uso
 _conteúdo_
