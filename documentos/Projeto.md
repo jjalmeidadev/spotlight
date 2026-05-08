@@ -49,8 +49,8 @@
   - [3.1 Requisitos Funcionais (RFs)](#31-requisitos-funcionais-rfs)
   - [3.2 Requisitos Não Funcionais (RNFs)](#32-requisitos-não-funcionais-rnfs)
   - [3.3 Correlação RFs e RNFs](#33-correlação-rfs-e-rnfs)
-  - [3.4 Casos de Uso](#34-casos-de-uso)
-  - [3.5 Casos de Uso x Requisitos Funcionais](#35-casos-de-uso-x-requisitos-funcionais)
+  - [3.4 Casos de Uso e Comparação com Requisitos Funcionais](#34-casos-de-uso-e-comparação-com-requisitos-funcionais)
+  - [3.5 Diagrama de Casos de Uso](#35-diagrama-de-casos-de-uso)
 - [4. Modelagem de Dados](#4-modelagem-de-dados)
   - [4.1 Especificação da Base de Dados para Modelo de Recomendação](#41-especificação-da-base-de-dados-para-modelo-de-recomendação)
   - [4.2 Modelo Conceitual de Dados](#42-modelo-conceitual-de-dados)
@@ -1089,10 +1089,23 @@ A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNF
 | RNF11 | Compatibilidade com dispositivos mobile | RF01, RF02, RF04, RF05, RF06, RF07, RF08, RF09, RF10 | Todas as funcionalidades devem operar corretamente nos dispositivos alvo. |
 | RNF12 | Execução em containers Docker | RF01, RF02, RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10, RF11, RF12, RF13, RF14, RF15, RF16 | Requisito transversal que impacta toda a arquitetura e execução do sistema. |
 
-## 3.4 Casos de Uso
-_conteúdo_
+## 3.4 Casos de Uso e Comparação com Requisitos Funcionais
 
-## 3.5 Casos de Uso x Requisitos Funcionais
+### 3.4.1 Atores do Sistema
+
+| Ator | Tipo | Descrição |
+|------|------|-----------|
+| Usuário | Externo | Usuário com conta criada e sessão ativa, com acesso a funcionalidades personalizadas como preferências, avaliações e comentários. |
+| Administrador | Externo | Usuário interno da Aventura com permissões para gerenciar o catálogo de espetáculos, categorias e avaliações da plataforma. |
+| Sistema de Recomendação | Interno | Componente automatizado responsável por coletar interações, gerar e atualizar recomendações sem ação direta do usuário. |
+
+---
+
+### 3.4.2. Casos de Uso Definidos
+
+
+
+## 3.5 Diagrama de Casos de Uso
 _conteúdo_
 
 # 4. Modelagem de Dados
