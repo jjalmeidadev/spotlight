@@ -1050,9 +1050,6 @@ _conteúdo_
 
 # Requisitos Não Funcionais
 
-<div align="center"> <sub>Tabela X - Requisitos não funcionais</sub>
-
-# Requisitos Não Funcionais
 
 | RNF   | Requisito Não Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição | Aspecto de Qualidade |
 | ----- | ---------------------- | ------------ | ---------------------- | ------------------ | ------------ | -------------------- |
@@ -1140,7 +1137,108 @@ _conteúdo_
 _conteúdo_
 
 ## 5.1 Diagrama de Classes
-_conteúdo_
+
+
+&nbsp;&nbsp;&nbsp;Os diagramas de classes apresentados nesta seção representam a modelagem estrutural do sistema de recomendação de espetáculos teatrais desenvolvido para a plataforma TAPI. A modelagem foi elaborada com base nos princípios da orientação a objetos, permitindo representar entidades, atributos, métodos e relacionamentos envolvidos no funcionamento da solução.
+
+&nbsp;&nbsp;&nbsp;O sistema possui diferentes responsabilidades distribuídas entre módulos específicos, como gerenciamento de usuários, catálogo de espetáculos, sessões, teatros e motor de recomendação. Dessa forma, os diagramas foram organizados em domínios separados para facilitar a leitura, reduzir a complexidade visual e tornar a documentação mais compreensível.
+
+---
+
+### 5.1.1 Visão Geral do Sistema
+
+&nbsp;&nbsp;&nbsp;O diagrama geral apresenta uma visão consolidada das principais entidades do sistema e de seus relacionamentos. Ele demonstra como usuários interagem com espetáculos, como sessões são organizadas em teatros e como o motor de recomendação utiliza interações e preferências para gerar sugestões personalizadas.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama Geral de Classes</sub>
+<br><br>
+
+<img src="./img/diagrama-geral.png" width="100%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+&nbsp;&nbsp;&nbsp;A estrutura central do sistema é composta pelas classes `Usuario`, `Espetaculo`, `Sessao`, `Teatro`, `Interacao` e `Recomendacao`. Essas entidades permitem organizar os dados do catálogo cultural, registrar o comportamento dos usuários e gerar recomendações personalizadas com base em algoritmos de recomendação.
+
+---
+
+### 5.1.2 Domínio de Gestão de Usuários
+
+&nbsp;&nbsp;&nbsp;O domínio de gestão de usuários concentra as funcionalidades relacionadas ao cadastro, autenticação, administração e gerenciamento de perfis da plataforma. Nesse módulo, a classe `Usuario` representa o público geral da aplicação, enquanto a classe `Administrador` representa usuários com permissões elevadas para gerenciamento do sistema.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama de Classes do Domínio de Gestão de Usuários</sub>
+<br><br>
+
+<img src="./img/diagrama-usuarios.png" width="70%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+### Descrição das Classes
+
+---
+
+**Usuario**
+
+&nbsp;&nbsp;&nbsp;Representa os usuários cadastrados na plataforma, responsáveis por acessar espetáculos, interagir com conteúdos e receber recomendações personalizadas.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_usuario` | `integer` | Identificador único do usuário |
+| `nome` | `varchar` | Nome completo do usuário |
+| `email` | `varchar` | E-mail utilizado para autenticação |
+| `senha` | `varchar` | Senha criptografada |
+| `data_nascimento` | `date` | Data de nascimento |
+| `localizacao` | `varchar` | Cidade ou região do usuário |
+| `perfil_preferencias` | `text` | Preferências culturais do usuário |
+| `data_cadastro` | `timestamp` | Data de criação da conta |
+| `tipo_usuario` | `varchar` | Tipo de usuário dentro do sistema |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `login(email, senha)` | `boolean` | Realiza autenticação do usuário |
+| `logout()` | `void` | Encerra a sessão do usuário |
+| `atualizarPerfil()` | `void` | Atualiza informações do perfil |
+| `visualizarRecomendacoes()` | `list` | Exibe recomendações disponíveis |
+
+---
+
+**Administrador**
+
+&nbsp;&nbsp;&nbsp;Representa usuários com privilégios administrativos dentro da plataforma. Essa classe herda os atributos e métodos da classe `Usuario`, adicionando funcionalidades relacionadas ao gerenciamento do sistema.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `cargo` | `varchar` | Cargo administrativo |
+| `permissao` | `varchar` | Nível de permissão do administrador |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `ajustarPrioridade()` | `void` | Ajusta prioridades das recomendações |
+| `visualizarMetricas()` | `list` | Exibe métricas da plataforma |
+| `gerenciarRecomendacoes()` | `void` | Gerencia recomendações geradas |
+
+---
+
+## Relacionamentos UML
+
+| Relação | Tipo | Descrição |
+|---|---|---|
+| `Administrador → Usuario` | Generalização | Administrador herda características da classe Usuario |
+
+---
+
 
 ## 5.2 Diagrama de Componentes da UML
 _conteúdo_
