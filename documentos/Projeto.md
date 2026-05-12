@@ -1413,6 +1413,69 @@ _conteúdo_
 
 ---
 
+## 5.1.5 Domínio do Motor de Recomendação
+
+&nbsp;&nbsp;&nbsp;O motor de recomendação representa a camada inteligente do sistema, responsável por analisar interações, preferências e dados dos espetáculos para gerar recomendações personalizadas aos usuários.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama de Classes do Motor de Recomendação</sub>
+<br><br>
+
+<img src="../documentos/img/diagramamotor.png" width="90%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+## Descrição das Classes
+
+---
+
+## **Recomendacao**
+
+&nbsp;&nbsp;&nbsp;Representa recomendações geradas pelo sistema para os usuários da plataforma.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_recomendacao` | `integer` | Identificador da recomendação |
+| `tipo_algoritmo` | `varchar` | Algoritmo utilizado |
+| `score_recomendacao` | `numeric` | Pontuação da recomendação |
+| `motivo_recomendacao` | `text` | Justificativa da recomendação |
+| `data_geracao` | `timestamp` | Data de geração |
+| `prioridade_manual` | `boolean` | Indica prioridade manual |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `gerarRecomendacao()` | `void` | Gera recomendação |
+| `calcularScore()` | `numeric` | Calcula score |
+| `atualizarPrioridade()` | `void` | Atualiza prioridade |
+
+---
+
+## Relacionamentos UML
+
+| Relação | Tipo | Descrição |
+|---|---|---|
+| `Usuario → Recomendacao` | Agregação | Usuários recebem recomendações |
+| `Espetaculo ↔ Recomendacao` | Associação | Espetáculos aparecem em recomendações |
+| `Administrador → Recomendacao` | Dependência | Administradores gerenciam recomendações |
+| `Recomendacao → Interacao` | Dependência | Recomendações utilizam dados de interação |
+
+---
+
+## 5.1.6 Justificativa da Modelagem
+
+&nbsp;&nbsp;&nbsp;A modelagem proposta foi estruturada para representar de forma modular os principais elementos necessários ao funcionamento da plataforma de recomendação de espetáculos. A separação em domínios permite reduzir acoplamento, melhorar organização arquitetural e facilitar futuras evoluções do sistema.
+
+&nbsp;&nbsp;&nbsp;O domínio de usuários concentra autenticação, perfis e permissões administrativas. O domínio de espetáculos organiza o catálogo cultural e registra o comportamento do usuário por meio das interações. O domínio de sessões e teatros representa a operacionalização das apresentações em locais físicos e datas específicas. Por fim, o domínio do motor de recomendação integra as informações coletadas para gerar sugestões personalizadas baseadas em preferências, avaliações e engajamento dos usuários.
+
+&nbsp;&nbsp;&nbsp;Essa estrutura contribui para uma arquitetura mais clara, escalável e alinhada aos princípios de orientação a objetos, além de facilitar manutenção, entendimento e evolução futura da solução.
+
+
 ## 5.2 Diagrama de Componentes da UML
 _conteúdo_
 
