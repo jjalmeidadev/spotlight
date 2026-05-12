@@ -1,4 +1,15 @@
 
 *.csv
+!src/dataset/
+!src/dataset/*.csv
 *.xls
 *.xlsx
+
+# Artefatos gerados por notebooks e análises locais
+src/aad/*.png
+src/aad/*.jpg
+src/aad/*.jpeg
+src/aad/*.svg
+src/aad/*.pdf
+src/aad/.ipynb_checkpoints/
+src/database/*.csv
