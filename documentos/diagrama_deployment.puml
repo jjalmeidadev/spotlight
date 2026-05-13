@@ -1,0 +1,236 @@
+@startuml
+
+title Diagrama de Deployment - Spotlight
+
+' ==========================================
+
+' CONFIGURAÇÕES VISUAIS DE ALTO PADRÃO
+
+' ==========================================
+
+skinparam linetype ortho
+
+skinparam nodesep 80
+
+skinparam ranksep 100
+
+skinparam padding 10
+
+skinparam defaultFontName "Segoe UI", Arial, sans-serif
+
+
+<style>
+
+node {
+
+  BackgroundColor #F8FAFC
+
+  BorderColor #94A3B8
+
+  BorderThickness 1.5
+
+  FontColor #0F172A
+
+  RoundCorner 8
+
+  Shadowing 0.0
+
+}
+
+cloud {
+
+  BackgroundColor transparent
+
+  BorderColor #0284C7
+
+  BorderThickness 2
+
+  BorderStyle dashed
+
+  FontColor #0369A1
+
+  FontSize 14
+
+  FontStyle bold
+
+}
+
+database {
+
+  BackgroundColor #F0FDF4
+
+  BorderColor #16A34A
+
+  FontColor #14532D
+
+}
+
+component {
+
+  BackgroundColor #F0F9FF
+
+  BorderColor #0284C7
+
+  FontColor #0F172A
+
+  RoundCorner 6
+
+}
+
+arrow {
+
+  Color #64748B
+
+  Thickness 1.5
+
+  FontColor #475569
+
+  FontSize 11
+
+}
+
+</style>
+
+
+
+' ==========================================
+
+' INFRAESTRUTURA
+
+' ==========================================
+
+
+
+node "Dispositivo do Usuário" as ClientNode <<device>> {
+
+    component "**Portal Aventura**\n<size:11>React Native + TS</size>" as App
+
+}
+
+
+
+cloud "Infraestrutura Cloud (AWS / Azure)" as Cloud {
+
+
+
+    node "Load Balancer" as ALBNode <<load balancer>> {
+
+        component "**Application Load Balancer**\n<size:11>SSL Termination</size>" as ALB
+
+    }
+
+
+
+    node "Cluster de Orquestração (K8s / ECS)" as K8s <<execution environment>> {
+
+        
+
+        node "Pod: API Gateway" as PodGW {
+
+            component "**Gateway**\n<size:11>.NET 9 (ASP.NET Core)</size>" as Gateway
+
+        }
+
+        
+
+        node "Pod: Serviços SOA" as PodSOA {
+
+            component "**Core Services**\n<size:11>ASP.NET Core C#</size>" as SOAServices
+
+        }
+
+        
+
+        node "Pod: Inteligência" as PodML {
+
+            component "**Motor de Recomendação**\n<size:11>C# + ML.NET</size>" as MLEngine
+
+        }
+
+    }
+
+
+
+    node "Serviços Gerenciados (PaaS / DBaaS)" as DBaaS <<execution environment>> {
+
+        database "**MongoDB**\n<size:11>Telemetria (NoSQL)</size>" as Mongo
+
+        
+
+        node "Supabase Cluster" as SupaNode {
+
+            component "**Supabase Auth**\n<size:11>Identity (JWT)</size>" as SAuth
+
+            database "**PostgreSQL**\n<size:11>Relacional</size>" as SDB
+
+            node "**Supabase Storage**" as SStore
+
+        }
+
+    }
+
+    
+
+    node "Cluster de Mensageria" as MsgCluster <<execution environment>> {
+
+        component "**RabbitMQ**\n<size:11>AMQP Broker</size>" as Broker
+
+    }
+
+}
+
+
+
+cloud "Parceiros Externos" as ExtCloud {
+
+    component "**API de Bilheteria**\n<size:11>Ticketing System</size>" as Ticketing
+
+}
+
+
+
+' ==========================================
+
+' CONEXÕES E PROTOCOLOS
+
+' ==========================================
+
+
+
+' Fluxo de Entrada
+
+App -down-> ALB : " HTTPS (TLS 1.3)"
+
+App .right.> SAuth : " Auth JWT"
+
+
+
+' Roteamento Interno
+
+ALB -down-> Gateway : " Port 443"
+
+Gateway -down-> SOAServices : " REST / gRPC"
+
+Gateway -down-> MLEngine : " REST / gRPC"
+
+Gateway -left-> Ticketing : " HTTPS"
+
+
+
+' Persistência e Eventos
+
+SOAServices -down-> SDB : " TCP"
+
+SOAServices -down-> SStore : " HTTPS"
+
+SOAServices -right-> Broker : " AMQP"
+
+
+
+MLEngine -down-> Mongo : " TCP"
+
+MLEngine -left-> Broker : " AMQP (Consome)"
+
+
+
+@enduml

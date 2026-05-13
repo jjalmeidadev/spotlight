@@ -1,0 +1,140 @@
+@startuml
+title Diagrama de Componentes SOA - Spotlight
+
+' ==========================================
+' CONFIGURAÇÕES VISUAIS PREMIUM
+' ==========================================
+skinparam linetype ortho
+skinparam nodesep 90
+skinparam ranksep 110
+skinparam padding 10
+skinparam defaultFontName "Segoe UI", Arial, sans-serif
+
+<style>
+component {
+  BackgroundColor #F0F9FF
+  BorderColor #0284C7
+  BorderThickness 1.5
+  FontColor #0F172A
+  RoundCorner 8
+  Shadowing 0.0
+}
+package {
+  BackgroundColor #F8FAFC
+  BorderColor #CBD5E1
+  BorderThickness 1.5
+  FontColor #475569
+  FontSize 14
+  FontStyle bold
+  Padding 25
+  RoundCorner 12
+}
+interface {
+  BackgroundColor #14B8A6
+  BorderColor #0F766E
+}
+arrow {
+  Color #94A3B8
+  Thickness 1.5
+  FontColor #64748B
+  FontSize 11
+}
+</style>
+
+' ==========================================
+' CAMADAS E COMPONENTES
+' ==========================================
+
+package "Serviços Externos" as LayerExt {
+    component "**Supabase Auth**\n<size:11>Identity Provider</size>" as Auth
+    interface "IAuth" as IAuth
+    Auth -up- IAuth
+    
+    component "**API de Bilheteria**\n<size:11>Ticketing</size>" as Ticketing
+    interface "ITicket" as ITicket
+    Ticketing -up- ITicket
+}
+
+package "Camada de Apresentação" as LayerUI {
+    component "**App Aventura**\n<size:11>React Native + TS (MVVM + Redux)</size>" as App
+}
+
+package "Mensageria" as LayerMsg {
+    interface "IEventBus" as IBroker
+    component "**RabbitMQ**\n<size:11>Message Broker</size>" as Broker
+    Broker -up- IBroker
+}
+
+package "Gerenciamento e Roteamento" as LayerRouting {
+    interface "IGateway" as IGateway
+    component "**API Gateway**\n<size:11>ASP.NET Core (.NET 9)</size>" as Gateway
+    Gateway -up- IGateway
+}
+
+package "Serviços de Negócios (SOA)" as LayerSOA {
+    interface "IUser" as IUser
+    component "**Serviço de Usuário**\n<size:11>ASP.NET Core C#</size>" as UserService
+    UserService -up- IUser
+    
+    interface "ICatalog" as ICatalog
+    component "**Serviço de Catálogo**\n<size:11>ASP.NET Core C#</size>" as CatalogService
+    CatalogService -up- ICatalog
+    
+    interface "IRecommend" as IRec
+    component "**Motor de Recomendação**\n<size:11>C# + ML.NET (k-NN / SVD)</size>" as RecService
+    RecService -up- IRec
+}
+
+package "Camada de Dados" as LayerData {
+    interface "IDataRelational" as IDBRelational
+    component "**Base Relacional**\n<size:11>Supabase PostgreSQL</size>" as Postgres
+    Postgres -up- IDBRelational
+    
+    interface "IStorage" as IStorage
+    component "**Assets & Mídia**\n<size:11>Supabase Storage</size>" as Storage
+    Storage -up- IStorage
+
+    interface "ITelemetry" as ITelemetry
+    component "**Base de Telemetria**\n<size:11>MongoDB</size>" as Mongo
+    Mongo -up- ITelemetry
+}
+
+' ==========================================
+' ALINHAMENTO ESTRUTURAL INVISÍVEL
+' ==========================================
+' Garante que Externos fiquem à esquerda e Mensageria à direita do fluxo central
+LayerExt -[hidden]right-> LayerUI
+LayerUI -[hidden]right-> LayerMsg
+
+LayerUI -[hidden]down-> LayerRouting
+LayerRouting -[hidden]down-> LayerSOA
+LayerSOA -[hidden]down-> LayerData
+
+' ==========================================
+' ROTEAMENTO DAS CONEXÕES (Ball-and-Socket)
+' ==========================================
+
+' App -> Acessa Gateway, Auth e RabbitMQ
+App -down-( IGateway : " Consome APIs"
+App -left-( IAuth : " Autenticação JWT"
+App -right-( IBroker : " Pub(Click/View/Time)"
+
+' Gateway -> Delega para SOA e API de Bilheteria
+Gateway -down-( IUser : " Contexto"
+Gateway -down-( ICatalog : " Busca"
+Gateway -down-( IRec : " Solicita sugestões"
+Gateway -left-( ITicket : " Orquestração de compras"
+
+' Serviços SOA -> Banco de Dados
+UserService -down-( IDBRelational
+CatalogService -down-( IDBRelational
+CatalogService -down-( IStorage : " Upload/Leitura"
+RecService -down-( ITelemetry : " Consulta ML"
+RecService -down-( IDBRelational : " Dados de Usuários"
+
+' Serviços SOA -> Publicação e Consumo via Mensageria
+UserService -right-( IBroker : " Pub(UserCreated)"
+CatalogService -right-( IBroker : " Pub(ShowUpdated)"
+RecService -right-( IBroker : " Sub(Eventos Assíncronos)"
+
+@enduml
