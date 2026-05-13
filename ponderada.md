@@ -264,6 +264,13 @@ A utilização de **containers Docker** melhora portabilidade e padronização e
 | O sistema deve ser implantável em diferentes ambientes | Portability | Deploy via Docker seguindo padrão 12-factor; tempo de setup em novo ambiente ≤ 30 min | O parceiro poderá migrar entre provedores de nuvem futuramente. Containers garantem paridade entre ambientes de desenvolvimento, homologação e produção, eliminando inconsistências de configuração. | Todos os serviços do backend, Camada de Dados |
 | O sistema deve garantir cobertura funcional das operações principais | Functional Suitability | Cobertura ≥ 95% dos casos de uso críticos (login, catálogo, recomendação, notificação); zero regressões em deploy | O sistema precisa executar corretamente as funcionalidades essenciais do parceiro. A separação em serviços SOA com contratos bem definidos garante que cada serviço entregue sua função sem dependências ocultas. | Frontend, todos os serviços de negócio, Camada de Dados |
 
+## Conclusão
+
+A arquitetura proposta demonstra que a adoção do padrão SOA não é apenas uma escolha técnica, mas uma decisão estratégica alinhada às necessidades reais do parceiro. A separação em serviços independentes — cada um com responsabilidade única, interface contratada e banco de dados próprio — cria um sistema que pode crescer de forma seletiva, ser mantido por equipes menores e integrar novos provedores sem reescritas.
+
+Os Requisitos Não Funcionais levantados reforçam essa escolha. Cada RNF foi mapeado a um componente concreto do diagrama, tornando as métricas de qualidade rastreáveis e verificáveis — não apenas declarações de intenção. A categorização pela ISO/IEC 25010 garante que os eixos críticos de qualidade (desempenho, confiabilidade, segurança, manutenibilidade e portabilidade) estejam cobertos com SLAs mensuráveis, o que viabiliza validação real em ambiente de produção.
+
+A combinação entre arquitetura desacoplada e requisitos não funcionais bem definidos reduz o risco técnico do projeto: falhas ficam isoladas, gargalos podem ser escalados pontualmente e a plataforma pode evoluir incrementalmente sem comprometer o que já está em operação. Esse alinhamento entre decisões arquiteturais e atributos de qualidade é o que diferencia um sistema que funciona de um sistema que sustenta o crescimento do parceiro a longo prazo.
 
 
 
