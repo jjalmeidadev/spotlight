@@ -1,0 +1,187 @@
+@startuml
+title Diagrama de Componentes - Spotlight (Portal Aventura)
+skinparam componentStyle rectangle
+skinparam shadowing false
+left to right direction
+
+' ─── TEMA GERAL ───
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
+skinparam actor {
+  BackgroundColor #F5F5F5
+  BorderColor #9E9E9E
+  FontColor #424242
+  FontSize 12
+}
+
+skinparam package {
+  BackgroundColor #FAFAFA
+  BorderColor #BDBDBD
+  FontColor #616161
+  FontSize 11
+  BorderThickness 1
+}
+
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #90A4AE
+  FontColor #263238
+  FontSize 12
+  BorderThickness 1.5
+  RoundCorner 8
+}
+
+skinparam interface {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+  FontColor #0D47A1
+  FontSize 10
+}
+
+skinparam database {
+  BackgroundColor #EDE7F6
+  BorderColor #4527A0
+  FontColor #311B92
+  FontSize 12
+}
+
+skinparam arrow {
+  Color #546E7A
+  FontColor #546E7A
+  FontSize 10
+  Thickness 1.5
+}
+
+skinparam component<<apresentacao>> {
+  BackgroundColor #1565C0
+  BorderColor #0D47A1
+  FontColor #FFFFFF
+  RoundCorner 8
+}
+
+skinparam component<<entrada>> {
+  BackgroundColor #6A1B9A
+  BorderColor #4A148C
+  FontColor #FFFFFF
+  RoundCorner 8
+}
+
+skinparam component<<servico>> {
+  BackgroundColor #00695C
+  BorderColor #004D40
+  FontColor #FFFFFF
+  RoundCorner 8
+}
+
+skinparam component<<ml>> {
+  BackgroundColor #E65100
+  BorderColor #BF360C
+  FontColor #FFFFFF
+  RoundCorner 8
+}
+
+skinparam component<<externo>> {
+  BackgroundColor #455A64
+  BorderColor #263238
+  FontColor #FFFFFF
+  RoundCorner 8
+}
+
+skinparam package<<Cloud>> {
+  BackgroundColor #ECEFF1
+  BorderColor #90A4AE
+  FontColor #455A64
+  BorderThickness 1
+}
+
+skinparam package<<Rectangle>> {
+  BorderThickness 1.5
+}
+
+' ─── ATORES ───
+actor "Usuário" as Usuario
+actor "Gestor de Dados" as Gestor
+
+' ─── SERVIÇOS EXTERNOS ───
+package "Serviços Externos" <<Cloud>> {
+  [Supabase Auth] <<externo>> as SupabaseAuth
+}
+
+' ─── SISTEMA SPOTLIGHT ───
+package "Spotlight · Portal Aventura" {
+
+  package "Camada de Apresentação" <<Rectangle>> {
+    [Frontend Web / Mobile] <<apresentacao>> as Frontend
+    [Painel Administrativo] <<apresentacao>> as Admin
+  }
+
+  package "Camada de Entrada" <<Rectangle>> {
+    [API Gateway] <<entrada>> as APIGateway
+    interface "REST /api/v1" as IRestAPI
+  }
+
+  package "Camada de Serviços (Back-end)" <<Rectangle>> {
+    [Serviço de Autenticação] <<servico>> as Auth
+    [Serviço de Perfil do Usuário] <<servico>> as Perfil
+    [Serviço de Catálogo de Espetáculos] <<servico>> as Catalogo
+    [Serviço de Recomendação] <<servico>> as Recomendacao
+    [Serviço de Coleta de Interações] <<servico>> as Interacoes
+  }
+
+  package "Camada de Processamento e ML" <<Rectangle>> {
+    [Motor de Recomendação\n(ML.NET)] <<ml>> as MotorML
+    [Fila de Mensagens\n(RabbitMQ)] <<ml>> as Fila
+    [Pipeline ETL /\nConsolidação de Dados] <<ml>> as ETL
+    interface "IFila" as IFila
+  }
+
+  package "Camada de Dados" <<Rectangle>> {
+    database "Banco de Dados\n(PostgreSQL)" as BD
+    interface "IDatabase" as IDatabase
+  }
+}
+
+' ─── ATORES → APRESENTAÇÃO ───
+Usuario --> Frontend : navega / interage
+Gestor --> Admin : cadastra e atualiza conteúdos
+
+' ─── APRESENTAÇÃO → ENTRADA ───
+' lollipop: Frontend e Admin requerem a interface REST
+Frontend --( IRestAPI
+Admin --( IRestAPI
+IRestAPI -- APIGateway
+
+' ─── GATEWAY → SERVIÇOS ───
+APIGateway --> Auth : valida token
+APIGateway --> Perfil : preferências do usuário
+APIGateway --> Catalogo : consulta espetáculos
+APIGateway --> Recomendacao : solicitar recomendações
+APIGateway --> Interacoes : registrar eventos
+
+' ─── SERVIÇOS → DADOS ───
+' lollipop: serviços requerem IDatabase, BD a fornece
+Perfil --( IDatabase
+Catalogo --( IDatabase
+Interacoes --( IDatabase
+Recomendacao --( IDatabase
+MotorML --( IDatabase
+ETL --( IDatabase
+IDatabase -- BD
+
+' ─── FLUXO ASSÍNCRONO ───
+' socket: Interações requer a fila, Fila a fornece
+Interacoes --( IFila : publicar eventos
+IFila -- Fila
+Fila --> MotorML : consumir eventos
+Fila ..> ETL : acionar consolidação
+
+' ─── ML ↔ RECOMENDAÇÃO ───
+' socket: Recomendação requer o Motor ML
+Recomendacao --( MotorML : solicitar ranking
+
+' ─── INTEGRAÇÃO EXTERNA ───
+' socket: Auth requer Supabase externamente
+Auth --( SupabaseAuth : delega autenticação
+
+@enduml

@@ -1,0 +1,196 @@
+@startuml
+title Diagrama de Deployment - Spotlight (Portal Aventura)
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
+' ─── NÓS ───
+skinparam node {
+  BackgroundColor #F5F5F5
+  BorderColor #90A4AE
+  FontColor #263238
+  FontSize 12
+  BorderThickness 1.5
+}
+
+' ─── ARTIFACTS ───
+skinparam artifact {
+  BackgroundColor #FFFFFF
+  BorderColor #B0BEC5
+  FontColor #263238
+  FontSize 11
+  BorderThickness 1
+}
+
+' ─── DATABASE ───
+skinparam database {
+  BackgroundColor #EDE7F6
+  BorderColor #4527A0
+  FontColor #311B92
+  FontSize 12
+}
+
+' ─── CLOUD ───
+skinparam cloud {
+  BackgroundColor #ECEFF1
+  BorderColor #90A4AE
+  FontColor #455A64
+  FontSize 12
+}
+
+' ─── ARROWS ───
+skinparam arrow {
+  Color #546E7A
+  FontColor #546E7A
+  FontSize 10
+  Thickness 1.5
+}
+
+' ─── CORES POR TIPO DE NÓ ───
+skinparam node<<cliente>> {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+  FontColor #0D47A1
+}
+
+skinparam node<<web>> {
+  BackgroundColor #E8F5E9
+  BorderColor #2E7D32
+  FontColor #1B5E20
+}
+
+skinparam node<<api>> {
+  BackgroundColor #EDE7F6
+  BorderColor #4527A0
+  FontColor #311B92
+}
+
+skinparam node<<ml>> {
+  BackgroundColor #FFF3E0
+  BorderColor #E65100
+  FontColor #BF360C
+}
+
+skinparam node<<queue>> {
+  BackgroundColor #FFF8E1
+  BorderColor #F57F17
+  FontColor #E65100
+}
+
+skinparam artifact<<front>> {
+  BackgroundColor #BBDEFB
+  BorderColor #1565C0
+  FontColor #0D47A1
+}
+
+skinparam artifact<<admin>> {
+  BackgroundColor #BBDEFB
+  BorderColor #1565C0
+  FontColor #0D47A1
+}
+
+skinparam artifact<<gateway>> {
+  BackgroundColor #CE93D8
+  BorderColor #6A1B9A
+  FontColor #4A148C
+}
+
+skinparam artifact<<servico>> {
+  BackgroundColor #C8E6C9
+  BorderColor #2E7D32
+  FontColor #1B5E20
+}
+
+skinparam artifact<<mlcomp>> {
+  BackgroundColor #FFE0B2
+  BorderColor #E65100
+  FontColor #BF360C
+}
+
+skinparam artifact<<externo>> {
+  BackgroundColor #CFD8DC
+  BorderColor #455A64
+  FontColor #263238
+}
+
+' ════════════════════════════
+' NÓS
+' ════════════════════════════
+
+node "Dispositivo do Usuário" <<cliente>> as UserDevice {
+  artifact "Browser / App Mobile" <<front>> as UserApp
+}
+
+node "Dispositivo do Gestor" <<cliente>> as AdminDevice {
+  artifact "Browser" <<admin>> as AdminBrowser
+}
+
+node "Servidor Web" <<web>> as WebServer {
+  artifact "Frontend Web / Mobile" <<front>> as Frontend
+  artifact "Painel Administrativo" <<admin>> as AdminPanel
+}
+
+node "Servidor de Aplicação" <<api>> as AppServer {
+  artifact "API Gateway" <<gateway>> as APIGateway
+  artifact "Serviço de Perfil do Usuário" <<servico>> as Perfil
+  artifact "Serviço de Catálogo de Espetáculos" <<servico>> as Catalogo
+  artifact "Serviço de Recomendação" <<servico>> as Recomendacao
+  artifact "Serviço de Coleta de Interações" <<servico>> as Interacoes
+}
+
+node "Servidor de Processamento / ML" <<ml>> as MLServer {
+  artifact "Motor de Recomendação (ML.NET)" <<mlcomp>> as MotorML
+  artifact "Pipeline ETL" <<mlcomp>> as ETL
+}
+
+node "Servidor de Mensageria" <<queue>> as QueueServer {
+  artifact "RabbitMQ" <<mlcomp>> as RabbitMQ
+}
+
+database "Servidor de Banco de Dados\n(PostgreSQL)" as DBServer {
+  artifact "Banco de Dados Spotlight" as BD
+}
+
+cloud "Serviço Externo" as ExternalCloud {
+  artifact "Supabase Auth" <<externo>> as SupabaseAuth
+}
+
+' ════════════════════════════
+' CONEXÕES
+' ════════════════════════════
+
+' ─── Clientes → Web ───
+UserApp --> Frontend : HTTPS / TLS 1.3
+AdminBrowser --> AdminPanel : HTTPS / TLS 1.3
+
+' ─── Web → API ───
+Frontend --> APIGateway : REST / HTTPS
+AdminPanel --> APIGateway : REST / HTTPS
+
+' ─── Gateway → Externo ───
+APIGateway --> SupabaseAuth : HTTPS / OAuth 2.0
+
+' ─── Gateway → Serviços internos ───
+APIGateway --> Perfil : HTTP (rede interna)
+APIGateway --> Catalogo : HTTP (rede interna)
+APIGateway --> Recomendacao : HTTP (rede interna)
+APIGateway --> Interacoes : HTTP (rede interna)
+
+' ─── Serviços → Banco ───
+Perfil --> BD : TCP / SQL
+Catalogo --> BD : TCP / SQL
+Interacoes --> BD : TCP / SQL
+Recomendacao --> BD : TCP / SQL
+
+' ─── Fluxo assíncrono ───
+Interacoes --> RabbitMQ : AMQP
+RabbitMQ --> MotorML : AMQP
+RabbitMQ ..> ETL : AMQP
+
+' ─── ML ───
+Recomendacao --> MotorML : HTTP (rede interna)
+MotorML --> BD : TCP / SQL
+ETL --> BD : TCP / SQL
+
+@enduml
