@@ -2,7 +2,7 @@
 
 # 1. Diagrama UML de Componentes
 
-## 1.1 Código PlantUML — Component Diagram
+## 1.1 Código PlantUML - Component Diagram
 
 ```plantuml
 @startuml
@@ -144,7 +144,7 @@ GATEWAY --> AUTH
 
 # 2. Diagrama UML de Deployment
 
-## 2.1 Código PlantUML — Deployment Diagram
+## 2.1 Código PlantUML - Deployment Diagram
 
 ```plantuml
 @startuml
@@ -279,22 +279,22 @@ A arquitetura em serviços também facilita o deploy independente aos processos 
 
 ## 4.2 Justificativa dos RNFs
 
-### RNF01 — Compatibilidade
+### RNF01 - Compatibilidade
 
 A compatibilidade entre versões da API é necessária para evitar que atualizações backend interrompam versões anteriores do aplicativo mobile. Neste contexto, Gateway da API une o versionamento e roteamento, permitindo a evolução gradual dos serviços sem a quebra de comunicação entre os protocolos utilizados.
 
-### RNF02 — Portabilidade
+### RNF02 - Portabilidade
 
 A utilização de containers Docker permite utilização padronizada da infraestrutura em diferentes ambientes, reduzindo dependências locais e simplificando processos de manutenção.
 
-### RNF03 — Adequação Funcional
+### RNF03 - Adequação Funcional
 
 O principal objetivo do sistema é fornecer recomendações relevantes ao usuário: O motor ML.NET utiliza dados comportamentais e preferências explícitas para aumentar a precisão das recomendações exibidas.
 
-### RNF04 — Usabilidade
+### RNF04 - Usabilidade
 
 Como o sistema possui abordagem mobile first, a navegação deve ser simples, objetiva e intuitiva. A estrutura do frontend em React Native reduz complexidade de interação (sendo um framework otimizado ao uso de tal ambiente) e melhora a experiência do usuário.
 
-### RNF05 — Segurança
+### RNF05 - Segurança
 
 O sistema manipula autenticação e dados personalizados dos usuários, exigindo mecanismos de proteção contra acessos indevidos. O Gateway da API centraliza a validação de autenticação e o Auth do Supabase gerencia os tokens JWT utilizados no HTTPS.
