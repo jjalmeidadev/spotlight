@@ -6,6 +6,8 @@
 
 ### 1.1 Diagrama de Componentes
 
+![Diagrama de Componentes](./diagrama-componentes.png)
+
 ```plantuml
 @startuml
 skinparam componentStyle uml2
@@ -149,77 +151,86 @@ A arquitetura também facilita **integração com APIs terceiras e sistemas lega
 
 ### 1.3 Diagrama de Deployment
 
+![Diagrama de Componentes](./diagrama-deployment.png)
+
 ```plantuml
 @startuml
 
-title Diagrama de Deployment
+skinparam shadowing false
+skinparam linetype ortho
 
-node "Cliente" {
-    artifact "App Mobile" as Mobile
-    artifact "Painel Web" as Web
+node "Dispositivo do Usuário" {
+
+  artifact "Browser Web"
+  artifact "Aplicativo Mobile"
+
 }
 
-node "Cloud (Docker / Kubernetes)" {
+node "Load Balancer" {
 
-    node "Load Balancer" as LB
+  component "Nginx / Gateway"
 
-    node "API Gateway Container" {
-        artifact "API Gateway\nASP.NET Core" as Gateway
-    }
-
-    node "Serviços de Negócio" {
-        artifact "Serviço do Usuário" as UserService
-        artifact "Serviço do Catálogo" as CatalogService
-        artifact "Serviço de Recomendação" as RecommendationService
-        artifact "Serviço de Notificações" as NotificationService
-    }
-
-    node "Motor de Recomendação" {
-        artifact "KNN Service" as KNN
-        artifact "SVD Service" as SVD
-        artifact "K-Means Service" as KMeans
-    }
-
-    node "Mensageria" {
-        artifact "RabbitMQ" as Rabbit
-    }
-
-    node "Camada de Dados" {
-        database "PostgreSQL\n(Supabase DB)" as Postgres
-        database "MongoDB" as Mongo
-        database "Supabase Storage" as Storage
-    }
 }
 
-node "Serviços Externos" {
-    artifact "Supabase Auth" as Auth
-    artifact "Push Notification API" as PushAPI
+node "Servidor Frontend" {
+
+  component "Frontend Web"
+
 }
 
-Mobile --> LB : HTTPS
-Web --> LB : HTTPS
-LB --> Gateway
+node "Cluster Backend" {
 
-Gateway --> UserService
-Gateway --> CatalogService
-Gateway --> RecommendationService
-Gateway --> NotificationService
+  node "Container Auth Service" {
+    component "Auth Service"
+  }
 
-Mobile --> Auth : OAuth2
-Web --> Auth : OAuth2
+  node "Container Recommendation Service" {
+    component "Recommendation Service"
+  }
 
-UserService --> Postgres
-CatalogService --> Postgres
-CatalogService --> Storage
-RecommendationService --> Mongo
-RecommendationService --> Postgres
-RecommendationService --> KNN
-RecommendationService --> SVD
-RecommendationService --> KMeans
+  node "Container Catalog Service" {
+    component "Catalog Service"
+  }
 
-NotificationService --> Rabbit
-Rabbit --> NotificationService
-NotificationService --> PushAPI
+  node "Container Order Service" {
+    component "Order Service"
+  }
+
+  node "Container Notification Service" {
+    component "Notification Service"
+  }
+
+}
+
+database "PostgreSQL\nBanco Principal" as DB
+
+database "MongoDB / Analytics\nBanco Analítico" as Analytics
+
+cloud "Gateway de Pagamento" as Payment
+cloud "Serviço de Geolocalização" as Geo
+cloud "Serviço de E-mail/SMS" as Message
+
+"Browser Web" --> "Nginx / Gateway"
+"Aplicativo Mobile" --> "Nginx / Gateway"
+
+"Nginx / Gateway" --> "Frontend Web"
+
+"Nginx / Gateway" --> "Auth Service"
+"Nginx / Gateway" --> "Recommendation Service"
+"Nginx / Gateway" --> "Catalog Service"
+"Nginx / Gateway" --> "Order Service"
+"Nginx / Gateway" --> "Notification Service"
+
+"Auth Service" --> DB
+"Catalog Service" --> DB
+"Order Service" --> DB
+
+"Recommendation Service" --> Analytics
+"Recommendation Service" --> DB
+
+"Order Service" --> Payment
+"Recommendation Service" --> Geo
+"Notification Service" --> Message
 
 @enduml
 ```
