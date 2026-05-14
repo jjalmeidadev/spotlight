@@ -1137,7 +1137,344 @@ _conteúdo_
 _conteúdo_
 
 ## 5.1 Diagrama de Classes
-_conteúdo_
+
+
+&nbsp;&nbsp;&nbsp;Os diagramas de classes apresentados nesta seção representam a modelagem estrutural do sistema de recomendação de espetáculos teatrais desenvolvido para a plataforma TAPI. A modelagem foi elaborada com base nos princípios da orientação a objetos, permitindo representar entidades, atributos, métodos e relacionamentos envolvidos no funcionamento da solução.
+
+&nbsp;&nbsp;&nbsp;O sistema possui diferentes responsabilidades distribuídas entre módulos específicos, como gerenciamento de usuários, catálogo de espetáculos, sessões, teatros e motor de recomendação. Dessa forma, os diagramas foram organizados em domínios separados para facilitar a leitura, reduzir a complexidade visual e tornar a documentação mais compreensível.
+
+---
+
+### 5.1.1 Visão Geral do Sistema
+
+&nbsp;&nbsp;&nbsp;O diagrama geral apresenta uma visão consolidada das principais entidades do sistema e de seus relacionamentos. Ele demonstra como usuários interagem com espetáculos, como sessões são organizadas em teatros e como o motor de recomendação utiliza interações e preferências para gerar sugestões personalizadas.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama Geral de Classes</sub>
+<br><br>
+
+<img src="./img/diagrama-geral.png" width="100%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+&nbsp;&nbsp;&nbsp;A estrutura central do sistema é composta pelas classes `Usuario`, `Espetaculo`, `Sessao`, `Teatro`, `Interacao` e `Recomendacao`. Essas entidades permitem organizar os dados do catálogo cultural, registrar o comportamento dos usuários e gerar recomendações personalizadas com base em algoritmos de recomendação.
+
+---
+
+### 5.1.2 Domínio de Gestão de Usuários
+
+&nbsp;&nbsp;&nbsp;O domínio de gestão de usuários concentra as funcionalidades relacionadas ao cadastro, autenticação, administração e gerenciamento de perfis da plataforma. Nesse módulo, a classe `Usuario` representa o público geral da aplicação, enquanto a classe `Administrador` representa usuários com permissões elevadas para gerenciamento do sistema.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama de Classes do Domínio de Gestão de Usuários</sub>
+<br><br>
+
+<img src="./img/diagrama-usuarios.png" width="70%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+### Descrição das Classes
+
+---
+
+**Usuario**
+
+&nbsp;&nbsp;&nbsp;Representa os usuários cadastrados na plataforma, responsáveis por acessar espetáculos, interagir com conteúdos e receber recomendações personalizadas.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_usuario` | `integer` | Identificador único do usuário |
+| `nome` | `varchar` | Nome completo do usuário |
+| `email` | `varchar` | E-mail utilizado para autenticação |
+| `senha` | `varchar` | Senha criptografada |
+| `data_nascimento` | `date` | Data de nascimento |
+| `localizacao` | `varchar` | Cidade ou região do usuário |
+| `perfil_preferencias` | `text` | Preferências culturais do usuário |
+| `data_cadastro` | `timestamp` | Data de criação da conta |
+| `tipo_usuario` | `varchar` | Tipo de usuário dentro do sistema |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `login(email, senha)` | `boolean` | Realiza autenticação do usuário |
+| `logout()` | `void` | Encerra a sessão do usuário |
+| `atualizarPerfil()` | `void` | Atualiza informações do perfil |
+| `visualizarRecomendacoes()` | `list` | Exibe recomendações disponíveis |
+
+---
+
+**Administrador**
+
+&nbsp;&nbsp;&nbsp;Representa usuários com privilégios administrativos dentro da plataforma. Essa classe herda os atributos e métodos da classe `Usuario`, adicionando funcionalidades relacionadas ao gerenciamento do sistema.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `cargo` | `varchar` | Cargo administrativo |
+| `permissao` | `varchar` | Nível de permissão do administrador |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `ajustarPrioridade()` | `void` | Ajusta prioridades das recomendações |
+| `visualizarMetricas()` | `list` | Exibe métricas da plataforma |
+| `gerenciarRecomendacoes()` | `void` | Gerencia recomendações geradas |
+
+---
+
+## Relacionamentos UML
+
+| Relação | Tipo | Descrição |
+|---|---|---|
+| `Administrador → Usuario` | Generalização | Administrador herda características da classe Usuario |
+
+---
+
+## 5.1.3 Domínio de Gestão de Espetáculos
+
+&nbsp;&nbsp;&nbsp;O domínio de gestão de espetáculos organiza as informações relacionadas ao catálogo cultural da plataforma. Esse módulo permite cadastrar espetáculos, classificá-los em categorias e registrar interações realizadas pelos usuários.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama de Classes do Domínio de Gestão de Espetáculos</sub>
+<br><br>
+
+<img src="./img/diagrama-espetaculos.jpeg" width="100%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+## Descrição das Classes
+
+---
+
+## **Espetaculo**
+
+&nbsp;&nbsp;&nbsp;Representa os espetáculos disponíveis na plataforma, contendo informações utilizadas tanto para exibição ao usuário quanto para alimentar o sistema de recomendação.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_espetaculo` | `integer` | Identificador único do espetáculo |
+| `titulo` | `varchar` | Nome do espetáculo |
+| `descricao` | `text` | Descrição detalhada |
+| `genero` | `varchar` | Gênero artístico |
+| `faixa_etaria` | `varchar` | Faixa etária recomendada |
+| `duracao` | `integer` | Duração em minutos |
+| `classificacao_indicativa` | `varchar` | Classificação indicativa |
+| `elenco` | `text` | Informações do elenco |
+| `produtora` | `varchar` | Produtora responsável |
+| `status` | `varchar` | Situação atual do espetáculo |
+| `popularidade` | `numeric` | Indicador de popularidade |
+| `nota_media` | `numeric` | Média das avaliações recebidas |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `cadastrarEspetaculo()` | `void` | Registra um novo espetáculo |
+| `atualizarEspetaculo()` | `void` | Atualiza informações do espetáculo |
+| `calcularNotaMedia()` | `numeric` | Calcula média das avaliações |
+| `alterarStatus(status)` | `void` | Atualiza status do espetáculo |
+
+---
+
+## **Categoria**
+
+&nbsp;&nbsp;&nbsp;Representa categorias utilizadas para classificação temática dos espetáculos.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_categoria` | `integer` | Identificador da categoria |
+| `nome` | `varchar` | Nome da categoria |
+| `descricao` | `text` | Descrição da categoria |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `criarCategoria()` | `void` | Cria uma categoria |
+| `atualizarCategoria()` | `void` | Atualiza categoria |
+| `listarEspetaculos()` | `list` | Lista espetáculos associados |
+
+---
+
+## **Interacao**
+
+&nbsp;&nbsp;&nbsp;Representa ações realizadas pelos usuários dentro da plataforma, como avaliações, comentários e tempo de permanência.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_interacao` | `integer` | Identificador da interação |
+| `tipo_interacao` | `varchar` | Tipo de interação realizada |
+| `data_hora` | `timestamp` | Momento da interação |
+| `tempo_permanencia` | `integer` | Tempo de permanência |
+| `nota` | `numeric` | Nota atribuída |
+| `comentario` | `text` | Comentário do usuário |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `registrarInteracao()` | `void` | Registra interação |
+| `registrarAvaliacao()` | `void` | Registra avaliação do usuário |
+| `calcularEngajamento()` | `numeric` | Calcula engajamento do usuário |
+
+---
+
+## Relacionamentos UML
+
+| Relação | Tipo | Descrição |
+|---|---|---|
+| `Categoria ↔ Espetaculo` | Associação | Categorias classificam espetáculos |
+| `Espetaculo ↔ Interacao` | Associação | Interações estão relacionadas aos espetáculos |
+
+---
+
+## 5.1.4 Domínio de Sessões e Teatros
+
+&nbsp;&nbsp;&nbsp;O domínio de sessões e teatros organiza as apresentações dos espetáculos em locais físicos específicos, permitindo controlar datas, horários, disponibilidade e informações de compra.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama de Classes do Domínio de Sessões e Teatros</sub>
+<br><br>
+
+<img src="./img/diagrama-sessoes-teatros.jpeg" width="90%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+## Descrição das Classes
+
+---
+
+## **Teatro**
+
+&nbsp;&nbsp;&nbsp;Representa os teatros parceiros da plataforma.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_teatro` | `integer` | Identificador do teatro |
+| `nome` | `varchar` | Nome do teatro |
+| `endereco` | `varchar` | Endereço completo |
+| `cidade` | `varchar` | Cidade do teatro |
+| `estado` | `varchar` | Estado do teatro |
+| `capacidade` | `integer` | Capacidade total |
+| `acessibilidade` | `boolean` | Recursos de acessibilidade |
+| `parceiro_naming_rights` | `varchar` | Parceiro associado |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `cadastrarTeatro()` | `void` | Cadastra teatro |
+| `atualizarTeatro()` | `void` | Atualiza informações |
+| `verificarCapacidade()` | `integer` | Verifica capacidade disponível |
+
+---
+
+## **Sessao**
+
+&nbsp;&nbsp;&nbsp;Representa uma apresentação específica de um espetáculo.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_sessao` | `integer` | Identificador da sessão |
+| `data` | `date` | Data da sessão |
+| `horario` | `time` | Horário da sessão |
+| `preco_minimo` | `numeric` | Menor preço disponível |
+| `preco_maximo` | `numeric` | Maior preço disponível |
+| `disponibilidade` | `integer` | Quantidade de ingressos |
+| `link_compra` | `text` | Link de compra |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `criarSessao()` | `void` | Cria nova sessão |
+| `atualizarSessao()` | `void` | Atualiza sessão |
+| `verificarDisponibilidade()` | `boolean` | Verifica disponibilidade |
+
+---
+
+## Relacionamentos UML
+
+| Relação | Tipo | Descrição |
+|---|---|---|
+| `Espetaculo → Sessao` | Composição | Um espetáculo pode possuir várias sessões |
+| `Teatro → Sessao` | Composição | Um teatro pode possuir várias sessões |
+
+---
+
+## 5.1.5 Domínio do Motor de Recomendação
+
+&nbsp;&nbsp;&nbsp;O motor de recomendação representa a camada inteligente do sistema, responsável por analisar interações, preferências e dados dos espetáculos para gerar recomendações personalizadas aos usuários.
+
+<br>
+
+<div align="center">
+<sub>Figura XX - Diagrama de Classes do Motor de Recomendação</sub>
+<br><br>
+
+<img src="../documentos/img/diagramamotor.png" width="90%">
+
+<br><br>
+<sup>Fonte: Material produzido pelos autores (2026)</sup>
+</div>
+
+<br>
+
+## Descrição das Classes
+
+---
+
+## **Recomendacao**
+
+&nbsp;&nbsp;&nbsp;Representa recomendações geradas pelo sistema para os usuários da plataforma.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_recomendacao` | `integer` | Identificador da recomendação |
+| `tipo_algoritmo` | `varchar` | Algoritmo utilizado |
+| `score_recomendacao` | `numeric` | Pontuação da recomendação |
+| `motivo_recomendacao` | `text` | Justificativa da recomendação |
+| `data_geracao` | `timestamp` | Data de geração |
+| `prioridade_manual` | `boolean` | Indica prioridade manual |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `gerarRecomendacao()` | `void` | Gera recomendação |
+| `calcularScore()` | `numeric` | Calcula score |
+| `atualizarPrioridade()` | `void` | Atualiza prioridade |
+
+---
+
+## Relacionamentos UML
+
+| Relação | Tipo | Descrição |
+|---|---|---|
+| `Usuario → Recomendacao` | Agregação | Usuários recebem recomendações |
+| `Espetaculo ↔ Recomendacao` | Associação | Espetáculos aparecem em recomendações |
+| `Administrador → Recomendacao` | Dependência | Administradores gerenciam recomendações |
+| `Recomendacao → Interacao` | Dependência | Recomendações utilizam dados de interação |
+
+---
+
+## 5.1.6 Justificativa da Modelagem
+
+&nbsp;&nbsp;&nbsp;A modelagem proposta foi estruturada para representar de forma modular os principais elementos necessários ao funcionamento da plataforma de recomendação de espetáculos. A separação em domínios permite reduzir acoplamento, melhorar organização arquitetural e facilitar futuras evoluções do sistema.
+
+&nbsp;&nbsp;&nbsp;O domínio de usuários concentra autenticação, perfis e permissões administrativas. O domínio de espetáculos organiza o catálogo cultural e registra o comportamento do usuário por meio das interações. O domínio de sessões e teatros representa a operacionalização das apresentações em locais físicos e datas específicas. Por fim, o domínio do motor de recomendação integra as informações coletadas para gerar sugestões personalizadas baseadas em preferências, avaliações e engajamento dos usuários.
+
+&nbsp;&nbsp;&nbsp;Essa estrutura contribui para uma arquitetura mais clara, escalável e alinhada aos princípios de orientação a objetos, além de facilitar manutenção, entendimento e evolução futura da solução.
+
 
 ## 5.2 Diagrama de Componentes da UML
 _conteúdo_
