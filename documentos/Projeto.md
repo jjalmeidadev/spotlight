@@ -975,7 +975,6 @@ _conteúdo_
 
 <div align="center"> <sub>Tabela X - Requisitos funcionais</sub>
 
-
 ## Requisitos Funcionais
 
 ### Autenticação e Perfil
@@ -1050,7 +1049,6 @@ _conteúdo_
 
 # Requisitos Não Funcionais
 
-
 | RNF   | Requisito Não Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição | Aspecto de Qualidade |
 | ----- | ---------------------- | ------------ | ---------------------- | ------------------ | ------------ | -------------------- |
 | RNF01 | O sistema deve carregar todas as telas principais (home, detalhes de espetáculo, categorias e calendário) em no máximo **2 segundos** em dispositivos mobile com conexão 4G (mínimo 20 Mbps de download), sendo este o cenário de referência prioritário. Em desktop, o limite se mantém. | Sistema disponível em produção, testado prioritariamente em dispositivo mobile físico (Android ou iOS) com conexão 4G ativa. | Utilizar ferramenta de medição de performance (ex: Lighthouse no modo mobile) para acessar cada tela principal e registrar FCP e TTI. Repetir o teste **5 vezes por tela** em horários distintos. | Todas as telas carregam completamente em até **2 segundos em 100% das execuções** no cenário mobile 4G. | Métricas de performance mobile registradas. | Desempenho |
@@ -1085,6 +1083,7 @@ A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNF
 | RNF10 | Usabilidade (máx. 3 toques) | RF04, RF05, RF06, RF07 | A descoberta de conteúdos e navegação depende da facilidade de uso da interface. |
 | RNF11 | Compatibilidade com dispositivos mobile | RF01, RF02, RF04, RF05, RF06, RF07, RF08, RF09, RF10 | Todas as funcionalidades devem operar corretamente nos dispositivos alvo. |
 | RNF12 | Execução em containers Docker | RF01, RF02, RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10, RF11, RF12, RF13, RF14, RF15, RF16 | Requisito transversal que impacta toda a arquitetura e execução do sistema. |
+</div>
 
 ## 3.4 Casos de Uso
 _conteúdo_
@@ -1122,6 +1121,7 @@ Artefatos entregáveis nesta Sprint:
 - Script/notebook de pré-processamento para geração de agregados e matrizes de similaridade.
 
 Esta especificação está alinhada com o escopo mínimo definido para as telas essenciais; melhorias (analytics, pipelines ML, integrações transacionais) ficam para fases posteriores.
+
 ## 4.2 Modelo Conceitual de Dados
 _conteúdo_
 
@@ -1490,10 +1490,16 @@ O foco está em justificar as escolhas técnicas com base em requisitos do proje
 O Supabase é utilizado nos três eixos principais da infraestrutura de dados:
 
 - **Autenticação**: Supabase Auth fornece JWT nativamente, integrado ao fluxo de login do app. O token é validado no API Gateway antes de qualquer roteamento de requisição.
-- **Banco de Dados**: PostgreSQL provisionado pelo Supabase (localmente via Docker). Armazena catálogo de espetáculos, perfis de usuários e a matriz de interações ponderadas (view=1pt, clique=2pt, favorito=3pt, compra=5pt) consumida pelo motor de ML.
+- **Banco de Dados Relacional**: PostgreSQL provisionado pelo Supabase. Armazena catálogo de espetáculos, perfis de usuários.
 - **Armazenamento**: Supabase Storage gerencia imagens e assets dos espetáculos, servindo as URLs diretamente ao frontend via CDN interno.
 
-### 5.3.2 Backend de APIs: ASP.NET Core Web API (C#, .NET 9)
+### 5.3.2 Banco de Dados Não Relacional: MongoDB
+
+O MongoDB foi adotado como banco de dados NoSQL orientado a documentos para armazenar o alto volume de eventos de telemetria gerados pelos usuários, com foco especial no registro de cliques e tempo de tela em cada espetáculo.
+
+Diferente dos dados transacionais armazenados no PostgreSQL, os dados comportamentais geram uma carga de escrita constante e massiva. O MongoDB foi escolhido por sua alta performance de gravação e escalabilidade horizontal, suportando picos de tráfego sem onerar o banco principal. Além disso, a flexibilidade de schema do formato JSON/BSON permite evoluir os dados capturados sem a necessidade de migrações complexas. Esses dados representam o "interesse implícito" do usuário e formam a base de ingestão bruta que alimenta e calibra os algoritmos do motor de Machine Learning.
+
+### 5.3.3 Backend de APIs: ASP.NET Core Web API (C#, .NET 9)
 
 A API de negócio é organizada em três serviços independentes, seguindo a arquitetura orientada a serviços (**SOA**):
 
@@ -1507,7 +1513,7 @@ O **ASP.NET Core Web API** foi escolhido por ser o framework mais maduro do ecos
 
 Um **API Gateway** centraliza o roteamento entre os três serviços, valida o JWT emitido pelo Supabase Auth e aplica rate limiting.
 
-### 5.3.3 Frontend: React Native + TypeScript
+### 5.3.4 Frontend: React Native + TypeScript
 
 O React Native foi adotado como framework de desenvolvimento mobile por permitir base de código única para Android e iOS, reduzindo o esforço de manutenção sem abrir mão de performance nativa. 
 
@@ -1515,13 +1521,13 @@ TypeScript adiciona tipagem estática, especialmente relevante num contexto com 
 
 O gerenciamento de estado é feito com **Redux Toolkit** e **RTK Query**, que eliminam boilerplate e tratam o caching de requisições de forma declarativa.
 
-### 5.3.4 Comunicação Assíncrona: RabbitMQ
+### 5.3.5 Comunicação Assíncrona: RabbitMQ
 
 A comunicação entre os serviços de negócio e o motor de recomendação é feita via fila de mensagens com **RabbitMQ**. Cada interação do usuário (clique, favorito, compra) gera um evento publicado na fila. O motor de ML consome esses eventos de forma assíncrona, atualizando os modelos incrementalmente sem bloquear a resposta ao usuário.
 
 Essa abordagem garante desacoplamento temporal entre os serviços e suporta picos de carga sem degradação.
 
-### 5.3.5 Motor de Recomendação: C# + ML.NET
+### 5.3.6 Motor de Recomendação: C# + ML.NET
 
 O motor de recomendação é implementado como um serviço C# separado utilizando **ML.NET**, a biblioteca oficial da Microsoft para machine learning em .NET. Três algoritmos são empregados conforme a maturidade do perfil do usuário:
 
@@ -1531,13 +1537,14 @@ O motor de recomendação é implementado como um serviço C# separado utilizand
 
 A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à capacidade de rodar os três algoritmos de forma nativa, sem dependências externas. O serviço expõe uma API interna consumida pelo serviço de recomendação via RabbitMQ.
 
-### 5.3.6 Tabela de Stacks
+### 5.3.7 Tabela de Stacks
 
 | Camada              | Tecnologia                          | Justificativa principal |
 |---------------------|-------------------------------------|--------------------------|
 | Frontend            | React Native + TypeScript           | Multiplataforma · MVVM · Redux |
 | Autenticação        | Supabase Auth                       | JWT nativo · integração direta com o app |
-| Banco de dados      | Supabase (PostgreSQL)               | Provisionamento local via Docker |
+| Banco de dados relacional     | Supabase (PostgreSQL)               | Provisionamento local via Docker |
+| Banco de Dados NoSQL          | MongoDB                             | Alta performance de gravação e schema flexível para armazenar a telemetria que alimenta o motor de ML |
 | Armazenamento       | Supabase Storage                    | Assets de espetáculos via CDN |
 | API Gateway         | ASP.NET Core (.NET 9)               | Roteamento · validação JWT · rate limiting |
 | Serviços SOA        | ASP.NET Core Web API (C#)           | Obrigatoriedade · maturidade · DI nativa |
