@@ -43,8 +43,8 @@
     - [2.5.1 Cadeia de Valor](#251-cadeia-de-valor)
     - [2.5.2 Fluxo de Negócio Proposto (AS-IS e TO-BE)](#252-fluxo-de-negócio-proposto-as-is-e-to-be)
   - [2.6 Matriz de Risco do Projeto](#26-matriz-de-risco-do-projeto)
-  - [2.7 Ideação](#27-ideação)
-  - [2.8 Canvas do Projeto](#28-canvas-do-projeto)
+  - [2.7 Brainstorm de Features](#27-brainstorm-de-features)
+  - [2.8 Business Model Canvas](#28-business-model-canvas)
 - [3. Requisitos do Projeto](#3-requisitos-do-projeto)
   - [3.1 Requisitos Funcionais (RFs)](#31-requisitos-funcionais-rfs)
   - [3.2 Requisitos Não Funcionais (RNFs)](#32-requisitos-não-funcionais-rnfs)
@@ -851,9 +851,116 @@ As conexões entre pools representam a troca de informações entre atores disti
 ## 2.6 Matriz de Risco do Projeto
 _conteúdo_
 
-## 2.7 Ideação
-_conteúdo_
-Obs.: Seção dedicada a discussão sobre ideias e priorização de features.
+## 2.7 Brainstorm de Features
+
+Esta seção detalha as principais telas da aplicação, desde Login/Cadastro, Seleção de Tags (onboarding), Tela Principal estilo Netflix, Calendário, até a página descritiva do espetáculo, além dos fluxos para usuários finais e administradores, justificando cada uma pela redução de rejeição, personalização e aumento de conversão. Em paralelo, explica a arquitetura do algoritmo de recomendação organizado em camadas de prioridade: alta, média e baixa, com o objetivo de entregar recomendações relevantes, viáveis e comercialmente eficazes.
+
+<div align="center">
+
+<sub>Figura X - Brainstorm de Features</sub><br>
+
+  <img src="../documentos/img/brainstorm_features.png" width="100%" alt="Brainstorm de Features"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### 2.7.1 Definição de Telas da Aplicação
+
+Com base no mapeamento (post-its azuis), a interface foi dividida em módulos que guiam o usuário desde a aquisição (onboarding) até a conversão (descoberta e aprofundamento).
+
+#### 2.7.1.1 Inventário de Telas (Post-its Azuis)
+
+1. **Login/Cadastro**  
+   Ponto de entrada da plataforma.
+
+2. **Tela de Seleção de Tags & Datas**  
+   Interface de onboarding inicial para captar interesses.
+
+3. **Dashboard Administrativo**  
+   Tela voltada para administradores da plataforma.
+
+4. **Tela Principal (Estilo Netflix)**  
+   Hub central de navegação, organizando os espetáculos em trilhas horizontais categorizadas.
+
+5. **Dropdown de Abas de Categorias**  
+   Menu de navegação secundária para filtragem rápida por gêneros ou temas.
+
+6. **Calendário de Peças**  
+   Visão em grade ou lista organizada cronologicamente para facilitar o planejamento.
+
+7. **Tela Descritiva do Espetáculo**  
+   Página de detalhes de uma peça específica, contendo avaliações, comentários e um carrossel inferior com sugestões de peças similares.
+
+#### 2.7.1.2 Fluxo das telas
+
+#### Visão do Usuário Final
+
+**Login/Cadastro** → **Seleção de Tags (Cold Start)** → **Tela Principal (Estilo Netflix)**
+
+A partir da Tela Principal, o usuário pode explorar usando o **Dropdown de Categorias** ou o **Calendário de Peças**, culminando no clique que o leva à **Tela Descritiva do Espetáculo** para tomada de decisão.
+
+#### Visão do Administrador
+
+**Login** → **Dashboard Adm** (onde regras de negócio pontuais podem sobrescrever temporariamente os algoritmos em campanhas específicas).
+
+### Justificativas das escolhas de telas
+
+- **Login/Cadastro & Seleção de Tags**  
+
+  **Por que é necessária?** Sistemas de recomendação sofrem com o problema de **"Cold Start"**.  
+  **Contribuição UX:** Coletar preferências diretas logo no início permite que a Tela Principal já seja povoada com relevância no primeiro acesso, reduzindo a taxa de rejeição.
+
+- **Tela Principal (Estilo Netflix) & Dropdown**  
+
+  **Por que é necessária?** Reduz a carga cognitiva do usuário.  
+  **Contribuição UX:** O formato de carrosséis horizontais é um modelo mental já consolidado no mercado. Permite descoberta passiva de conteúdo. O dropdown atende usuários com intenção de busca mais ativa.
+
+- **Tela Descritiva com Carrossel de Sugestões** 
+
+  **Por que é necessária?** É o momento decisivo de conversão (venda do ingresso/interesse).  
+  **Contribuição UX:** Estrelas e comentários fornecem prova social. O carrossel de sugestões é vital: mantém o usuário navegando mesmo se não se interessar pela peça atual.
+
+- **Dashboard Adm**  
+
+  **Por que é necessária?** Garante controle de negócios. Algoritmos não preveem contratos comerciais fechados pela produtora que exijam destaque na página inicial.
+
+---
+
+# 2.7.2 Fatores de Recomendação e Priorização de Algoritmos
+
+O motor de recomendação do Spotlight foi desenhado considerando múltiplas camadas de dados. A ordem de prioridade de execução e peso no modelo segue:
+
+### 🟢 Prioridade Alta: Filtragem Colaborativa e Comportamento Implícito
+
+- **Fatores:** Semelhança de usuários, Navegação (tempo de permanência e cliques), Histórico.
+- **Categoria:** Comportamento do Usuário & Filtragem Colaborativa (User-to-User / Item-to-Item).
+- **Peso Relativo:** Alto (espinha dorsal do modelo).
+
+**Justificativa:**  
+O que o usuário *faz* (comportamento implícito) tem muito mais valor do que o que ele diz que gosta. A similaridade entre usuários permite recomendações hiper-personalizadas.
+
+---
+
+### 🟡 Prioridade Média: Contexto, Heurísticas e Serendipidade
+
+- **Fatores:** Localização, Preço, Data, Popularidade, "Me Surpreenda".
+- **Categoria:** Regras de Contexto & Diversificação.
+- **Peso Relativo:** Médio.
+
+**Justificativa:**  
+Espetáculos teatrais são eventos físicos e temporais. Esses fatores garantem viabilidade da recomendação. O "Me Surpreenda" introduz serendipidade e ajuda a romper a bolha de filtro.
+
+---
+
+### 🟠 Prioridade Baixa/Complementar: Tendências e Feedback Explícito
+
+- **Fatores:** Histórico Async, Avaliação, Tendência, Vendas, Sazonalidade.
+- **Categoria:** Dados Globais & Qualidade do Item.
+- **Peso Relativo:** Baixo (ajuste fino/multiplicadores).
+
+**Justificativa:**  
+Avaliações e volume de vendas indicam qualidade intrínseca. Tendências e sazonalidade capturam o momento cultural. Esses fatores ajudam a desempatar itens com afinidade similar.
 
 ## 2.8 Business Model Canvas
 
@@ -907,7 +1014,7 @@ O valor entregue para os diferentes segmentos de clientes (espectadores e equipe
 - **Aumento do tempo de permanência no Portal Aventura**: Ao oferecer um feed contínuo e relevante, o usuário consome mais conteúdo sobre as produções antes de decidir.
 - **Estímulo à compra de ingressos por recomendação contextual**: Inserção de "gatilhos" de compra no momento exato de maior interesse, aumentando a taxa de conversão.
 - **Jornada cultural contínua**: Transforma uma compra isolada em um ciclo de consumo recorrente, fidelizando o cliente ao selo Aventura.
-- **Segmentação inteligente de público (B2B)**: Permite que o marketing abandone o anúncios genéricos e faça campanhas ultra-segmentadas baseadas nos clusters gerados pelo ML.
+- **Segmentação inteligente de público**: Permite que o marketing abandone o anúncios genéricos e faça campanhas ultra-segmentadas baseadas nos clusters gerados pelo ML.
 - **Explicabilidade das recomendações**: Transparência para o usuário ("Recomendado porque você assistiu X") e para os gestores, aumentando a confiança nas predições do sistema.
 
 ---
