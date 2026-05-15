@@ -1257,6 +1257,23 @@ A entidade Usuário representa as pessoas que utilizam a plataforma de recomenda
 #### Importância no contexto do projeto
 Essa entidade permite identificar os usuários da plataforma, registrar preferências e armazenar informações necessárias para recomendações personalizadas.
 
+### Tabela x - Tabela de atributos Usuário
+
+| Atributo | Descrição |
+|---|---|
+| id_usuario | Identificador único do usuário. |
+| nome | Nome completo do usuário. |
+| email | E-mail utilizado para acesso à plataforma. |
+| senha | Senha de autenticação do usuário. |
+| data_nascimento | Data de nascimento do usuário. |
+| localizacao | Localização do usuário. |
+| perfil_preferencias | Preferências de categorias e conteúdos. |
+| data_cadastro | Data de criação da conta. |
+| tipo_usuario | Define o tipo do usuário (visitante, cadastrado ou administrador). |
+
+Fonte: material elaborado pelos autores (2025).
+
+
 ---
 
 ### Entidade: Espetáculo
@@ -1267,6 +1284,26 @@ A entidade Espetáculo representa os eventos e apresentações disponíveis na p
 #### Importância no contexto do projeto
 Essa é a principal entidade do sistema, responsável por armazenar as informações dos espetáculos que serão exibidos e recomendados aos usuários.
 
+### Tabela x - Tabela de atributos Espetáculo
+
+| Atributo | Descrição |
+|---|---|
+| id_espetaculo | Identificador único do espetáculo. |
+| titulo | Nome do espetáculo. |
+| descricao | Descrição do espetáculo. |
+| genero | Gênero da apresentação. |
+| faixa_etaria | Faixa etária recomendada. |
+| duracao | Tempo de duração do espetáculo. |
+| classificacao_indicativa | Classificação indicativa oficial. |
+| elenco | Artistas participantes da apresentação. |
+| produtora | Empresa responsável pela produção. |
+| status | Situação atual do espetáculo (em cartaz, em breve ou encerrado). |
+| popularidade | Indicador de popularidade do espetáculo. |
+| nota_media | Média das avaliações recebidas. |
+
+Fonte: material elaborado pelos autores (2025).
+
+
 ---
 
 ### Entidade: Teatro
@@ -1276,6 +1313,23 @@ A entidade Teatro representa os locais físicos onde os espetáculos acontecem.
 
 #### Importância no contexto do projeto
 Ela permite armazenar informações sobre os espaços culturais utilizados para realização das sessões.
+
+### Tabela x - Tabela de atributos Teatro
+
+| Atributo | Descrição |
+|---|---|
+| id_teatro | Identificador único do teatro. |
+| nome | Nome do teatro. |
+| endereco | Endereço completo do teatro. |
+| cidade | Cidade onde o teatro está localizado. |
+| estado | Estado onde o teatro está localizado. |
+| capacidade | Quantidade máxima de espectadores. |
+| acessibilidade | Recursos de acessibilidade disponíveis. |
+| parceiro_naming_rights | Empresa parceira vinculada ao naming rights do teatro. |
+
+Fonte: material elaborado pelos autores (2025).
+
+
 ---
 
 ### Entidade: Sessão
@@ -1285,6 +1339,23 @@ A entidade Sessão representa uma apresentação específica de um espetáculo e
 
 #### Importância no contexto do projeto
 Ela organiza as apresentações disponíveis para compra e consulta pelos usuários.
+
+### Tabela x - Tabela de atributos Sessão
+
+| Atributo | Descrição |
+|---|---|
+| id_sessao | Identificador único da sessão. |
+| data | Data da apresentação. |
+| horario | Horário da sessão. |
+| preco_minimo | Menor valor disponível para ingresso. |
+| preco_maximo | Maior valor disponível para ingresso. |
+| disponibilidade | Quantidade de ingressos disponíveis. |
+| link_compra | Link para compra de ingressos. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
+
 
 
 
