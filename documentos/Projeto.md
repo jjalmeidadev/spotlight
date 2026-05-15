@@ -1356,6 +1356,48 @@ Fonte: material elaborado pelos autores (2025).
 
 ---
 
+### Entidade: Categoria
+
+#### Descrição da entidade
+A entidade Categoria representa a classificação temática dos espetáculos.
+
+#### Importância no contexto do projeto
+Ela auxilia na organização dos espetáculos e na personalização das recomendações feitas aos usuários.
+
+### Tabela x - Tabela de atributos Categoria
+
+| Atributo | Descrição |
+|---|---|
+| id_categoria | Identificador único da categoria. |
+| nome | Nome da categoria. |
+| descricao | Descrição da categoria. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
+
+### Entidade: Interação
+
+#### Descrição da entidade
+A entidade Interação representa as ações comportamentais realizadas pelos usuários na plataforma em relação aos espetáculos.
+
+#### Importância no contexto do projeto
+Essa entidade centraliza os dados comportamentais utilizados pelo sistema de recomendação, permitindo analisar preferências e padrões de navegação dos usuários.
+
+### Tabela x - Tabela de atributos Interação
+
+| Atributo | Descrição |
+|---|---|
+| id_interacao | Identificador único da interação. |
+| id_usuario | Usuário responsável pela interação. |
+| id_espetaculo | Espetáculo relacionado à interação. |
+| tipo_interacao | Tipo de interação realizada. |
+| data_hora | Data e horário da interação. |
+| tempo_permanencia | Tempo de permanência do usuário no conteúdo. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
 
 
 
