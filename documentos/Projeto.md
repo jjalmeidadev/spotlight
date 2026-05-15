@@ -1245,14 +1245,21 @@ _inserir entidades_
 
 ### 4.2.3. Descrição Textual dos Relacionamentos entre Entidades
 
-_inserir tabela_
+| Nº | Relacionamento | Entidade 1 | Entidade 2 | Cardinalidade | Descrição |
+|---|---|---|---|---|---|
+| 1 | Realiza | Usuário | Interação | 1:N | Um usuário pode realizar várias interações ao longo do tempo (visualizações, cliques, favoritos, etc.), mas cada interação pertence a exatamente um único usuário. |
+| 2 | Refere-se a | Interação | Espetáculo | N:1 | Várias interações podem se referir ao mesmo espetáculo, mas cada interação está associada a exatamente um espetáculo. |
+| 3 | Avalia | Usuário | Espetáculo | N:N | Um usuário pode avaliar vários espetáculos e um espetáculo pode receber avaliações de vários usuários. Este relacionamento é distinto da Interação pois representa uma nota explícita atribuída pelo usuário, armazenada no banco relacional e utilizada para o cálculo da média do espetáculo. |
+| 4 | Recebe | Usuário | Recomendação | 1:N | Um usuário pode receber várias recomendações geradas pelo sistema ao longo da sua jornada, mas cada recomendação é direcionada a um único usuário. |
+| 5 | Recomenda | Recomendação | Espetáculo | N:1 | Um mesmo espetáculo pode ser recomendado a múltiplos usuários em recomendações distintas, mas cada recomendação aponta para um único espetáculo. |
+| 6 | Possui | Espetáculo | Sessão | 1:N | Um espetáculo pode ter várias sessões em datas, horários e teatros diferentes, mas cada sessão pertence a um único espetáculo. |
+|
 
 ### 4.2.4. Detalhamento
 
 Este modelo conceitual descreve a estrutura de dados do sistema Spotlight, contemplando as oito entidades centrais do domínio — Usuário, Espetáculo, Teatro, Sessão, Categoria, Interação, Recomendação e Ator — e os onze relacionamentos que as conectam. A modelagem foi construída com base nos requisitos do projeto e nas particularidades do negócio da Aventura Teatros, garantindo que cada decisão estrutural tenha correspondência direta com uma necessidade funcional do sistema.
 
 Dois pontos de destaque merecem atenção especial. O primeiro é a separação entre os relacionamentos **Realiza** e **Avalia**: enquanto o relacionamento Realiza captura interações implícitas do usuário com os espetáculos — como visualizações, cliques e favoritos, armazenadas no banco NoSQL para alimentar o motor de recomendação —, o relacionamento Avalia representa a nota explícita atribuída pelo usuário, persistida no banco relacional e utilizada para o cálculo da média de avaliação de cada espetáculo. Essa distinção reflete a arquitetura de dados do sistema e garante que os dois tipos de sinal sejam tratados com a precisão adequada. O segundo destaque é a incorporação do papel de administrador diretamente na entidade Usuário, por meio do atributo `tipo_usuario`, eliminando a redundância de uma entidade separada e centralizando as regras de controle de acesso em um único ponto do modelo.
-
 
 ## 4.3 Modelo Lógico de Dados
 _conteúdo_
