@@ -1231,7 +1231,7 @@ Esta especificação está alinhada com o escopo mínimo definido para as telas 
 
 ## 4.2 Modelo Conceitual de Dados
 
-_introdução_
+O modelo conceitual de dados representa as entidades e seus relacionamentos de forma abstrata, descrevendo os elementos do domínio do negócio e como eles se conectam dentro do sistema Spotlight. Ele serve como base para o desenvolvimento do modelo lógico e a implementação do banco de dados, garantindo que a estrutura de dados atenda aos requisitos do projeto e suporte a evolução do sistema de recomendação de espetáculos da Aventura.
 
 ### 4.2.1. Diagrama Conceitual
 
