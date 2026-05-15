@@ -1091,6 +1091,8 @@ A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNF
 
 ## 3.4 Casos de Uso e Comparação com Requisitos Funcionais
 
+A seção de casos de uso tem como objetivo representar as principais funcionalidades do Sistema de Recomendação para a Aventura a partir da perspectiva dos atores envolvidos no sistema, estabelecendo a relação entre as necessidades dos usuários e os requisitos funcionais definidos para a plataforma. Por meio dessa modelagem, é possível visualizar como usuários, administradores e o sistema de recomendação interagem com o ambiente, garantindo maior clareza sobre os comportamentos esperados, as responsabilidades de cada ator e o funcionamento geral das funcionalidades propostas.
+
 ### 3.4.1 Atores do Sistema
 
 | Ator | Tipo | Descrição |
