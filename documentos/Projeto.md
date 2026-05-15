@@ -1264,7 +1264,10 @@ _inserir entidades_
 | 7 | Sedia | Teatro | Sessão | 1:N | Um teatro pode sediar várias sessões de diferentes espetáculos, mas cada sessão ocorre em um único teatro. |
 | 8 | Pertence a | Espetáculo | Categoria | N:1 | Vários espetáculos podem pertencer a uma mesma categoria, mas cada espetáculo está classificado sob uma única categoria principal. |
 | 9 | Prefere | Usuário | Categoria | N:1 | Vários usuários podem preferir a mesma categoria cultural, mas cada usuário possui uma única categoria de preferência principal registrada. |
-|
+| 10 | Gerencia | Usuário | Espetáculo | 1:N | Um usuário com perfil administrador pode gerenciar vários espetáculos na plataforma, sendo responsável por cadastrar, editar e controlar o status de cada produção. Cada espetáculo está sob responsabilidade de um único usuário administrador. |
+| 11 | Atua em | Espetáculo | Ator | N:N | Um espetáculo conta com vários atores em seu elenco e um ator pode participar de vários espetáculos ao longo de sua carreira. Este relacionamento é implementado por meio de uma tabela associativa no modelo lógico. |
+
+---
 
 ### 4.2.4. Detalhamento
 
