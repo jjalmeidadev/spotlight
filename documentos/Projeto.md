@@ -1399,6 +1399,31 @@ Fonte: material elaborado pelos autores (2025).
 
 ---
 
+### Entidade: Recomendação
+
+#### Descrição da entidade
+A entidade Recomendação representa as sugestões de espetáculos geradas para os usuários.
+
+#### Importância no contexto do projeto
+Ela armazena os resultados produzidos pelos algoritmos de recomendação da plataforma.
+
+### Tabela x - Tabela de atributos Recomendação
+
+| Atributo | Descrição |
+|---|---|
+| id_recomendacao | Identificador único da recomendação. |
+| id_usuario | Usuário que recebeu a recomendação. |
+| id_espetaculo | Espetáculo recomendado. |
+| tipo_algoritmo | Algoritmo utilizado para gerar a recomendação. |
+| score_recomendacao | Pontuação de relevância da recomendação. |
+| motivo_recomendacao | Justificativa da recomendação. |
+| data_geracao | Data de geração da recomendação. |
+| prioridade_manual | Indica se houve priorização manual. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
+
 
 
 ### 4.2.3. Descrição Textual dos Relacionamentos entre Entidades
