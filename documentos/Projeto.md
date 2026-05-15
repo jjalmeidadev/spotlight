@@ -1230,7 +1230,24 @@ Artefatos entregáveis nesta Sprint:
 Esta especificação está alinhada com o escopo mínimo definido para as telas essenciais; melhorias (analytics, pipelines ML, integrações transacionais) ficam para fases posteriores.
 
 ## 4.2 Modelo Conceitual de Dados
-_conteúdo_
+
+_introdução_
+
+### 4.2.1. Diagrama Conceitual
+
+_inserir diagrama_
+
+### 4.2.2. Descrição Textual de Entidades e Atributos
+
+_inserir entidades_
+
+### 4.2.3. Descrição Textual dos Relacionamentos entre Entidades
+
+_inserir tabela_
+
+### 4.2.4. Detalhamento
+
+_inserir conclusão_
 
 ## 4.3 Modelo Lógico de Dados
 _conteúdo_
