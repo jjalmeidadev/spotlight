@@ -1269,6 +1269,15 @@ Este modelo conceitual descreve a estrutura de dados do sistema Spotlight, conte
 
 Dois pontos de destaque merecem atenção especial. O primeiro é a separação entre os relacionamentos **Realiza** e **Avalia**: enquanto o relacionamento Realiza captura interações implícitas do usuário com os espetáculos — como visualizações, cliques e favoritos, armazenadas no banco NoSQL para alimentar o motor de recomendação —, o relacionamento Avalia representa a nota explícita atribuída pelo usuário, persistida no banco relacional e utilizada para o cálculo da média de avaliação de cada espetáculo. Essa distinção reflete a arquitetura de dados do sistema e garante que os dois tipos de sinal sejam tratados com a precisão adequada. O segundo destaque é a incorporação do papel de administrador diretamente na entidade Usuário, por meio do atributo `tipo_usuario`, eliminando a redundância de uma entidade separada e centralizando as regras de controle de acesso em um único ponto do modelo.
 
+Na implementação, cada entidade será mapeada para uma tabela relacional no Supabase (PostgreSQL), com os relacionamentos representados por chaves estrangeiras que respeitam as cardinalidades definidas. O relacionamento N:N entre Espetáculo e Ator será resolvido por uma tabela associativa `espetaculo_ator`. O sistema permitirá:
+
+- Cadastro e autenticação de usuários com diferentes níveis de acesso;
+- Registro contínuo de interações implícitas para alimentar o motor de recomendação;
+- Registro de avaliações explícitas e atualização automática da nota média dos espetáculos;
+- Geração automática de recomendações personalizadas com rastreabilidade de algoritmo e score;
+- Gerenciamento do catálogo de espetáculos, sessões e elencos por usuários administradores;
+- Filtragem e descoberta de produções por categoria e localização geográfica.
+
 ## 4.3 Modelo Lógico de Dados
 _conteúdo_
 
