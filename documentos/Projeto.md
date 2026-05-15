@@ -1583,8 +1583,197 @@ _conteúdo_
 &nbsp;&nbsp;&nbsp;Essa estrutura contribui para uma arquitetura mais clara, escalável e alinhada aos princípios de orientação a objetos, além de facilitar manutenção, entendimento e evolução futura da solução.
 
 
-## 5.2 Diagrama de Componentes da UML
-_conteúdo_
+## 5.2 Diagrama de Componentes UML
+
+Um diagrama de componentes é um modelo arquitetural da UML que representa os principais módulos de um sistema, suas responsabilidades e a forma como eles se comunicam entre si. Ele é importante para o Spotlight porque permite visualizar claramente a separação entre frontend, APIs, motor de recomendação, mensageria e bancos de dados, facilitando o entendimento da arquitetura, a escalabilidade e a manutenção do sistema. Além disso, o diagrama evidencia como os serviços trabalham de forma desacoplada, especialmente o uso do RabbitMQ e do ML Engine, garantindo maior desempenho, organização e evolução contínua da plataforma de recomendação inteligente do Portal Aventura.
+
+<div align="center">
+
+<sub>Figura X - Diagrama de componentes UML</sub><br>
+
+  <img src="../documentos/img/diagrama_componentes.png" width="100%" alt="Diagrama de componentes UML"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### Camada de Apresentação
+
+Contém o **Spotlight App**, responsável pela interface com o usuário final e captura de interações (telemetria).
+
+### Serviços Externos
+
+Engloba a infraestrutura de identidade (**Supabase Auth**) e a API das Ticketeiras, provendo dados de inventário e emissão de ingressos.
+
+### API Gateway
+
+Atua como a fronteira de segurança, roteador central e orquestrador das requisições provenientes do frontend.
+
+### Serviços de Negócios (SOA)
+Camada central de processamento contendo:
+
+- Serviço do Usuário
+- Serviço do Catálogo
+- Serviço de Recomendação
+
+Cada domínio gerencia sua própria regra de negócio isoladamente.
+
+### Motor de Recomendação
+
+O **ML Engine**, componente especializado e isolado, responsável por processar os modelos matemáticos e gerar os vetores de afinidade.
+
+### Mensageria
+
+O **RabbitMQ**, atuando como *message broker* para o desacoplamento de eventos transacionais e comportamentais.
+
+### Camada de Dados
+
+Infraestrutura de persistência segregada por perfil de carga, contendo:
+
+- **Supabase DB (PostgreSQL)** — banco relacional
+- **MongoDB** — banco não relacional/documental
+
+---
+
+### 5.2.1 Componentes e Responsabilidades
+
+| Componente | Função | Tecnologia |
+|---|---|---|
+| **Spotlight App** | Interface do usuário, onboarding de preferências e coleta contínua de telemetria. | React Native + TypeScript |
+| **API Gateway** | Ponto único de entrada (BFF/Gateway), roteamento, terminação SSL e validação de autenticação JWT. | ASP.NET Core (.NET 9) |
+| **Serviço de Catálogo** | Gerenciamento de domínio de espetáculos, teatros, gêneros e precificação. | ASP.NET Core Web API |
+| **Serviço de Usuário** | Gestão de perfis, preferências explícitas e histórico de consumo. | ASP.NET Core Web API |
+| **Serviço de Recomendação** | Orquestração do fluxo de sugestões, consultando predições pré-processadas pelo Motor de ML. | ASP.NET Core Web API |
+| **Motor de ML** | Processamento de algoritmos de filtragem colaborativa (k-NN, SVD) para geração de recomendações. | C# + ML.NET |
+| **RabbitMQ** | Message Broker dedicado ao enfileiramento de eventos assíncronos de telemetria e interações. | RabbitMQ |
+| **Supabase Auth** | Provedor de Identidade, responsável por autenticação e emissão de tokens JWT. | Supabase Auth |
+| **Supabase DB (PostgreSQL)** | Banco de dados relacional primário para perfis, catálogo e metadados transacionais. | PostgreSQL via Supabase |
+| **MongoDB** | Repositório de alto volume para armazenamento de logs comportamentais e eventos de telemetria brutos. | MongoDB |
+
+---
+
+## 5.2.2 Infraestrutura de Dados
+
+A arquitetura de dados segue o princípio da **persistência poliglota**, adequando a tecnologia ao padrão de leitura/escrita do domínio.
+
+### Supabase DB (PostgreSQL)
+
+Utilizado pelas APIs de Negócios:
+
+- Serviço de Usuário
+- Serviço de Catálogo
+- Serviço de Recomendação
+- ML Engine via interface SQL
+
+
+### MongoDB
+
+Utilizado para o armazenamento de telemetria.
+
+A interface NoSQL reflete sua capacidade de ingerir dados não estruturados de:
+
+- Cliques
+- Tempo de tela
+- Interações do usuário
+
+Tudo isso sem onerar o banco relacional principal.
+
+---
+
+## 5.2.3 Interfaces e Protocolos de Comunicação
+
+O diagrama estabelece portas e interfaces estritas (conectores e receptores) entre as camadas.
+
+| Interface | Responsabilidade |
+|---|---|
+| **ISpotlightAPI** | Interface de consumo central exposta ao App (REST/GraphQL). |
+| **IAuth** | Interface de comunicação direta com o Supabase Auth para delegação de credenciais. |
+| **ITickets** | Integração de saída para APIs de terceiros (Ticketeiras). |
+| **IUserPrefs** | Contrato interno roteado pelo Gateway para o Serviço do Usuário. |
+| **ICatalog** | Contrato interno roteado pelo Gateway para o Serviço de Catálogo. |
+| **IRecommendation** | Contrato interno roteado pelo Gateway para o Serviço de Recomendação. |
+| **IEvents** | Contrato de publicação de mensagens (*Producer*) em tópicos/filas do RabbitMQ. |
+| **Worker** | Interface de consumo (*Consumer*) onde o ML Engine extrai lotes de eventos do RabbitMQ continuamente e de forma desacoplada. |
+| **SQL / NoSQL** | Abstrações de conexão de persistência (EF Core / MongoDB Driver). |
+
+---
+
+## 5.2.4 Lógica de Inteligência do Motor de ML
+
+O **ML Engine**, construído sobre **ML.NET**, atua como o cérebro do Spotlight.
+
+Para garantir sugestões relevantes de teatros e musicais, o sistema implementa algoritmos de recomendação baseados em **Filtragem Colaborativa Baseada em Itens (Item-based Collaborative Filtering)**.
+
+### k-NN (k-Nearest Neighbors)
+
+Agrupa:
+
+- Usuários com gostos similares
+- Espetáculos com perfis de público parecidos
+
+Isso facilita o descobrimento de nichos específicos e conteúdos correlacionados.
+
+### SVD (Singular Value Decomposition)
+
+Utiliza fatoração de matrizes para lidar com a esparsidade dos dados, especialmente em cenários onde usuários avaliaram poucos espetáculos.
+
+O algoritmo extrai características latentes, como:
+
+- Preferência implícita por musicais longos
+- Interesse em peças infantis interativas
+- Afinidade com determinados gêneros teatrais
+
+---
+
+## 5.2.5 Considerações Técnicas
+
+### API Gateway como Orquestrador
+
+Todo o tráfego externo passa pelo Gateway, o que blinda a camada SOA contra acessos não autorizados.
+
+Responsabilidades centrais:
+
+- Validação de JWT emitido pelo Supabase
+- Roteamento inteligente
+- Centralização de autenticação
+- Redução de responsabilidades dos microserviços
+
+Isso evita validações repetitivas de token em cada serviço interno.
+
+### Desacoplamento de Telemetria via RabbitMQ
+
+Aplicações mobile geram grande volume de eventos e telemetria.
+
+O uso do RabbitMQ (`IEvents → Worker`) garante:
+
+- Resposta imediata ao frontend
+- Processamento assíncrono
+- Treinamento contínuo do ML Engine
+- Redução de gargalos transacionais
+- Maior resiliência operacional
+
+### Separação entre Transacional e Analítico
+
+O uso combinado de PostgreSQL e MongoDB separa claramente cargas transacionais e analíticas.
+
+### PostgreSQL
+
+Responsável pelos dados estruturados essenciais:
+
+- Usuários
+- Catálogo
+- Preferências
+- Regras de negócio
+
+### MongoDB
+
+Responsável pela ingestão massiva de documentos JSON flexíveis oriundos da telemetria.
+
+Essa abordagem preserva:
+
+- Performance
+- Escalabilidade
+- Estabilidade operacional do Portal Aventura
 
 ## 5.3 Justificativa das escolhas tecnológicas
 
