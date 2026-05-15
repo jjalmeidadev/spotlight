@@ -1,26 +1,23 @@
 <Table>
   <tr>
-    <td><a href= "https://www.btgpactual.com/"><img src="img/logo-btg.png" alt="Centro Paula Souza" border="0"></td>
-    <td>
       <a href= "https://www.inteli.edu.br/"><img src="img/logo-Inteli.png" alt="Inteli - Instituto de Tecnologia e Liderança" border="0"></a>
     </td>
   </tr>
 </table>
 
-# Nome do Projeto: <nome do projeto>
+# Spotlight
 
-## Nome do Grupo: <nome do grupo>
+## Dora
 
 ## Integrantes:
 
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
-- <a href="https://www.linkedin.com/in/username/">Nome</a>
+- <a href="https://www.linkedin.com/in/celsojwnior/">Celso Rodrigues</a>
+- <a href="https://www.linkedin.com/in/jaimeandradedealmeida/">Jaime Almeida</a>
+- <a href="https://www.linkedin.com/in/leonardoramosvieira/">Leonardo Ramos</a>
+- <a href="https://www.linkedin.com/in/marianalacerdareis/">Mariana Lacerda</a>
+- <a href="https://www.linkedin.com/in/mariana-pereira-de-souza1/">Mariana Pereira</a>
+- <a href="https://www.linkedin.com/in/rafael-figueiredo-campos-72131735b/">Rafael Campos</a>
+- <a href="https://www.linkedin.com/in/vitor-ribeiro-ms/">Vitor Ribeiro</a>
 
 # Sumário
 
@@ -1479,7 +1476,111 @@ Na implementação, cada entidade será mapeada para uma tabela relacional no Su
 - Filtragem e descoberta de produções por categoria e localização geográfica.
 
 ## 4.3 Modelo Lógico de Dados
-_conteúdo_
+
+A modelagem lógica de dados é uma etapa fundamental na arquitetura do Spotlight, atuando como a ponte entre os requisitos de negócio e a implementação física no banco de dados. Seu objetivo principal é estruturar as informações de forma que garantam a integridade, evitem redundâncias e otimizem as consultas, independentemente das limitações específicas de um Sistema de Gerenciamento de Banco de Dados em particular.
+
+Nesta arquitetura, a modelagem lógica foi desenhada para suportar um ecossistema de alta performance e escalabilidade. Isso significa que diferentes tipos de dados são armazenados em tecnologias distintas, escolhidas de acordo com a natureza e o volume das informações.
+
+Para suportar tanto a integridade dos dados do catálogo quanto a alta volumetria de eventos gerados pelos usuários, a arquitetura de dados foi desenhada em um modelo híbrido.
+
+O núcleo transacional reside em um banco de dados relacional (**PostgreSQL**), responsável por gerenciar usuários, espetáculos, teatros e sessões. Paralelamente, os dados comportamentais (interações) foram delegados a um banco de dados não-relacional (**MongoDB**), otimizando a performance do motor de recomendação.
+
+---
+
+### 4.3.1. Core Relacional (PostgreSQL)
+
+O modelo lógico no PostgreSQL foi projetado com foco em normalização, integridade referencial e eficiência em consultas estruturadas. Abaixo, detalhamos as principais escolhas arquiteturais.
+
+<div align="center">
+
+<sub>Figura 1 - Modelo lógico de dados</sub><br>
+
+  <img src="../documentos/img/modelo_logico.png" width="100%" alt="Modelo lógico de dados"><br>
+
+  <sup>Fonte: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+#### 4.3.1.1. Gestão de Usuários e Acessos
+
+A tabela `usuario` centraliza todos os perfis de acesso, diferenciados pelo enum `tipo_usuario_enum`.
+
+A escolha de unificar os perfis em uma única tabela evita a complexidade de múltiplos sistemas de autenticação. O campo `nivel_acesso` (tipo `jsonb`) confere flexibilidade para definir permissões granulares para administradores sem a necessidade de criar tabelas complexas de controle de acesso neste momento inicial.
+
+---
+
+#### 4.3.1.2. Catálogo de Espetáculos e Elenco
+
+A tabela `espetaculo` armazena os metadados das peças teatrais. Uma decisão crucial nesta versão final foi a remoção do campo `elenco` (anteriormente um `jsonb`) em favor de uma estrutura relacional dedicada.
+
+Foram criadas as tabelas `ator` e a associativa `espetaculo_ator`.
+
+Esta modelagem permite:
+
+- **Buscas Eficientes:** Consultar rapidamente todos os espetáculos de um ator específico.
+
+- **Integridade:** Evitar duplicidade de nomes e garantir que o histórico do ator seja mantido de forma centralizada.
+
+- **Riqueza de Detalhes:** A tabela associativa `espetaculo_ator` permite registrar o papel específico e a `ordem_exibicao` do ator em cada peça, essencial para a interface do usuário.
+
+Os campos `popularidade` e `nota_media` na tabela `espetaculo` funcionam como um cache de leitura. Eles não são calculados em tempo real no PostgreSQL, mas sim atualizados periodicamente por **Workers** que processam os dados brutos armazenados no MongoDB.
+
+---
+
+#### 4.3.1.3. Teatros, Sessões e Categorias 
+
+A infraestrutura física e a agenda são gerenciadas pelas tabelas `teatro` e `sessao`.
+
+A tabela `sessao` atua como o elo temporal e espacial, conectando um `espetaculo` a um `teatro` em uma data e horário específicos. O campo `disponibilidade` (`jsonb`) atua como um cache rápido para a interface, enquanto a venda real pode ser delegada a um sistema parceiro via `link_compra`.
+
+A categorização dos espetáculos é feita através de uma relação N:M clássica (`categoria` e `espetaculo_categoria`), permitindo que uma peça pertença a múltiplos gêneros ou coleções.
+
+---
+
+#### 4.3.1.4. Recomendações
+
+A tabela `recomendacao` armazena o resultado final dos algoritmos de Machine Learning.
+
+Ela cruza um `usuario` com um `espetaculo` sugerido, registrando o `score_recomendacao` e o `tipo_algoritmo` utilizado.
+
+O campo `referencia_origem_id` é um elo vital com o mundo NoSQL. Ele armazena o identificador da interação que serviu de gatilho para aquela recomendação, permitindo rastreabilidade e auditoria da qualidade do modelo.
+
+---
+
+### 4.3.2. Dados Comportamentais (MongoDB)
+
+A decisão de remover a tabela de `interacao` do PostgreSQL e movê-la para o MongoDB é o pilar da escalabilidade do Spotlight.
+
+#### 4.3.2.1. O Problema do Relacional para Eventos
+
+Sistemas de recomendação dependem de um volume massivo de dados implícitos (visualizações, cliques, tempo de tela).
+
+Se cada clique gerasse um `INSERT` no PostgreSQL, o banco sofreria com gargalos de I/O e o crescimento exponencial das tabelas degradaria a performance das consultas do catálogo.
+
+---
+
+#### 4.3.2.2. A Solução NoSQL
+
+O MongoDB, sendo um banco de dados orientado a documentos, é ideal para cargas de trabalho **append-only** em alta velocidade.
+
+#### Benefícios da abordagem
+
+- **Flexibilidade de Schema:**  
+  Diferentes tipos de interação podem ter atributos distintos.
+
+  No MongoDB, esses eventos podem coexistir na mesma coleção sem a necessidade de colunas nulas ou tabelas separadas.
+
+- **Escalabilidade Horizontal:**  
+  O MongoDB permite distribuir os dados de interações em múltiplos servidores de forma nativa, suportando picos de tráfego sem impactar o banco principal.
+
+- **Alimentação do ML:**  
+  Os pipelines de Machine Learning podem consumir os dados do MongoDB de forma muito mais eficiente para treinar os modelos de filtragem colaborativa ou baseados em conteúdo.
+
+---
+
+O PostgreSQL garante a consistência e a riqueza relacional do catálogo e do elenco, enquanto o MongoDB absorve o impacto da alta volumetria de eventos comportamentais.
+
+Essa separação de responsabilidades assegura que o sistema seja performático, escalável e otimizado para alimentar os algoritmos de recomendação.
 
 ## 4.4 Modelo Físico de Dados
 _conteúdo_
