@@ -1230,7 +1230,253 @@ Artefatos entregáveis nesta Sprint:
 Esta especificação está alinhada com o escopo mínimo definido para as telas essenciais; melhorias (analytics, pipelines ML, integrações transacionais) ficam para fases posteriores.
 
 ## 4.2 Modelo Conceitual de Dados
-_conteúdo_
+
+O modelo conceitual de dados representa as entidades e seus relacionamentos de forma abstrata, descrevendo os elementos do domínio do negócio e como eles se conectam dentro do sistema Spotlight. Ele serve como base para o desenvolvimento do modelo lógico e a implementação do banco de dados, garantindo que a estrutura de dados atenda aos requisitos do projeto e suporte a evolução do sistema de recomendação de espetáculos da Aventura.
+
+O modelo é composto por oito entidades principais — Usuário, Espetáculo, Teatro, Sessão, Categoria, Interação, Recomendação e Ator — e onze relacionamentos que traduzem as regras de negócio do portal em estruturas de dados coerentes. As decisões de modelagem refletem também a arquitetura de dados do sistema, que distribui informações entre um banco relacional (Supabase/PostgreSQL), responsável por dados estruturados e transacionais, e um banco não relacional (MongoDB), utilizado para o registro de interações comportamentais que alimentam o motor de recomendação.
+
+### 4.2.1. Diagrama Conceitual
+
+<div align="center">
+
+<sub>Figura X - Diagrama Conceitual</sub><br>
+
+  <img src="../documentos/img/diagrama-conceitual.jpeg" width="100%" alt="Diagrama Conceitual"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### 4.2.2. Descrição Textual de Entidades e Atributos
+
+### Entidade: Usuário
+
+#### Descrição da entidade
+A entidade Usuário representa as pessoas que utilizam a plataforma de recomendação de espetáculos.
+
+#### Importância no contexto do projeto
+Essa entidade permite identificar os usuários da plataforma, registrar preferências e armazenar informações necessárias para recomendações personalizadas.
+
+### Tabela x - Tabela de atributos Usuário
+
+| Atributo | Descrição |
+|---|---|
+| id_usuario | Identificador único do usuário. |
+| nome | Nome completo do usuário. |
+| email | E-mail utilizado para acesso à plataforma. |
+| senha | Senha de autenticação do usuário. |
+| data_nascimento | Data de nascimento do usuário. |
+| localizacao | Localização do usuário. |
+| perfil_preferencias | Preferências de categorias e conteúdos. |
+| data_cadastro | Data de criação da conta. |
+| tipo_usuario | Define o tipo do usuário (visitante, cadastrado ou administrador). |
+
+Fonte: material elaborado pelos autores (2025).
+
+
+---
+
+### Entidade: Espetáculo
+
+#### Descrição da entidade
+A entidade Espetáculo representa os eventos e apresentações disponíveis na plataforma.
+
+#### Importância no contexto do projeto
+Essa é a principal entidade do sistema, responsável por armazenar as informações dos espetáculos que serão exibidos e recomendados aos usuários.
+
+### Tabela x - Tabela de atributos Espetáculo
+
+| Atributo | Descrição |
+|---|---|
+| id_espetaculo | Identificador único do espetáculo. |
+| titulo | Nome do espetáculo. |
+| descricao | Descrição do espetáculo. |
+| genero | Gênero da apresentação. |
+| faixa_etaria | Faixa etária recomendada. |
+| duracao | Tempo de duração do espetáculo. |
+| classificacao_indicativa | Classificação indicativa oficial. |
+| elenco | Artistas participantes da apresentação. |
+| produtora | Empresa responsável pela produção. |
+| status | Situação atual do espetáculo (em cartaz, em breve ou encerrado). |
+| popularidade | Indicador de popularidade do espetáculo. |
+| nota_media | Média das avaliações recebidas. |
+
+Fonte: material elaborado pelos autores (2025).
+
+
+---
+
+### Entidade: Teatro
+
+#### Descrição da entidade
+A entidade Teatro representa os locais físicos onde os espetáculos acontecem.
+
+#### Importância no contexto do projeto
+Ela permite armazenar informações sobre os espaços culturais utilizados para realização das sessões.
+
+### Tabela x - Tabela de atributos Teatro
+
+| Atributo | Descrição |
+|---|---|
+| id_teatro | Identificador único do teatro. |
+| nome | Nome do teatro. |
+| endereco | Endereço completo do teatro. |
+| cidade | Cidade onde o teatro está localizado. |
+| estado | Estado onde o teatro está localizado. |
+| capacidade | Quantidade máxima de espectadores. |
+| acessibilidade | Recursos de acessibilidade disponíveis. |
+| parceiro_naming_rights | Empresa parceira vinculada ao naming rights do teatro. |
+
+Fonte: material elaborado pelos autores (2025).
+
+
+---
+
+### Entidade: Sessão
+
+#### Descrição da entidade
+A entidade Sessão representa uma apresentação específica de um espetáculo em determinada data e horário.
+
+#### Importância no contexto do projeto
+Ela organiza as apresentações disponíveis para compra e consulta pelos usuários.
+
+### Tabela x - Tabela de atributos Sessão
+
+| Atributo | Descrição |
+|---|---|
+| id_sessao | Identificador único da sessão. |
+| data | Data da apresentação. |
+| horario | Horário da sessão. |
+| preco_minimo | Menor valor disponível para ingresso. |
+| preco_maximo | Maior valor disponível para ingresso. |
+| disponibilidade | Quantidade de ingressos disponíveis. |
+| link_compra | Link para compra de ingressos. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
+
+### Entidade: Categoria
+
+#### Descrição da entidade
+A entidade Categoria representa a classificação temática dos espetáculos.
+
+#### Importância no contexto do projeto
+Ela auxilia na organização dos espetáculos e na personalização das recomendações feitas aos usuários.
+
+### Tabela x - Tabela de atributos Categoria
+
+| Atributo | Descrição |
+|---|---|
+| id_categoria | Identificador único da categoria. |
+| nome | Nome da categoria. |
+| descricao | Descrição da categoria. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
+
+### Entidade: Interação
+
+#### Descrição da entidade
+A entidade Interação representa as ações comportamentais realizadas pelos usuários na plataforma em relação aos espetáculos.
+
+#### Importância no contexto do projeto
+Essa entidade centraliza os dados comportamentais utilizados pelo sistema de recomendação, permitindo analisar preferências e padrões de navegação dos usuários.
+
+### Tabela x - Tabela de atributos Interação
+
+| Atributo | Descrição |
+|---|---|
+| id_interacao | Identificador único da interação. |
+| id_usuario | Usuário responsável pela interação. |
+| id_espetaculo | Espetáculo relacionado à interação. |
+| tipo_interacao | Tipo de interação realizada. |
+| data_hora | Data e horário da interação. |
+| tempo_permanencia | Tempo de permanência do usuário no conteúdo. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
+
+### Entidade: Recomendação
+
+#### Descrição da entidade
+A entidade Recomendação representa as sugestões de espetáculos geradas para os usuários.
+
+#### Importância no contexto do projeto
+Ela armazena os resultados produzidos pelos algoritmos de recomendação da plataforma.
+
+### Tabela x - Tabela de atributos Recomendação
+
+| Atributo | Descrição |
+|---|---|
+| id_recomendacao | Identificador único da recomendação. |
+| id_usuario | Usuário que recebeu a recomendação. |
+| id_espetaculo | Espetáculo recomendado. |
+| tipo_algoritmo | Algoritmo utilizado para gerar a recomendação. |
+| score_recomendacao | Pontuação de relevância da recomendação. |
+| motivo_recomendacao | Justificativa da recomendação. |
+| data_geracao | Data de geração da recomendação. |
+| prioridade_manual | Indica se houve priorização manual. |
+
+Fonte: material elaborado pelos autores (2025).
+
+---
+
+### Entidade: Ator
+
+#### Descrição da entidade
+A entidade Ator representa os profissionais responsáveis pela atuação nos espetáculos cadastrados na plataforma.
+
+#### Importância no contexto do projeto
+Essa entidade permite registrar informações sobre os integrantes do elenco, possibilitando relacionar atores aos espetáculos em que atuam e organizar os dados artísticos da plataforma.
+
+### Tabela x - Tabela de atributos Ator
+
+| Atributo | Descrição |
+|---|---|
+| id_ator | Identificador único do ator. |
+| nome | Nome completo do ator. |
+| biografia | Texto descritivo com informações sobre a trajetória profissional do ator. |
+| created_at | Data e horário de criação do registro do ator. |
+
+Fonte: material elaborado pelos autores (2025).
+
+### 4.2.3. Descrição Textual dos Relacionamentos entre Entidades
+
+A tabela a seguir descreve os relacionamentos entre as entidades do modelo, especificando os atores envolvidos, a cardinalidade e a semântica de cada associação.
+
+| Nº | Relacionamento | Entidade 1 | Entidade 2 | Cardinalidade | Descrição |
+|---|---|---|---|---|---|
+| 1 | Realiza | Usuário | Interação | 1:N | Um usuário pode realizar várias interações ao longo do tempo (visualizações, cliques, favoritos, etc.), mas cada interação pertence a exatamente um único usuário. |
+| 2 | Refere-se a | Interação | Espetáculo | N:1 | Várias interações podem se referir ao mesmo espetáculo, mas cada interação está associada a exatamente um espetáculo. |
+| 3 | Avalia | Usuário | Espetáculo | N:N | Um usuário pode avaliar vários espetáculos e um espetáculo pode receber avaliações de vários usuários. Este relacionamento é distinto da Interação pois representa uma nota explícita atribuída pelo usuário, armazenada no banco relacional e utilizada para o cálculo da média do espetáculo. |
+| 4 | Recebe | Usuário | Recomendação | 1:N | Um usuário pode receber várias recomendações geradas pelo sistema ao longo da sua jornada, mas cada recomendação é direcionada a um único usuário. |
+| 5 | Recomenda | Recomendação | Espetáculo | N:1 | Um mesmo espetáculo pode ser recomendado a múltiplos usuários em recomendações distintas, mas cada recomendação aponta para um único espetáculo. |
+| 6 | Possui | Espetáculo | Sessão | 1:N | Um espetáculo pode ter várias sessões em datas, horários e teatros diferentes, mas cada sessão pertence a um único espetáculo. |
+| 7 | Sedia | Teatro | Sessão | 1:N | Um teatro pode sediar várias sessões de diferentes espetáculos, mas cada sessão ocorre em um único teatro. |
+| 8 | Pertence a | Espetáculo | Categoria | N:1 | Vários espetáculos podem pertencer a uma mesma categoria, mas cada espetáculo está classificado sob uma única categoria principal. |
+| 9 | Prefere | Usuário | Categoria | N:1 | Vários usuários podem preferir a mesma categoria cultural, mas cada usuário possui uma única categoria de preferência principal registrada. |
+| 10 | Gerencia | Usuário | Espetáculo | 1:N | Um usuário com perfil administrador pode gerenciar vários espetáculos na plataforma, sendo responsável por cadastrar, editar e controlar o status de cada produção. Cada espetáculo está sob responsabilidade de um único usuário administrador. |
+| 11 | Atua em | Espetáculo | Ator | N:N | Um espetáculo conta com vários atores em seu elenco e um ator pode participar de vários espetáculos ao longo de sua carreira. Este relacionamento é implementado por meio de uma tabela associativa no modelo lógico. |
+
+---
+
+### 4.2.4. Detalhamento
+
+Este modelo conceitual descreve a estrutura de dados do sistema Spotlight, contemplando as oito entidades centrais do domínio — Usuário, Espetáculo, Teatro, Sessão, Categoria, Interação, Recomendação e Ator — e os onze relacionamentos que as conectam. A modelagem foi construída com base nos requisitos do projeto e nas particularidades do negócio da Aventura Teatros, garantindo que cada decisão estrutural tenha correspondência direta com uma necessidade funcional do sistema.
+
+Dois pontos de destaque merecem atenção especial. O primeiro é a separação entre os relacionamentos **Realiza** e **Avalia**: enquanto o relacionamento Realiza captura interações implícitas do usuário com os espetáculos — como visualizações, cliques e favoritos, armazenadas no banco NoSQL para alimentar o motor de recomendação —, o relacionamento Avalia representa a nota explícita atribuída pelo usuário, persistida no banco relacional e utilizada para o cálculo da média de avaliação de cada espetáculo. Essa distinção reflete a arquitetura de dados do sistema e garante que os dois tipos de sinal sejam tratados com a precisão adequada. O segundo destaque é a incorporação do papel de administrador diretamente na entidade Usuário, por meio do atributo `tipo_usuario`, eliminando a redundância de uma entidade separada e centralizando as regras de controle de acesso em um único ponto do modelo.
+
+Na implementação, cada entidade será mapeada para uma tabela relacional no Supabase (PostgreSQL), com os relacionamentos representados por chaves estrangeiras que respeitam as cardinalidades definidas. O relacionamento N:N entre Espetáculo e Ator será resolvido por uma tabela associativa `espetaculo_ator`. O sistema permitirá:
+
+- Cadastro e autenticação de usuários com diferentes níveis de acesso;
+- Registro contínuo de interações implícitas para alimentar o motor de recomendação;
+- Registro de avaliações explícitas e atualização automática da nota média dos espetáculos;
+- Geração automática de recomendações personalizadas com rastreabilidade de algoritmo e score;
+- Gerenciamento do catálogo de espetáculos, sessões e elencos por usuários administradores;
+- Filtragem e descoberta de produções por categoria e localização geográfica.
 
 ## 4.3 Modelo Lógico de Dados
 _conteúdo_
