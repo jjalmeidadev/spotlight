@@ -1249,7 +1249,44 @@ O modelo é composto por oito entidades principais — Usuário, Espetáculo, Te
 
 ### 4.2.2. Descrição Textual de Entidades e Atributos
 
-_inserir entidades_
+### Entidade: Usuário
+
+#### Descrição da entidade
+A entidade Usuário representa as pessoas que utilizam a plataforma de recomendação de espetáculos.
+
+#### Importância no contexto do projeto
+Essa entidade permite identificar os usuários da plataforma, registrar preferências e armazenar informações necessárias para recomendações personalizadas.
+
+---
+
+### Entidade: Espetáculo
+
+#### Descrição da entidade
+A entidade Espetáculo representa os eventos e apresentações disponíveis na plataforma.
+
+#### Importância no contexto do projeto
+Essa é a principal entidade do sistema, responsável por armazenar as informações dos espetáculos que serão exibidos e recomendados aos usuários.
+
+---
+
+### Entidade: Teatro
+
+#### Descrição da entidade
+A entidade Teatro representa os locais físicos onde os espetáculos acontecem.
+
+#### Importância no contexto do projeto
+Ela permite armazenar informações sobre os espaços culturais utilizados para realização das sessões.
+---
+
+### Entidade: Sessão
+
+#### Descrição da entidade
+A entidade Sessão representa uma apresentação específica de um espetáculo em determinada data e horário.
+
+#### Importância no contexto do projeto
+Ela organiza as apresentações disponíveis para compra e consulta pelos usuários.
+
+
 
 ### 4.2.3. Descrição Textual dos Relacionamentos entre Entidades
 
