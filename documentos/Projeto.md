@@ -1424,7 +1424,24 @@ Fonte: material elaborado pelos autores (2025).
 
 ---
 
+### Entidade: Ator
 
+#### Descrição da entidade
+A entidade Ator representa os profissionais responsáveis pela atuação nos espetáculos cadastrados na plataforma.
+
+#### Importância no contexto do projeto
+Essa entidade permite registrar informações sobre os integrantes do elenco, possibilitando relacionar atores aos espetáculos em que atuam e organizar os dados artísticos da plataforma.
+
+### Tabela x - Tabela de atributos Ator
+
+| Atributo | Descrição |
+|---|---|
+| id_ator | Identificador único do ator. |
+| nome | Nome completo do ator. |
+| biografia | Texto descritivo com informações sobre a trajetória profissional do ator. |
+| created_at | Data e horário de criação do registro do ator. |
+
+Fonte: material elaborado pelos autores (2025).
 
 ### 4.2.3. Descrição Textual dos Relacionamentos entre Entidades
 
