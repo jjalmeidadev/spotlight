@@ -1233,6 +1233,8 @@ Esta especificação está alinhada com o escopo mínimo definido para as telas 
 
 O modelo conceitual de dados representa as entidades e seus relacionamentos de forma abstrata, descrevendo os elementos do domínio do negócio e como eles se conectam dentro do sistema Spotlight. Ele serve como base para o desenvolvimento do modelo lógico e a implementação do banco de dados, garantindo que a estrutura de dados atenda aos requisitos do projeto e suporte a evolução do sistema de recomendação de espetáculos da Aventura.
 
+O modelo é composto por oito entidades principais — Usuário, Espetáculo, Teatro, Sessão, Categoria, Interação, Recomendação e Ator — e onze relacionamentos que traduzem as regras de negócio do portal em estruturas de dados coerentes. As decisões de modelagem refletem também a arquitetura de dados do sistema, que distribui informações entre um banco relacional (Supabase/PostgreSQL), responsável por dados estruturados e transacionais, e um banco não relacional (MongoDB), utilizado para o registro de interações comportamentais que alimentam o motor de recomendação.
+
 ### 4.2.1. Diagrama Conceitual
 
 _inserir diagrama_
