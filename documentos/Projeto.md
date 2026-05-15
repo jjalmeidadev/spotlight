@@ -1253,6 +1253,8 @@ _inserir entidades_
 
 ### 4.2.3. Descrição Textual dos Relacionamentos entre Entidades
 
+A tabela a seguir descreve os relacionamentos entre as entidades do modelo, especificando os atores envolvidos, a cardinalidade e a semântica de cada associação.
+
 | Nº | Relacionamento | Entidade 1 | Entidade 2 | Cardinalidade | Descrição |
 |---|---|---|---|---|---|
 | 1 | Realiza | Usuário | Interação | 1:N | Um usuário pode realizar várias interações ao longo do tempo (visualizações, cliques, favoritos, etc.), mas cada interação pertence a exatamente um único usuário. |
