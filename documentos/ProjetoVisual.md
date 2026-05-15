@@ -537,12 +537,11 @@ Fonte: Material produzido pelos autores (2026).
 &emsp;O dashboard responde diretamente à necessidade de validação das metas declaradas na Visão do Produto (20% de aumento no engajamento, 25% na descoberta, 30% na conversão). O KPI "Conversões" mede cliques em compra de ingresso a partir de recomendações - o indicador mais direto do valor gerado pelo Spotlight. A separação "Externo/Aventura" em Tipos de exibições reflete a dualidade da empresa como produtora e plataforma cultural: dado estratégico para decisões de portfólio. O donut foi escolhido sobre o pie chart porque o centro vazio permite alocar o logotipo sem reduzir a área legível do gráfico; no mockup, esse centro passa a exibir o total numérico de exibições, tornando o espaço ainda mais funcional.
 
 ---
-
-# 4. Mockups
+## 4. Mockups
 
 ## 4.1 Visão Geral e Link de Acesso
 
-&emsp;Os mockups navegáveis foram desenvolvidos no Figma sobre a mesma estrutura de frames dos wireframes. 
+&emsp;Os mockups navegáveis foram desenvolvidos no Figma sobre a mesma estrutura de frames dos wireframes.
 
 &emsp;As transições entre telas usam Smart Animate e easing ease-in-out, simulando transições nativas do Android. Nenhum elemento estrutural foi adicionado ou removido em relação ao wireframe sem registro na subseção correspondente. As únicas divergências documentadas são intencionais.
 
@@ -570,7 +569,7 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp;Com a identidade Aventura aplicada, o fundo adota o Preto Aventura (`#0A0A0A`), cor de background principal do brand kit. O logotipo aparece na versão negativa: triângulo com contorno Branco (`#FFFFFF`) e circle interno, acompanhado do wordmark "AVENTURA" em Gotham Bold 700, letter-spacing 4px, caixa alta, conforme especificação do brand kit. A animação de entrada é fade-in do logotipo em 500ms (opacity 0 a 1), pausa de 1,5 segundo e fade-out da tela inteira em 400ms antes da transição para o Login.
+&emsp;Com a identidade Aventura aplicada, o fundo adota o Preto Aventura (`#0A0A0A`), cor de background principal do brand kit. O logotipo aparece na versão negativa: triângulo com contorno Branco (`#FFFFFF`) e círculo interno, acompanhado do wordmark "AVENTURA" em Gotham Bold 700, letter-spacing 4px, caixa alta, conforme especificação do brand kit. A animação de entrada é fade-in do logotipo em 500ms (opacity 0 a 1), pausa de 1,5 segundo e fade-out da tela inteira em 400ms antes da transição para o Login.
 
 ---
 
@@ -586,9 +585,9 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp;Fundo em Preto Aventura (`#0A0A0A`). O título "LOGIN" usa Gotham Bold 700, caixa alta, Branco (`#FFFFFF`), aplicação direta da regra tipográfica do brand kit para títulos de tela. A ilustração decorativa da montanha mantém o posicionamento do wireframe, agora em Grafite (`#1A1A1A`) com contorno Cinza Escuro (`#2C2C2C`), integrando-se ao fundo sem competir com o formulário.
+&emsp;Fundo em vermelho-alaranjado vibrante, cor de destaque aplicada ao fluxo de autenticação para diferenciar visualmente as telas de entrada do restante do aplicativo. O título "Login" usa Gotham Bold 700, caixa alta, em cor escura sobre o fundo colorido. A ilustração de elenco em destaque ocupa a metade inferior da tela, reforçando o contexto teatral antes mesmo do usuário acessar o catálogo.
 
-&emsp;Os campos de e-mail e senha usam float label com borda inferior em Cinza Escuro (`#2C2C2C`). 
+&emsp;Os campos de e-mail e senha usam float label com borda inferior. O botão "Entrar" está posicionado na base do formulário com largura total, mantendo o padrão de CTA da estrutura definida no wireframe.
 
 ---
 
@@ -604,9 +603,9 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp;Fundo em Preto Aventura (`#0A0A0A`). Título "CADASTRO" em Gotham Bold 700, caixa alta, Branco. Subtítulo em Gotham Book 300, Cinza Texto (`#8A8A8A`). Todos os campos seguem o mesmo padrão de float label do Login, a consistência entre formulários é obrigatória para não criar estranhamento ao navegar entre as telas.
+&emsp;Fundo em Preto Aventura (`#0A0A0A`) com área de formulário em superfície clara, criando separação visual entre o fundo da tela e o bloco de entrada de dados. Título "Cadastro" em Gotham Bold 700, caixa alta. Subtítulo "Nos conte sobre você!" em Gotham Book 300, Cinza Texto.
 
-&emsp;Os botões de ação mantêm a diferenciação do wireframe: "Criar Conta" com fundo Branco e texto Preto Aventura (CTA primário). A combinação é a única forma de criar diferenciação de hierarquia dentro da paleta monocromática da Aventura.
+&emsp;Os campos exibidos são: Nome, Seu melhor e-mail, Senha, Idade, Gênero e Compartilhar Localização? Todos os campos seguem o padrão de float label, mantendo consistência com o Login. O botão de ação primário "Criar Conta" usa fundo Preto Aventura e texto Branco (`#FFFFFF`), seguido de link secundário "Criar Conta" em texto simples abaixo.
 
 ---
 
@@ -622,7 +621,11 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp;Fundo em Preto Aventura (`#0A0A0A`). Título "PREFERÊNCIAS" em Gotham Bold 700, caixa alta, Branco. Os chips de gênero têm dois estados com transição por Smart Animate (200ms, ease-out): inativo (borda Cinza Escuro `#2C2C2C`, fundo transparente, texto Cinza Texto `#8A8A8A`) e ativo (fundo Branco `#FFFFFF`, texto Preto Aventura `#0A0A0A`). A micro-interação de mudança de estado ao tap confirma visualmente que o toque foi registrado e torna a seleção tatilmente satisfatória.
+&emsp;Fundo em branco e cinza, antes da entrada no catálogo. Título "Preferências" em Gotham Bold 700, caixa alta.
+
+&emsp;A tela exibe dois grupos de seleção: uma linha de tags de faixa de preço ("Até R$50", "R$50-100", "R$100-200") posicionada no topo da área de conteúdo, e abaixo a grade de chips de gênero artístico (Drama, Comédia, Musical, Infantil, Ação, Romance, Suspense, Stand-up, Palestra) em linhas flexíveis com wrapping. A adição da faixa de preço em relação ao wireframe é uma extensão do perfil de preferências, permitindo que o motor de recomendação filtre também por acessibilidade financeira. O botão "Continuar" está fixado no rodapé, com largura total.
+
+&emsp;As tags têm dois estados com transição por Smart Animate (200ms, ease-out): inativo (fundo transparente, borda em tom escuro) e ativo (fundo escuro, texto branco). A micro-interação de mudança de estado ao tap confirma visualmente que o toque foi registrado.
 
 ---
 
@@ -638,9 +641,9 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp;Fundo em Preto Aventura (`#0A0A0A`). O banner de destaque usa imagem real do espetáculo com gradiente linear na base: de `rgba(10,10,10,0)` a `rgba(10,10,10,0.85)`, usando a mesma cor do fundo para que a transição seja imperceptível e o título em Branco mantenha contraste mínimo de 4,5:1 independentemente da cor dominante da fotografia. O gradiente substitui sombra de texto (que degrada em imagens variadas) e caixa de fundo sólida (que bloqueia a foto).
+&emsp;Fundo em Preto Aventura (`#0A0A0A`). O banner de destaque usa imagem real do espetáculo com gradiente linear na base: de `rgba(10,10,10,0)` a `rgba(10,10,10,0.85)`, usando a mesma cor do fundo para que a transição seja imperceptível e o título em Branco mantenha contraste mínimo de 4,5:1 independentemente da cor dominante da fotografia. Um controle de filtro por gênero está visível abaixo do banner.
 
-&emsp;Os cards de espetáculo nos carrosséis têm cantos arredondados (border-radius 8dp), imagem 2:3 na parte superior.
+&emsp;A ordenação das seções no mockup prioriza o conteúdo de maior alcance antes do personalizado: "Os mais populares do momento:" aparece primeiro, seguida de "Outras pessoas também assistiram:" e, por último, "Porque você gostou de 'Macacos':". Essa sequência posiciona a recomendação personalizada como destaque final do scroll, após o usuário já ter sido exposto ao catálogo geral, estratégia que reduz a percepção de caixa preta do sistema para usuários com pouco histórico. Os cards de espetáculo nos carrosséis têm cantos arredondados (border-radius 8dp), imagem 2:3 na parte superior.
 
 ---
 
@@ -656,7 +659,7 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp;Estrutura visual idêntica à Tela 5. Aplica cores alinhadas ao brand guide similarmente.
+&emsp;Estrutura visual idêntica à Tela 5 em fundo e cards. As seções exibidas refletem o gênero selecionado: "Porque você gostou de 'Macacos':", "Porque você gostou de Stand-Up:" e "Para ver com a família:", cada uma agrupando recomendações por afinidade temática distinta. Essa abordagem torna a navegação por afinidade mais ativa e explorável do que a versão passiva do wireframe, sem alterar a estrutura de carrosseis horizontais.
 
 ---
 
@@ -672,9 +675,9 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp;O player de vídeo usa a thumbnail real do espetáculo com overlay `rgba(10,10,10,0.4)` para escurecer levemente a imagem e garantir contraste do ícone de play em Branco centralizado. 
+&emsp;A área de destaque no topo é implementada como player de vídeo. O botão de fechar (X) permanece no canto superior direito com área de toque de 44 x 44dp.
 
-&emsp;O título do espetáculo usa Gotham Bold 700, caixa alta, 20sp, Branco. As estrelas de avaliação seguem o padrão da Tela 6: preenchidas em Branco, vazias com contorno Cinza Escuro. O label "DESCRIÇÃO" usa Gotham Medium 500, o texto da sinopse usa Gotham Book 300, Cinza Texto (`#8A8A8A`). 
+&emsp;O título do espetáculo usa Gotham Bold 700, caixa alta, 20sp, Branco. A avaliação exibe 3 estrelas preenchidas em Branco e vazias com contorno Cinza Escuro, com count numérico ao lado. O label "DESCRIÇÃO" usa Gotham Medium 500; o texto da sinopse usa Gotham Book 300, Cinza Texto (`#8A8A8A`). A seção "Eventos semelhantes" encerra a tela com carrossel horizontal de cards no padrão do Catálogo.
 
 ---
 
@@ -690,8 +693,8 @@ Fonte: Material produzido pelos autores (2026).
 
 </div>
 
-&emsp; Título "ESTATÍSTICAS" em Gotham Bold 700, caixa alta, Branco. Os cards de KPI usam fundo Grafite (`#1A1A1A`) com borda Cinza Escuro (`#2C2C2C`). Valores numéricos em Gotham Bold 700, 22sp, Branco; labels em Gotham Book 300, 12sp, Cinza Texto (`#8A8A8A`). A barra de progresso de Ingressos Vendidos usa fundo Cinza Escuro (`#2C2C2C`) com preenchimento Branco (`#FFFFFF`), cantos arredondados.
+&emsp;Ao contrário das demais telas, o Dashboard adota fundo claro (Off-white `#F0F0F0`), diferenciando visualmente o ambiente administrativo do catálogo de usuário final. Título "Estatísticas" em Gotham Bold 700, caixa alta, em Preto Aventura (`#0A0A0A`). Os cards de KPI apresentam ícones ilustrativos ao lado de cada métrica: Conversões (234), Média de Permanência (23 segs), Ingressos Vendidos (300/500) e Visitas (2300), dispostos em grade de duas colunas. Labels em Gotham Book 300, 12sp; valores em Gotham Bold 700, 22sp.
 
-&emsp;O donut chart usa Branco (`#FFFFFF`) para o segmento "Aventura" e Cinza Escuro (`#2C2C2C`) para "Externo". 
+&emsp;O donut chart de "Tipos de exibições" usa laranja/vermelho para o segmento "Externa" e azul para "Aventura", introduzindo cor funcional na única tela onde a distinção cromática entre categorias é necessária para leitura imediata do dado. O centro do donut exibe o total numérico de exibições, tornando o espaço funcional além de decorativo.
 
-&emsp;O gráfico de barras usa Branco (`#FFFFFF`) para as barras sobre fundo Grafite (`#1A1A1A`). Os eixos e labels usam Cinza Texto (`#8A8A8A`). As tabs "SEMANA", "MÊS", "ANO" seguem o mesmo padrão de chip das preferências: ativo (fundo Branco, texto Preto Aventura, Gotham Bold) e inativo (sem fundo, texto Cinza Texto, Gotham Book). A reutilização do mesmo componente de chip entre telas distintas é uma consequência direta do Atomic Design, o átomo definido uma vez é aplicado em contextos diferentes sem redesenho.
+&emsp;O gráfico de barras de "Vendas por período" usa barras azuis sobre fundo claro. Os eixos e labels usam Cinza Texto (`#8A8A8A`). As tabs "SEMANA", "MÊS", "ANO" seguem o mesmo padrão de chip das preferências: ativo (fundo destacado, Gotham Bold) e inativo (sem fundo, texto Cinza Texto, Gotham Book). 
