@@ -1128,6 +1128,26 @@ A seção de casos de uso tem como objetivo representar as principais funcionali
 
 O diagrama de casos de uso a seguir representa as interações entre os atores do sistema — **Usuário**, **Administrador** e **Sistema de Recomendação** — e as funcionalidades disponíveis na plataforma Portal Aventura. Ele oferece uma visão estruturada dos requisitos funcionais do sistema, evidenciando as responsabilidades de cada ator e os fluxos de interação previstos para o MVP do projeto.
 
+<div align="center">
+
+<sub>Figura X - Diagrama de Casos de Uso 1 </sub><br>
+
+  <img src="../documentos/img/diagramadecasosdesuso.png" width="100%" alt="Diagrama de Casos de Uso 1 "><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+<div align="center">
+
+<sub>Figura X - Diagrama de Casos de Uso 2 </sub><br>
+
+  <img src="../documentos/img/sistemaderecomendacao.png" width="100%" alt="Diagrama de Casos de Uso 2 "><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
 # 4. Modelagem de Dados
 _conteúdo_
 
