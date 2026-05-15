@@ -1237,7 +1237,15 @@ O modelo é composto por oito entidades principais — Usuário, Espetáculo, Te
 
 ### 4.2.1. Diagrama Conceitual
 
-_inserir diagrama_
+<div align="center">
+
+<sub>Figura X - Diagrama Conceitual</sub><br>
+
+  <img src="../documentos/img/diagrama-conceitual.jpeg" width="100%" alt="Diagrama Conceitual"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
 
 ### 4.2.2. Descrição Textual de Entidades e Atributos
 
