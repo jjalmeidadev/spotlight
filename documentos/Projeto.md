@@ -1681,16 +1681,15 @@ _conteúdo_
 
 ## 5.1 Diagrama de Classes
 
-
 &nbsp;&nbsp;&nbsp;Os diagramas de classes apresentados nesta seção representam a modelagem estrutural do sistema de recomendação de espetáculos teatrais desenvolvido para a plataforma TAPI. A modelagem foi elaborada com base nos princípios da orientação a objetos, permitindo representar entidades, atributos, métodos e relacionamentos envolvidos no funcionamento da solução.
 
-&nbsp;&nbsp;&nbsp;O sistema possui diferentes responsabilidades distribuídas entre módulos específicos, como gerenciamento de usuários, catálogo de espetáculos, sessões, teatros e motor de recomendação. Dessa forma, os diagramas foram organizados em domínios separados para facilitar a leitura, reduzir a complexidade visual e tornar a documentação mais compreensível.
+&nbsp;&nbsp;&nbsp;O sistema possui diferentes responsabilidades distribuídas entre módulos específicos, como gerenciamento de usuários, catálogo de espetáculos, sessões, teatros e motor de recomendação. Dessa forma, os diagramas foram organizados em três domínios separados para facilitar a leitura, reduzir a complexidade visual e tornar a documentação mais compreensível.
 
 ---
 
 ### 5.1.1 Visão Geral do Sistema
 
-&nbsp;&nbsp;&nbsp;O diagrama geral apresenta uma visão consolidada das principais entidades do sistema e de seus relacionamentos. Ele demonstra como usuários interagem com espetáculos, como sessões são organizadas em teatros e como o motor de recomendação utiliza interações e preferências para gerar sugestões personalizadas.
+&nbsp;&nbsp;&nbsp;O diagrama geral apresenta uma visão consolidada das principais entidades do sistema e de seus relacionamentos. Ele demonstra como usuários interagem com espetáculos, como sessões são organizadas em teatros e como o motor de recomendação utiliza interações e avaliações para gerar sugestões personalizadas.
 
 <br>
 
@@ -1706,21 +1705,21 @@ _conteúdo_
 
 <br>
 
-&nbsp;&nbsp;&nbsp;A estrutura central do sistema é composta pelas classes `Usuario`, `Espetaculo`, `Sessao`, `Teatro`, `Interacao` e `Recomendacao`. Essas entidades permitem organizar os dados do catálogo cultural, registrar o comportamento dos usuários e gerar recomendações personalizadas com base em algoritmos de recomendação.
+&nbsp;&nbsp;&nbsp;A estrutura do sistema é organizada em três pacotes principais: **Usuário & Comportamento**, **Catálogo** e **Sessões & Espaços**. O pacote de usuários concentra as classes `Usuario`, `Interacao`, `Avaliacao` e `Recomendacao`, que registram o comportamento e as preferências dos usuários na plataforma. O pacote de catálogo organiza as classes `Espetaculo`, `Categoria`, `Ator` e a classe associativa `EspetaculoAtor`, responsáveis pelo acervo cultural disponível. O pacote de sessões e espaços contém `Teatro` e `Sessao`, que operacionalizam as apresentações físicas.
 
 ---
 
-### 5.1.2 Domínio de Gestão de Usuários
+### 5.1.2 Domínio: Usuário & Comportamento
 
-&nbsp;&nbsp;&nbsp;O domínio de gestão de usuários concentra as funcionalidades relacionadas ao cadastro, autenticação, administração e gerenciamento de perfis da plataforma. Nesse módulo, a classe `Usuario` representa o público geral da aplicação, enquanto a classe `Administrador` representa usuários com permissões elevadas para gerenciamento do sistema.
+&nbsp;&nbsp;&nbsp;Este domínio concentra as funcionalidades relacionadas ao cadastro, autenticação, comportamento e personalização da experiência dos usuários na plataforma. A classe `Usuario` representa tanto o público geral quanto usuários com permissões administrativas, eliminando a necessidade de herança para controle de papéis. As classes `Interacao`, `Avaliacao` e `Recomendacao` capturam respectivamente o comportamento implícito, o julgamento explícito e as sugestões personalizadas geradas pelo sistema.
 
 <br>
 
 <div align="center">
-<sub>Figura XX - Diagrama de Classes do Domínio de Gestão de Usuários</sub>
+<sub>Figura XX - Domínio Usuário & Comportamento</sub>
 <br><br>
 
-<img src="./img/diagrama-usuarios.png" width="70%">
+<img src="./img/diagrama-usuarios.png" width="80%">
 
 <br><br>
 <sup>Fonte: Material produzido pelos autores (2026)</sup>
@@ -1734,7 +1733,7 @@ _conteúdo_
 
 **Usuario**
 
-&nbsp;&nbsp;&nbsp;Representa os usuários cadastrados na plataforma, responsáveis por acessar espetáculos, interagir com conteúdos e receber recomendações personalizadas.
+&nbsp;&nbsp;&nbsp;Representa todos os usuários cadastrados na plataforma. O controle de papéis administrativos é feito pelos atributos `tipo_usuario` e `nivel_acesso`, eliminando o uso de herança forçada. Essa decisão de modelagem reflete melhor a realidade do banco de dados relacional e permite granularidade no controle de permissões sem criar uma hierarquia artificial de classes.
 
 | Atributo | Tipo | Descrição |
 |---|---|---|
@@ -1744,9 +1743,9 @@ _conteúdo_
 | `senha` | `varchar` | Senha criptografada |
 | `data_nascimento` | `date` | Data de nascimento |
 | `localizacao` | `varchar` | Cidade ou região do usuário |
-| `perfil_preferencias` | `text` | Preferências culturais do usuário |
 | `data_cadastro` | `timestamp` | Data de criação da conta |
-| `tipo_usuario` | `varchar` | Tipo de usuário dentro do sistema |
+| `tipo_usuario` | `varchar` | Papel do usuário no sistema (ex: `comum`, `admin`) |
+| `nivel_acesso` | `jsonb` | Permissões granulares em formato JSON |
 
 | Método | Retorno | Descrição |
 |---|---|---|
@@ -1754,45 +1753,93 @@ _conteúdo_
 | `logout()` | `void` | Encerra a sessão do usuário |
 | `atualizarPerfil()` | `void` | Atualiza informações do perfil |
 | `visualizarRecomendacoes()` | `list` | Exibe recomendações disponíveis |
+| `visualizarMetricas()` | `list` | Exibe métricas da plataforma (restrito por `nivel_acesso`) |
+| `ajustarPrioridade()` | `void` | Ajusta prioridades das recomendações (restrito por `nivel_acesso`) |
+| `gerenciarRecomendacoes()` | `void` | Gerencia recomendações geradas (restrito por `nivel_acesso`) |
 
 ---
 
-**Administrador**
+**Interacao**
 
-&nbsp;&nbsp;&nbsp;Representa usuários com privilégios administrativos dentro da plataforma. Essa classe herda os atributos e métodos da classe `Usuario`, adicionando funcionalidades relacionadas ao gerenciamento do sistema.
+&nbsp;&nbsp;&nbsp;Representa ações implícitas realizadas pelos usuários dentro da plataforma, como cliques, visualizações e tempo de permanência em um espetáculo. O atributo `id_usuario` garante rastreabilidade direta entre a interação e o usuário que a realizou, essencial para que o motor de recomendação consulte eventos de comportamento de forma independente. Os dados de interação também alimentam o MongoDB como telemetria bruta, conforme descrito na seção 5.3.2.
 
 | Atributo | Tipo | Descrição |
 |---|---|---|
-| `cargo` | `varchar` | Cargo administrativo |
-| `permissao` | `varchar` | Nível de permissão do administrador |
+| `id_interacao` | `integer` | Identificador único da interação |
+| `id_usuario` | `integer` | Referência ao usuário que realizou a interação |
+| `tipo_interacao` | `varchar` | Tipo de ação realizada (ex: clique, visualização) |
+| `data_hora` | `timestamp` | Momento em que a interação ocorreu |
+| `tempo_permanencia` | `integer` | Duração da interação em segundos |
 
 | Método | Retorno | Descrição |
 |---|---|---|
-| `ajustarPrioridade()` | `void` | Ajusta prioridades das recomendações |
-| `visualizarMetricas()` | `list` | Exibe métricas da plataforma |
-| `gerenciarRecomendacoes()` | `void` | Gerencia recomendações geradas |
+| `registrarInteracao()` | `void` | Registra o evento de interação |
+| `calcularEngajamento()` | `numeric` | Calcula índice de engajamento do usuário |
 
 ---
 
-## Relacionamentos UML
+**Avaliacao** *(classe associativa)*
 
-| Relação | Tipo | Descrição |
+&nbsp;&nbsp;&nbsp;Representa o julgamento explícito de um usuário sobre um espetáculo. É modelada como classe associativa entre `Usuario` e `Espetaculo`, pois possui atributos e comportamento próprios que vão além de uma simples tabela de junção. Um usuário pode avaliar múltiplos espetáculos (`0..*`), e um espetáculo pode receber avaliações de múltiplos usuários (`0..*`).
+
+| Atributo | Tipo | Descrição |
 |---|---|---|
-| `Administrador → Usuario` | Generalização | Administrador herda características da classe Usuario |
+| `id_avaliacao` | `integer` | Identificador único da avaliação |
+| `nota` | `numeric` | Nota atribuída ao espetáculo |
+| `comentario` | `text` | Comentário textual do usuário |
+| `created_at` | `timestamp` | Data e hora do registro da avaliação |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `registrarAvaliacao(nota, comentario)` | `void` | Registra a avaliação do usuário para o espetáculo |
 
 ---
 
-## 5.1.3 Domínio de Gestão de Espetáculos
+**Recomendacao**
 
-&nbsp;&nbsp;&nbsp;O domínio de gestão de espetáculos organiza as informações relacionadas ao catálogo cultural da plataforma. Esse módulo permite cadastrar espetáculos, classificá-los em categorias e registrar interações realizadas pelos usuários.
+&nbsp;&nbsp;&nbsp;Representa sugestões de espetáculos geradas pelo motor de ML para um usuário específico. O atributo `referencia_origem_id` permite rastrear qual interação ou avaliação deu origem a cada recomendação, garantindo explicabilidade e auditabilidade do sistema. A classe depende de `Interacao` e `Avaliacao` para compor seus dados de entrada, e é agregada ao `Usuario` que a recebe.
+
+| Atributo | Tipo | Descrição |
+|---|---|---|
+| `id_recomendacao` | `integer` | Identificador único da recomendação |
+| `tipo_algoritmo` | `varchar` | Algoritmo utilizado (k-NN, SVD, k-means) |
+| `score_recomendacao` | `numeric` | Pontuação de relevância calculada |
+| `motivo_recomendacao` | `text` | Justificativa textual da recomendação |
+| `data_geracao` | `timestamp` | Data e hora de geração |
+| `prioridade_manual` | `boolean` | Indica se a prioridade foi ajustada manualmente |
+| `referencia_origem_id` | `varchar` | ID da interação ou avaliação que originou a recomendação |
+
+| Método | Retorno | Descrição |
+|---|---|---|
+| `gerarRecomendacao()` | `void` | Aciona o motor de ML para gerar a recomendação |
+| `calcularScore()` | `numeric` | Calcula o score de relevância da recomendação |
+| `atualizarPrioridade()` | `void` | Atualiza a prioridade da recomendação manualmente |
+
+---
+
+### Relacionamentos UML — Domínio Usuário & Comportamento
+
+| Relação | Tipo | Multiplicidade | Descrição |
+|---|---|---|---|
+| `Usuario → Interacao` | Composição | 1 para 0..* | Interações pertencem ao ciclo de vida do usuário |
+| `Usuario → Recomendacao` | Agregação | 1 para 0..* | Usuários recebem recomendações geradas pelo sistema |
+| `Usuario ↔ Espetaculo` via `Avaliacao` | Classe Associativa | 1 para 0..* (ambos) | Um usuário pode avaliar múltiplos espetáculos e vice-versa |
+| `Recomendacao → Interacao` | Dependência | — | O motor usa dados de interação para gerar recomendações |
+| `Recomendacao → Avaliacao` | Dependência | — | O motor usa avaliações para calibrar as recomendações |
+
+---
+
+### 5.1.3 Domínio: Catálogo
+
+&nbsp;&nbsp;&nbsp;O domínio de catálogo organiza as informações relacionadas ao acervo cultural da plataforma. Neste módulo estão representados os espetáculos disponíveis, suas categorias temáticas, os atores envolvidos e o relacionamento entre elenco e peças. A separação do elenco em uma entidade própria (`Ator`) com classe associativa (`EspetaculoAtor`) permite modelar com precisão o relacionamento N:M entre espetáculos e artistas, com atributos contextuais como papel desempenhado e ordem de exibição nos créditos.
 
 <br>
 
 <div align="center">
-<sub>Figura XX - Diagrama de Classes do Domínio de Gestão de Espetáculos</sub>
+<sub>Figura XX - Domínio Catálogo</sub>
 <br><br>
 
-<img src="./img/diagrama-espetaculos.jpeg" width="100%">
+<img src="./img/diagrama-catalogo.png" width="90%">
 
 <br><br>
 <sup>Fonte: Material produzido pelos autores (2026)</sup>
@@ -1800,97 +1847,99 @@ _conteúdo_
 
 <br>
 
-## Descrição das Classes
+### Descrição das Classes
 
 ---
 
-## **Espetaculo**
+**Espetaculo**
 
-&nbsp;&nbsp;&nbsp;Representa os espetáculos disponíveis na plataforma, contendo informações utilizadas tanto para exibição ao usuário quanto para alimentar o sistema de recomendação.
+&nbsp;&nbsp;&nbsp;Representa os espetáculos disponíveis na plataforma, contendo informações utilizadas tanto para exibição ao usuário quanto para alimentar o sistema de recomendação. O atributo `elenco : text` foi removido desta classe na versão atualizada do modelo, sendo substituído pelo relacionamento N:M com `Ator` via `EspetaculoAtor`, o que proporciona maior riqueza estrutural e possibilidade de consultas segmentadas por artista.
 
 | Atributo | Tipo | Descrição |
 |---|---|---|
 | `id_espetaculo` | `integer` | Identificador único do espetáculo |
 | `titulo` | `varchar` | Nome do espetáculo |
-| `descricao` | `text` | Descrição detalhada |
-| `genero` | `varchar` | Gênero artístico |
+| `descricao` | `text` | Descrição detalhada do conteúdo |
+| `genero` | `varchar` | Gênero artístico (ex: drama, musical, dança) |
 | `faixa_etaria` | `varchar` | Faixa etária recomendada |
 | `duracao` | `integer` | Duração em minutos |
-| `classificacao_indicativa` | `varchar` | Classificação indicativa |
-| `elenco` | `text` | Informações do elenco |
-| `produtora` | `varchar` | Produtora responsável |
-| `status` | `varchar` | Situação atual do espetáculo |
-| `popularidade` | `numeric` | Indicador de popularidade |
+| `classificacao_indicativa` | `varchar` | Classificação indicativa oficial |
+| `produtora` | `varchar` | Produtora responsável pelo espetáculo |
+| `status` | `varchar` | Situação atual (ex: em cartaz, encerrado) |
+| `popularidade` | `numeric` | Indicador de popularidade baseado em interações |
 | `nota_media` | `numeric` | Média das avaliações recebidas |
 
 | Método | Retorno | Descrição |
 |---|---|---|
-| `cadastrarEspetaculo()` | `void` | Registra um novo espetáculo |
+| `cadastrarEspetaculo()` | `void` | Registra um novo espetáculo no catálogo |
 | `atualizarEspetaculo()` | `void` | Atualiza informações do espetáculo |
-| `calcularNotaMedia()` | `numeric` | Calcula média das avaliações |
-| `alterarStatus(status)` | `void` | Atualiza status do espetáculo |
+| `calcularNotaMedia()` | `numeric` | Recalcula a média das avaliações recebidas |
+| `alterarStatus(status)` | `void` | Atualiza o status de exibição do espetáculo |
 
 ---
 
-## **Categoria**
+**Categoria**
 
-&nbsp;&nbsp;&nbsp;Representa categorias utilizadas para classificação temática dos espetáculos.
+&nbsp;&nbsp;&nbsp;Representa as categorias temáticas utilizadas para classificação dos espetáculos. Um espetáculo pode pertencer a múltiplas categorias, e uma categoria pode conter múltiplos espetáculos, configurando um relacionamento N:M de associação simples.
 
 | Atributo | Tipo | Descrição |
 |---|---|---|
-| `id_categoria` | `integer` | Identificador da categoria |
-| `nome` | `varchar` | Nome da categoria |
-| `descricao` | `text` | Descrição da categoria |
+| `id_categoria` | `integer` | Identificador único da categoria |
+| `nome` | `varchar` | Nome da categoria (ex: Teatro Adulto, Infantil) |
+| `descricao` | `text` | Descrição do escopo da categoria |
 
 | Método | Retorno | Descrição |
 |---|---|---|
-| `criarCategoria()` | `void` | Cria uma categoria |
-| `atualizarCategoria()` | `void` | Atualiza categoria |
-| `listarEspetaculos()` | `list` | Lista espetáculos associados |
+| `criarCategoria()` | `void` | Cria uma nova categoria no sistema |
+| `atualizarCategoria()` | `void` | Atualiza informações da categoria |
+| `listarEspetaculos()` | `list` | Lista todos os espetáculos associados à categoria |
 
 ---
 
-## **Interacao**
+**Ator**
 
-&nbsp;&nbsp;&nbsp;Representa ações realizadas pelos usuários dentro da plataforma, como avaliações, comentários e tempo de permanência.
+&nbsp;&nbsp;&nbsp;Representa os artistas que compõem o elenco dos espetáculos. É uma entidade de domínio sem comportamento próprio, criada para substituir o atributo textual `elenco` da classe `Espetaculo`, permitindo buscas, filtros e recomendações por artista de forma estruturada.
 
 | Atributo | Tipo | Descrição |
 |---|---|---|
-| `id_interacao` | `integer` | Identificador da interação |
-| `tipo_interacao` | `varchar` | Tipo de interação realizada |
-| `data_hora` | `timestamp` | Momento da interação |
-| `tempo_permanencia` | `integer` | Tempo de permanência |
-| `nota` | `numeric` | Nota atribuída |
-| `comentario` | `text` | Comentário do usuário |
-
-| Método | Retorno | Descrição |
-|---|---|---|
-| `registrarInteracao()` | `void` | Registra interação |
-| `registrarAvaliacao()` | `void` | Registra avaliação do usuário |
-| `calcularEngajamento()` | `numeric` | Calcula engajamento do usuário |
+| `id_ator` | `integer` | Identificador único do ator |
+| `nome` | `varchar` | Nome artístico ou completo |
+| `biografia` | `text` | Biografia e histórico do artista |
 
 ---
 
-## Relacionamentos UML
+**EspetaculoAtor** *(classe associativa)*
 
-| Relação | Tipo | Descrição |
+&nbsp;&nbsp;&nbsp;Representa o vínculo entre um espetáculo e um ator, modelando o relacionamento N:M com atributos contextuais. Um ator pode participar de múltiplos espetáculos em diferentes papéis, e um espetáculo pode ter múltiplos atores com diferentes funções no elenco.
+
+| Atributo | Tipo | Descrição |
 |---|---|---|
-| `Categoria ↔ Espetaculo` | Associação | Categorias classificam espetáculos |
-| `Espetaculo ↔ Interacao` | Associação | Interações estão relacionadas aos espetáculos |
+| `papel` | `varchar` | Papel ou personagem interpretado pelo ator |
+| `ordem_exibicao` | `integer` | Ordem de exibição nos créditos do espetáculo |
 
 ---
 
-## 5.1.4 Domínio de Sessões e Teatros
+### Relacionamentos UML — Domínio Catálogo
 
-&nbsp;&nbsp;&nbsp;O domínio de sessões e teatros organiza as apresentações dos espetáculos em locais físicos específicos, permitindo controlar datas, horários, disponibilidade e informações de compra.
+| Relação | Tipo | Multiplicidade | Descrição |
+|---|---|---|---|
+| `Categoria ↔ Espetaculo` | Associação | 0..* para 0..* | Categorias classificam espetáculos tematicamente |
+| `Espetaculo ↔ Interacao` | Associação | 1 para 0..* | Interações estão associadas a espetáculos específicos |
+| `Espetaculo ↔ Ator` via `EspetaculoAtor` | Classe Associativa | 1..* para 0..* | Um espetáculo tem um ou mais atores; atores participam de múltiplos espetáculos |
+
+---
+
+### 5.1.4 Domínio: Sessões & Espaços
+
+&nbsp;&nbsp;&nbsp;O domínio de sessões e espaços organiza as apresentações físicas dos espetáculos em teatros parceiros da plataforma. Permite controlar datas, horários, disponibilidade de ingressos e links de compra. A composição forte entre `Espetaculo` e `Sessao`, e entre `Teatro` e `Sessao`, expressa que sessões não existem independentemente dessas entidades — são partes integrantes do seu ciclo de vida.
 
 <br>
 
 <div align="center">
-<sub>Figura XX - Diagrama de Classes do Domínio de Sessões e Teatros</sub>
+<sub>Figura XX - Domínio Sessões & Espaços</sub>
 <br><br>
 
-<img src="./img/diagrama-sessoes-teatros.jpeg" width="90%">
+<img src="./img/diagrama-sessoes-espacos.png" width="80%">
 
 <br><br>
 <sup>Fonte: Material produzido pelos autores (2026)</sup>
@@ -1898,125 +1947,79 @@ _conteúdo_
 
 <br>
 
-## Descrição das Classes
+### Descrição das Classes
 
 ---
 
-## **Teatro**
+**Teatro**
 
-&nbsp;&nbsp;&nbsp;Representa os teatros parceiros da plataforma.
+&nbsp;&nbsp;&nbsp;Representa os teatros parceiros da plataforma TAPI, incluindo suas características físicas e informações de localização. O atributo `parceiro_naming_rights` registra eventuais vínculos comerciais de nomenclatura do espaço.
 
 | Atributo | Tipo | Descrição |
 |---|---|---|
-| `id_teatro` | `integer` | Identificador do teatro |
+| `id_teatro` | `integer` | Identificador único do teatro |
 | `nome` | `varchar` | Nome do teatro |
 | `endereco` | `varchar` | Endereço completo |
-| `cidade` | `varchar` | Cidade do teatro |
-| `estado` | `varchar` | Estado do teatro |
-| `capacidade` | `integer` | Capacidade total |
-| `acessibilidade` | `boolean` | Recursos de acessibilidade |
-| `parceiro_naming_rights` | `varchar` | Parceiro associado |
+| `cidade` | `varchar` | Cidade onde está localizado |
+| `estado` | `varchar` | Estado onde está localizado |
+| `capacidade` | `integer` | Capacidade total de público |
+| `acessibilidade` | `boolean` | Indica presença de recursos de acessibilidade |
+| `parceiro_naming_rights` | `varchar` | Parceiro comercial associado ao nome do teatro |
 
 | Método | Retorno | Descrição |
 |---|---|---|
-| `cadastrarTeatro()` | `void` | Cadastra teatro |
-| `atualizarTeatro()` | `void` | Atualiza informações |
-| `verificarCapacidade()` | `integer` | Verifica capacidade disponível |
+| `cadastrarTeatro()` | `void` | Registra um novo teatro parceiro |
+| `atualizarTeatro()` | `void` | Atualiza informações do teatro |
+| `verificarCapacidade()` | `integer` | Retorna a capacidade disponível para uma sessão |
 
 ---
 
-## **Sessao**
+**Sessao**
 
-&nbsp;&nbsp;&nbsp;Representa uma apresentação específica de um espetáculo.
+&nbsp;&nbsp;&nbsp;Representa uma apresentação específica de um espetáculo em um teatro, em data e horário determinados. O atributo `link_compra` conecta a plataforma a sistemas externos de venda de ingressos sem que a TAPI precise gerenciar transações diretamente.
 
 | Atributo | Tipo | Descrição |
 |---|---|---|
-| `id_sessao` | `integer` | Identificador da sessão |
-| `data` | `date` | Data da sessão |
-| `horario` | `time` | Horário da sessão |
-| `preco_minimo` | `numeric` | Menor preço disponível |
-| `preco_maximo` | `numeric` | Maior preço disponível |
-| `disponibilidade` | `integer` | Quantidade de ingressos |
-| `link_compra` | `text` | Link de compra |
+| `id_sessao` | `integer` | Identificador único da sessão |
+| `data` | `date` | Data da apresentação |
+| `horario` | `time` | Horário de início da apresentação |
+| `preco_minimo` | `numeric` | Menor preço de ingresso disponível |
+| `preco_maximo` | `numeric` | Maior preço de ingresso disponível |
+| `disponibilidade` | `integer` | Quantidade de ingressos disponíveis |
+| `link_compra` | `text` | URL para compra de ingressos em plataforma externa |
 
 | Método | Retorno | Descrição |
 |---|---|---|
-| `criarSessao()` | `void` | Cria nova sessão |
-| `atualizarSessao()` | `void` | Atualiza sessão |
-| `verificarDisponibilidade()` | `boolean` | Verifica disponibilidade |
+| `criarSessao()` | `void` | Registra uma nova sessão de apresentação |
+| `atualizarSessao()` | `void` | Atualiza informações de uma sessão existente |
+| `verificarDisponibilidade()` | `boolean` | Verifica se há ingressos disponíveis |
 
 ---
 
-## Relacionamentos UML
+### Relacionamentos UML — Domínio Sessões & Espaços
 
-| Relação | Tipo | Descrição |
-|---|---|---|
-| `Espetaculo → Sessao` | Composição | Um espetáculo pode possuir várias sessões |
-| `Teatro → Sessao` | Composição | Um teatro pode possuir várias sessões |
-
----
-
-## 5.1.5 Domínio do Motor de Recomendação
-
-&nbsp;&nbsp;&nbsp;O motor de recomendação representa a camada inteligente do sistema, responsável por analisar interações, preferências e dados dos espetáculos para gerar recomendações personalizadas aos usuários.
-
-<br>
-
-<div align="center">
-<sub>Figura XX - Diagrama de Classes do Motor de Recomendação</sub>
-<br><br>
-
-<img src="./img/diagramamotor.png" width="90%">
-
-<br><br>
-<sup>Fonte: Material produzido pelos autores (2026)</sup>
-</div>
-
-<br>
-
-## Descrição das Classes
+| Relação | Tipo | Multiplicidade | Descrição |
+|---|---|---|---|
+| `Espetaculo → Sessao` | Composição | 1 para 0..* | Um espetáculo pode ter múltiplas sessões; sessões não existem sem o espetáculo |
+| `Teatro → Sessao` | Composição | 1 para 0..* | Um teatro pode sediar múltiplas sessões; sessões não existem sem o teatro |
 
 ---
 
-## **Recomendacao**
+### 5.1.5 Justificativa da Modelagem
 
-&nbsp;&nbsp;&nbsp;Representa recomendações geradas pelo sistema para os usuários da plataforma.
+&nbsp;&nbsp;&nbsp;A modelagem proposta foi estruturada para representar de forma modular os principais elementos necessários ao funcionamento da plataforma de recomendação de espetáculos. A separação em três domínios — Usuário & Comportamento, Catálogo e Sessões & Espaços — reduz acoplamento, melhora a organização arquitetural e facilita futuras evoluções do sistema.
 
-| Atributo | Tipo | Descrição |
-|---|---|---|
-| `id_recomendacao` | `integer` | Identificador da recomendação |
-| `tipo_algoritmo` | `varchar` | Algoritmo utilizado |
-| `score_recomendacao` | `numeric` | Pontuação da recomendação |
-| `motivo_recomendacao` | `text` | Justificativa da recomendação |
-| `data_geracao` | `timestamp` | Data de geração |
-| `prioridade_manual` | `boolean` | Indica prioridade manual |
+&nbsp;&nbsp;&nbsp;Três decisões de modelagem merecem destaque por impactar diretamente a qualidade técnica da solução:
 
-| Método | Retorno | Descrição |
-|---|---|---|
-| `gerarRecomendacao()` | `void` | Gera recomendação |
-| `calcularScore()` | `numeric` | Calcula score |
-| `atualizarPrioridade()` | `void` | Atualiza prioridade |
+&nbsp;&nbsp;&nbsp;**Eliminação da herança para controle de papéis:** A classe `Administrador` foi removida e suas responsabilidades absorvidas pela classe `Usuario` por meio dos atributos `tipo_usuario : varchar` e `nivel_acesso : jsonb`. Herança baseada em papel é um antipadrão em modelagem de domínio: papéis mudam ao longo do tempo, e uma hierarquia de classes não reflete bem essa dinamicidade. O uso de JSONB permite granularidade de permissões sem rigidez estrutural, alinhando o modelo ao banco PostgreSQL provisionado pelo Supabase.
+
+&nbsp;&nbsp;&nbsp;**Separação de Avaliacao e Interacao em classes distintas:** As avaliações explícitas (nota e comentário) foram separadas das interações implícitas (cliques, tempo de permanência). Essa distinção é fundamental para o motor de ML: interações alimentam o MongoDB como telemetria bruta de alta frequência, enquanto avaliações compõem o sinal de feedback qualitativo de menor volume, usado para calibrar e validar os algoritmos SVD e k-NN. Manter os dois conceitos na mesma classe comprometeria tanto a semântica do modelo quanto o desempenho do pipeline de dados.
+
+&nbsp;&nbsp;&nbsp;**Modelagem do elenco com classe associativa:** A substituição do atributo textual `elenco : text` pelo relacionamento N:M entre `Espetaculo` e `Ator` via `EspetaculoAtor` permite que a plataforma implemente funcionalidades de busca e recomendação por artista, e que os créditos sejam exibidos com ordenação e papéis específicos. Essa decisão amplia o potencial do catálogo sem aumentar a complexidade do domínio central.
+
+&nbsp;&nbsp;&nbsp;Essa estrutura contribui para uma arquitetura clara, escalável e alinhada aos princípios de orientação a objetos, facilitando a manutenção, o entendimento e a evolução futura da solução.
 
 ---
-
-## Relacionamentos UML
-
-| Relação | Tipo | Descrição |
-|---|---|---|
-| `Usuario → Recomendacao` | Agregação | Usuários recebem recomendações |
-| `Espetaculo ↔ Recomendacao` | Associação | Espetáculos aparecem em recomendações |
-| `Administrador → Recomendacao` | Dependência | Administradores gerenciam recomendações |
-| `Recomendacao → Interacao` | Dependência | Recomendações utilizam dados de interação |
-
----
-
-## 5.1.6 Justificativa da Modelagem
-
-&nbsp;&nbsp;&nbsp;A modelagem proposta foi estruturada para representar de forma modular os principais elementos necessários ao funcionamento da plataforma de recomendação de espetáculos. A separação em domínios permite reduzir acoplamento, melhorar organização arquitetural e facilitar futuras evoluções do sistema.
-
-&nbsp;&nbsp;&nbsp;O domínio de usuários concentra autenticação, perfis e permissões administrativas. O domínio de espetáculos organiza o catálogo cultural e registra o comportamento do usuário por meio das interações. O domínio de sessões e teatros representa a operacionalização das apresentações em locais físicos e datas específicas. Por fim, o domínio do motor de recomendação integra as informações coletadas para gerar sugestões personalizadas baseadas em preferências, avaliações e engajamento dos usuários.
-
-&nbsp;&nbsp;&nbsp;Essa estrutura contribui para uma arquitetura mais clara, escalável e alinhada aos princípios de orientação a objetos, além de facilitar manutenção, entendimento e evolução futura da solução.
 
 
 ## 5.2 Diagrama de Componentes UML
