@@ -1,9 +1,98 @@
-<Table>
+<p align="center">
+  <img src="./img/header.png" alt="header">
+</p>
+
+<table align="center" style="border: none; border-collapse: collapse;">
   <tr>
-      <a href= "https://www.inteli.edu.br/"><img src="img/logo-Inteli.png" alt="Inteli - Instituto de Tecnologia e Liderança" border="0"></a>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/celsojwnior/">
+        <img src="./img/celso.png" width="90" alt="Celso Rodrigues">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/jaimeandradedealmeida/">
+        <img src="./img/jaime.png" width="90" alt="Jaime Almeida">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/leonardoramosvieira/">
+        <img src="./img/leonardo.png" width="90" alt="Leonardo Ramos">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/marianalacerdareis/">
+        <img src="./img/mariana_lacerda.png" width="90" alt="Mariana Lacerda">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/mariana-pereira-de-souza1/">
+        <img src="./img/marianap.png" width="90" alt="Mariana Pereira">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/rafael-figueiredo-campos-72131735b/">
+        <img src="./img/rafael.png" width="90" alt="Rafael Campos">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/vitor-ribeiro-ms/">
+        <img src="./img/vitor.png" width="90" alt="Vitor Ribeiro">
+      </a>
     </td>
   </tr>
 </table>
+
+<br>
+
+<p align="center">
+  <img src="./img/professores.png" alt="professores">
+</p>
+
+<table align="center" style="border: none; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/vanunes/">
+        <img src="./img/vanessa.png" width="100" alt="Vanessa Nunes">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/afonsolelis/">
+        <img src="./img/afonso.png" width="100" alt="Afonso Brandão">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/hermano-peixoto-1091796/">
+        <img src="./img/hermano.png" width="100" alt="Hermano Peixoto">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/luciano-galdino-26191b36/">
+        <img src="./img/luciano.png" width="100" alt="Luciano Galdino">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/rafael-jacomossi-6135b0a1/">
+        <img src="./img/rafaelJ.png" width="100" alt="Rafael Jacomossi">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/francisco-escobar/">
+        <img src="./img/francisco.png" width="100" alt="Francisco Escobar">
+      </a>
+    </td>
+    <td align="center" style="border: none; padding: 5px;">
+      <a href="https://www.linkedin.com/in/filipe-gon%C3%A7alves-08a55015b/">
+        <img src="./img/filipe.png" width="100" alt="Filipe Gonçalves">
+      </a>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<p align="center">
+  <img src="./img/bottom.png" alt="bottom">
+</p>
 
 # Spotlight
 
@@ -664,7 +753,7 @@ Este documento descreve o fluxo de negócio modelado em BPMN 2.0 para o sistema 
 
 O fluxo modela a jornada completa, desde o primeiro acesso ao portal até a compra do ingresso ou avaliação do evento, integrando o motor de ML e o pipeline de dados que sustenta as recomendações.
 
-Para visualizar o diagrama completo, basta acessar o [Diagrama BPMN](../documentos/img/BPMN.pdf) no repositório.
+Para visualizar o diagrama completo, basta acessar o [Diagrama BPMN](./img/BPMN.pdf) no repositório.
 
 ---
 
@@ -688,7 +777,7 @@ Este pool representa a experiência do usuário no Portal Aventura. O fluxo é i
 
 <sub>Figura X - Cliente </sub><br>
  
-  <img src="../documentos/img/pool1.png" width="100%" alt="Cliente"><br>
+  <img src="./img/pool1.png" width="100%" alt="Cliente"><br>
 
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
@@ -738,7 +827,7 @@ Este pool representa o motor de ML do Spotlight. Ele é ativado pelas interaçõ
 
 <sub>Figura X - Sistema de Recomendação</sub><br>
 
-  <img src="../documentos/img/pool2.png" width="100%" alt="Sistema de Recomendação"><br>
+  <img src="./img/pool2.png" width="100%" alt="Sistema de Recomendação"><br>
 
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
@@ -773,7 +862,7 @@ Este pool representa o processo interno da equipe de gestão de dados da Aventur
 
 <sub>Figura X - Gestores de Dados</sub><br>
 
-  <img src="../documentos/img/pool3.png" width="100%" alt="Gestores de Dados"><br>
+  <img src="./img/pool3.png" width="100%" alt="Gestores de Dados"><br>
 
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 </div>
@@ -856,7 +945,7 @@ Esta seção detalha as principais telas da aplicação, desde Login/Cadastro, S
 
 <sub>Figura X - Brainstorm de Features</sub><br>
 
-  <img src="../documentos/img/brainstorm_features.png" width="100%" alt="Brainstorm de Features"><br>
+  <img src="./img/brainstorm_features.png" width="100%" alt="Brainstorm de Features"><br>
 
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 
@@ -967,7 +1056,7 @@ Esta seção detalha o modelo de negócios desenvolvido para o **Spotlight**, **
 
 <sub>Figura X - Business Model Canvas</sub><br>
 
-  <img src="../documentos/img/bmn.png" width="100%" alt="Business Model Canvas"><br>
+  <img src="./img/bmn.png" width="100%" alt="Business Model Canvas"><br>
 
   <sup>Source: Material produzido pelos autores, 2026.</sup>
 
@@ -1221,7 +1310,7 @@ Notas de pré-processamento e uso (Sprint 1):
 
 Artefatos entregáveis nesta Sprint:
 
-- Scripts SQL de criação e carga inicial: [database/01_create_database.sql](database/01_create_database.sql) e [database/02_initial_data.sql](database/02_initial_data.sql).
+- Scripts SQL de criação e carga inicial: [src/database/01_create_database.sql](../src/database/01_create_database.sql) e [src/database/02_initial_data.sql](../src/database/02_initial_data.sql).
 - Script/notebook de pré-processamento para geração de agregados e matrizes de similaridade.
 
 Esta especificação está alinhada com o escopo mínimo definido para as telas essenciais; melhorias (analytics, pipelines ML, integrações transacionais) ficam para fases posteriores.
@@ -1238,7 +1327,7 @@ O modelo é composto por oito entidades principais — Usuário, Espetáculo, Te
 
 <sub>Figura X - Diagrama Conceitual</sub><br>
 
-  <img src="../documentos/img/diagrama-conceitual.jpeg" width="100%" alt="Diagrama Conceitual"><br>
+  <img src="./img/diagrama-conceitual.jpeg" width="100%" alt="Diagrama Conceitual"><br>
 
   <sup>Source: Material produzido pelos autores, 2026.</sup>
 
@@ -1495,7 +1584,7 @@ O modelo lógico no PostgreSQL foi projetado com foco em normalização, integri
 
 <sub>Figura 1 - Modelo lógico de dados</sub><br>
 
-  <img src="../documentos/img/modelo_logico.png" width="100%" alt="Modelo lógico de dados"><br>
+  <img src="./img/modelo_logico.png" width="100%" alt="Modelo lógico de dados"><br>
 
   <sup>Fonte: Material produzido pelos autores, 2026.</sup>
 
@@ -1877,7 +1966,7 @@ _conteúdo_
 <sub>Figura XX - Diagrama de Classes do Motor de Recomendação</sub>
 <br><br>
 
-<img src="../documentos/img/diagramamotor.png" width="90%">
+<img src="./img/diagramamotor.png" width="90%">
 
 <br><br>
 <sup>Fonte: Material produzido pelos autores (2026)</sup>
@@ -1938,7 +2027,7 @@ Um diagrama de componentes é um modelo arquitetural da UML que representa os pr
 
 <sub>Figura X - Diagrama de componentes UML</sub><br>
 
-  <img src="../documentos/img/diagrama_componentes.png" width="100%" alt="Diagrama de componentes UML"><br>
+  <img src="./img/diagrama_componentes.png" width="100%" alt="Diagrama de componentes UML"><br>
 
   <sup>Source: Material produzido pelos autores, 2026.</sup>
 
