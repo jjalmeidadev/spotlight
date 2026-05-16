@@ -298,6 +298,27 @@ Todas as tasks acima devem ser registradas no quadro Kanban com os campos obriga
 - Documentações devem ser versionadas na pasta `docs` do repositório antes de serem consideradas concluídas.
 ---
 
+---
+
+## 2.3 Sprint 3  
+Nota: Insira informações sobre mudanças realizadas.
+
+---
+
+## 2.4 Sprint 4  
+Nota: Insira informações sobre mudanças realizadas.
+
+---
+
+## 2.5 Sprint 5  
+Nota: Insira informações sobre mudanças realizadas.
+
+---
+
+# 3. Análise de Riscos
+
+O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a cada sprint como parte das cerimônias de retrospectiva e planejamento. Os riscos são classificados por probabilidade e impacto, com estratégias de mitigação definidas e responsáveis atribuídos.
+
 ## 3.1 Riscos Identificados
 
 | ID | Risco | Probabilidade | Impacto | Responsável |
