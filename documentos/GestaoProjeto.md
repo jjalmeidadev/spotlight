@@ -125,8 +125,178 @@ Todas as tasks acima devem ser registradas no quadro Kanban com os campos obriga
 ---
 
 ## 2.2 Sprint 2  
-Nota: Insira informações sobre mudanças realizadas.
-
+#### 2.2.1 Retrospectiva da Sprint 2
+ 
+Ao final da Sprint 2, a equipe conduziu nova sessão de retrospectiva com a finalidade de avaliar o desempenho do ciclo encerrado, comparar a evolução em relação à Sprint 1 e identificar pontos de atenção para a Sprint 3. A análise foi novamente segmentada em pontos positivos, pontos negativos e ações de melhoria, mantendo o padrão definido nas políticas de gestão de configuração.
+ 
+De forma geral, a Sprint 2 apresentou um avanço significativo no engajamento coletivo e na qualidade do produto entregue, ainda que tenha exposto limitações relevantes no processo de execução. A síntese desse ciclo pode ser resumida da seguinte forma: o grupo falhou no processo, mas obteve um produto de qualidade.
+ 
+---
+ 
+#### 2.2.2 Análise dos Pontos Identificados
+ 
+##### Pontos Positivos
+ 
+O planejamento da estrutura dos slides de apresentação evoluiu de maneira expressiva em relação à Sprint 1, indicando que a ação de melhoria relacionada à introdução de um checkpoint antecipado de revisão de materiais não-técnicos surtiu efeito prático. A equipe demonstrou maturidade ao tratar o entregável de comunicação com a mesma atenção dedicada aos entregáveis técnicos.
+ 
+O alinhamento da equipe também foi destacado como fator decisivo no ciclo. A coesão nas decisões técnicas e a clareza sobre os objetivos da sprint reduziram retrabalhos e mantiveram o grupo orientado por uma visão compartilhada da solução.
+ 
+Houve aumento perceptível no rigor com o preenchimento das seções dos artefatos entregues, o que indica amadurecimento no uso das políticas de gestão de configuração e no cumprimento do Definition of Done definido pelo grupo.
+ 
+Por fim, a equipe manteve postura ativa e colaborativa na resolução de gargalos e problemas que surgiram ao longo do ciclo, reforçando a cultura de ownership coletivo e de comunicação aberta promovida desde a Sprint 1.
+ 
+##### Pontos Negativos
+ 
+O principal ponto negativo identificado foi a ausência de uma definição clara de prioridade e de dependências entre tasks ao longo do ciclo. Embora o backlog tenha sido sequenciado durante o planejamento, a execução ocorreu sem o devido controle das relações de precedência entre as tarefas, o que comprometeu o fluxo natural do trabalho e gerou retrabalho em pontos específicos do ciclo.
+ 
+Foi também identificada uma inadequação no fluxo de cards no Kanban e no padrão dos commits realizados no repositório. A movimentação dos cards entre os estados (Doing, Review, Closed) não ocorreu de forma consistente, e a maioria dos commits não seguiram, uma consistencia diraria.
+ 
+A equipe deixou acumular um volume excessivo de revisões pendentes ao final do ciclo, concentrando esforços de revisão em momentos próximos da entrega, o que comprometeu a qualidade do processo de validação e elevou o risco de retrabalho.
+ 
+Por fim, foi observada a permanência de tarefas no estado "Doing" por períodos prolongados, sem progressão para Review ou Closed. Esse comportamento indica falta de monitoramento ativo do fluxo de trabalho e ausência de gatilhos para tratamento de tarefas estagnadas.
+ 
+##### Ações de Melhoria Propostas
+ 
+- Construir, durante o planejamento da Sprint 3, uma matriz de dependências entre as tasks, formalizando precedências técnicas e bloqueios potenciais antes do início da execução.
+- Estabelecer SLA interno para revisão de Merge Requests de no máximo 24 horas após a abertura, evitando o acúmulo de revisões pendentes no final do ciclo.
+- Definir limite explícito de Work In Progress (WIP) no quadro Kanban, garantindo que cada membro mantenha no máximo duas tasks simultâneas em estado "Doing".
+- Implantar verificação diária, durante as dailys, das tarefas que permanecem em "Doing" há mais de 48 horas, com tratamento ativo de impedimentos.
+- Reforçar com a equipe o padrão de mensagens de commit definido na gestão de configuração, com revisão pelo Scrum Master nos primeiros dias da sprint.
+- Registrar os desvios de fluxo de cards e de commits no registro de riscos da Sprint 3, com monitoramento ativo ao longo do ciclo.
+---
+ 
+#### 2.2.3 Planejamento da Sprint 3
+ 
+##### Objetivo da Sprint 3
+ 
+A Sprint 3 representa o ponto de virada do projeto rumo à materialização da solução proposta. O ciclo tem como objetivo central transformar a modelagem técnica e o projeto visual desenvolvidos na Sprint 2 em uma solução de software funcional, contemplando a implementação física do banco de dados, o desenvolvimento incremental de backend e frontend integrados, a definição estruturada do planejamento de testes e a continuidade da gestão evolutiva do projeto.
+ 
+Esta sprint é caracterizada pela maior densidade técnica do projeto até o momento e exigirá rigor na aplicação das políticas de gestão de configuração, na adoção da metodologia TDD e na manutenção de fluxo saudável no quadro Kanban, em resposta direta às ações de melhoria pactuadas na retrospectiva da Sprint 2.
+ 
+##### Estratégia de Priorização
+ 
+O backlog da Sprint 3 foi estruturado com base em uma matriz de dependências técnicas, em resposta direta a um dos principais pontos negativos identificados no ciclo anterior. A sequência adotada respeita as relações de precedência entre os artefatos e busca evitar bloqueios e retrabalho ao longo da execução.
+ 
+| Ordem | Item                                   | Descrição                                                                            |
+|-------|----------------------------------------|--------------------------------------------------------------------------------------|
+| 1     | Implementação do Banco de Dados        | Base estrutural sobre a qual o backend será construído                               |
+| 2     | Arquitetura e Padrões de Codificação   | Definição estrutural que orienta toda a implementação da solução                     |
+| 3     | Definição de APIs Externas             | Autenticação e API complementar, dependências do backend                             |
+| 4     | Desenvolvimento de Backend             | Implementação de Services, rotas e integração com banco e APIs externas             |
+| 5     | Desenvolvimento de Frontend            | Implementação das telas integradas ao backend, ainda que com dados mockados         |
+| 6     | Testes Unitários e Documentação Swagger | Validação técnica do backend e documentação funcional das APIs                       |
+| 7     | Planejamento de Testes                 | Estruturação dos cenários de teste funcional, RNF, usabilidade, API e integração     |
+| 8     | Gestão de Projetos                     | Retrospectiva, planejamento contínuo e atualização da documentação evolutiva         |
+ 
+##### Backlog Priorizado e Sequenciado
+ 
+###### Bloco 1 — Implementação do Banco de Dados
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T1   | Elaborar script SQL de criação do banco (`01_create_database.sql`)                         |             | M                 | Alta       | A Fazer |
+| T2   | Elaborar script de inserção de dados iniciais (`02_initial_data.sql`)                      |             | M                 | Alta       | A Fazer |
+| T3   | Construir dicionário de dados (tipos, restrições, relacionamentos, descrições)             |             | M                 | Alta       | A Fazer |
+| T4   | Documentar regras de negócio implementadas diretamente no banco                            |             | P                 | Alta       | A Fazer |
+| T5   | Redigir instruções de implantação (versão, dependências, ajustes) no `README.md`           |             | P                 | Alta       | A Fazer |
+| T6   | Dockerizar o banco e implantar no servidor Inteli conforme acordado                        |             | G                 | Alta       | A Fazer |
+ 
+###### Bloco 2 — Arquitetura e Padrões de Codificação
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T7   | Definir e documentar a estrutura de diretórios do projeto                                  |             | P                 | Alta       | A Fazer |
+| T8   | Produzir representação visual da arquitetura de codificação                                |             | M                 | Alta       | A Fazer |
+| T9   | Documentar padrões de codificação no `GuiaPadroesDesenvolvimento.md`                       |             | M                 | Alta       | A Fazer |
+| T10  | Identificar e descrever padrão de projeto criacional aplicado ao contexto da solução       |             | P                 | Média      | A Fazer |
+| T11  | Identificar e descrever padrão de projeto comportamental aplicado ao contexto da solução   |             | P                 | Média      | A Fazer |
+ 
+###### Bloco 3 — Definição de APIs Externas
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T12  | Definir API de autenticação externa (SSO, Auth0 ou equivalente)                            |             | M                 | Alta       | A Fazer |
+| T13  | Definir API adicional (Watson, ChatGPT, geolocalização ou similar)                         |             | M                 | Alta       | A Fazer |
+| T14  | Atualizar modelagens da solução técnica refletindo as APIs definidas                       |             | M                 | Alta       | A Fazer |
+ 
+###### Bloco 4 — Desenvolvimento de Backend
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T15  | Implementar estrutura base do backend (configuração, conexão com banco, organização)       |             | G                 | Alta       | A Fazer |
+| T16  | Implementar Services e rotas das features planejadas para a Sprint 3                       |             | G                 | Alta       | A Fazer |
+| T17  | Definir contratos de API em formato JSON (entrada e saída de cada rota)                    |             | M                 | Alta       | A Fazer |
+| T18  | Configurar e publicar documentação Swagger das APIs do backend                             |             | M                 | Alta       | A Fazer |
+ 
+###### Bloco 5 — Desenvolvimento de Frontend
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T19  | Implementar estrutura base do frontend conforme a arquitetura definida                     |             | G                 | Alta       | A Fazer |
+| T20  | Implementar telas das features planejadas, integradas ao backend ou com dados mockados     |             | G                 | Alta       | A Fazer |
+ 
+###### Bloco 6 — Testes Unitários e Metodologia TDD
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T21  | Definir e documentar estratégia de testes adotada                                          |             | M                 | Alta       | A Fazer |
+| T22  | Implementar testes unitários nos Services do backend                                       |             | G                 | Alta       | A Fazer |
+| T23  | Documentar cobertura e resultados dos testes no `Projeto.md`                               |             | P                 | Média      | A Fazer |
+ 
+###### Bloco 7 — Planejamento de Testes
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T24  | Evoluir o planejamento de testes funcionais (cenários positivos, negativos e abrangência)  |             | M                 | Alta       | A Fazer |
+| T25  | Evoluir o planejamento de testes de RNFs                                                   |             | M                 | Alta       | A Fazer |
+| T26  | Elaborar roteiro de teste de usabilidade (SUS) com ao menos 5 usuários externos            |             | M                 | Média      | A Fazer |
+| T27  | Planejar testes de APIs externas (propósito, cenários e abrangência)                       |             | M                 | Alta       | A Fazer |
+| T28  | Planejar testes de integração com uso obrigatório do módulo VHS para caching de respostas  |             | G                 | Alta       | A Fazer |
+ 
+###### Bloco 8 — Evidências e Gestão de Projetos
+ 
+| Task | Descrição                                                                                  | Responsável | Tamanho (T-Shirt) | Prioridade | Status  |
+|------|--------------------------------------------------------------------------------------------|-------------|-------------------|------------|---------|
+| T29  | Gravar vídeo demonstrativo da aplicação em execução (tela dividida com console do VSCode)  |             | P                 | Alta       | A Fazer |
+| T30  | Consolidar e revisar o `Projeto.md` com arquitetura, features, testes e comprovações       |             | M                 | Alta       | A Fazer |
+| T31  | Realizar retrospectiva da Sprint 3 e atualizar o `GestaoProjeto.md` com o ciclo encerrado  |             | P                 | Alta       | A Fazer |
+| T32  | Elaborar planejamento inicial da Sprint 4 conforme políticas do PMO                        |             | P                 | Alta       | A Fazer |
+ 
+##### Legenda de Tamanhos (T-Shirt Sizing)
+ 
+| Tamanho | Tempo Estimado    |
+|---------|-------------------|
+| P       | Até 30 minutos    |
+| M       | 30 a 60 minutos   |
+| G       | 60 a 120 minutos  |
+ 
+##### Matriz de Dependências Críticas
+ 
+Em resposta direta ao ponto negativo identificado na retrospectiva da Sprint 2 referente à ausência de definição de dependências, a tabela abaixo formaliza os principais bloqueios técnicos entre tasks do ciclo:
+ 
+| Task Dependente | Depende de        | Justificativa                                                              |
+|-----------------|-------------------|----------------------------------------------------------------------------|
+| T15, T16        | T1, T2            | Backend depende do banco criado e populado para operar e ser testado       |
+| T16             | T7, T9            | Implementação de Services depende da arquitetura e dos padrões definidos   |
+| T16             | T12, T13          | Rotas integradas dependem das APIs externas estarem definidas              |
+| T20             | T16, T17          | Telas integradas dependem do backend funcional e dos contratos definidos   |
+| T22             | T16               | Testes unitários requerem Services implementados                           |
+| T18             | T16, T17          | Documentação Swagger exige rotas e contratos consolidados                  |
+| T28             | T12, T13          | Testes de integração com VHS dependem das APIs externas definidas          |
+| T29, T30        | T15 — T22         | Evidências e documentação final dependem da solução em execução           |
+| T31, T32        | Todas as anteriores | Gestão evolutiva consolida o que foi efetivamente realizado no ciclo      |
+ 
+##### Alinhamento com a Gestão de Configuração
+ 
+Todas as tasks acima devem ser registradas no quadro Kanban com os campos obrigatórios preenchidos (descrição, DoR, DoD, tamanho e tipo), seguindo as políticas definidas no documento de Gestão de Configuração. Para esta sprint, em resposta às ações de melhoria pactuadas, ficam estabelecidas as seguintes diretrizes adicionais:
+ 
+- Cada membro da equipe deve manter no máximo duas tasks simultâneas no estado "Doing", respeitando o limite de WIP acordado.
+- Merge Requests devem receber revisão em até 24 horas após sua abertura, evitando o acúmulo de revisões pendentes ao final do ciclo.
+- Tarefas que permanecerem no estado "Doing" por mais de 24 horas devem ser tratadas como ponto de atenção nas dailys subsequentes.
+- Commits devem seguir o padrão definido na gestão de configuração, com verificação amostral pelo Scrum Master nos primeiros dias do ciclo.
+- Artefatos de código devem ter Merge Request vinculado antes de avançarem para Closed.
+- Documentações devem ser versionadas na pasta `docs` do repositório antes de serem consideradas concluídas.
+---
 ---
 
 ## 2.3 Sprint 3  
