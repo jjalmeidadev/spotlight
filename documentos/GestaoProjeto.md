@@ -139,17 +139,17 @@ De forma geral, a Sprint 2 apresentou um avanço significativo no engajamento co
  
 O planejamento da estrutura dos slides de apresentação evoluiu de maneira expressiva em relação à Sprint 1, indicando que a ação de melhoria relacionada à introdução de um checkpoint antecipado de revisão de materiais não-técnicos surtiu efeito prático. A equipe demonstrou maturidade ao tratar o entregável de comunicação com a mesma atenção dedicada aos entregáveis técnicos.
  
-O alinhamento da equipe também foi destacado como fator decisivo no ciclo. A coesão nas decisões técnicas e a clareza sobre os objetivos da sprint reduziram retrabalhos e mantiveram o grupo orientado por uma visão compartilhada da solução.
+O alinhamento da equipe também foi destacado como fator decisivo no ciclo. Reuniões de sincronização com duração média de uma hora, registradas no Kanban com a tag "meet" e tamanho M, foram realizadas com os responsáveis pelas tarefas em aberto, garantindo coesão nas decisões técnicas e clareza sobre os objetivos da sprint. Essa prática reduziu retrabalhos e manteve o grupo orientado por uma visão compartilhada da solução.
  
 Houve aumento perceptível no rigor com o preenchimento das seções dos artefatos entregues, o que indica amadurecimento no uso das políticas de gestão de configuração e no cumprimento do Definition of Done definido pelo grupo.
  
-Por fim, a equipe manteve postura ativa e colaborativa na resolução de gargalos e problemas que surgiram ao longo do ciclo, reforçando a cultura de ownership coletivo e de comunicação aberta promovida desde a Sprint 1.
+Por fim, a equipe manteve postura ativa e colaborativa na resolução de gargalos que surgiram ao longo do ciclo, como acúmulo de revisões pendentes, dependência de feedbacks sobre artefatos de outras entregas e necessidade de ajustes em tarefas sequenciais causados pela falta de priorização clara no início do ciclo. A comunicação aberta e o ownership coletivo foram determinantes para que esses impedimentos fossem tratados sem comprometer o produto final.
  
 ##### Pontos Negativos
  
 O principal ponto negativo identificado foi a ausência de uma definição clara de prioridade e de dependências entre tasks ao longo do ciclo. Embora o backlog tenha sido sequenciado durante o planejamento, a execução ocorreu sem o devido controle das relações de precedência entre as tarefas, o que comprometeu o fluxo natural do trabalho e gerou retrabalho em pontos específicos do ciclo.
  
-Foi também identificada uma inadequação no fluxo de cards no Kanban e no padrão dos commits realizados no repositório. A movimentação dos cards entre os estados (Doing, Review, Closed) não ocorreu de forma consistente, e a maioria dos commits não seguiram, uma consistencia diraria.
+Foi também identificada uma inadequação no fluxo de cards no Kanban e no padrão dos commits realizados no repositório. A movimentação dos cards entre os estados (Doing, Review, Closed) não ocorreu de forma consistente, e a maioria dos commits não seguiu o padrão de mensagens definido nas políticas de gestão de configuração.
  
 A equipe deixou acumular um volume excessivo de revisões pendentes ao final do ciclo, concentrando esforços de revisão em momentos próximos da entrega, o que comprometeu a qualidade do processo de validação e elevou o risco de retrabalho.
  
@@ -161,7 +161,7 @@ Por fim, foi observada a permanência de tarefas no estado "Doing" por períodos
 - Estabelecer SLA interno para revisão de Merge Requests de no máximo 24 horas após a abertura, evitando o acúmulo de revisões pendentes no final do ciclo.
 - Definir limite explícito de Work In Progress (WIP) no quadro Kanban, garantindo que cada membro mantenha no máximo duas tasks simultâneas em estado "Doing".
 - Implantar verificação diária, durante as dailys, das tarefas que permanecem em "Doing" há mais de 48 horas, com tratamento ativo de impedimentos.
-- Reforçar com a equipe o padrão de mensagens de commit definido na gestão de configuração, com revisão pelo Scrum Master nos primeiros dias da sprint.
+- Reforçar com a equipe o padrão de mensagens de commit definido na gestão de configuração, com verificação amostral pelo Scrum Master nos primeiros dias da sprint.
 - Registrar os desvios de fluxo de cards e de commits no registro de riscos da Sprint 3, com monitoramento ativo ao longo do ciclo.
 ---
  
@@ -297,26 +297,6 @@ Todas as tasks acima devem ser registradas no quadro Kanban com os campos obriga
 - Artefatos de código devem ter Merge Request vinculado antes de avançarem para Closed.
 - Documentações devem ser versionadas na pasta `docs` do repositório antes de serem consideradas concluídas.
 ---
----
-
-## 2.3 Sprint 3  
-Nota: Insira informações sobre mudanças realizadas.
-
----
-
-## 2.4 Sprint 4  
-Nota: Insira informações sobre mudanças realizadas.
-
----
-
-## 2.5 Sprint 5  
-Nota: Insira informações sobre mudanças realizadas.
-
----
-
-# 3. Análise de Riscos
-
-O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a cada sprint como parte das cerimônias de retrospectiva e planejamento. Os riscos são classificados por probabilidade e impacto, com estratégias de mitigação definidas e responsáveis atribuídos.
 
 ## 3.1 Riscos Identificados
 
