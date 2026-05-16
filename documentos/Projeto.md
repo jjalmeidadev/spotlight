@@ -135,8 +135,8 @@
   - [3.1 Requisitos Funcionais (RFs)](#31-requisitos-funcionais-rfs)
   - [3.2 Requisitos Não Funcionais (RNFs)](#32-requisitos-não-funcionais-rnfs)
   - [3.3 Correlação RFs e RNFs](#33-correlação-rfs-e-rnfs)
-  - [3.4 Casos de Uso](#34-casos-de-uso)
-  - [3.5 Casos de Uso x Requisitos Funcionais](#35-casos-de-uso-x-requisitos-funcionais)
+  - [3.4 Casos de Uso e Comparação com Requisitos Funcionais](#34-casos-de-uso-e-comparação-com-requisitos-funcionais)
+  - [3.5 Diagrama de Casos de Uso](#35-diagrama-de-casos-de-uso)
 - [4. Modelagem de Dados](#4-modelagem-de-dados)
   - [4.1 Especificação da Base de Dados para Modelo de Recomendação](#41-especificação-da-base-de-dados-para-modelo-de-recomendação)
   - [4.2 Modelo Conceitual de Dados](#42-modelo-conceitual-de-dados)
@@ -1278,11 +1278,64 @@ A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNF
 | RNF12 | Execução em containers Docker | RF01, RF02, RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10, RF11, RF12, RF13, RF14, RF15, RF16 | Requisito transversal que impacta toda a arquitetura e execução do sistema. |
 </div>
 
-## 3.4 Casos de Uso
-_conteúdo_
+## 3.4 Casos de Uso e Comparação com Requisitos Funcionais
 
-## 3.5 Casos de Uso x Requisitos Funcionais
-_conteúdo_
+A seção de casos de uso tem como objetivo representar as principais funcionalidades do Sistema de Recomendação para a Aventura a partir da perspectiva dos atores envolvidos no sistema, estabelecendo a relação entre as necessidades dos usuários e os requisitos funcionais definidos para a plataforma. Por meio dessa modelagem, é possível visualizar como usuários, administradores e o sistema de recomendação interagem com o ambiente, garantindo maior clareza sobre os comportamentos esperados, as responsabilidades de cada ator e o funcionamento geral das funcionalidades propostas.
+
+### 3.4.1 Atores do Sistema
+
+| Ator | Tipo | Descrição |
+|------|------|-----------|
+| Usuário | Externo | Usuário com conta criada e sessão ativa, com acesso a funcionalidades personalizadas como preferências, avaliações e comentários. |
+| Administrador | Externo | Usuário interno da Aventura com permissões para gerenciar o catálogo de espetáculos, categorias e avaliações da plataforma. |
+| Sistema de Recomendação | Interno | Componente automatizado responsável por coletar interações, gerar e atualizar recomendações sem ação direta do usuário. |
+
+---
+
+### 3.4.2. Casos de Uso Definidos
+
+| Nome do Caso de Uso | User Story | RF(s) Associado(s) |
+|---------------------|------------|--------------------|
+| Cadastrar-se na plataforma | Como usuário, quero me cadastrar na plataforma Portal Aventura, para que eu possa acessar funcionalidades personalizadas como recomendações, avaliações e comentários. | RF01 |
+| Realizar login | Como usuário, quero realizar login na plataforma Portal Aventura, para que eu possa acessar minha conta e usufruir das funcionalidades personalizadas disponíveis. | RF02 |
+| Definir preferências de perfil | Como usuário, quero definir minhas preferências de perfil na plataforma, para que o sistema de recomendação possa sugerir espetáculos mais alinhados aos meus gostos desde o início. | RF03 |
+| Visualizar recomendações personalizadas | Como usuário, quero visualizar recomendações personalizadas de espetáculos no portal, para que eu possa descobrir apresentações relevantes ao meu perfil de forma prática e eficiente. | RF04 |
+| Pesquisar espetáculos | Como usuário, quero pesquisar espetáculos dentro da plataforma Portal Aventura, para que eu possa encontrar apresentações de meu interesse de forma rápida e direta. | RF05 |
+| Filtrar espetáculos | Como usuário, quero filtrar os espetáculos disponíveis na plataforma por critérios como categoria, data e avaliação, para que eu possa refinar minha busca e encontrar apresentações mais adequadas às minhas preferências. | RF06 |
+| Visualizar detalhes de espetáculo | Como usuário, quero visualizar os detalhes de um espetáculo no portal, para que eu possa obter informações completas sobre a apresentação antes de tomar minha decisão de compra. | RF07 |
+| Visualizar avaliações de espetáculos | Como usuário, quero visualizar as avaliações de outros usuários sobre os espetáculos disponíveis, para que eu possa embasar minha escolha com base na experiência da comunidade do portal. | RF08 |
+| Avaliar espetáculos | Como usuário, quero avaliar os espetáculos da companhia Aventura, para que minhas recomendações futuras sejam cada vez mais assertivas. | RF09 |
+| Comentar sobre espetáculos | Como usuário, quero ter a possibilidade de apresentar um feedback sobre as apresentações teatrais das quais eu frequentei, para que saibam minha opinião real sobre o espetáculo. | RF10 |
+| Registrar interações do usuário | Como Sistema de Recomendação, quero registrar as interações de todos os usuários da plataforma, para que seja possível disponibilizar recomendações precisas entre usuários ou por item. | RF11 |
+| Gerar recomendações personalizadas | Como Sistema de Recomendação, quero gerar recomendações com base nas interações do usuário no portal, para oferecer conteúdos relevantes e reduzir a ociosidade de assentos. | RF12 |
+| Atualizar recomendações com base em novas interações | Como Sistema de Recomendação, quero atualizar recomendações com base nas novas interações do usuário, para que seja possível garantir a personalização assídua das especificidades de apreciação do mesmo. | RF13 |
+| Recomendar por filtragem colaborativa | Como Sistema de Recomendação, quero disseminar conteúdos através da filtragem colaborativa, para que o comportamento similar de usuários possa refletir em acertos na recomendação entre eles de forma bilateral. | RF14 |
+| Recomendar conteúdos populares para novos usuários | Como Sistema de Recomendação, quero indicar os conteúdos mais populares entre a comunidade do Portal Aventura, para que usuários em cold start possam ter acesso a conteúdos de interesse mesmo sem interações prévias com a plataforma. | RF15 |
+| Gerenciar conteúdos da plataforma | Como Administrador, quero que seja possível realizar o gerenciamento de conteúdos dentro da plataforma, para que haja garantia de concordância dos conteúdos disponibilizados. | RF16 |
+
+## 3.5. Diagrama de Casos de Uso
+
+O diagrama de casos de uso a seguir representa as interações entre os atores do sistema — **Usuário**, **Administrador** e **Sistema de Recomendação** — e as funcionalidades disponíveis na plataforma Portal Aventura. Ele oferece uma visão estruturada dos requisitos funcionais do sistema, evidenciando as responsabilidades de cada ator e os fluxos de interação previstos para o MVP do projeto.
+
+<div align="center">
+
+<sub>Figura X - Diagrama de Casos de Uso 1 </sub><br>
+
+  <img src="../documentos/img/diagramadecasosdesuso.png" width="100%" alt="Diagrama de Casos de Uso 1 "><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+<div align="center">
+
+<sub>Figura X - Diagrama de Casos de Uso 2 </sub><br>
+
+  <img src="../documentos/img/sistemaderecomendacao.png" width="100%" alt="Diagrama de Casos de Uso 2 "><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
 
 # 4. Modelagem de Dados
 _conteúdo_
