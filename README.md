@@ -148,11 +148,13 @@ da Aventura — levando o público certo ao espetáculo certo.
  ┃ ┗ 📜Projeto.md
  ┣ 📂src
  ┃ ┣ 📂aad
- ┃ ┃ ┣ 📜distribuicao_antes.png
- ┃ ┃ ┣ 📜interacoes_usuario.png
- ┃ ┃ ┣ 📜top_espetaculos.png
  ┃ ┃ ┗ 📜tratamento-dados.ipynb
+ ┃ ┣ 📂dataset
+ ┃ ┃ ┗ 📜recomendacao.csv
  ┃ ┗ 📂database
+ ┃ ┃ ┣ 📜01_create_database.sql
+ ┃ ┃ ┣ 📜02_initial_data.sql
+ ┃ ┃ ┗ 📜readme.md
  ┣ 📜.gitignore
  ┗ 📜README.md
  ```
@@ -166,7 +168,7 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 - <b>imagens</b>: imagens relacionadas ao projeto como um todo (por exemplo imagens do sistema, do grupo, logotipos e afins).
 
-- <b>src</b>: nesta pasta encontra-se todo o código fonte do sistema (circuito e eventuais sistemas complementares).
+- <b>src</b>: nesta pasta encontra-se o código fonte do sistema, os notebooks de análise, os scripts de banco de dados e o dataset versionado em <b>src/dataset</b>.
 
 ## 🗃 Histórico de lançamentos
 
@@ -191,4 +193,3 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 ## 📋 Licença/License
 
 <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="#">Spotlight</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.inteli.edu.br/">Inteli</a>, <a href="ttps://www.linkedin.com/in/celsojwnior/">Celso Rodrigues</a>, <a href="https://www.linkedin.com/in/jaimeandradedealmeida/">Jaime Almeida</a>, <a href="https://www.linkedin.com/in/leonardoramosvieira/">Leonardo Ramos</a>, <a href="https://www.linkedin.com/in/marianalacerdareis/">Mariana Lacerda</a>, <a href="https://www.linkedin.com/in/mariana-pereira-de-souza1/">Mariana Pereira</a>, <a href="https://www.linkedin.com/in/rafael-figueiredo-campos-72131735b/">Rafael Campos</a>, <a href="https://www.linkedin.com/in/vitor-ribeiro-ms/">Vitor Ribeiro</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
-
