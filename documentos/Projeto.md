@@ -2370,7 +2370,107 @@ _conteúdo_
 _conteúdo_
 
 ## 8.1 Arquitetura de Codificação e Estrutura de Diretórios
-_conteúdo_
+
+&emsp;A solução foi organizada para separar a aplicação Expo do restante do ecossistema do projeto. A raiz concentra os arquivos de configuração do app e os ativos estáticos, enquanto `src/` reúne as camadas de código-fonte. Essa divisão segue dois objetivos principais: manter o frontend em uma estrutura MVVM clara e manter o backend como uma composição SOA explícita, com contratos, serviços e integração externa separados por responsabilidade.
+
+### Estrutura de diretórios
+
+```text
+g04/
+├─ app.json
+├─ babel.config.js
+├─ expo-env.d.ts
+├─ package.json
+├─ tsconfig.json
+├─ README.md
+├─ assets/
+├─ documentos/
+│  ├─ Projeto.md
+│  ├─ ProjetoVisual.md
+│  ├─ GestaoProjeto.md
+│  └─ Manual-instalacao.md
+└─ src/
+  ├─ backend/
+  │  ├─ api-gateway/
+  │  ├─ contracts/
+  │  │  ├─ dtos/
+  │  │  └─ events/
+  │  ├─ services/
+  │  │  ├─ catalogo/
+  │  │  ├─ recomendacao/
+  │  │  └─ usuario/
+  │  └─ ml-engine/
+  │     ├─ data-preparation/
+  │     ├─ inference/
+  │     └─ training/
+  ├─ frontend/
+  │  ├─ components/
+  │  ├─ screens/
+  │  ├─ viewmodels/
+  │  ├─ models/
+  │  ├─ repositories/
+  │  ├─ theme/
+  │  └─ types/
+  ├─ aad/
+  ├─ database/
+  ├─ dataset/
+  └─ models/
+```
+
+### Representação visual da arquitetura
+
+```mermaid
+flowchart TB
+  Root[Raiz do repositório] --> Expo[Configs do Expo\napp.json + babel.config.js + tsconfig.json]
+  Root --> Assets[assets/\nrecursos estáticos]
+  Root --> Docs[documentos/\nDocumentação do projeto]
+  Root --> Src[src/]
+
+  Src --> Backend[backend/\nAPI, contratos, serviços e ML]
+  Src --> Frontend[frontend/\nUI em MVVM]
+  Src --> Data[database/\ndatasets e scripts SQL]
+  Src --> Aad[aad/\nnotebooks de análise]
+  Src --> ProjectModels[models/\nmodelos e artefatos]
+
+  Backend --> Gateway[api-gateway/\nporta de entrada do backend]
+  Backend --> Contracts[contracts/\nDTOs e eventos]
+  Backend --> Services[services/\nregras de negócio]
+  Backend --> MLEngine[ml-engine/\npreparação, treino e inferência]
+
+  Contracts --> DTOs[dtos/\nmodelos de troca de dados]
+  Contracts --> Events[events/\neventos de integração]
+
+  Services --> Catalogo[catalogo/\noperações do catálogo]
+  Services --> Recomendacao[recomendacao/\nregras da recomendação]
+  Services --> Usuario[usuario/\nfluxos de usuário]
+
+  MLEngine --> Prep[data-preparation/\ntratamento de dados]
+  MLEngine --> Training[training/\nmodelagem e treino]
+  MLEngine --> Inference[inference/\nexecução de predição]
+
+  Frontend --> Screens[screens/\ntelas]
+  Frontend --> Components[components/\ncomponentes reutilizáveis]
+  Frontend --> ViewModels[viewmodels/\nregras de apresentação]
+  Frontend --> Repos[repositories/\nacesso a dados]
+  Frontend --> Theme[theme/\ncores e estilos]
+  Frontend --> FrontendModels[models/\nentidades e mocks]
+  Frontend --> Types[types/\ntipos compartilhados]
+```
+
+### Critérios de organização
+
+- `assets/` guarda imagens e recursos estáticos consumidos pelo app.
+- `src/frontend` concentra a interface e segue o padrão MVVM: `screens` representam a visão, `viewmodels` concentram a lógica de apresentação, `repositories` isolam o acesso a dados, `components` reaproveitam UI e `types`/`models` sustentam os contratos locais.
+- `src/backend` é organizado segundo SOA, com uma separação explícita entre a porta de entrada (`api-gateway`), os contratos (`contracts`), a lógica de negócio (`services`) e a camada de ML (`ml-engine`).
+- `src/backend/contracts/dtos` define os objetos de transferência usados nas fronteiras dos serviços; `events` registra mensagens/eventos de integração entre módulos.
+- `src/backend/services/catalogo`, `recomendacao` e `usuario` separam responsabilidades por domínio, reduzindo acoplamento e facilitando testes e manutenção.
+- `src/backend/ml-engine/data-preparation`, `training` e `inference` organizam o ciclo de dados e modelo de forma independente, permitindo evoluir o motor de recomendação sem misturar preparo, treino e predição.
+- `src/database`, `src/dataset` e `src/aad` permanecem como apoio aos dados e análises do projeto.
+- `documentos/` reúne a documentação do artefato e das entregas do projeto.
+
+### Justificativa da arquitetura
+
+&emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o MVVM facilita a separação entre interface e regra de apresentação, deixando as telas mais simples e os comportamentos reutilizáveis em ViewModels. No backend, a abordagem SOA permite expor serviços com fronteiras claras, usar contratos estáveis entre componentes e isolar o motor de recomendação em uma camada própria de ML. Isso reduz acoplamento, melhora a testabilidade e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
 
 ## 8.2 Modelo de Recomendação
 _conteúdo_
