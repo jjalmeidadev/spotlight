@@ -7,7 +7,7 @@ Este diretório reúne os scripts SQL responsáveis pela criação, carga inicia
 | Arquivo | Finalidade |
 |---|---|
 | `01_create_database.sql` | Script principal de criação da base relacional. Remove objetos anteriores quando existirem, cria os tipos enumerados, tabelas, constraints, políticas de RLS, trigger de criação de usuário e índices de apoio às consultas. |
-| `02_initial_data.sql` | Script reservado para inserção de dados iniciais relevantes para iniciar a solução, como categorias, atores, teatros, espetáculos, sessões e registros mínimos necessários para validações e demonstrações. No momento, o arquivo ainda está vazio. |
+| `02_initial_data.sql` | Script reservado para inserção de dados iniciais relevantes para iniciar a solução, como categorias, atores, teatros, espetáculos, sessões e registros mínimos necessários para validações e demonstrações. |
 | `03_rollback.sql` | Script de reversão da estrutura criada, removendo trigger, função, tabelas e tipos enumerados em ordem compatível com as dependências do banco. Deve ser usado em cenários controlados de limpeza ou recriação do ambiente. |
 
 ## Dicionário de Dados
