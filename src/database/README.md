@@ -658,3 +658,39 @@ Não há triggers ou functions associadas diretamente.
 | `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Otimiza busca de avaliações por espetáculo. |
 | `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Otimiza busca de espetáculos por ator. |
 
+## Regras de Negócio Implementadas no Banco de Dados
+
+Esta seção consolida as regras de negócio que devem ser garantidas diretamente pelo banco de dados, por meio de chaves primárias, chaves estrangeiras, constraints, tipos enumerados, políticas de Row Level Security, triggers e funções.
+
+| ID | Regra de negócio | Implementação no banco | Objeto SQL |
+|---|---|---|---|
+| RN-BD-01 | Todo usuário da aplicação deve estar associado a um usuário autenticado. | Chave estrangeira com remoção em cascata. | `usuario.id_usuario -> auth.users(id) ON DELETE CASCADE` |
+| RN-BD-02 | O perfil de usuário deve ser criado automaticamente quando um usuário for cadastrado no provedor de autenticação. | Trigger `AFTER INSERT` em `auth.users` executando função de criação de perfil. | `on_auth_user_created`, `public.handle_new_user()` |
+| RN-BD-03 | O e-mail do usuário deve ser único e possuir formato válido. | Constraint `UNIQUE` e constraint `CHECK` com expressão regular. | `usuario.email`, `chk_email_formato` |
+| RN-BD-04 | Usuários só podem ler e atualizar o próprio perfil. | Políticas de Row Level Security com `auth.uid() = id_usuario`. | Políticas `usuario: leitura do próprio perfil` e `usuario: atualização do próprio perfil` |
+| RN-BD-05 | O tipo de usuário deve ser limitado aos papéis previstos pelo sistema. | Tipo enumerado com valor padrão. | `tipo_usuario_enum`, `usuario.tipo_usuario DEFAULT 'cadastrado'` |
+| RN-BD-06 | O status do espetáculo deve ser limitado aos estados válidos do ciclo de exibição. | Tipo enumerado com valor padrão. | `status_espetaculo_enum`, `espetaculo.status DEFAULT 'em_breve'` |
+| RN-BD-07 | O nome de cada categoria deve ser único. | Constraint `UNIQUE`. | `categoria.nome` |
+| RN-BD-08 | A duração de um espetáculo, quando informada, deve ser maior que zero. | Constraint `CHECK`. | `espetaculo.duracao CHECK (duracao > 0)` |
+| RN-BD-09 | A nota média de um espetáculo deve permanecer entre 0 e 10. | Constraint `CHECK` e valor padrão. | `espetaculo.nota_media CHECK (nota_media BETWEEN 0 AND 10)` |
+| RN-BD-10 | A exclusão do administrador responsável não deve remover o espetáculo. | Chave estrangeira com `ON DELETE SET NULL`. | `espetaculo.id_admin -> usuario(id_usuario)` |
+| RN-BD-11 | Um espetáculo não pode ser associado mais de uma vez à mesma categoria. | Chave primária composta. | `espetaculo_categoria(id_espetaculo, id_categoria)` |
+| RN-BD-12 | As associações de categoria devem ser removidas quando o espetáculo ou a categoria forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `espetaculo_categoria.id_espetaculo`, `espetaculo_categoria.id_categoria` |
+| RN-BD-13 | Um ator não pode ser associado mais de uma vez ao mesmo espetáculo. | Chave primária composta. | `espetaculo_ator(id_espetaculo, id_ator)` |
+| RN-BD-14 | A ordem de exibição do ator, quando informada, deve ser maior que zero. | Constraint `CHECK`. | `espetaculo_ator.ordem_exibicao CHECK (ordem_exibicao > 0)` |
+| RN-BD-15 | As associações de elenco devem ser removidas quando o espetáculo ou o ator forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `espetaculo_ator.id_espetaculo`, `espetaculo_ator.id_ator` |
+| RN-BD-16 | A capacidade do teatro, quando informada, deve ser maior que zero. | Constraint `CHECK`. | `teatro.capacidade CHECK (capacidade > 0)` |
+| RN-BD-17 | Um teatro com sessões associadas não pode ser excluído. | Chave estrangeira com `ON DELETE RESTRICT`. | `sessao.id_teatro -> teatro(id_teatro)` |
+| RN-BD-18 | Toda sessão deve estar vinculada a um espetáculo e a um teatro. | Chaves estrangeiras obrigatórias (`NOT NULL`). | `sessao.id_espetaculo`, `sessao.id_teatro` |
+| RN-BD-19 | A exclusão de um espetáculo deve remover suas sessões, avaliações, recomendações e associações de catálogo. | Chaves estrangeiras com `ON DELETE CASCADE`. | `sessao`, `avaliacao`, `recomendacao`, `espetaculo_categoria`, `espetaculo_ator` |
+| RN-BD-20 | Preços de sessão não podem ser negativos e o preço máximo não pode ser menor que o preço mínimo. | Constraints `CHECK`. | `sessao.preco_minimo`, `sessao.preco_maximo`, `chk_preco_intervalo` |
+| RN-BD-21 | A disponibilidade de uma sessão não pode ser negativa. | Constraint `CHECK` e valor padrão. | `sessao.disponibilidade DEFAULT 0 CHECK (disponibilidade >= 0)` |
+| RN-BD-22 | Cada usuário pode avaliar um mesmo espetáculo apenas uma vez. | Constraint `UNIQUE`. | `avaliacao(id_usuario, id_espetaculo)` |
+| RN-BD-23 | A nota de uma avaliação deve estar entre 0 e 10. | Constraint `CHECK`. | `avaliacao.nota CHECK (nota BETWEEN 0 AND 10)` |
+| RN-BD-24 | Usuários só podem inserir ou excluir avaliações próprias. | Políticas de Row Level Security com `auth.uid() = id_usuario`. | Políticas `avaliacao: inserção pelo próprio usuário` e `avaliacao: exclusão pelo próprio usuário` |
+| RN-BD-25 | Avaliações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `avaliacao.id_usuario`, `avaliacao.id_espetaculo` |
+| RN-BD-26 | Usuários só podem consultar recomendações destinadas a eles. | Política de Row Level Security com `auth.uid() = id_usuario`. | Política `recomendacao: leitura pelo próprio usuário` |
+| RN-BD-27 | O algoritmo de recomendação deve pertencer à lista de algoritmos aceitos. | Constraint `CHECK`. | `chk_tipo_algoritmo` |
+| RN-BD-28 | O score de recomendação não pode ser negativo. | Constraint `CHECK`. | `recomendacao.score_recomendacao CHECK (score_recomendacao >= 0)` |
+| RN-BD-29 | Recomendações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `recomendacao.id_usuario`, `recomendacao.id_espetaculo` |
+| RN-BD-30 | Dados de catálogo e agenda devem ser públicos para consulta. | Políticas de Row Level Security com `USING (true)`. | Políticas de `SELECT` em `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao` e `avaliacao` |
