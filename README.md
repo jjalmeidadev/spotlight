@@ -137,6 +137,8 @@ da Aventura — levando o público certo ao espetáculo certo.
 
 ## 📁 Estrutura de pastas
 
+O app Expo fica na raiz do repositório; a interface vive em `src/frontend`.
+
 ```text
 📦g04
  ┣ 📂documentos
@@ -145,20 +147,24 @@ da Aventura — levando o público certo ao espetáculo certo.
  ┃ ┣ 📜GestaoProjeto.md
  ┃ ┣ 📜Index.md
  ┃ ┣ 📜Manual-instalacao.md
- ┃ ┗ 📜Projeto.md
+ ┃ ┣ 📜Projeto.md
+ ┃ ┗ 📜ProjetoVisual.md
  ┣ 📂src
  ┃ ┣ 📂aad
- ┃ ┃ ┗ 📜tratamento-dados.ipynb
+ ┃ ┣ 📂backend
+ ┃ ┣ 📂database
  ┃ ┣ 📂dataset
- ┃ ┃ ┗ 📜recomendacao.csv
- ┃ ┗ 📂database
- ┃ ┃ ┣ 📜01_create_database.sql
- ┃ ┃ ┣ 📜02_initial_data.sql
- ┃ ┃ ┗ 📜readme.md
+ ┃ ┣ 📂frontend
+ ┃ ┗ 📂models
+ ┣ 📜app.json
+ ┣ 📜assets
+ ┣ 📜babel.config.js
+ ┣ 📜expo-env.d.ts
+ ┣ 📜package.json
+ ┣ 📜tsconfig.json
  ┣ 📜.gitignore
  ┗ 📜README.md
- ```
-
+```
 
 Dentre os arquivos presentes na raiz do projeto, definem-se:
 
@@ -168,7 +174,17 @@ Dentre os arquivos presentes na raiz do projeto, definem-se:
 
 - <b>imagens</b>: imagens relacionadas ao projeto como um todo (por exemplo imagens do sistema, do grupo, logotipos e afins).
 
-- <b>src</b>: nesta pasta encontra-se o código fonte do sistema, os notebooks de análise, os scripts de banco de dados e o dataset versionado em <b>src/dataset</b>.
+
+- <b>src</b>: nesta pasta encontra-se o código fonte do sistema, incluindo o backend em `src/backend` e o frontend em `src/frontend`, além dos notebooks, scripts e datasets.
+
+## 📱 Configuração do Expo
+
+Configuração principal do Expo na raiz do projeto:
+
+```bash
+npm install
+npm start
+```
 
 ## 🗃 Histórico de lançamentos
 

@@ -2370,7 +2370,117 @@ _conteúdo_
 _conteúdo_
 
 ## 8.1 Arquitetura de Codificação e Estrutura de Diretórios
-_conteúdo_
+
+&emsp;A solução foi organizada para separar a aplicação Expo do restante do ecossistema do projeto. A raiz concentra os arquivos de configuração do app e os ativos estáticos, enquanto `src/` reúne as camadas de código-fonte. Essa divisão segue dois objetivos principais: manter o frontend em uma estrutura MVVM clara e manter o backend como uma composição SOA explícita, com contratos, serviços e integração externa separados por responsabilidade.
+
+### Estrutura de diretórios
+
+```text
+g04/
+├─ app.json
+├─ babel.config.js
+├─ expo-env.d.ts
+├─ package.json
+├─ tsconfig.json
+├─ README.md
+├─ assets/
+├─ documentos/
+│  ├─ Projeto.md
+│  ├─ ProjetoVisual.md
+│  ├─ GestaoProjeto.md
+│  └─ Manual-instalacao.md
+└─ src/
+  ├─ backend/
+  │  ├─ api-gateway/
+  │  ├─ contracts/
+  │  │  ├─ dtos/
+  │  │  └─ events/
+  │  ├─ services/
+  │  │  ├─ catalogo/
+  │  │  ├─ recomendacao/
+  │  │  └─ usuario/
+  │  └─ ml-engine/
+  │     ├─ data-preparation/
+  │     ├─ inference/
+  │     └─ training/
+  ├─ frontend/
+  │  ├─ components/
+  │  ├─ screens/
+  │  ├─ viewmodels/
+  │  ├─ models/
+  │  ├─ repositories/
+  │  ├─ theme/
+  │  └─ types/
+  ├─ aad/
+  ├─ database/
+  ├─ dataset/
+  └─ models/
+```
+
+### Representação visual da arquitetura
+
+```mermaid
+flowchart TB
+  Root[Raiz do repositório] --> Expo[Configs do Expo\napp.json + babel.config.js + tsconfig.json]
+  Root --> Assets[assets/\nrecursos estáticos]
+  Root --> Docs[documentos/\nDocumentação do projeto]
+  Root --> Src[src/]
+
+  Src --> Backend[backend/\nAPI, contratos, serviços e ML]
+  Src --> Frontend[frontend/\nUI em MVVM]
+  Src --> Data[database/\ndatasets e scripts SQL]
+  Src --> Aad[aad/\nnotebooks de análise]
+  Src --> ProjectModels[models/\nmodelos e artefatos]
+
+  Backend --> Gateway[api-gateway/\nporta de entrada do backend]
+  Backend --> Contracts[contracts/\nDTOs e eventos]
+  Backend --> Services[services/\nregras de negócio]
+  Backend --> MLEngine[ml-engine/\npreparação, treino e inferência]
+
+  Contracts --> DTOs[dtos/\nmodelos de troca de dados]
+  Contracts --> Events[events/\neventos de integração]
+
+  Services --> Catalogo[catalogo/\noperações do catálogo]
+  Services --> Recomendacao[recomendacao/\nregras da recomendação]
+  Services --> Usuario[usuario/\nfluxos de usuário]
+
+  MLEngine --> Prep[data-preparation/\ntratamento de dados]
+  MLEngine --> Training[training/\nmodelagem e treino]
+  MLEngine --> Inference[inference/\nexecução de predição]
+
+  Frontend --> Screens[screens/\ntelas]
+  Frontend --> Components[components/\ncomponentes reutilizáveis]
+  Frontend --> ViewModels[viewmodels/\nregras de apresentação]
+  Frontend --> Repos[repositories/\nacesso a dados]
+  Frontend --> Theme[theme/\ncores e estilos]
+  Frontend --> FrontendModels[models/\nentidades e mocks]
+  Frontend --> Types[types/\ntipos compartilhados]
+```
+
+### Critérios de organização
+
+- `assets/` guarda imagens e recursos estáticos consumidos pelo app; isso evita misturar conteúdo visual com código e facilita manutenção do pacote do Expo.
+- `documentos/` reúne a documentação do artefato e das entregas do projeto; centralizar isso melhora rastreabilidade e revisão.
+- `src/aad/` concentra notebooks e análises exploratórias; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
+- `src/database/` contém scripts SQL de criação e carga inicial; isso torna o banco reproduzível.
+- `src/dataset/` armazena dados de apoio e amostras do projeto; separar os dados do código facilita reprocessamento e versionamento.
+- `src/models/` guarda notebooks e artefatos de modelagem; isso isola experimentos de ML do restante da aplicação.
+- `src/frontend/` concentra a interface e segue o padrão MVVM. `screens/` representam a visão, `viewmodels/` concentram a lógica de apresentação, `repositories/` isolam o acesso a dados, `components/` reaproveitam UI, `models/` guardam entidades e mocks de apoio, `types/` concentram contratos compartilhados e `theme/` padroniza cores, tipografia e estilos.
+- `src/backend/` é organizado segundo SOA. `api-gateway/` funciona como porta de entrada das requisições, `contracts/` define os contratos compartilhados, `services/` contém a regra de negócio por domínio e `ml-engine/` isola o ciclo de dados e modelo.
+- `src/backend/contracts/dtos/` define os objetos de transferência usados nas fronteiras dos serviços; `events/` registra mensagens e eventos de integração entre módulos. Essa separação evita acoplamento entre emissores e consumidores.
+- `src/backend/services/catalogo/`, `recomendacao/` e `usuario/` separam responsabilidades por domínio, reduzindo acoplamento e facilitando testes e manutenção. Em cada serviço, `application/` orquestra casos de uso, `domain/` guarda entidades e value objects, `infrastructure/` implementa persistência e integrações, e `presentation/` expõe controllers ou adaptadores de entrada.
+- `src/backend/services/*/application/dtos/` reúne os dados de entrada e saída dos casos de uso; isso protege o domínio de formatos externos.
+- `src/backend/services/*/application/usecases/` concentra as regras de aplicação; aqui fica a coordenação das operações do domínio.
+- `src/backend/services/*/domain/entities/` guarda as entidades centrais do negócio; `value-objects/` mantém valores imutáveis e validados. Essa camada é importante porque preserva as regras críticas do domínio independentemente da interface ou da persistência.
+- `src/backend/services/*/infrastructure/persistence/` implementa o acesso a dados; separar isso permite trocar a tecnologia de armazenamento sem alterar o domínio.
+- `src/backend/services/*/presentation/controllers/` expõe os pontos de entrada de cada serviço; essa camada adapta requisições externas para os casos de uso internos.
+- `src/backend/ml-engine/data-preparation/`, `training/` e `inference/` organizam o ciclo de dados e modelo de forma independente, permitindo evoluir o motor de recomendação sem misturar preparo, treino e predição.
+
+As pastas vazias preservadas com `.gitkeep` existem para manter essa estrutura visível no Git até que os arquivos reais sejam implementados.
+
+### Justificativa da arquitetura
+
+&emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o MVVM facilita a separação entre interface e regra de apresentação, deixando as telas mais simples e os comportamentos reutilizáveis em ViewModels. No backend, a abordagem SOA permite expor serviços com fronteiras claras, usar contratos estáveis entre componentes e isolar o motor de recomendação em uma camada própria de ML. Isso reduz acoplamento, melhora a testabilidade e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
 
 ## 8.2 Modelo de Recomendação
 _conteúdo_
