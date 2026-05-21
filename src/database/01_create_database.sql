@@ -114,7 +114,7 @@ CREATE TABLE espetaculo (
     status                   status_espetaculo_enum NOT NULL DEFAULT 'em_breve',
     popularidade             NUMERIC(10, 4)         NOT NULL DEFAULT 0,
     nota_media               NUMERIC(3, 2)          NOT NULL DEFAULT 0
-                                                    CHECK (nota_media BETWEEN 0 AND 10),
+                                                    CHECK (nota_media BETWEEN 0 AND 5),
     id_admin                 UUID                   REFERENCES usuario(id_usuario) ON DELETE SET NULL,
     created_at               TIMESTAMP              NOT NULL DEFAULT NOW(),
     updated_at               TIMESTAMP              NOT NULL DEFAULT NOW()
@@ -199,7 +199,7 @@ CREATE TABLE avaliacao (
     id_avaliacao  SERIAL         PRIMARY KEY,
     id_usuario    UUID           NOT NULL REFERENCES usuario(id_usuario)       ON DELETE CASCADE,
     id_espetaculo INTEGER        NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
-    nota          NUMERIC(4, 2)  NOT NULL CHECK (nota BETWEEN 0 AND 10),
+    nota          NUMERIC(4, 2)  NOT NULL CHECK (nota BETWEEN 0 AND 5),
     comentario    TEXT,
     created_at    TIMESTAMP      NOT NULL DEFAULT NOW(),
 
