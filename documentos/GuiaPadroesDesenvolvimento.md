@@ -158,10 +158,42 @@ CREATE TABLE usuarios (
 
 ### 3.1 Padrão Criacional: Builder Pattern
 
-#### 3.1.1 Contexto de Aplicação
-No projeto, o **Builder Pattern** é aplicado na construção dos modelos de recomendação, especificamente na criação e configuração do modelo KNN e suas matrizes associadas.
+#### 3.1.1 Problema Concreto no Sistema
+O sistema de recomendação do Portal Aventura enfrenta o seguinte problema concreto:
 
-#### 3.1.2 Implementação
+**Complexidade na construção do modelo de recomendação**: A criação de um modelo KNN funcional requer múltiplas etapas interdependentes que devem ser executadas em ordem específica:
+1. Carregamento e validação dos dados
+2. Construção da matriz item-usuário com tratamento de esparsidade
+3. Configuração de hiperparâmetros do modelo
+4. Transformação para matriz esparsa CSR
+5. Treinamento do modelo
+6. Geração de mapeamentos auxiliares (item_to_idx, idx_to_item)
+
+Sem um padrão adequado, esse processo resultaria em:
+- Código procedural longo e difícil de manter
+- Duplicação ao criar variações do modelo (diferentes valores de k)
+- Dificuldade para testar etapas individuais
+- Acoplamento forte entre as etapas de construção
+
+#### 3.1.2 Por que o Builder Pattern Resolve Este Problema
+O **Builder Pattern** é o padrão criacional mais adequado porque:
+
+1. **Construção passo a passo**: Permite controlar cada etapa da criação do modelo complexo
+2. **Encapsulamento da complexidade**: Esconde os detalhes de implementação de cada etapa
+3. **Flexibilidade de configuração**: Facilita criar diferentes configurações do modelo (k=15, k=20, etc.)
+4. **Imutabilidade controlada**: Garante que o modelo só seja usado quando completamente construído
+5. **Interface fluente**: Melhora a legibilidade com method chaining
+
+#### 3.1.3 Comparação com Outros Padrões Criacionais GoF
+
+| Padrão | Por que NÃO foi escolhido | Problema que resolveria | Nossa necessidade |
+|--------|---------------------------|------------------------|-------------------|
+| **Factory Method** | Criamos sempre o mesmo tipo de objeto (modelo KNN), não uma hierarquia | Criação polimórfica de objetos | Construção complexa de um único tipo |
+| **Abstract Factory** | Não temos famílias de objetos relacionados | Criar famílias de objetos compatíveis | Construir um objeto complexo passo a passo |
+| **Singleton** | Precisamos múltiplas instâncias para comparação (k=15 vs k=20) | Garantir instância única | Múltiplas configurações do modelo |
+| **Prototype** | Não clonamos modelos existentes, construímos do zero | Clonar objetos complexos | Construir novos modelos com configurações específicas |
+
+#### 3.1.4 Implementação Detalhada
 ```python
 class ModeloRecomendacaoBuilder:
     """
@@ -221,12 +253,38 @@ sistema = ModeloRecomendacaoBuilder()
     .build()
 ```
 
-#### 3.1.3 Justificativa
-O Builder Pattern foi escolhido porque:
-- **Separação de responsabilidades**: Cada etapa da construção é independente
-- **Flexibilidade**: Permite diferentes configurações sem alterar o código base
-- **Clareza**: O processo de construção fica explícito e documentado
-- **Reutilização**: O mesmo builder pode criar múltiplas configurações de modelos
+#### 3.1.5 Aplicação Prática no Código Real do Projeto
+
+No notebook `sistema_recomendacao_knn.ipynb`, o processo atual de construção do modelo segue exatamente as etapas que o Builder encapsula:
+
+```python
+# Código atual (procedural) - linha por linha no notebook:
+df = pd.read_csv('../dataset/recomendacao_balanceado.csv')
+matriz_item_usuario = df.pivot_table(index='item_id', columns='user_id', values='rating')
+matriz_preenchida = matriz_item_usuario.fillna(0)
+matriz_esparsa = csr_matrix(matriz_preenchida.values)
+modelo_knn = NearestNeighbors(n_neighbors=20, metric='cosine', algorithm='brute')
+modelo_knn.fit(matriz_esparsa)
+
+# Com Builder Pattern - mais limpo e reutilizável:
+modelo = ModeloRecomendacaoBuilder()
+    .carregar_dados('../dataset/recomendacao_balanceado.csv')
+    .construir_matriz()
+    .configurar_modelo(n_vizinhos=20)
+    .treinar()
+    .build()
+```
+
+#### 3.1.6 Benefícios Concretos para o Portal Aventura
+
+1. **Experimentação facilitada**: Testar diferentes valores de k sem duplicar código
+2. **Manutenção simplificada**: Mudanças em uma etapa não afetam as outras
+3. **Testes unitários**: Cada método do builder pode ser testado isoladamente
+4. **Documentação viva**: O código se torna autodocumentado
+5. **Extensibilidade**: Fácil adicionar novas etapas (ex: normalização, validação)
+
+#### 3.1.7 Validação da Escolha
+O Builder Pattern é a escolha correta porque nosso problema central é a **complexidade de construção**, não a criação de diferentes tipos (Factory), nem a necessidade de instância única (Singleton), nem a clonagem (Prototype). É um caso clássico de uso do Builder conforme descrito no livro GoF: "Separar a construção de um objeto complexo de sua representação".
 
 ### 3.2 Padrão Comportamental: Strategy Pattern
 
