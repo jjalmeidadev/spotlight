@@ -2351,8 +2351,155 @@ _conteúdo_
 ## 6.2 Justificativa das Escolhas de Implantação
 _conteúdo_
 
-## 6.3 Considerações sobre Desempenho e Segurança
-_conteúdo_
+## 6.3 Autenticação e Segurança
+
+Esta seção apresenta uma análise detelhada sobre o Supabase Auth e nos ensina a integrá-lo de forma robusta e otimizada, abordando diretamente as preocupações sobre hospedagem, infraestrutura e comparação com o Auth0, serviço de autenticação anteriormente utilizado em outro projeto do Inteli.
+
+---
+
+### 6.3.1 Supabase Auth vs. Auth0
+
+Abaixo está um comparativo focado em infraestrutura, custos e facilidade de deploy:
+
+| Critério | Auth0 | Supabase Auth |
+|---|---|---|
+| **Limite Grátis (MAUs)** | Até 7.000 ou 10.000 usuários ativos mensais (varia conforme a política recente). | Até 50.000 usuários ativos mensais. |
+| **Exigência de Domínio Pago** | Sim/Recomendado. Exige domínio customizado configurado (`auth.suaempresa.com`) para evitar bloqueio de cookies de terceiros e garantir callbacks estáveis. | Não. O Supabase fornece um subdomínio padrão gratuito (`https://xyz.supabase.co`) funcionando diretamente em produção. |
+| **Uso em Mobile (React Native)** | Exige integração com WebViews ou Browser do sistema para login social e callbacks OIDC complexos. | Permite chamadas diretas via API REST ou SDK nativo sem obrigatoriedade de Browser pop-ups. |
+| **Integração com Banco de Dados** | Dados residem nos servidores do Auth0. Sincronização exige Webhooks ou Actions. | Integração nativa com PostgreSQL. Usuários ficam na tabela `auth.users`. |
+| **Vendor Lock-in** | Alto. Exportar hashes e credenciais é complexo. | Baixo. O banco é PostgreSQL padrão e pode ser migrado livremente. |
+| **Row Level Security (RLS)** | Não possui suporte nativo. | Suporte nativo integrado ao PostgreSQL. |
+
+---
+
+### 6.3.2 Domínio no Supabase
+
+No Auth0, a dependência de um domínio customizado ocorre principalmente devido a duas restrições:
+
+#### Segurança e Cookies de Terceiros
+
+Navegadores modernos bloqueiam cookies de sites diferentes do domínio principal do app.
+
+Nesse cenário, os cookies podem ser tratados como cookies de terceiros e bloqueados.
+
+#### Redirect URIs
+
+O fluxo do Auth0 depende fortemente de redirecionamentos seguros entre domínios.
+
+---
+
+### 6.3.3 Por que no Supabase Auth + React Native isso não é um problema?
+
+#### Mobile não usa cookies
+
+Em aplicativos React Native (iOS/Android), não existe o conceito tradicional de cookies de terceiros como no navegador web.
+
+A autenticação funciona via:
+
+```http
+Authorization: Bearer <TOKEN>
+```
+
+#### Endpoints Nativos
+
+O SDK do Supabase no React Native realiza requisições HTTPS normais de autenticação para o endpoint:
+
+```text
+https://xyz.supabase.co/auth/v1/token
+```
+
+Isso funciona perfeitamente em produção, independentemente do ambiente utilizado:
+
+- Aplicações publicadas na App Store
+- Aplicações publicadas na Google Play
+- Backend hospedado em VPS simples
+
+---
+
+#### Hospedagem Flexível
+
+O Supabase fornece o endpoint HTTPS de forma totalmente gratuita e gerenciada na própria infraestrutura da plataforma.
+
+Também é possível utilizar o Supabase em modo self-hosted, executando os serviços via Docker em uma VPS própria utilizando:
+
+- IP público
+- DuckDNS
+- No-IP
+- Outros serviços gratuitos de DNS dinâmico
+
+Com isso, nenhum domínio próprio pago é necessário para colocar o sistema em produção.
+
+---
+
+### 6.3.4 Como funciona o Supabase Auth na prática?
+
+O fluxo operacional no ecossistema do Spotlight funcionará conforme ilustrado abaixo.
+
+<div align="center">
+
+<sub>Figura X - Fluxo Supabase Auth</sub><br>
+
+  <img src="./img/fluxo_supabase_auth.png" width="100%" alt="Fluxo Supabase Auth"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+---
+
+### 6.3.5 Componentes Chave
+
+### Access Token (JWT)
+
+Token de curta duração (geralmente 1 hora).
+
+Contém informações criptografadas como:
+
+- ID do usuário (`sub`)
+- Email
+- Permissões (`role`)
+
+---
+
+### Refresh Token
+
+Token de longa duração armazenado de forma segura no dispositivo.
+
+Responsável por solicitar automaticamente um novo JWT sem exigir que o usuário faça login novamente.
+
+---
+
+### Validação Local 
+
+O API Gateway em ASP.NET Core não precisa realizar requisições HTTP ao Supabase para verificar a validade do token.
+
+O processo consiste apenas em:
+
+- Descriptografar o JWT
+- Validar sua assinatura criptográfica utilizando a chave secreta compartilhada (`JWT Secret`)
+
+#### Benefícios
+
+- Validação instantânea
+- Sem latência de rede
+- Menor custo operacional
+
+### Row Level Security
+
+O Supabase expõe funções especiais diretamente no PostgreSQL, como:
+
+```sql
+auth.uid()
+```
+
+Caso o backend realize consultas "em nome do usuário" utilizando o JWT na conexão, o próprio PostgreSQL aplica automaticamente as regras de acesso.
+
+#### Benefícios do RLS
+
+- O banco impede acessos indevidos automaticamente
+- Segurança centralizada na camada de dados
+- Redução de lógica manual no backend
+- Melhor isolamento entre usuários
 
 # 7. Projeto Visual da Solução
 _conteúdo_
