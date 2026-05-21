@@ -2459,14 +2459,24 @@ flowchart TB
 
 ### Critérios de organização
 
-- `assets/` guarda imagens e recursos estáticos consumidos pelo app.
-- `src/frontend` concentra a interface e segue o padrão MVVM: `screens` representam a visão, `viewmodels` concentram a lógica de apresentação, `repositories` isolam o acesso a dados, `components` reaproveitam UI e `types`/`models` sustentam os contratos locais.
-- `src/backend` é organizado segundo SOA, com uma separação explícita entre a porta de entrada (`api-gateway`), os contratos (`contracts`), a lógica de negócio (`services`) e a camada de ML (`ml-engine`).
-- `src/backend/contracts/dtos` define os objetos de transferência usados nas fronteiras dos serviços; `events` registra mensagens/eventos de integração entre módulos.
-- `src/backend/services/catalogo`, `recomendacao` e `usuario` separam responsabilidades por domínio, reduzindo acoplamento e facilitando testes e manutenção.
-- `src/backend/ml-engine/data-preparation`, `training` e `inference` organizam o ciclo de dados e modelo de forma independente, permitindo evoluir o motor de recomendação sem misturar preparo, treino e predição.
-- `src/database`, `src/dataset` e `src/aad` permanecem como apoio aos dados e análises do projeto.
-- `documentos/` reúne a documentação do artefato e das entregas do projeto.
+- `assets/` guarda imagens e recursos estáticos consumidos pelo app; isso evita misturar conteúdo visual com código e facilita manutenção do pacote do Expo.
+- `documentos/` reúne a documentação do artefato e das entregas do projeto; centralizar isso melhora rastreabilidade e revisão.
+- `src/aad/` concentra notebooks e análises exploratórias; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
+- `src/database/` contém scripts SQL de criação e carga inicial; isso torna o banco reproduzível.
+- `src/dataset/` armazena dados de apoio e amostras do projeto; separar os dados do código facilita reprocessamento e versionamento.
+- `src/models/` guarda notebooks e artefatos de modelagem; isso isola experimentos de ML do restante da aplicação.
+- `src/frontend/` concentra a interface e segue o padrão MVVM. `screens/` representam a visão, `viewmodels/` concentram a lógica de apresentação, `repositories/` isolam o acesso a dados, `components/` reaproveitam UI, `models/` guardam entidades e mocks de apoio, `types/` concentram contratos compartilhados e `theme/` padroniza cores, tipografia e estilos.
+- `src/backend/` é organizado segundo SOA. `api-gateway/` funciona como porta de entrada das requisições, `contracts/` define os contratos compartilhados, `services/` contém a regra de negócio por domínio e `ml-engine/` isola o ciclo de dados e modelo.
+- `src/backend/contracts/dtos/` define os objetos de transferência usados nas fronteiras dos serviços; `events/` registra mensagens e eventos de integração entre módulos. Essa separação evita acoplamento entre emissores e consumidores.
+- `src/backend/services/catalogo/`, `recomendacao/` e `usuario/` separam responsabilidades por domínio, reduzindo acoplamento e facilitando testes e manutenção. Em cada serviço, `application/` orquestra casos de uso, `domain/` guarda entidades e value objects, `infrastructure/` implementa persistência e integrações, e `presentation/` expõe controllers ou adaptadores de entrada.
+- `src/backend/services/*/application/dtos/` reúne os dados de entrada e saída dos casos de uso; isso protege o domínio de formatos externos.
+- `src/backend/services/*/application/usecases/` concentra as regras de aplicação; aqui fica a coordenação das operações do domínio.
+- `src/backend/services/*/domain/entities/` guarda as entidades centrais do negócio; `value-objects/` mantém valores imutáveis e validados. Essa camada é importante porque preserva as regras críticas do domínio independentemente da interface ou da persistência.
+- `src/backend/services/*/infrastructure/persistence/` implementa o acesso a dados; separar isso permite trocar a tecnologia de armazenamento sem alterar o domínio.
+- `src/backend/services/*/presentation/controllers/` expõe os pontos de entrada de cada serviço; essa camada adapta requisições externas para os casos de uso internos.
+- `src/backend/ml-engine/data-preparation/`, `training/` e `inference/` organizam o ciclo de dados e modelo de forma independente, permitindo evoluir o motor de recomendação sem misturar preparo, treino e predição.
+
+As pastas vazias preservadas com `.gitkeep` existem para manter essa estrutura visível no Git até que os arquivos reais sejam implementados.
 
 ### Justificativa da arquitetura
 
