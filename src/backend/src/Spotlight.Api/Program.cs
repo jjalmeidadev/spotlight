@@ -40,9 +40,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // ---------------------------------------------------------------------------
 // Health checks: liveness (sempre 200) + readiness (checa o Postgres)
+// O check do Postgres só é registrado quando há connection string — assim a
+// API sobe mesmo sem banco configurado (ex.: testes), e /health/ready apenas
+// não terá o check "ready" nesse caso.
 // ---------------------------------------------------------------------------
-builder.Services.AddHealthChecks()
-    .AddNpgSql(connectionString, name: "postgres", tags: ["ready"]);
+var healthChecks = builder.Services.AddHealthChecks();
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    healthChecks.AddNpgSql(connectionString, name: "postgres", tags: ["ready"]);
+}
 
 // ---------------------------------------------------------------------------
 // CORS

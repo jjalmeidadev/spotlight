@@ -23,7 +23,7 @@ receber as features do T16. Stack conforme a arquitetura documentada em
 
 ```text
 src/backend/
-├── Spotlight.sln                       # criado via dotnet (ver abaixo)
+├── Spotlight.sln                       # solution com Api + Tests vinculados
 ├── .env.example
 ├── src/
 │   └── Spotlight.Api/
@@ -55,19 +55,18 @@ A partir desta pasta (`src/backend`):
 cp .env.example .env
 # edite o .env e preencha DATABASE_CONNECTION_STRING
 
-# 2. (apenas na 1ª vez) criar a solution e vincular os projetos
-dotnet new sln -n Spotlight
-dotnet sln add src/Spotlight.Api/Spotlight.Api.csproj
-dotnet sln add tests/Spotlight.Api.Tests/Spotlight.Api.Tests.csproj
-
-# 3. Restaurar dependências
+# 2. Restaurar dependências (a solution Spotlight.sln já vem versionada)
 dotnet restore
 
-# 4. Subir a API
+# 3. Subir a API
 dotnet run --project src/Spotlight.Api
 ```
 
 A API sobe em `http://localhost:5000`. Swagger em `http://localhost:5000/swagger`.
+
+> A solution `Spotlight.sln` já está no repositório com os dois projetos
+> (`Spotlight.Api` e `Spotlight.Api.Tests`) vinculados. Para abrir no Visual
+> Studio/Rider, basta abrir esse arquivo.
 
 > Se algum pacote acusar versão inexistente no `restore`, rode
 > `dotnet add src/Spotlight.Api package <Pacote>` para fixar a versão estável
