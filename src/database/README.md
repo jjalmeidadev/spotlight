@@ -1,14 +1,243 @@
-﻿# Banco de Dados
+﻿# Banco de Dados — Spotlight
 
-Este diretório reúne os scripts SQL responsáveis pela criação, carga inicial e reversão da estrutura relacional do sistema de teatro e espetáculos. A base foi modelada para sustentar o catálogo de espetáculos, sessões, teatros, usuários, avaliações e recomendações personalizadas.
+#### Documentação técnica do modelo físico de dados da plataforma Spotlight, desenvolvida em parceria com a Aventura Teatros.
 
-## Contextualização dos Arquivos
+---
 
-| Arquivo | Finalidade |
+## Sumário
+
+- [1. Visão Geral](#1-visão-geral)
+- [2. Estrutura de Arquivos](#2-estrutura-de-arquivos)
+- [3. Pré-requisitos](#3-pré-requisitos)
+- [4. Variáveis de Ambiente](#4-variáveis-de-ambiente)
+- [5. Execução dos Scripts](#5-execução-dos-scripts)
+- [6. Implantação](#6-implantação)
+- [7. Dicionário de Dados](#dicionário-de-dados)
+- [8. Regras de Negócio](#regras-de-negócio-implementadas-no-banco-de-dados)
+
+---
+
+## 1. Visão Geral
+
+O **Spotlight** é uma plataforma de recomendação de espetáculos teatrais que conecta usuários ao catálogo da Aventura Teatros por meio de algoritmos de Machine Learning (k-NN, SVD, k-means). O banco de dados relacional é o núcleo da solução: armazena o catálogo de espetáculos, perfis de usuários, avaliações explícitas e as recomendações geradas pelo motor de ML.
+
+**SGBD:** PostgreSQL 15+ provisionado via **Supabase**
+
+**Por que dois bancos?** O PostgreSQL (Supabase) guarda dados transacionais e estruturados — catálogo, perfis, avaliações e recomendações processadas. O MongoDB armazena os eventos brutos de telemetria (cliques, tempo de tela) em alta volumetria. Os workers de ML consomem o MongoDB e escrevem os resultados processados de volta no PostgreSQL, na tabela `recomendacao`.
+
+**Integração com Supabase Auth:** A tabela `usuario` referencia `auth.users` via UUID. O Supabase Auth é a única fonte de verdade para autenticação — senhas nunca são armazenadas no schema público. Um trigger automático (`on_auth_user_created`) cria o perfil do usuário no schema público imediatamente após o signup.
+
+---
+
+## 2. Estrutura de Arquivos
+
+```
+src/database/
+├── 01_create_database.sql   — criação de tabelas, tipos ENUM, índices, RLS e trigger do Auth
+├── 02_initial_data.sql      — seed com dados iniciais (categorias, teatros, atores, espetáculos e sessões)
+├── 03_rollback.sql          — desfaz completamente a execução do 01_create_database.sql
+└── README.md                — este arquivo
+```
+
+---
+
+## 3. Pré-requisitos
+
+| Dependência | Versão mínima | Observação |
+|---|---|---|
+| PostgreSQL | 15.0 | Incluso na imagem Docker do Supabase |
+| Docker | 24.0 | Para implantação local ou no servidor Inteli |
+| Docker Compose | 2.20 | Para orquestração dos containers |
+| Supabase CLI | 1.150 | Opcional — facilita o gerenciamento local |
+
+> Para execução apenas via SQL Editor do Supabase (cloud), Docker não é necessário.
+
+---
+
+## 4. Variáveis de Ambiente
+
+Crie um arquivo `.env` na **raiz do repositório** (nunca em `src/database`). O arquivo `.env` deve estar no `.gitignore` — **jamais commite segredos no repositório**.
+
+```env
+# ─── PostgreSQL ──────────────────────────────────────────────
+POSTGRES_PASSWORD=sua_senha_segura_aqui
+
+# ─── Supabase Auth ───────────────────────────────────────────
+# Gerados via: supabase start  ou  supabase gen keys
+JWT_SECRET=seu_jwt_secret_com_minimo_32_caracteres
+ANON_KEY=REDACTED_FOR_PUBLIC_RELEASE
+SERVICE_ROLE_KEY=REDACTED_FOR_PUBLIC_RELEASE
+
+# ─── URL pública do Supabase ─────────────────────────────────
+SUPABASE_URL=http://localhost:8000
+# Em produção (cloud): https://<project-ref>.supabase.co
+
+# ─── Frontend / API Gateway ──────────────────────────────────
+SITE_URL=http://localhost:3000
+```
+
+### Onde cada variável é consumida
+
+| Variável | Consumido por |
 |---|---|
-| `01_create_database.sql` | Script principal de criação da base relacional. Remove objetos anteriores quando existirem, cria os tipos enumerados, tabelas, constraints, políticas de RLS, trigger de criação de usuário e índices de apoio às consultas. |
-| `02_initial_data.sql` | Script reservado para inserção de dados iniciais relevantes para iniciar a solução, como categorias, atores, teatros, espetáculos, sessões e registros mínimos necessários para validações e demonstrações. |
-| `03_rollback.sql` | Script de reversão da estrutura criada, removendo trigger, função, tabelas e tipos enumerados em ordem compatível com as dependências do banco. Deve ser usado em cenários controlados de limpeza ou recriação do ambiente. |
+| `POSTGRES_PASSWORD` | Container PostgreSQL (Docker) |
+| `JWT_SECRET` | API Gateway (ASP.NET Core) — validação offline do JWT |
+| `ANON_KEY` | React Native — chamadas públicas à API do Supabase |
+| `SERVICE_ROLE_KEY` | Workers de ML e API Gateway — bypass de RLS para operações administrativas |
+| `SUPABASE_URL` | React Native e API Gateway — endpoint base do Supabase |
+
+---
+
+## 5. Execução dos Scripts
+
+### 5.1 Via SQL Editor do Supabase
+
+1. Acesse o [Supabase Dashboard](https://supabase.com/dashboard) e abra o projeto
+2. Vá em **SQL Editor → New Query**
+3. Cole e execute `01_create_database.sql`
+4. Aguarde a confirmação de sucesso
+5. Cole e execute `02_initial_data.sql`
+
+**Validação:** Acesse **Table Editor** e confirme que as 11 tabelas aparecem no schema `public`.
+
+### 5.2 Via `psql` (linha de comando)
+
+```bash
+# Substitua <host>, <porta> e <senha> pelos valores do seu ambiente
+export PGPASSWORD=<senha>
+
+# 1. Cria todas as estruturas
+psql -h <host> -p <porta> -U postgres -d postgres \
+  -f src/database/01_create_database.sql
+
+# 2. Insere os dados iniciais
+psql -h <host> -p <porta> -U postgres -d postgres \
+  -f src/database/02_initial_data.sql
+
+# Validação: lista as tabelas criadas
+psql -h <host> -p <porta> -U postgres -d postgres \
+  -c "\dt public.*"
+```
+
+**Saída esperada na validação:**
+
+```
+          List of relations
+ Schema |         Name          | Type  |  Owner
+--------+-----------------------+-------+----------
+ public | ator                  | table | postgres
+ public | avaliacao             | table | postgres
+ public | categoria             | table | postgres
+ public | espetaculo            | table | postgres
+ public | espetaculo_ator       | table | postgres
+ public | espetaculo_categoria  | table | postgres
+ public | recomendacao          | table | postgres
+ public | sessao                | table | postgres
+ public | teatro                | table | postgres
+ public | usuario               | table | postgres
+(10 rows)
+```
+
+### 5.3 Rollback (desfaz tudo)
+
+```bash
+psql -h <host> -p <porta> -U postgres -d postgres \
+  -f src/database/03_rollback.sql
+```
+
+> O rollback é **destrutivo**. Apaga todos os dados e estruturas. Use apenas em desenvolvimento ou para reset total do ambiente.
+
+### 5.4 Ordem obrigatória de execução
+
+```
+01_create_database.sql  →  02_initial_data.sql
+```
+
+O `02_initial_data.sql` depende das tabelas criadas pelo `01`. Nunca inverta a ordem.
+
+---
+
+## 6. Implantação
+
+### 6.1 Docker Compose (local e servidor Inteli)
+
+Crie o arquivo `docker-compose.yml` na raiz do repositório:
+
+```yaml
+version: "3.8"
+
+services:
+  db:
+    image: supabase/postgres:15.1.0.147
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create.sql
+      - ./src/database/02_initial_data.sql:/docker-entrypoint-initdb.d/02_seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
+```
+
+> Os scripts em `docker-entrypoint-initdb.d/` são executados automaticamente na **primeira inicialização** do container, em ordem alfabética. Em reinicializações subsequentes, o volume já contém os dados e os scripts não são re-executados.
+
+### 6.2 Subindo o banco
+
+```bash
+# Na raiz do repositório, com o .env preenchido
+docker compose up -d db
+
+# Acompanhe os logs para confirmar a inicialização
+docker compose logs -f db
+
+# Saída esperada ao final:
+# db  | database system is ready to accept connections
+```
+
+### 6.3 Instruções específicas — Servidor Inteli
+
+O servidor Inteli exige que os containers sejam executados com configurações específicas de rede e porta. Siga os passos abaixo após obter acesso ao servidor:
+
+```bash
+# 1. Clone o repositório no servidor
+git clone https://git.inteli.edu.br/graduacao/2026-1b/t17/g04.git
+cd g04
+
+# 2. Crie o .env com as variáveis do ambiente de produção
+#    (solicite os valores ao responsável técnico do grupo)
+cp .env.example .env
+nano .env
+
+# 3. Suba apenas o container do banco
+docker compose up -d db
+
+# 4. Valide a execução dos scripts de inicialização
+docker compose exec db psql -U postgres -c "\dt public.*"
+```
+
+> A porta `5432` deve estar liberada no firewall do servidor Inteli. Confirme com o professor/tutor responsável pela infraestrutura antes de subir.
+
+### 6.4 Reinicialização e reset
+
+```bash
+# Parar e remover containers sem apagar dados
+docker compose down
+
+# Reset total — apaga o volume e recria do zero
+docker compose down -v
+docker compose up -d db
+```
+
+---
 
 ## Dicionário de Dados
 
@@ -314,7 +543,7 @@ Entidade principal.
 | `produtora` | `VARCHAR(150)` | Sim | - | - | - | Produtora responsável pelo espetáculo. |
 | `status` | `status_espetaculo_enum` | Não | `'em_breve'` | - | Valores do ENUM | Situação atual do espetáculo. |
 | `popularidade` | `NUMERIC(10,4)` | Não | `0` | - | - | Métrica numérica de popularidade. |
-| `nota_media` | `NUMERIC(3,2)` | Não | `0` | - | `CHECK (nota_media BETWEEN 0 AND 10)` | Nota média consolidada das avaliações. |
+| `nota_media` | `NUMERIC(3,2)` | Não | `0` | - | `CHECK (nota_media BETWEEN 0 AND 5)` | Nota média consolidada das avaliações. |
 | `id_admin` | `UUID` | Sim | - | FK | Referencia `usuario(id_usuario) ON DELETE SET NULL` | Usuário administrador responsável pelo cadastro ou gestão. |
 | `created_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de criação do registro. |
 | `updated_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora da última atualização. |
@@ -325,7 +554,7 @@ Entidade principal.
 |---|---|---|
 | `espetaculo_pkey` | Primary Key | `id_espetaculo` |
 | Check implícito | Check | `duracao > 0` |
-| Check implícito | Check | `nota_media BETWEEN 0 AND 10` |
+| Check implícito | Check | `nota_media BETWEEN 0 AND 5` |
 | FK implícita | Foreign Key | `id_admin -> usuario(id_usuario) ON DELETE SET NULL` |
 
 #### Relacionamentos
@@ -537,7 +766,7 @@ Entidade transacional / associativa com atributos.
 | `id_avaliacao` | `SERIAL` | Não | Sequência automática | PK | - | Identificador único da avaliação. |
 | `id_usuario` | `UUID` | Não | - | FK | Referencia `usuario(id_usuario) ON DELETE CASCADE` | Usuário autor da avaliação. |
 | `id_espetaculo` | `INTEGER` | Não | - | FK | Referencia `espetaculo(id_espetaculo) ON DELETE CASCADE` | Espetáculo avaliado. |
-| `nota` | `NUMERIC(4,2)` | Não | - | - | `CHECK (nota BETWEEN 0 AND 10)` | Nota atribuída pelo usuário. |
+| `nota` | `NUMERIC(4,2)` | Não | - | - | `CHECK (nota BETWEEN 0 AND 5)` | Nota atribuída pelo usuário. |
 | `comentario` | `TEXT` | Sim | - | - | - | Comentário textual opcional. |
 | `created_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora da avaliação. |
 
@@ -547,7 +776,7 @@ Entidade transacional / associativa com atributos.
 |---|---|---|
 | `avaliacao_pkey` | Primary Key | `id_avaliacao` |
 | Unique implícita | Unique | `(id_usuario, id_espetaculo)` |
-| Check implícito | Check | `nota BETWEEN 0 AND 10` |
+| Check implícito | Check | `nota BETWEEN 0 AND 5` |
 | FK implícita | Foreign Key | `id_usuario -> usuario(id_usuario) ON DELETE CASCADE` |
 | FK implícita | Foreign Key | `id_espetaculo -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
 
@@ -672,7 +901,7 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-06 | O status do espetáculo deve ser limitado aos estados válidos do ciclo de exibição. | Tipo enumerado com valor padrão. | `status_espetaculo_enum`, `espetaculo.status DEFAULT 'em_breve'` |
 | RN-BD-07 | O nome de cada categoria deve ser único. | Constraint `UNIQUE`. | `categoria.nome` |
 | RN-BD-08 | A duração de um espetáculo, quando informada, deve ser maior que zero. | Constraint `CHECK`. | `espetaculo.duracao CHECK (duracao > 0)` |
-| RN-BD-09 | A nota média de um espetáculo deve permanecer entre 0 e 10. | Constraint `CHECK` e valor padrão. | `espetaculo.nota_media CHECK (nota_media BETWEEN 0 AND 10)` |
+| RN-BD-09 | A nota média de um espetáculo deve permanecer entre 0 e 5. | Constraint `CHECK` e valor padrão. | `espetaculo.nota_media CHECK (nota_media BETWEEN 0 AND 5)` |
 | RN-BD-10 | A exclusão do administrador responsável não deve remover o espetáculo. | Chave estrangeira com `ON DELETE SET NULL`. | `espetaculo.id_admin -> usuario(id_usuario)` |
 | RN-BD-11 | Um espetáculo não pode ser associado mais de uma vez à mesma categoria. | Chave primária composta. | `espetaculo_categoria(id_espetaculo, id_categoria)` |
 | RN-BD-12 | As associações de categoria devem ser removidas quando o espetáculo ou a categoria forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `espetaculo_categoria.id_espetaculo`, `espetaculo_categoria.id_categoria` |
@@ -686,7 +915,7 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-20 | Preços de sessão não podem ser negativos e o preço máximo não pode ser menor que o preço mínimo. | Constraints `CHECK`. | `sessao.preco_minimo`, `sessao.preco_maximo`, `chk_preco_intervalo` |
 | RN-BD-21 | A disponibilidade de uma sessão não pode ser negativa. | Constraint `CHECK` e valor padrão. | `sessao.disponibilidade DEFAULT 0 CHECK (disponibilidade >= 0)` |
 | RN-BD-22 | Cada usuário pode avaliar um mesmo espetáculo apenas uma vez. | Constraint `UNIQUE`. | `avaliacao(id_usuario, id_espetaculo)` |
-| RN-BD-23 | A nota de uma avaliação deve estar entre 0 e 10. | Constraint `CHECK`. | `avaliacao.nota CHECK (nota BETWEEN 0 AND 10)` |
+| RN-BD-23 | A nota de uma avaliação deve estar entre 0 e 5. | Constraint `CHECK`. | `avaliacao.nota CHECK (nota BETWEEN 0 AND 5)` |
 | RN-BD-24 | Usuários só podem inserir ou excluir avaliações próprias. | Políticas de Row Level Security com `auth.uid() = id_usuario`. | Políticas `avaliacao: inserção pelo próprio usuário` e `avaliacao: exclusão pelo próprio usuário` |
 | RN-BD-25 | Avaliações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `avaliacao.id_usuario`, `avaliacao.id_espetaculo` |
 | RN-BD-26 | Usuários só podem consultar recomendações destinadas a eles. | Política de Row Level Security com `auth.uid() = id_usuario`. | Política `recomendacao: leitura pelo próprio usuário` |
