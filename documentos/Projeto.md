@@ -2353,7 +2353,7 @@ _conteúdo_
 
 ## 6.3 Autenticação e Segurança
 
-Esta seção apresenta uma análise detelhada sobre o Supabase Auth e nos ensina a integrá-lo de forma robusta e otimizada, abordando diretamente as preocupações sobre hospedagem, infraestrutura e comparação com o Auth0, serviço de autenticação anteriormente utilizado em outro projeto do Inteli.
+Esta seção apresenta uma análise detalhada sobre o Supabase Auth e sua integração de forma robusta e otimizada, abordando diretamente as preocupações sobre hospedagem, infraestrutura e comparação com o Auth0, serviço de autenticação anteriormente utilizado em outro projeto do Inteli.
 
 ---
 
@@ -2402,11 +2402,30 @@ Authorization: Bearer <TOKEN>
 
 #### Endpoints Nativos
 
-O SDK do Supabase no React Native realiza requisições HTTPS normais de autenticação para o endpoint:
+O SDK do Supabase no React Native realiza requisições HTTPS normais de autenticação para os endpoints REST do Supabase Auth. A URL base do serviço segue o padrão:
 
 ```text
-https://xyz.supabase.co/auth/v1/token
+https://<PROJECT_REF>.supabase.co/auth/v1
 ```
+
+Os endpoints relevantes para o fluxo do Spotlight estão detalhados abaixo. Em chamadas públicas, o header `apikey` recebe a chave anônima do projeto (`SUPABASE_ANON_KEY`) e o header `Authorization` pode usar a mesma chave no formato `Bearer <SUPABASE_ANON_KEY>`. Em chamadas autenticadas, o header `Authorization` recebe o `access_token` do usuário no formato `Bearer <ACCESS_TOKEN>`.
+
+| Operação | Método e endpoint | Headers principais | Body da requisição | Exemplo de resposta |
+|---|---|---|---|---|
+| Cadastro de usuário | `POST /signup` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <SUPABASE_ANON_KEY>`<br>`Content-Type: application/json` | `{ "email": "ana@email.com", "password": "REDACTED_FOR_PUBLIC_RELEASE", "data": { "nome": "Ana" } }` | `{ "user": { "id": "uuid", "email": "ana@email.com" }, "session": { "access_token": "jwt", "refresh_token": "token" } }` |
+| Login com e-mail e senha | `POST /token?grant_type=password` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <SUPABASE_ANON_KEY>`<br>`Content-Type: application/json` | `{ "email": "ana@email.com", "password": "REDACTED_FOR_PUBLIC_RELEASE" }` | `{ "access_token": "jwt", "token_type": "bearer", "expires_in": 3600, "refresh_token": "token", "user": { "id": "uuid" } }` |
+| Renovação de sessão | `POST /token?grant_type=refresh_token` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <SUPABASE_ANON_KEY>`<br>`Content-Type: application/json` | `{ "refresh_token": "token" }` | `{ "access_token": "novo-jwt", "token_type": "bearer", "expires_in": 3600, "refresh_token": "novo-token" }` |
+| Consulta do usuário autenticado | `GET /user` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <ACCESS_TOKEN>` | Não possui body | `{ "id": "uuid", "email": "ana@email.com", "aud": "authenticated", "role": "authenticated" }` |
+| Atualização de dados do usuário | `PUT /user` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <ACCESS_TOKEN>`<br>`Content-Type: application/json` | `{ "data": { "nome": "Ana Clara" } }` | `{ "id": "uuid", "email": "ana@email.com", "user_metadata": { "nome": "Ana Clara" } }` |
+| Logout | `POST /logout` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <ACCESS_TOKEN>` | Não possui body | `{}` |
+
+No backend do Spotlight, as rotas protegidas do API Gateway e dos serviços ASP.NET Core não recebem o `refresh_token`. Elas recebem apenas o JWT de acesso emitido pelo Supabase Auth:
+
+```http
+Authorization: Bearer <ACCESS_TOKEN>
+```
+
+Quando a sessão expira, o aplicativo React Native usa o `refresh_token` diretamente contra o Supabase Auth para obter um novo `access_token`, sem expor esse token de renovação aos serviços internos.
 
 Isso funciona perfeitamente em produção, independentemente do ambiente utilizado:
 
@@ -2447,13 +2466,55 @@ O fluxo operacional no ecossistema do Spotlight funcionará conforme ilustrado a
 
 ---
 
-### 6.3.5 Componentes Chave
+### 6.3.5 Variáveis de Ambiente e Configuração
 
-### Access Token (JWT)
+As variáveis de ambiente separam configuração de código-fonte e evitam que chaves sensíveis sejam versionadas no repositório. A tabela abaixo descreve quais variáveis são necessárias, onde cada uma é consumida e como configurá-las por camada.
+
+| Variável | Camada que consome | Finalidade | Como configurar |
+|---|---|---|---|
+| `EXPO_PUBLIC_SUPABASE_URL` | React Native | URL pública do projeto Supabase, usada pelo SDK no app mobile. | Definir no `.env` do app Expo com o valor `https://<PROJECT_REF>.supabase.co`. |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | React Native | Chave pública anônima usada para chamadas públicas ao Supabase Auth e para iniciar sessões. | Definir no `.env` do app Expo. Por ser pública, pode ir para o bundle mobile, mas deve ser combinada com RLS no banco. |
+| `SUPABASE_URL` | API Gateway e serviços ASP.NET Core | URL do projeto Supabase para integrações server-side. | Definir como variável de ambiente do processo .NET ou em `appsettings.Development.json` apenas no ambiente local. |
+| `SUPABASE_JWT_SECRET` | API Gateway ASP.NET Core | Chave usada para validar localmente a assinatura dos JWTs emitidos pelo Supabase Auth. | Definir somente no backend. Em produção, armazenar no provedor de secrets da hospedagem e nunca expor ao frontend. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Serviços ASP.NET Core autorizados | Chave administrativa para operações server-side que precisam ignorar RLS em rotinas internas controladas. | Definir apenas nos serviços que realmente precisam dessa permissão. Não usar no React Native. |
+| `POSTGRES_CONNECTION_STRING` | Serviços ASP.NET Core e rotinas de migração | String de conexão com o PostgreSQL provisionado pelo Supabase. | Definir no formato `Host=<host>;Port=5432;Database=postgres;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true`. |
+| `POSTGRES_DB`, `POSTGRES_USER` e `POSTGRES_PASSWORD` | PostgreSQL local/self-hosted | Configuração do banco quando o Supabase é executado localmente ou via Docker. | Definir no arquivo `.env` usado pelo `docker compose` da infraestrutura local. |
+
+Exemplo de configuração local do React Native:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://<PROJECT_REF>.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
+```
+
+Exemplo de configuração local do API Gateway em ASP.NET Core:
+
+```env
+SUPABASE_URL=https://<PROJECT_REF>.supabase.co
+SUPABASE_JWT_SECRET=<supabase-jwt-secret>
+SUPABASE_SERVICE_ROLE_KEY=<supabase-service-role-key>
+POSTGRES_CONNECTION_STRING=Host=<host>;Port=5432;Database=postgres;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true
+```
+
+Exemplo de configuração local do PostgreSQL em ambiente self-hosted:
+
+```env
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<senha-forte>
+```
+
+A configuração em produção deve seguir três regras: o frontend recebe apenas URL pública e chave anônima; o backend recebe segredos de autenticação e conexão por meio do ambiente de execução; e o PostgreSQL recebe credenciais apenas na infraestrutura, sem exposição ao aplicativo mobile.
+
+---
+
+### 6.3.6 Componentes Chave
+
+#### Access Token (JWT)
 
 Token de curta duração (geralmente 1 hora).
 
-Contém informações criptografadas como:
+Contém informações codificadas e assinadas como:
 
 - ID do usuário (`sub`)
 - Email
@@ -2461,7 +2522,7 @@ Contém informações criptografadas como:
 
 ---
 
-### Refresh Token
+#### Refresh Token
 
 Token de longa duração armazenado de forma segura no dispositivo.
 
@@ -2469,13 +2530,13 @@ Responsável por solicitar automaticamente um novo JWT sem exigir que o usuário
 
 ---
 
-### Validação Local 
+#### Validação Local
 
 O API Gateway em ASP.NET Core não precisa realizar requisições HTTP ao Supabase para verificar a validade do token.
 
 O processo consiste apenas em:
 
-- Descriptografar o JWT
+- Decodificar o JWT
 - Validar sua assinatura criptográfica utilizando a chave secreta compartilhada (`JWT Secret`)
 
 #### Benefícios
@@ -2484,7 +2545,7 @@ O processo consiste apenas em:
 - Sem latência de rede
 - Menor custo operacional
 
-### Row Level Security
+#### Row Level Security
 
 O Supabase expõe funções especiais diretamente no PostgreSQL, como:
 
