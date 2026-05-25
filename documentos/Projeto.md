@@ -173,6 +173,9 @@
   - [9.3 Testes de Usabilidade](#93-testes-de-usabilidade)
     - [9.3.1 Planejamento](#931-planejamento)
     - [9.3.2 Resultados](#932-resultados)
+  - [9.4 Testes de Integração](#94-testes-de-integração)
+    - [9.4.1 Planejamento](#941-planejamento)
+    - [9.4.2 Resultados](#942-resultados)
 - [10. Procedimentos de Implantação](#10-procedimentos-de-implantação)
   - [10.1 Implantação e Configuração do Banco de Dados](#101-implantação-e-configuração-do-banco-de-dados)
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
@@ -2744,6 +2747,468 @@ _conteúdo_
 
 ## 9.3.2 Resultados
 _conteúdo_
+
+## 9.4 Testes de Integração
+
+&emsp;Os testes de integração têm como objetivo validar as interações entre os componentes internos do Spotlight e os sistemas externos com os quais ele se comunica. Enquanto os testes unitários verificam o comportamento isolado de cada módulo, os testes de integração verificam que as fronteiras entre serviços, bancos de dados, filas de mensagens e APIs externas funcionam corretamente em conjunto.
+
+&emsp;A arquitetura SOA do Spotlight introduz múltiplos pontos de integração críticos: o API Gateway valida tokens com o Supabase Auth, os serviços de negócio persistem dados no PostgreSQL e no MongoDB, o RabbitMQ transporta eventos de telemetria até o ML Engine e o aplicativo mobile redireciona o usuário para a API da ticketeira parceira. Cada uma dessas fronteiras é um ponto potencial de falha e, portanto, deve ser coberta por cenários de teste positivos e negativos.
+
+### 9.4.1 Planejamento
+
+#### Módulo VHS — Mecanismo de Caching de Respostas de API Externa
+
+&emsp;Todos os testes de integração que envolvem chamadas a sistemas externos (Supabase Auth e API da Ticketeira) fazem uso obrigatório do módulo **VHS** (*Virtual HTTP Server*). O VHS é um mecanismo de caching que intercepta as chamadas HTTP realizadas pelo `HttpClient`, armazena a resposta real em memória (ou em arquivo `.json` no diretório `tests/cassettes/`), e a repete nas execuções seguintes até que o TTL expire ou o cassete seja invalidado manualmente.
+
+**Funcionamento do VHS:**
+
+```
+Primeira execução:                         Execuções subsequentes (TTL válido):
+┌────────────────┐   HTTP real    ┌──────────────────┐     ┌────────────────┐   cache hit    ┌──────────────────┐
+│  Serviço .NET  │ ─────────────► │  API Externa     │     │  Serviço .NET  │ ─────────────► │  VHS Cache Layer │
+│                │ ◄───────────── │  (Supabase Auth  │     │                │ ◄───────────── │  (resposta       │
+│                │  resposta real │   / Ticketeira)  │     │                │  cached JSON   │   armazenada)    │
+└────────────────┘                └──────────────────┘     └────────────────┘                └──────────────────┘
+         │                                                                                            │
+         └──────────────────── armazena em tests/cassettes/<nome_do_teste>.json ────────────────────►┘
+```
+
+**Implementação como `DelegatingHandler` no ASP.NET Core:**
+
+```csharp
+// src/backend/contracts/vhs/VhsCachingHandler.cs
+public class VhsCachingHandler : DelegatingHandler
+{
+    private readonly IMemoryCache _cache;
+    private readonly VhsOptions _options;
+
+    public VhsCachingHandler(IMemoryCache cache, VhsOptions options)
+    {
+        _cache = cache;
+        _options = options;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var cacheKey = $"vhs:{request.Method}:{request.RequestUri}";
+
+        if (_cache.TryGetValue(cacheKey, out string cachedBody))
+        {
+            var cachedResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(cachedBody, Encoding.UTF8, "application/json")
+            };
+            return cachedResponse;
+        }
+
+        var response = await base.SendAsync(request, cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        _cache.Set(cacheKey, body, TimeSpan.FromSeconds(_options.TtlSeconds));
+
+        return response;
+    }
+}
+
+public class VhsOptions
+{
+    public int TtlSeconds { get; set; } = 300; // 5 minutos por padrão
+    public string CassettesDirectory { get; set; } = "tests/cassettes";
+}
+```
+
+**Registro no `Program.cs` dos serviços:**
+
+```csharp
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton(new VhsOptions { TtlSeconds = 300 });
+builder.Services.AddTransient<VhsCachingHandler>();
+
+builder.Services.AddHttpClient("supabase-auth")
+    .AddHttpMessageHandler<VhsCachingHandler>();
+
+builder.Services.AddHttpClient("ticketeira")
+    .AddHttpMessageHandler<VhsCachingHandler>();
+```
+
+**Configuração do TTL por ambiente:**
+
+| Ambiente | TTL padrão | Observação |
+|---|---|---|
+| `Development` | 300 s (5 min) | Permite iteração rápida sem chamar a API real |
+| `Testing` | 0 s (desabilitado) | Cassetes pré-gravados são usados via arquivo |
+| `Production` | Não usar | VHS não deve ser ativado em produção |
+
+---
+
+#### Escopo dos Testes de Integração
+
+Os testes cobrem seis fronteiras de integração definidas pela arquitetura do Spotlight:
+
+| ID | Fronteira | Tipo | Usa VHS |
+|---|---|---|---|
+| IT-01 | App Mobile → API Gateway (autenticação JWT) | Interno | Não |
+| IT-02 | API Gateway → Supabase Auth (validação de token) | Externo | **Sim** |
+| IT-03 | Serviços SOA → Supabase PostgreSQL | Interno | Não |
+| IT-04 | Serviços SOA → MongoDB (telemetria) | Interno | Não |
+| IT-05 | Serviços SOA → RabbitMQ → ML Engine | Interno | Não |
+| IT-06 | App Mobile → API Ticketeira (link de compra) | Externo | **Sim** |
+
+---
+
+#### IT-01 — API Gateway: Validação de JWT e Roteamento para Serviços SOA
+
+**Descrição:** Valida que o API Gateway aceita requisições com JWT válido, rejeita requisições inválidas e roteia corretamente para os três serviços internos (catálogo, usuário e recomendação).
+
+**Ferramentas utilizadas:**
+- `xUnit` — framework de testes do .NET
+- `Microsoft.AspNetCore.Mvc.Testing` — servidor de teste integrado (`WebApplicationFactory`)
+- `Bogus` — geração de dados fictícios para usuários e tokens
+
+**Instruções de execução:**
+```bash
+# a partir da raiz do repositório
+dotnet test src/backend/api-gateway --filter "Category=Integration" --logger "console;verbosity=detailed"
+```
+
+---
+
+**Pré-condições:**
+
+- Ambiente Docker em execução com todos os containers (`docker compose up -d`)
+- Variáveis de ambiente configuradas: `SUPABASE_JWT_SECRET`, `SUPABASE_URL`, `POSTGRES_CONNECTION_STRING`
+- Pelo menos um usuário registrado no Supabase Auth com `tipo_usuario=comum`
+- Pelo menos um usuário administrador com `tipo_usuario=admin`
+- Os três serviços internos (catálogo, usuário, recomendação) estão em execução e respondendo em suas portas configuradas
+- Nenhum rate-limit ativo que possa interferir nas chamadas sequenciais dos testes
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-01-P01 | Requisição autenticada roteia para Serviço de Catálogo | Enviar `GET /api/catalogo/espetaculos` com header `Authorization: Bearer <JWT_VALIDO>` | HTTP 200 com lista de espetáculos; header `X-Routed-To: catalogo` presente na resposta | Nenhuma alteração de estado; log de acesso registrado |
+| IT-01-P02 | Requisição autenticada roteia para Serviço de Usuário | Enviar `GET /api/usuario/perfil` com header `Authorization: Bearer <JWT_VALIDO>` | HTTP 200 com dados do perfil do usuário autenticado | Nenhuma alteração de estado |
+| IT-01-P03 | Requisição autenticada roteia para Serviço de Recomendação | Enviar `GET /api/recomendacao` com header `Authorization: Bearer <JWT_VALIDO>` | HTTP 200 com lista de recomendações | Nenhuma alteração de estado |
+| IT-01-P04 | Administrador acessa rota protegida por papel | Enviar `POST /api/admin/espetaculos` com JWT de usuário `tipo_usuario=admin` e body JSON válido | HTTP 201 com espetáculo criado; campo `id` presente no body de resposta | Espetáculo persiste no banco PostgreSQL |
+| IT-01-P05 | Token renovado (refresh) é aceito normalmente | Obter novo `access_token` via `POST /auth/token?grant_type=refresh_token`; usar o novo token em `GET /api/catalogo/espetaculos` | HTTP 200; novo token aceito sem erros | Sessão permanece ativa |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-01-N01 | Requisição sem header de autorização | Enviar `GET /api/catalogo/espetaculos` sem header `Authorization` | HTTP 401; body `{ "error": "token_missing" }` | Nenhuma alteração de estado; log de erro registrado |
+| IT-01-N02 | JWT com assinatura inválida | Enviar `GET /api/usuario/perfil` com token adulterado (último caractere alterado) | HTTP 401; body `{ "error": "invalid_token" }` | Nenhuma alteração de estado |
+| IT-01-N03 | JWT expirado | Enviar requisição com token gerado com `exp` no passado (simulado via `VhsOptions.TtlSeconds=0`) | HTTP 401; body `{ "error": "token_expired" }` | Nenhuma alteração de estado |
+| IT-01-N04 | Usuário comum acessa rota exclusiva de administrador | Enviar `POST /api/admin/espetaculos` com JWT de `tipo_usuario=comum` | HTTP 403; body `{ "error": "insufficient_permissions" }` | Nenhuma alteração de estado |
+| IT-01-N05 | Serviço interno indisponível | Derrubar o container do Serviço de Catálogo e enviar `GET /api/catalogo/espetaculos` com JWT válido | HTTP 503; body `{ "error": "service_unavailable", "service": "catalogo" }` | Gateway registra erro em log; outros serviços permanecem funcionais |
+
+**Pós-condições gerais:** Todos os acessos — bem-sucedidos e rejeitados — são registrados nos logs estruturados do API Gateway com os cinco campos obrigatórios definidos no RNF07 (timestamp, nível, serviço, sessão, dispositivo).
+
+**Método de validação dos resultados:**
+1. Verificar código HTTP retornado contra o esperado
+2. Validar estrutura do body de resposta via `JsonSchema`
+3. Inspecionar logs do container do API Gateway com `docker logs api-gateway | grep ERROR`
+4. Confirmar que nenhum token inválido passou para os serviços internos via análise dos logs dos serviços
+
+---
+
+#### IT-02 — API Gateway ↔ Supabase Auth: Validação de Token (com VHS)
+
+**Descrição:** Valida a integração entre o API Gateway e o Supabase Auth para os fluxos de cadastro, login e renovação de sessão. O módulo VHS é ativado para armazenar as respostas do Supabase Auth, evitando dependência de conectividade com o serviço remoto durante a bateria de testes.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Microsoft.AspNetCore.Mvc.Testing`
+- **Módulo VHS** com TTL de 300 segundos e cassetes pré-gravados em `tests/cassettes/supabase/`
+- `Supabase.Client` — SDK oficial para chamadas diretas quando necessário gravar novos cassetes
+- `FluentAssertions` — validação expressiva de respostas HTTP
+
+**Instruções de execução:**
+```bash
+# Gravar cassetes novos (requer conectividade com Supabase):
+VHS_MODE=record dotnet test src/backend/api-gateway --filter "Category=Integration&Tag=Supabase"
+
+# Executar com cassetes gravados (modo padrão, sem conectividade):
+dotnet test src/backend/api-gateway --filter "Category=Integration&Tag=Supabase"
+
+# Inspecionar cassetes gerados:
+ls tests/cassettes/supabase/
+```
+
+---
+
+**Pré-condições:**
+
+- Módulo VHS configurado no pipeline do `HttpClient` para o cliente nomeado `"supabase-auth"` (conforme código em `VhsCachingHandler.cs`)
+- Cassetes pré-gravados em `tests/cassettes/supabase/` para cada cenário (gerados com `VHS_MODE=record` em ambiente com conectividade)
+- Variável `SUPABASE_JWT_SECRET` definida no ambiente de teste para validação local de assinatura
+- Email `ana.test@spotlighttest.com` disponível no projeto Supabase (não cadastrado previamente)
+- Email `usuario.existente@spotlighttest.com` cadastrado previamente no projeto Supabase
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-02-P01 | Cadastro de novo usuário com dados válidos | Enviar `POST /auth/signup` com `{ "email": "ana.test@spotlighttest.com", "password": "Senh@Forte123", "data": { "nome": "Ana Teste" } }`; VHS retorna cassete `signup_success.json` | HTTP 200; body contém `user.id` (UUID), `session.access_token` e `session.refresh_token`; `access_token` é JWT válido com `sub` igual ao `user.id` | VHS registra resposta em cache com TTL de 300 s; usuário persiste no Supabase (ou cassete simula isso) |
+| IT-02-P02 | Login com credenciais válidas | Enviar `POST /auth/token?grant_type=password` com `{ "email": "usuario.existente@spotlighttest.com", "password": "Senh@Forte123" }`; VHS retorna cassete `login_success.json` | HTTP 200; `access_token` presente e assinado com `SUPABASE_JWT_SECRET`; `expires_in` = 3600 | Token em cache no VHS por 300 s; log de autenticação bem-sucedida registrado |
+| IT-02-P03 | Renovação de sessão com refresh_token válido | Enviar `POST /auth/token?grant_type=refresh_token` com `{ "refresh_token": "<TOKEN_VALIDO>" }`; VHS retorna cassete `refresh_success.json` | HTTP 200; novo `access_token` gerado; `refresh_token` atualizado; TTL do novo token = 3600 s | VHS invalida cache anterior e armazena nova resposta |
+| IT-02-P04 | Cache VHS é utilizado na segunda chamada idêntica | Realizar `POST /auth/token?grant_type=password` duas vezes com os mesmos dados dentro do TTL | Segunda chamada não gera tráfego real para o Supabase; resposta idêntica à primeira; latência < 5 ms na segunda chamada | Contador de cache hit incrementado; log VHS registra `cache_hit=true` |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-02-N01 | Login com senha incorreta | Enviar `POST /auth/token?grant_type=password` com senha errada; VHS retorna cassete `login_wrong_password.json` | HTTP 400; body `{ "error": "invalid_grant", "error_description": "Invalid login credentials" }` | VHS armazena resposta de erro em cache; nenhuma sessão criada |
+| IT-02-N02 | Cadastro com email já registrado | Enviar `POST /auth/signup` com email `usuario.existente@spotlighttest.com`; VHS retorna cassete `signup_duplicate.json` | HTTP 422; body `{ "error": "User already registered" }` | Nenhuma alteração de estado; erro registrado em log |
+| IT-02-N03 | Cadastro com senha fraca (menos de 8 caracteres) | Enviar `POST /auth/signup` com `"password": "abc"` | HTTP 422; body contém mensagem de validação de senha | Nenhum usuário criado |
+| IT-02-N04 | Renovação com refresh_token expirado | Enviar `POST /auth/token?grant_type=refresh_token` com token expirado; VHS retorna cassete `refresh_expired.json` | HTTP 400; body `{ "error": "invalid_grant" }` | Cache VHS invalidado; usuário deve fazer login novamente |
+| IT-02-N05 | Supabase Auth indisponível e VHS cache expirado | Definir `VhsOptions.TtlSeconds=0` e simular indisponibilidade do Supabase; enviar `POST /auth/token?grant_type=password` | HTTP 503; body `{ "error": "auth_service_unavailable" }`; fallback de retry não excede 3 tentativas com backoff exponencial | Erro crítico registrado em log estruturado; nenhum dado sensível exposto na resposta |
+
+**Pós-condições gerais:** O VHS persiste cassetes em `tests/cassettes/supabase/` somente quando `VHS_MODE=record`; em modo padrão, nenhuma chamada real é feita ao Supabase durante a execução dos testes.
+
+**Método de validação dos resultados:**
+1. Verificar se `VhsCachingHandler` foi invocado inspecionando logs com `[VHS]` no prefixo
+2. Confirmar que `cache_hit=true` aparece nos logs da segunda requisição idêntica (IT-02-P04)
+3. Validar assinatura do JWT retornado com `jose-jwt` ou `System.IdentityModel.Tokens.Jwt`
+4. Comparar body de resposta com o cassete JSON armazenado usando `DeepEqual`
+
+---
+
+#### IT-03 — Serviços SOA ↔ Supabase PostgreSQL: Persistência e Leitura
+
+**Descrição:** Valida que os três serviços de negócio (catálogo, usuário e recomendação) leem e escrevem corretamente no banco PostgreSQL provisionado via Supabase, respeitando as constraints definidas no modelo físico.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Testcontainers.PostgreSql` — instância isolada do PostgreSQL em container Docker para testes
+- `Entity Framework Core` — ORM utilizado pelos serviços
+- `Respawn` — reset do banco entre os testes para garantir isolamento
+- Scripts SQL de criação de schema: `src/database/01_create_database.sql` e `src/database/02_initial_data.sql`
+
+**Instruções de execução:**
+```bash
+# Requer Docker em execução
+dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" \
+  --logger "trx;LogFileName=integration-postgres.trx"
+```
+
+---
+
+**Pré-condições:**
+
+- Docker disponível no ambiente de execução para criação do container PostgreSQL via `Testcontainers`
+- Scripts SQL `01_create_database.sql` e `02_initial_data.sql` executados com sucesso no banco de teste
+- Variáveis de ambiente de teste isoladas (`POSTGRES_CONNECTION_STRING` apontando para o container efêmero do `Testcontainers`)
+- Dados de seed carregados: mínimo de 5 espetáculos, 3 usuários, 2 categorias e 1 teatro
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-03-P01 | Cadastro de espetáculo persiste no banco | Chamar `POST /api/catalogo/espetaculos` com payload completo e válido | Registro inserido na tabela `espetaculo` com `id` gerado; `status='em_cartaz'`; `popularidade=0.0`; `nota_media=0.0` | Linha verificada via `SELECT` direto no banco de teste |
+| IT-03-P02 | Atualização de preferências do usuário | Chamar `PUT /api/usuario/preferencias` com array de categorias e faixa de preço | Campo `nivel_acesso` do usuário atualizado no PostgreSQL com as novas preferências em JSON | Campo verificado via query `SELECT nivel_acesso FROM usuario WHERE id=$1` |
+| IT-03-P03 | Geração de recomendação persiste resultado | ML Engine publica resultado via RabbitMQ; Serviço de Recomendação consome e persiste | Registro na tabela `recomendacao` com `score_recomendacao > 0`, `tipo_algoritmo` preenchido e `referencia_origem_id` vinculando ao evento de telemetria | Linha verificada via `SELECT` com JOIN em `usuario` e `espetaculo` |
+| IT-03-P04 | Avaliação registrada atualiza nota_media do espetáculo | Inserir avaliação com nota 4.5; verificar `nota_media` do espetáculo antes e depois | `nota_media` do espetáculo atualizado para refletir a nova avaliação (média recalculada pelo Worker) | Campo `nota_media` verificado na tabela `espetaculo` após processamento |
+| IT-03-P05 | Consulta com filtros retorna subset correto | Chamar `GET /api/catalogo/espetaculos?categoria=musical&preco_max=100` | Apenas espetáculos da categoria "musical" com `preco_minimo ≤ 100` são retornados; nenhum espetáculo fora do filtro presente na lista | Nenhuma alteração de estado no banco |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-03-N01 | Violação de constraint NOT NULL | Tentar inserir espetáculo sem campo obrigatório `titulo` | HTTP 400; body `{ "error": "validation_failed", "field": "titulo" }`; nenhum registro inserido | Banco permanece consistente; rollback confirmado |
+| IT-03-N02 | Violação de chave estrangeira | Tentar inserir sessão com `espetaculo_id` inexistente | HTTP 400; body `{ "error": "foreign_key_violation" }`; nenhum registro inserido | Banco permanece consistente |
+| IT-03-N03 | Consulta com ID inexistente | Chamar `GET /api/catalogo/espetaculos/99999999` | HTTP 404; body `{ "error": "not_found", "resource": "espetaculo" }` | Nenhuma alteração de estado |
+| IT-03-N04 | Falha de conexão com banco | Forçar queda do container PostgreSQL e executar `GET /api/catalogo/espetaculos` | HTTP 503; mensagem de erro genérica (sem detalhes de infraestrutura); log interno com detalhe completo da exceção | Serviço tenta reconectar após 5 s; demais serviços permanecem operacionais |
+| IT-03-N05 | Inserção duplicada com email já cadastrado | Tentar registrar usuário com `email` já existente no banco | HTTP 409; body `{ "error": "conflict", "field": "email" }` | Nenhum registro duplicado inserido; constraint UNIQUE mantida |
+
+**Pós-condições gerais:** `Respawn` reseta todas as tabelas após cada teste; o container `Testcontainers` é destruído ao final da suite, sem resíduos em disco.
+
+**Método de validação dos resultados:**
+1. Verificar retorno HTTP e estrutura do body
+2. Executar `SELECT` direto no banco de teste via conexão de inspeção do `Testcontainers`
+3. Validar que constraints do banco (NOT NULL, FK, UNIQUE) foram aplicadas corretamente
+4. Conferir que nenhum dado de teste persiste após `Respawn`
+
+---
+
+#### IT-04 — Serviços SOA ↔ MongoDB: Registro de Telemetria Comportamental
+
+**Descrição:** Valida que os eventos de comportamento do usuário (cliques, visualizações, tempo de permanência) são registrados corretamente no MongoDB e que o ML Engine consegue lê-los para alimentar os algoritmos de recomendação.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Testcontainers.MongoDb` — instância isolada do MongoDB em container Docker
+- `MongoDB.Driver` — driver oficial C# para verificações diretas na coleção
+- `FluentAssertions` — validações expressivas em documentos BSON
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/services/usuario --filter "Category=Integration&Tag=MongoDB" \
+  --logger "console;verbosity=normal"
+```
+
+---
+
+**Pré-condições:**
+
+- Docker disponível para instanciar o container MongoDB via `Testcontainers`
+- Coleção `interacoes` vazia no banco de teste (garantido por `IAsyncLifetime.InitializeAsync`)
+- `user_id` de teste disponível (`"user_test_001"`)
+- `espetaculo_id` de teste disponível (`"espetaculo_test_001"`)
+- Pelo menos 3 tipos de interação definidos no enum: `visualizacao`, `clique`, `favorito`
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-04-P01 | Evento de visualização é persistido corretamente | O Serviço de Usuário recebe evento de visualização e chama repositório MongoDB | Documento inserido na coleção `interacoes` com campos: `user_id`, `espetaculo_id`, `tipo_interacao="visualizacao"`, `timestamp` (ISO 8601), `tempo_permanencia` | Documento verificado via `collection.FindAsync(filter)` |
+| IT-04-P02 | Múltiplos eventos do mesmo usuário são registrados independentemente | Enviar 10 eventos de clique para o mesmo espetáculo em sequência rápida | 10 documentos distintos inseridos na coleção `interacoes`; cada um com `timestamp` diferente | Count verificado via `collection.CountDocumentsAsync` |
+| IT-04-P03 | ML Engine lê últimas interações de um usuário | ML Engine consulta `interacoes` do `user_test_001` para gerar recomendação | Consulta retorna documentos ordenados por `timestamp DESC`; campos `espetaculo_id` e `tipo_interacao` presentes em todos | Nenhuma alteração de estado na coleção |
+| IT-04-P04 | Agregação de interações por espetáculo | Consultar total de visualizações do `espetaculo_test_001` | Pipeline de agregação MongoDB retorna contagem correta; resultado coerente com os documentos inseridos | Nenhuma alteração de estado |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-04-N01 | Evento com `espetaculo_id` nulo | Tentar inserir documento com `espetaculo_id: null` | Documento rejeitado pela validação do repositório antes de chegar ao MongoDB; HTTP 400 retornado ao chamador | Nenhum documento inserido; log de erro registrado |
+| IT-04-N02 | MongoDB indisponível durante escrita | Derrubar container MongoDB e enviar evento de interação | Evento enfileirado no RabbitMQ como fallback; HTTP 202 retornado ao frontend; evento será reprocessado quando MongoDB voltar | Evento persistido na fila RabbitMQ; log de aviso registrado |
+| IT-04-N03 | Consulta com `user_id` sem histórico | ML Engine solicita interações de usuário sem nenhum evento registrado | Array vazio retornado `[]`; serviço trata cold start ativando algoritmo k-NN baseado em popularidade | Nenhuma exceção lançada; fallback de cold start ativado |
+
+**Pós-condições gerais:** Container MongoDB destruído ao final da suite via `IAsyncLifetime.DisposeAsync`.
+
+**Método de validação dos resultados:**
+1. Verificar documentos inseridos via `FindAsync` com filtro exato
+2. Comparar `timestamp` dos documentos para garantir ordenação correta
+3. Confirmar que dados com campos inválidos não chegam à coleção MongoDB
+
+---
+
+#### IT-05 — Serviços SOA ↔ RabbitMQ ↔ ML Engine: Pipeline de Eventos Assíncronos
+
+**Descrição:** Valida o fluxo completo de publicação e consumo de eventos de telemetria via RabbitMQ, desde o Serviço de Usuário (publisher) até o ML Engine (consumer), incluindo o processamento do evento e a geração de recomendação resultante.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Testcontainers.RabbitMq` — instância isolada do RabbitMQ em container Docker
+- `RabbitMQ.Client` — SDK oficial para verificações diretas nas filas
+- `MassTransit.Testing` — utilitários de teste para publicação e consumo de mensagens
+- Pausa estratégica com `Task.Delay` para aguardar processamento assíncrono (máx. 5 s)
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/services --filter "Category=Integration&Tag=RabbitMQ" \
+  --timeout 30000
+```
+
+---
+
+**Pré-condições:**
+
+- Docker disponível para instanciar o container RabbitMQ via `Testcontainers`
+- Exchange `spotlight.telemetry` e filas `q.interacoes` e `q.recomendacoes` criadas no broker de teste
+- ML Engine configurado para consumir `q.interacoes` no ambiente de teste
+- Banco PostgreSQL de teste disponível para persistência do resultado da recomendação
+- Banco MongoDB de teste disponível para registro do evento de interação
+- Pelo menos 1 usuário e 5 espetáculos no banco de teste para que o algoritmo produza resultado
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-05-P01 | Evento de interação publicado chega ao ML Engine | Serviço de Usuário publica `InteracaoEvent { user_id, espetaculo_id, tipo="clique" }` na exchange `spotlight.telemetry`; aguardar até 5 s | ML Engine consome o evento da fila `q.interacoes`; evento registrado no MongoDB; recomendação gerada e publicada em `q.recomendacoes` | Coleção `interacoes` no MongoDB contém o documento; tabela `recomendacao` no PostgreSQL contém novo registro |
+| IT-05-P02 | Múltiplos eventos processados sem perda | Publicar 50 eventos em burst na exchange; aguardar 10 s | Todos os 50 eventos consumidos; 0 mensagens na fila após processamento; contagem no MongoDB = 50 | Todas as mensagens processadas e removidas da fila; verificado via Management API do RabbitMQ |
+| IT-05-P03 | Recomendação publicada pelo ML Engine é consumida pelo Serviço de Recomendação | ML Engine publica `RecomendacaoEvent` em `q.recomendacoes`; Serviço de Recomendação consome | Registro na tabela `recomendacao` com `score > 0` e `tipo_algoritmo` preenchido | Linha verificada no PostgreSQL de teste |
+| IT-05-P04 | Mensagem com dead-letter move para DLQ após 3 falhas | Configurar consumer para falhar intencionalmente; publicar 1 mensagem | Após 3 tentativas de reentrega, mensagem movida para `q.interacoes.dlq`; erro registrado em log | Mensagem disponível na DLQ para inspeção; sistema continua processando demais mensagens |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-05-N01 | RabbitMQ indisponível durante publicação | Derrubar container RabbitMQ e tentar publicar evento de interação | Serviço de Usuário retorna HTTP 202 ao frontend (aceita o evento); evento é salvo em buffer local (arquivo ou memória) para reenvio | Buffer de retry ativo; log de aviso `[RABBITMQ] broker_unavailable` registrado |
+| IT-05-N02 | Mensagem com schema inválido no payload | Publicar mensagem com `user_id` ausente na fila `q.interacoes` | ML Engine rejeita a mensagem; mensagem movida para DLQ; nenhuma recomendação gerada | DLQ contém a mensagem inválida; log de erro registrado com detalhes do schema |
+| IT-05-N03 | ML Engine indisponível | Parar o container do ML Engine e publicar 5 eventos | Mensagens acumuladas na fila `q.interacoes` (não processadas); ao reiniciar o ML Engine, mensagens são consumidas sem perda | Fila verificada via Management API durante a pausa; processamento retomado sem perda de dados |
+
+**Pós-condições gerais:** Containers RabbitMQ, PostgreSQL e MongoDB destruídos ao final da suite; nenhuma fila ou binding persiste entre execuções.
+
+**Método de validação dos resultados:**
+1. Verificar mensagens remanescentes na fila via RabbitMQ Management API (`GET /api/queues/%2F/q.interacoes`)
+2. Confirmar documentos no MongoDB via `CountDocumentsAsync`
+3. Confirmar registros no PostgreSQL via `SELECT count(*) FROM recomendacao WHERE data_geracao > now() - interval '1 minute'`
+4. Verificar DLQ após cenários negativos
+
+---
+
+#### IT-06 — App Mobile ↔ API Ticketeira: Redirecionamento para Compra de Ingressos (com VHS)
+
+**Descrição:** Valida que o link de compra de ingressos (`link_compra`) retornado pelo Serviço de Catálogo é válido, acessível e redireciona corretamente para a plataforma parceira de ticketing. O módulo VHS armazena as respostas da API da ticketeira para evitar chamadas reais durante os testes.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Microsoft.AspNetCore.Mvc.Testing`
+- **Módulo VHS** com cassetes em `tests/cassettes/ticketeira/`
+- `HttpClient` com seguimento de redirecionamentos desabilitado (`AllowAutoRedirect=false`) para verificar o `Location` header
+- `FluentAssertions` para validação de URLs e códigos HTTP
+
+**Instruções de execução:**
+```bash
+# Gravar cassetes (requer conectividade com a ticketeira):
+VHS_MODE=record dotnet test src/backend/services/catalogo \
+  --filter "Category=Integration&Tag=Ticketeira"
+
+# Executar com cassetes:
+dotnet test src/backend/services/catalogo \
+  --filter "Category=Integration&Tag=Ticketeira"
+```
+
+---
+
+**Pré-condições:**
+
+- Módulo VHS configurado no cliente HTTP nomeado `"ticketeira"` com TTL de 300 s
+- Cassete `ticketeira_sessao_disponivel.json` pré-gravado com resposta de disponibilidade válida
+- Cassete `ticketeira_sessao_indisponivel.json` pré-gravado com resposta de esgotamento
+- Espetáculo com sessão ativa e `link_compra` preenchido disponível no banco de teste
+- Espetáculo com sessão sem ingressos (`disponibilidade=0`) disponível no banco de teste
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-06-P01 | Link de compra retornado é URL válida e acessível | Chamar `GET /api/catalogo/espetaculos/{id}/sessoes` e obter `link_compra`; fazer `HEAD` na URL com `AllowAutoRedirect=false`; VHS retorna cassete `ticketeira_sessao_disponivel.json` | HTTP 301 ou 302 no `HEAD`; header `Location` aponta para domínio da ticketeira parceira; URL bem formada (https, sem espaços) | VHS armazena resposta por 300 s; log `[VHS] cache_miss, storing response` registrado na primeira chamada |
+| IT-06-P02 | Campo `disponibilidade` reflete dados da ticketeira | Consultar disponibilidade via VHS cassete; verificar campo `disponibilidade` na resposta do catálogo | Campo `disponibilidade` > 0 quando cassete indica ingressos disponíveis; campo = 0 quando cassete indica esgotamento | Nenhuma alteração de estado no banco |
+| IT-06-P03 | VHS serve resposta em cache na segunda chamada idêntica | Chamar `GET /api/catalogo/espetaculos/{id}/sessoes` duas vezes com mesmo ID dentro do TTL | Segunda chamada usa cache VHS; log `[VHS] cache_hit=true` na segunda chamada; latência < 5 ms na segunda chamada | Cache válido por TTL restante |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-06-N01 | API da Ticketeira retorna erro 500 | VHS retorna cassete `ticketeira_error_500.json` com resposta de falha interna | Serviço de Catálogo retorna HTTP 200 para o frontend com `disponibilidade=null` e `link_compra` preservado (não invalida o link pelo erro da ticketeira); log de warning registrado | Nenhuma alteração no catálogo; usuário pode tentar acessar o link diretamente |
+| IT-06-N02 | TTL do VHS expira e API da Ticketeira está indisponível | Configurar `VhsOptions.TtlSeconds=1`; aguardar expiração; ticketeira simulada como indisponível; nova chamada | Serviço usa último valor de `disponibilidade` conhecido (stale cache strategy); log `[VHS] stale_cache_used` registrado | Valor stale retornado ao frontend com header `X-Cache: stale`; erro registrado em log sem expor ao usuário |
+| IT-06-N03 | `link_compra` ausente no banco para uma sessão | Consultar sessão onde `link_compra IS NULL` no banco | HTTP 200 com campo `link_compra: null` na resposta; frontend deve exibir mensagem "venda não disponível online" | Nenhuma chamada à API da Ticketeira realizada; VHS não invocado |
+
+**Pós-condições gerais:** Cassetes VHS não são sobrescritos em modo padrão (apenas com `VHS_MODE=record`); nenhuma chamada real à API da ticketeira é feita durante a execução padrão.
+
+**Método de validação dos resultados:**
+1. Verificar se logs contêm `[VHS] cache_hit=true` na segunda chamada idêntica (IT-06-P03)
+2. Confirmar que URL no campo `link_compra` passa na validação de formato `Uri.IsWellFormedUriString`
+3. Verificar header `Location` no `HEAD` da URL com regex `^https://[a-zA-Z0-9.-]+\.(sympla|blueticket|ingresso)\.com\.br`
+4. Confirmar que nenhuma chamada HTTP real foi gerada para a ticketeira nos logs de rede (exceto quando `VHS_MODE=record`)
+
+---
+
+### 9.4.2 Resultados
+
+_Seção a ser preenchida após a execução dos testes planejados. Incluir: data de execução, versão do código testado, tabela de resultados por cenário (passou/falhou/bloqueado), evidências (logs e capturas de tela), defeitos encontrados e status de resolução._
+
+---
 
 # 10. Procedimentos de Implantação
 _conteúdo_
