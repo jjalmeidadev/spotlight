@@ -2690,6 +2690,180 @@ As pastas vazias preservadas com `.gitkeep` existem para manter essa estrutura v
 
 &emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o MVVM facilita a separação entre interface e regra de apresentação, deixando as telas mais simples e os comportamentos reutilizáveis em ViewModels. No backend, a abordagem SOA permite expor serviços com fronteiras claras, usar contratos estáveis entre componentes e isolar o motor de recomendação em uma camada própria de ML. Isso reduz acoplamento, melhora a testabilidade e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
 
+### 8.1.2 Arquitetura de Codificação — Spotlight
+
+&emsp;Representação visual e descritiva da arquitetura de codificação da solução, evidenciando camadas, componentes principais, fluxo de dados e responsabilidades de cada parte do sistema.
+
+<div align="center">
+
+### Figura X – Arquitetura de Codificação do Spotlight
+
+![Arquitetura de Codificação](./img/arquiteturacodificação%20.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+#### Descrição das Camadas
+
+##### 1. Camada de Apresentação
+
+&emsp;Contém o Spotlight App, responsável pela interface com o usuário final e pela captura contínua de interações (telemetria).
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| Spotlight App | React Native + TypeScript | Interface do usuário, onboarding de preferências, coleta de telemetria (cliques, tempo de tela, navegação) |
+
+Regras desta camada:
+
+- Toda comunicação com o backend passa exclusivamente pelo API Gateway via HTTPS.
+- Tokens JWT armazenados de forma segura (Keychain no iOS, Keystore no Android).
+- Estado local mínimo; dados persistentes vivem no backend.
+
+##### 2. Serviços Externos
+
+&emsp;Infraestrutura de identidade e de inventário de ingressos, consumidos pelo app e pelo Gateway.
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| Supabase Auth | Supabase Auth | Provedor de identidade: autenticação, emissão e validação de tokens JWT, OAuth |
+| API das Ticketeiras | API externa | Inventário de ingressos, emissão e validação |
+
+Interfaces: `IAuth` · `ITickets`
+
+##### 3. API Gateway
+
+&emsp;Ponto único de entrada para todas as requisições do frontend. Nenhum serviço SOA é acessível diretamente pelo app.
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| API Gateway | ASP.NET Core (.NET 9) | BFF/Gateway: roteamento, terminação SSL, validação de JWT, rate limiting, orquestração de chamadas aos serviços SOA |
+
+Interface exposta: `ISpotlightAPI`
+
+Responsabilidades detalhadas:
+
+- Valida o token emitido pelo Supabase Auth antes de rotear qualquer requisição.
+- Publica eventos de telemetria de forma assíncrona no RabbitMQ via interface `IEvents`.
+- Roteia para o serviço SOA correto com base no recurso solicitado.
+
+##### 4. Serviços de Negócio (SOA)
+
+&emsp;Cada serviço encapsula um domínio de negócio isolado. Implementados como ASP.NET Core Web APIs.
+
+**Serviço do Usuário (`IUserPrefs`)**
+
+- Gestão de perfis de usuário.
+- Preferências explícitas selecionadas na onboarding (tags e categorias).
+- Histórico de consumo (espetáculos visualizados, avaliados, favoritados).
+- Persiste no Supabase DB (PostgreSQL).
+
+**Serviço do Catálogo (`ICatalog`)**
+
+- Domínio de espetáculos: criação, edição, publicação e remoção.
+- Gestão de teatros, gêneros e precificação.
+- Persiste no Supabase DB (PostgreSQL).
+
+**Serviço de Recomendação (`IRecommendation`)**
+
+- Orquestra o fluxo de sugestões personalizadas para o usuário.
+- Consulta predições pré-processadas pelo ML Engine via interface `Worker`.
+- Persiste resultados no Supabase DB (PostgreSQL).
+
+##### 5. Infraestrutura de Processamento
+
+**ML Engine**
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| ML Engine | C# + ML.NET | Algoritmos de filtragem colaborativa (k-NN, SVD), geração de vetores de afinidade, predições pré-processadas consumidas pelo Serviço de Recomendação |
+
+- Lê dados estruturados do Supabase DB (PostgreSQL) via interface SQL.
+- Componente isolado — não exposto diretamente ao Gateway.
+
+**RabbitMQ**
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| RabbitMQ | RabbitMQ | Message broker para enfileiramento de eventos assíncronos de telemetria e interações comportamentais |
+
+- Recebe eventos publicados pelo API Gateway (interface `IEvents`).
+- Descarrega o banco relacional de escritas de alto volume.
+- Eventos consumidos são persistidos no MongoDB.
+
+##### 6. Camada de Dados (Persistência Poliglota)
+
+&emsp;A arquitetura segue o princípio da persistência poliglota — tecnologia adequada ao perfil de carga de cada domínio.
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| Supabase DB | PostgreSQL via Supabase | Banco relacional principal: perfis, catálogo, recomendações, metadados transacionais |
+| MongoDB | MongoDB | Repositório de alto volume: logs comportamentais brutos, telemetria, cliques, tempo de tela |
+
+Supabase DB é utilizado por: Serviço do Usuário, Serviço do Catálogo, Serviço de Recomendação e ML Engine (leitura via SQL).
+
+MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
+
+#### Interfaces do Sistema
+
+| Interface | Entre | Descrição |
+|---|---|---|
+| `ISpotlightAPI` | App → API Gateway | Contrato REST do frontend com o backend |
+| `IAuth` | App → Supabase Auth | Autenticação e emissão de JWT |
+| `ITickets` | Gateway → API Ticketeiras | Consulta e emissão de ingressos |
+| `IUserPrefs` | Gateway → Serv. Usuário | Perfis e preferências |
+| `ICatalog` | Gateway → Serv. Catálogo | Espetáculos e metadados |
+| `IRecommendation` | Gateway → Serv. Recomendação | Sugestões personalizadas |
+| `Worker` | Serv. Recomendação → ML Engine | Predições e vetores de afinidade |
+| `IEvents` | Gateway → RabbitMQ | Publicação assíncrona de eventos de telemetria |
+| `SQL` | Serviços SOA + ML Engine → PostgreSQL | Leitura/escrita relacional |
+| `NoSQL` | RabbitMQ consumer → MongoDB | Ingestão de telemetria bruta |
+
+#### Fluxo de Dados — Exemplos
+
+**Busca de Recomendações**
+
+```
+1. Usuário abre tela de descoberta no Spotlight App
+2. App → HTTPS GET /recomendacoes → API Gateway (ISpotlightAPI)
+3. Gateway valida JWT com Supabase Auth
+4. Gateway → Serviço de Recomendação (IRecommendation)
+5. Serviço de Recomendação → ML Engine (Worker): solicita predições
+6. ML Engine consulta PostgreSQL (vetores de afinidade pré-calculados)
+7. ML Engine retorna lista ranqueada ao Serviço de Recomendação
+8. Serviço de Recomendação retorna ao Gateway → App
+9. App registra interação do usuário (clique, tempo de tela)
+10. Gateway publica evento no RabbitMQ (IEvents) — assíncrono
+11. Consumer do RabbitMQ persiste evento no MongoDB
+```
+
+**Compra de Ingresso**
+
+```
+1. Usuário seleciona sessão e clica em "Comprar"
+2. App → HTTPS POST /ingressos → API Gateway
+3. Gateway valida JWT → roteia para Serviço do Catálogo
+4. Serviço do Catálogo consulta disponibilidade no PostgreSQL
+5. Serviço do Catálogo aciona API das Ticketeiras (ITickets)
+6. Confirmação → ingresso gravado no PostgreSQL
+7. Gateway publica evento de compra no RabbitMQ
+8. Consumer persiste log no MongoDB
+9. Resposta de sucesso retorna ao App
+```
+
+#### Padrões e Decisões de Projeto
+
+| Decisão | Escolha | Justificativa |
+|---|---|---|
+| Protocolo cliente–backend | REST (HTTPS) | Simplicidade, compatibilidade com React Native |
+| Autenticação | JWT + Supabase Auth | Stateless, escalável, OAuth integrado |
+| Controle de acesso | RBAC (usuario, admin) | Separação clara entre perfis de uso |
+| Banco relacional | PostgreSQL via Supabase | Dados estruturados, integridade referencial |
+| Banco de telemetria | MongoDB | Alto volume, esquema flexível, sem onerar o relacional |
+| Mensageria | RabbitMQ | Desacoplamento de eventos, resiliência a picos |
+| Motor de ML | ML.NET | Ecossistema .NET, integração nativa com os serviços SOA |
+| Containerização | Docker + Docker Compose | Portabilidade entre ambientes dev/prod |
+
 ## 8.2 Modelo de Recomendação
 _conteúdo_
 
