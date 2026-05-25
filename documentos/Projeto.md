@@ -175,6 +175,7 @@
     - [9.3.2 Resultados](#932-resultados)
   - [9.4 Testes de Integração](#94-testes-de-integração)
     - [9.4.1 Planejamento](#941-planejamento)
+      - [Abrangência dos Testes de Integração](#abrangência-dos-testes-de-integração)
     - [9.4.2 Resultados](#942-resultados)
 - [10. Procedimentos de Implantação](#10-procedimentos-de-implantação)
   - [10.1 Implantação e Configuração do Banco de Dados](#101-implantação-e-configuração-do-banco-de-dados)
@@ -3201,6 +3202,54 @@ dotnet test src/backend/services/catalogo \
 2. Confirmar que URL no campo `link_compra` passa na validação de formato `Uri.IsWellFormedUriString`
 3. Verificar header `Location` no `HEAD` da URL com regex `^https://[a-zA-Z0-9.-]+\.(sympla|blueticket|ingresso)\.com\.br`
 4. Confirmar que nenhuma chamada HTTP real foi gerada para a ticketeira nos logs de rede (exceto quando `VHS_MODE=record`)
+
+---
+
+#### Abrangência dos Testes de Integração
+
+##### O que está coberto
+
+&emsp;O planejamento cobre as **seis fronteiras de integração críticas** da arquitetura do Spotlight, escolhidas com base na análise de risco e no mapeamento dos componentes definidos no Diagrama de Componentes UML (seção 5.2). A tabela abaixo correlaciona cada fronteira com os Requisitos Funcionais e Não Funcionais que ela valida diretamente:
+
+| Fronteira | RFs Cobertos | RNFs Cobertos | Justificativa |
+|---|---|---|---|
+| IT-01: API Gateway ↔ Serviços SOA | RF01, RF02, RF04, RF05, RF06, RF07, RF16 | RNF05 (segurança JWT), RNF08 (deploy independente) | Toda a comunicação do app passa pelo Gateway; falha aqui interrompe 100% das funcionalidades |
+| IT-02: API Gateway ↔ Supabase Auth | RF01, RF02 | RNF05 (JWT, HTTPS), RNF03 (disponibilidade) | Autenticação é pré-requisito para todas as funcionalidades personalizadas; VHS garante isolamento do teste |
+| IT-03: Serviços SOA ↔ PostgreSQL | RF03, RF04, RF07, RF08, RF09, RF10, RF12, RF16 | RNF01 (tempo de carregamento), RNF06 (200 usuários) | Banco relacional é a fonte de verdade para catálogo, usuários e recomendações |
+| IT-04: Serviços SOA ↔ MongoDB | RF11, RF12, RF13, RF14 | RNF09 (processamento assíncrono), RNF07 (logs) | Telemetria comportamental alimenta o motor de ML; perda de eventos degrada a qualidade das recomendações ao longo do tempo |
+| IT-05: RabbitMQ ↔ ML Engine | RF12, RF13, RF14, RF15 | RNF09 (100 eventos/s), RNF02 (recomendações em 2 s) | Desacoplamento assíncrono é o pilar de escalabilidade; falha aqui impede a geração de recomendações personalizadas |
+| IT-06: Serviço de Catálogo ↔ Ticketeira | RF07 | RNF01, RNF03 | Redirecionamento para compra é o ponto final da conversão; VHS isola a dependência externa |
+
+&emsp;Em termos de **cobertura de requisitos**, os testes de integração planejados cobrem diretamente 15 dos 16 Requisitos Funcionais (RF01–RF15 integralmente; RF16 parcialmente via IT-01-P04) e 8 dos 12 Requisitos Não Funcionais (RNF01, RNF02, RNF03, RNF05, RNF06, RNF07, RNF08, RNF09).
+
+&emsp;Em termos de **cobertura de cenários de falha**, cada fronteira possui pelo menos 3 cenários negativos, totalizando 22 cenários de falha planejados, endereçando as categorias: indisponibilidade de serviço externo, dados inválidos, violações de constraint, tokens expirados/adulterados e expiração de cache VHS.
+
+---
+
+##### O que não está coberto e por quê
+
+| Exclusão | Justificativa |
+|---|---|
+| Testes de integração ponta a ponta (E2E) com o app mobile | Cobertos pelos Testes Funcionais (seção 9.1), que já validam o fluxo completo da UI ao banco |
+| Performance sob carga das integrações (stress/soak) | Cobertos pelos Testes de RNFs (seção 9.2), especificamente RNF06 e RNF09, com ferramentas dedicadas (k6, JMeter) |
+| Integração com o Supabase Storage (imagens dos espetáculos) | Fora do escopo do MVP: leitura de assets estáticos não representa risco de falha sistêmica para as recomendações |
+| Integração com sistemas de analytics externos | Não implementado no MVP; planejado para fase posterior |
+| Validação da interface gráfica nas integrações | Responsabilidade dos Testes de Usabilidade (seção 9.3) |
+| Integração entre frontend React Native e API Gateway em dispositivos físicos | Validado pelos Testes Funcionais (seção 9.1) e Testes de Compatibilidade (RNF11) |
+
+---
+
+##### Justificativa do uso do módulo VHS
+
+&emsp;O VHS é obrigatório nas fronteiras IT-02 e IT-06 por três razões técnicas:
+
+1. **Determinismo:** Chamadas reais ao Supabase Auth ou à API da Ticketeira retornam dados não determinísticos (tokens com `exp` variável, disponibilidade de ingressos dinâmica). O VHS garante que o mesmo cassete produza o mesmo resultado em toda execução, tornando os testes reproduzíveis em CI/CD.
+
+2. **Isolamento:** A suite de integração não deve depender de conectividade externa ou de estado de serviços de terceiros. Um teste que falha por instabilidade da rede não é um teste de integração — é um teste de infraestrutura. O VHS elimina essa dependência.
+
+3. **Velocidade:** Chamadas reais ao Supabase Auth levam entre 200 ms e 800 ms por requisição. Com o VHS em cache-hit, a latência cai para menos de 5 ms, permitindo executar a suite completa em CI em menos de 60 segundos.
+
+&emsp;Para as fronteiras internas (IT-01, IT-03, IT-04, IT-05), o VHS não é utilizado porque os serviços são instanciados via `Testcontainers` no próprio ambiente de teste, garantindo isolamento e determinismo sem a necessidade de interceptar chamadas HTTP externas.
 
 ---
 
