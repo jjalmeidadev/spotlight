@@ -2204,9 +2204,177 @@ WHERE ea.id_ator = 7;
 ---
 
 ## 4.4 Modelo Físico de Dados
-_conteúdo_
 
-**Nota:** Insira uma explicação e direcionamento para o readme.md da pasta database.
+&emsp;O modelo físico de dados descreve como a estrutura lógica definida na seção 4.3 foi concretizada em tecnologias específicas de armazenamento, incluindo tipos de dados nativos do SGBD, mecanismos de segurança em nível de linha, índices de performance, triggers e a organização dos scripts de provisionamento. A documentação técnica completa do banco, incluindo instruções de instalação, rollback e dicionário detalhado, está disponível em [`src/database/README.md`](../src/database/README.md).
+
+---
+
+### 4.4.1 Tecnologias de Persistência
+
+O Spotlight adota uma estratégia de **persistência poliglota**, utilizando dois SGBDs com responsabilidades complementares:
+
+| SGBD | Versão | Provisionamento | Responsabilidade |
+|---|---|---|---|
+| **PostgreSQL** | 15+ | Supabase (cloud ou self-hosted via Docker) | Dados transacionais e estruturados: catálogo, perfis, avaliações e recomendações processadas |
+| **MongoDB** | 7+ | Container Docker independente | Eventos de telemetria comportamental em alta volumetria (cliques, tempo de tela) |
+
+A separação é justificada pela diferença de padrão de acesso: o PostgreSQL serve consultas relacionais complexas com JOINs e filtros compostos, enquanto o MongoDB absorve escritas massivas e contínuas sem impactar o banco principal.
+
+---
+
+### 4.4.2 Scripts SQL de Provisionamento
+
+Todos os scripts estão em `src/database/` e devem ser executados na ordem indicada:
+
+| Arquivo | Função | Ordem |
+|---|---|---|
+| [`01_create_database.sql`](../src/database/01_create_database.sql) | Cria os tipos ENUM, as 10 tabelas, as políticas de RLS, os 10 índices e o trigger de integração com o Supabase Auth | 1º |
+| [`02_initial_data.sql`](../src/database/02_initial_data.sql) | Insere dados de seed (categorias, teatros, atores, espetáculos e sessões iniciais) | 2º |
+| [`03_rollback.sql`](../src/database/03_rollback.sql) | Desfaz completamente o `01_create_database.sql` — destrutivo, uso exclusivo em desenvolvimento | — |
+
+**Execução via SQL Editor do Supabase:**
+1. Acesse o Supabase Dashboard → SQL Editor → New Query
+2. Cole e execute `01_create_database.sql`
+3. Cole e execute `02_initial_data.sql`
+
+**Execução via `psql`:**
+```bash
+export PGPASSWORD=<senha>
+psql -h <host> -p <porta> -U postgres -d postgres -f src/database/01_create_database.sql
+psql -h <host> -p <porta> -U postgres -d postgres -f src/database/02_initial_data.sql
+```
+
+---
+
+### 4.4.3 Implementação Física no PostgreSQL
+
+#### Tipos Enumerados (ENUMs)
+
+Dois tipos customizados são criados antes das tabelas e utilizados como domínio restrito de valores:
+
+| Tipo | Valores | Tabela que utiliza |
+|---|---|---|
+| `tipo_usuario_enum` | `'visitante'`, `'cadastrado'`, `'administrador'` | `usuario.tipo_usuario` |
+| `status_espetaculo_enum` | `'em_cartaz'`, `'em_breve'`, `'encerrado'` | `espetaculo.status` |
+
+O uso de ENUMs em vez de `VARCHAR` com CHECK garante que o banco rejeite valores inválidos sem a necessidade de manter a lógica de validação duplicada na aplicação.
+
+#### Integração com Supabase Auth via Trigger
+
+A tabela `usuario` não armazena senhas. A autenticação é delegada integralmente ao Supabase Auth, cujo estado reside na tabela `auth.users` (schema gerenciado). A sincronização entre o cadastro de um novo usuário no Supabase Auth e a criação do perfil no schema público é feita automaticamente por um trigger:
+
+```sql
+-- Função executada após INSERT em auth.users
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+    INSERT INTO public.usuario (id_usuario, nome, email)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
+        NEW.email
+    );
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+Isso garante que toda conta criada via Supabase Auth resulte automaticamente em um perfil na tabela `usuario`, sem necessidade de chamada explícita pela aplicação.
+
+#### Row Level Security (RLS)
+
+Todas as 10 tabelas têm RLS habilitado. As políticas implementadas seguem dois padrões:
+
+| Padrão | Tabelas | Regra |
+|---|---|---|
+| **Leitura pública** | `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao`, `avaliacao` | `USING (true)` — qualquer requisição pode ler |
+| **Acesso restrito ao próprio usuário** | `usuario`, `avaliacao` (INSERT/DELETE), `recomendacao` | `USING (auth.uid() = id_usuario)` — apenas o titular acessa |
+
+O RLS é a camada de segurança de dados mais próxima do banco. Mesmo que um token com permissões elevadas chegue ao banco, as políticas garantem que cada usuário só enxerga e modifica seus próprios registros onde aplicável.
+
+#### Índices de Performance
+
+10 índices explícitos foram criados para otimizar os padrões de consulta mais frequentes da aplicação:
+
+| Índice | Tabela | Colunas | Consulta otimizada |
+|---|---|---|---|
+| `idx_espetaculo_status` | `espetaculo` | `status` | Filtrar espetáculos em cartaz |
+| `idx_espetaculo_nota_media` | `espetaculo` | `nota_media DESC` | Ranking por avaliação |
+| `idx_espetaculo_popularidade` | `espetaculo` | `popularidade DESC` | Ranking por popularidade |
+| `idx_sessao_espetaculo` | `sessao` | `id_espetaculo` | Sessões de um espetáculo |
+| `idx_sessao_data` | `sessao` | `data` | Sessões por data |
+| `idx_sessao_teatro` | `sessao` | `id_teatro` | Sessões de um teatro |
+| `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | Recomendações de um usuário |
+| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score DESC` | Top recomendações por usuário |
+| `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Avaliações de um espetáculo |
+| `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Espetáculos de um ator |
+
+Além desses, o PostgreSQL cria automaticamente índices para todas as chaves primárias e constraints UNIQUE.
+
+---
+
+### 4.4.4 Implementação Física no MongoDB
+
+O MongoDB armazena os eventos de telemetria comportamental gerados pelos usuários durante a navegação. A estrutura física é composta por uma única coleção principal:
+
+**Coleção: `interacoes`**
+
+Cada documento representa um evento de comportamento de um usuário em relação a um espetáculo:
+
+```json
+{
+  "_id": "ObjectId(...)",
+  "user_id": "uuid-do-usuario",
+  "espetaculo_id": 42,
+  "tipo_interacao": "visualizacao",
+  "timestamp": "2026-05-26T14:32:00.000Z",
+  "tempo_permanencia": 87,
+  "session_id": "sess_abc123",
+  "dispositivo": "mobile"
+}
+```
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `_id` | `ObjectId` | Sim (automático) | Identificador único gerado pelo MongoDB |
+| `user_id` | `String` (UUID) | Sim | ID do usuário — corresponde a `usuario.id_usuario` no PostgreSQL |
+| `espetaculo_id` | `Integer` | Sim | ID do espetáculo — corresponde a `espetaculo.id_espetaculo` |
+| `tipo_interacao` | `String` | Sim | Tipo do evento: `"visualizacao"`, `"clique"`, `"favorito"` |
+| `timestamp` | `Date` | Sim | Momento do evento em ISO 8601 |
+| `tempo_permanencia` | `Integer` | Não | Segundos de permanência na página do espetáculo |
+| `session_id` | `String` | Não | Identificador da sessão de navegação |
+| `dispositivo` | `String` | Não | Plataforma de origem: `"mobile"`, `"web"` |
+
+Os Workers do ML Engine consomem esta coleção em lote, calculam os scores de recomendação e escrevem os resultados processados de volta na tabela `recomendacao` do PostgreSQL, completando o ciclo de dados do sistema.
+
+---
+
+### 4.4.5 Implantação Local com Docker
+
+Para desenvolvimento local, o banco PostgreSQL é provisionado via Docker usando a imagem oficial do Supabase:
+
+```yaml
+services:
+  db:
+    image: supabase/postgres:15.1.0.147
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create.sql
+      - ./src/database/02_initial_data.sql:/docker-entrypoint-initdb.d/02_seed.sql
+```
+
+Os scripts mapeados em `docker-entrypoint-initdb.d/` são executados automaticamente na **primeira inicialização** do container, em ordem alfabética. Em reinicializações subsequentes, o volume já contém os dados e os scripts não são reexecutados.
+
+Para instruções completas de execução, variáveis de ambiente necessárias e procedimentos de rollback, consulte [`src/database/README.md`](../src/database/README.md).
 
 # 5. Solução Técnica (Design)
 _conteúdo_
