@@ -1,4 +1,4 @@
-# Guia de Padrões de Desenvolvimento - Portal Aventura
+#- Portal Aventura
 
 ## 1. Introdução
 
