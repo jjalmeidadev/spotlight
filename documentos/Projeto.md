@@ -2856,6 +2856,16 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 
 **Consulta de Geolocalização**
 
+<div align="center">
+
+### Figura X – Fluxo de Geolocalização com Google Maps Platform API
+
+![Fluxo de Geolocalização](./img/fluxo_geolocalizacao_google_maps.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
 ```
 1. Usuário autoriza compartilhamento de localização no Spotlight App
 2. App → API Gateway com requisição protegida por JWT
