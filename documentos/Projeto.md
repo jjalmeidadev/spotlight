@@ -142,6 +142,7 @@
   - [4.2 Modelo Conceitual de Dados](#42-modelo-conceitual-de-dados)
   - [4.3 Modelo Lógico de Dados](#43-modelo-lógico-de-dados)
     - [4.3.3 Dicionário de Dados](#433-dicionário-de-dados)
+    - [4.3.4 Normalização do Modelo Relacional](#434-normalização-do-modelo-relacional)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
@@ -1939,6 +1940,104 @@ Armazena os resultados gerados pelos algoritmos de Machine Learning para cada us
 | `avaliacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
 | `recomendacao` | `id_usuario` | `usuario(id_usuario)` | CASCADE DELETE |
 | `recomendacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+
+---
+
+### 4.3.4 Normalização do Modelo Relacional
+
+&emsp;A normalização é o processo de organizar as tabelas de um banco de dados relacional de forma a reduzir redundâncias, evitar anomalias de inserção, atualização e exclusão, e garantir a integridade dos dados. O modelo lógico do Spotlight foi projetado seguindo as três primeiras formas normais (1FN, 2FN e 3FN), cujas aplicações são detalhadas abaixo com exemplos reais das tabelas do projeto.
+
+---
+
+#### 4.3.4.1 Primeira Forma Normal (1FN)
+
+**Definição:** Uma tabela está na 1FN quando todos os seus atributos contêm apenas valores atômicos (indivisíveis) e não há grupos repetitivos de colunas.
+
+**Violação típica:** armazenar múltiplos valores em uma única coluna, como uma lista de categorias separada por vírgulas no campo `genero` da tabela `espetaculo`, ou um campo `elenco TEXT` com vários nomes concatenados.
+
+**Aplicação no Spotlight:**
+
+A decisão mais representativa da 1FN no projeto foi a **eliminação do campo `elenco TEXT`** da tabela `espetaculo`. Em uma modelagem sem normalização, esse campo poderia conter valores como `"João Silva, Maria Souza, Pedro Lima"` — um único atributo com múltiplos valores embutidos, violando diretamente a 1FN. A solução adotada foi criar a entidade `ator` e a tabela associativa `espetaculo_ator`, garantindo que cada célula da tabela contenha exatamente um valor atômico:
+
+| Antes (viola 1FN) | Depois (1FN atendida) |
+|---|---|
+| `espetaculo.elenco = 'João Silva, Maria Souza'` | `espetaculo_ator(id_espetaculo=1, id_ator=10, papel='Protagonista')` |
+| Não é possível filtrar por ator específico | `SELECT * FROM espetaculo_ator WHERE id_ator = 10` funciona diretamente |
+
+O mesmo raciocínio se aplica às **categorias**: em vez de armazenar `genero = 'Musical, Infantil'` na tabela `espetaculo`, foi criada a tabela associativa `espetaculo_categoria`, permitindo que cada linha represente exatamente uma relação espetáculo–categoria.
+
+Quanto ao campo `perfil_preferencias JSONB` da tabela `usuario`, sua natureza semiestruturada é intencional e justificada: preferências do usuário são dinâmicas e evoluem sem esquema fixo. O uso de `JSONB` é um padrão reconhecido no PostgreSQL para dados flexíveis, e não constitui violação da 1FN, pois o campo em si é atômico do ponto de vista da tabela relacional — o conteúdo interno é tratado como um documento opaco com estrutura gerenciada pela aplicação.
+
+---
+
+#### 4.3.4.2 Segunda Forma Normal (2FN)
+
+**Definição:** Uma tabela está na 2FN quando está na 1FN e todos os seus atributos não-chave dependem **completamente** da chave primária. A 2FN é relevante apenas para tabelas com **chave primária composta**: se algum atributo depende apenas de parte da chave, há dependência parcial, caracterizando violação da forma normal.
+
+**Violação típica:** em uma tabela com PK `(id_espetaculo, id_ator)`, incluir uma coluna `titulo_espetaculo` — que depende somente de `id_espetaculo`, não da combinação completa.
+
+**Aplicação no Spotlight:**
+
+As duas tabelas com chaves primárias compostas no projeto são `espetaculo_categoria` e `espetaculo_ator`. Ambas foram analisadas para garantir ausência de dependências parciais:
+
+**Tabela `espetaculo_ator` — PK `(id_espetaculo, id_ator)`:**
+
+| Atributo | Depende de `id_espetaculo` sozinho? | Depende de `id_ator` sozinho? | Depende da PK completa? |
+|---|---|---|---|
+| `papel` | Não — o mesmo espetáculo pode ter vários papéis | Não — o mesmo ator pode ter papéis diferentes em peças distintas | **Sim** — o papel é específico ao vínculo espetáculo+ator |
+| `ordem_exibicao` | Não | Não | **Sim** — a ordem nos créditos é específica a cada par |
+
+Nenhuma informação sobre o espetáculo (como `titulo` ou `status`) foi incluída nesta tabela. Da mesma forma, nenhuma informação sobre o ator (como `biografia`) foi duplicada aqui — ambas residem em suas respectivas tabelas de origem, eliminando qualquer dependência parcial.
+
+**Tabela `espetaculo_categoria` — PK `(id_espetaculo, id_categoria)`:**
+
+Esta tabela não possui atributos além das chaves estrangeiras que formam a PK, portanto está trivialmente na 2FN. A relação apenas registra a existência do vínculo; qualquer detalhe adicional pertence às tabelas `espetaculo` ou `categoria`.
+
+Para as demais tabelas com chaves primárias simples (`usuario`, `espetaculo`, `teatro`, `sessao`, `avaliacao`, `recomendacao`, `ator`, `categoria`), a 2FN é automaticamente satisfeita, pois chaves simples não podem gerar dependências parciais.
+
+---
+
+#### 4.3.4.3 Terceira Forma Normal (3FN)
+
+**Definição:** Uma tabela está na 3FN quando está na 2FN e nenhum atributo não-chave depende de outro atributo não-chave (ausência de **dependências transitivas**). Uma dependência transitiva ocorre quando o atributo A determina B, e B determina C — sendo C transitivamente dependente de A via B, em vez de ser diretamente dependente da chave primária.
+
+**Violação típica:** incluir `cidade_teatro` e `estado_teatro` na tabela `sessao`. Esses atributos dependeriam de `id_teatro`, não de `id_sessao`, criando uma cadeia: `id_sessao → id_teatro → cidade_teatro`.
+
+**Aplicação no Spotlight:**
+
+**Separação de `teatro` e `sessao`:**
+
+A decisão de manter `teatro` como entidade independente elimina a principal fonte potencial de dependência transitiva no projeto. Se os dados do teatro fossem desnormalizados em `sessao`, campos como `endereco`, `cidade` e `acessibilidade` dependeriam de `id_teatro` (que por sua vez depende de `id_sessao`), não da chave da sessão diretamente. Ao referenciar o teatro via FK `id_teatro`, cada atributo de localização do teatro permanece em sua tabela de origem, onde depende diretamente de `id_teatro`:
+
+```
+sessao.id_sessao → sessao.id_teatro → teatro.cidade  ← dependência transitiva se cidade estivesse em sessao
+sessao.id_sessao → sessao.id_teatro                   ← correto: apenas a FK fica em sessao
+teatro.id_teatro → teatro.cidade                      ← correto: cidade depende diretamente de id_teatro
+```
+
+**Separação de `ator` e `espetaculo_ator`:**
+
+Sem a entidade `ator`, a tabela `espetaculo_ator` poderia conter `nome_ator` e `biografia_ator` diretamente. Esses campos dependeriam de `id_ator` (não da PK composta da tabela associativa), criando dependência transitiva. A solução adotada mantém todos os atributos do ator na tabela `ator`, onde dependem diretamente de `id_ator`.
+
+**Campos `popularidade` e `nota_media` em `espetaculo`:**
+
+Esses dois campos merecem atenção especial. Na lógica estrita de normalização, `nota_media` poderia ser considerado um valor derivado das linhas de `avaliacao` — calculável a partir de `AVG(nota) WHERE id_espetaculo = X`. No entanto, a equipe optou por mantê-los desnormalizados intencionalmente, pois representam um **cache de leitura** atualizado periodicamente por Workers que processam dados do MongoDB. Essa decisão é uma **desnormalização controlada e justificada**, padrão reconhecido em sistemas de alta leitura para evitar agregações custosas em tempo real. O trade-off é explícito: aceita-se eventual inconsistência temporal (cache ligeiramente desatualizado) em troca de consultas ao catálogo extremamente rápidas sem JOINs de agregação.
+
+**Atributo `referencia_origem_id` em `recomendacao`:**
+
+Este campo armazena o ID de um documento no MongoDB que originou a recomendação. Ele não depende de nenhum outro campo não-chave da tabela `recomendacao` — depende exclusivamente da chave `id_recomendacao`. Não há, portanto, dependência transitiva.
+
+---
+
+#### Síntese
+
+| Forma Normal | Decisão de Modelagem | Exemplo no Projeto |
+|---|---|---|
+| **1FN** | Eliminação de listas e grupos repetitivos | Tabelas `ator` + `espetaculo_ator` substituem campo `elenco TEXT`; `espetaculo_categoria` substitui `genero` com múltiplos valores |
+| **2FN** | Eliminação de dependências parciais em chaves compostas | `espetaculo_ator.papel` depende do par `(id_espetaculo, id_ator)`, nunca de apenas um dos dois |
+| **3FN** | Eliminação de dependências transitivas | Dados de `teatro` (cidade, endereço) não são copiados em `sessao`; dados de `ator` não são duplicados em `espetaculo_ator` |
+
+&emsp;O modelo relacional do Spotlight atende integralmente às três primeiras formas normais nas tabelas transacionais do PostgreSQL. A única exceção deliberada — os campos de cache `popularidade` e `nota_media` em `espetaculo` — é uma desnormalização justificada por critérios de desempenho, documentada como decisão arquitetural consciente e não como descuido de modelagem.
 
 ---
 
