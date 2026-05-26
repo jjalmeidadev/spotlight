@@ -141,6 +141,7 @@
   - [4.1 Especificação da Base de Dados para Modelo de Recomendação](#41-especificação-da-base-de-dados-para-modelo-de-recomendação)
   - [4.2 Modelo Conceitual de Dados](#42-modelo-conceitual-de-dados)
   - [4.3 Modelo Lógico de Dados](#43-modelo-lógico-de-dados)
+    - [4.3.3 Dicionário de Dados](#433-dicionário-de-dados)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
@@ -1723,6 +1724,223 @@ O MongoDB, sendo um banco de dados orientado a documentos, é ideal para cargas 
 O PostgreSQL garante a consistência e a riqueza relacional do catálogo e do elenco, enquanto o MongoDB absorve o impacto da alta volumetria de eventos comportamentais.
 
 Essa separação de responsabilidades assegura que o sistema seja performático, escalável e otimizado para alimentar os algoritmos de recomendação.
+
+### 4.3.3 Dicionário de Dados
+
+&emsp;O dicionário de dados descreve em detalhe cada tabela do banco relacional PostgreSQL, especificando o tipo de dado, as restrições e o significado semântico de cada coluna. As informações são derivadas diretamente do script `src/database/01_create_database.sql` e estão alinhadas ao modelo lógico apresentado nas seções anteriores.
+
+As abreviações utilizadas nas colunas de restrição são:
+
+| Abreviação | Significado |
+|---|---|
+| PK | Primary Key — chave primária, identifica unicamente cada linha |
+| FK | Foreign Key — chave estrangeira, referencia outra tabela |
+| NN | Not Null — valor obrigatório |
+| UQ | Unique — valor único na tabela |
+| CK | Check — constraint de validação de domínio |
+| DF | Default — valor padrão quando não informado |
+
+---
+
+#### Tabela: `usuario`
+
+Armazena os dados dos usuários cadastrados na plataforma, integrada ao sistema de autenticação do Supabase Auth via chave primária. O controle de acesso a linhas é feito por Row Level Security (RLS), garantindo que cada usuário só leia e edite o próprio perfil.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_usuario` | `UUID` | PK, FK → `auth.users(id)` ON DELETE CASCADE, NN | Identificador único do usuário, espelhado do Supabase Auth. Gerado automaticamente pelo trigger `on_auth_user_created` no cadastro. |
+| `nome` | `VARCHAR(150)` | NN | Nome completo ou nome de exibição do usuário. Preenchido automaticamente pelo trigger a partir dos metadados do cadastro. |
+| `email` | `VARCHAR(255)` | NN, UQ, CK (`email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'`) | E-mail do usuário. Deve ter formato válido. Único na tabela. |
+| `data_nascimento` | `DATE` | — | Data de nascimento. Opcional; utilizada para filtros de faixa etária em recomendações. |
+| `localizacao` | `VARCHAR(150)` | — | Cidade ou região informada pelo usuário. Utilizada como sinal de contexto para recomendações baseadas em localização. |
+| `data_cadastro` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
+| `tipo_usuario` | `tipo_usuario_enum` | NN, DF `'cadastrado'` | Papel do usuário: `'visitante'`, `'cadastrado'` ou `'administrador'`. Controla o acesso a funcionalidades administrativas. |
+| `nivel_acesso` | `JSONB` | NN, DF `'{}'` | Permissões granulares em formato JSON. Permite definir capacidades específicas dentro do papel sem criar tabelas de controle adicionais. |
+| `perfil_preferencias` | `JSONB` | NN, DF `'{}'` | Preferências declaradas pelo usuário (gêneros, faixa de preço, etc.). Alimenta o motor de recomendação no cold start. |
+
+---
+
+#### Tabela: `categoria`
+
+Classifica os espetáculos por gênero ou tema. Um espetáculo pode pertencer a múltiplas categorias através da tabela associativa `espetaculo_categoria`.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_categoria` | `SERIAL` | PK, NN | Identificador único da categoria, gerado automaticamente. |
+| `nome` | `VARCHAR(100)` | NN, UQ | Nome da categoria (ex: "Musical", "Infantil", "Drama"). Único na tabela para evitar duplicidade. |
+| `descricao` | `TEXT` | — | Descrição textual do escopo da categoria. Opcional. |
+
+---
+
+#### Tabela: `ator`
+
+Representa os artistas do elenco dos espetáculos. Substituiu o campo textual `elenco` da tabela `espetaculo`, permitindo consultas estruturadas por artista e exibição ordenada dos créditos.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_ator` | `SERIAL` | PK, NN | Identificador único do ator, gerado automaticamente. |
+| `nome` | `VARCHAR(150)` | NN | Nome artístico ou completo do ator. |
+| `biografia` | `TEXT` | — | Texto descritivo com a trajetória profissional do ator. Opcional. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente. |
+
+---
+
+#### Tabela: `espetaculo`
+
+Tabela central do catálogo, armazena os metadados de cada peça teatral disponível na plataforma. Os campos `popularidade` e `nota_media` funcionam como cache de leitura, atualizados periodicamente por Workers que consomem dados do MongoDB.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `SERIAL` | PK, NN | Identificador único do espetáculo, gerado automaticamente. |
+| `titulo` | `VARCHAR(200)` | NN | Nome do espetáculo. Obrigatório. |
+| `descricao` | `TEXT` | — | Sinopse ou descrição detalhada do conteúdo. Opcional. |
+| `genero` | `VARCHAR(100)` | — | Gênero artístico principal (ex: "Musical", "Drama", "Dança"). Complementado pela relação com `categoria`. |
+| `faixa_etaria` | `VARCHAR(50)` | — | Faixa etária recomendada (ex: "Livre", "12 anos"). Exibida na interface para filtro de conteúdo. |
+| `duracao` | `INTEGER` | CK `(duracao > 0)` | Duração em minutos. Deve ser positivo quando informado. |
+| `classificacao_indicativa` | `VARCHAR(20)` | — | Classificação indicativa oficial (ex: "L", "10", "14", "18"). |
+| `produtora` | `VARCHAR(150)` | — | Nome da produtora responsável. Pode ser utilizado em filtros administrativos. |
+| `status` | `status_espetaculo_enum` | NN, DF `'em_breve'` | Situação atual: `'em_cartaz'`, `'em_breve'` ou `'encerrado'`. Indexado para filtragem rápida. |
+| `popularidade` | `NUMERIC(10,4)` | NN, DF `0` | Indicador de popularidade calculado a partir das interações no MongoDB. Cache de leitura atualizado por Workers. |
+| `nota_media` | `NUMERIC(3,2)` | NN, DF `0`, CK `BETWEEN 0 AND 5` | Média das avaliações recebidas. Valor entre 0 e 5. Cache atualizado ao registrar novas avaliações. |
+| `id_admin` | `UUID` | FK → `usuario(id_usuario)` ON DELETE SET NULL | Administrador responsável pelo cadastro e gestão do espetáculo. Nulo quando o administrador é removido. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+| `updated_at` | `TIMESTAMP` | NN, DF `NOW()` | Data da última atualização. Deve ser mantida pelo aplicativo ou por trigger ao editar. |
+
+**Índices:** `idx_espetaculo_status`, `idx_espetaculo_nota_media` (DESC), `idx_espetaculo_popularidade` (DESC).
+
+---
+
+#### Tabela: `espetaculo_categoria`
+
+Tabela associativa que implementa o relacionamento N:M entre espetáculos e categorias. Permite que uma peça seja classificada em múltiplos gêneros ou coleções temáticas.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `INTEGER` | PK (composta), FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Referência ao espetáculo. Removido em cascata se o espetáculo for excluído. |
+| `id_categoria` | `INTEGER` | PK (composta), FK → `categoria(id_categoria)` ON DELETE CASCADE, NN | Referência à categoria. Removido em cascata se a categoria for excluída. |
+
+**Chave Primária:** composta por `(id_espetaculo, id_categoria)`.
+
+---
+
+#### Tabela: `espetaculo_ator`
+
+Tabela associativa com atributos que implementa o relacionamento N:M entre espetáculos e atores. Registra o papel desempenhado e a ordem de exibição nos créditos de cada produção.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `INTEGER` | PK (composta), FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Referência ao espetáculo. Removido em cascata se o espetáculo for excluído. |
+| `id_ator` | `INTEGER` | PK (composta), FK → `ator(id_ator)` ON DELETE CASCADE, NN | Referência ao ator. Removido em cascata se o ator for excluído. |
+| `papel` | `VARCHAR(150)` | — | Personagem ou função desempenhada pelo ator no espetáculo. |
+| `ordem_exibicao` | `INTEGER` | CK `(ordem_exibicao > 0)` | Ordem do ator na listagem de créditos. Deve ser positivo quando informado. |
+
+**Chave Primária:** composta por `(id_espetaculo, id_ator)`. **Índice:** `idx_espetaculo_ator_ator` em `id_ator` para buscas por ator.
+
+---
+
+#### Tabela: `teatro`
+
+Armazena os dados dos espaços físicos onde os espetáculos são realizados.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_teatro` | `SERIAL` | PK, NN | Identificador único do teatro, gerado automaticamente. |
+| `nome` | `VARCHAR(200)` | NN | Nome oficial do teatro (pode incluir o nome do parceiro de naming rights). |
+| `endereco` | `VARCHAR(300)` | NN | Endereço completo (rua, número, bairro). |
+| `cidade` | `VARCHAR(100)` | NN | Cidade onde o teatro está localizado. Utilizada em filtros de localização. |
+| `estado` | `CHAR(2)` | NN | Sigla do estado (UF), dois caracteres (ex: "SP", "RJ"). |
+| `capacidade` | `INTEGER` | CK `(capacidade > 0)` | Número máximo de espectadores. Deve ser positivo quando informado. |
+| `acessibilidade` | `BOOLEAN` | NN, DF `FALSE` | Indica se o teatro possui recursos de acessibilidade (rampa, elevador, etc.). |
+| `parceiro_naming_rights` | `VARCHAR(200)` | — | Nome da empresa parceira vinculada ao naming rights do teatro. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+
+---
+
+#### Tabela: `sessao`
+
+Representa uma apresentação específica de um espetáculo em um teatro, em data e horário determinados. É o elo temporal e espacial do catálogo.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_sessao` | `SERIAL` | PK, NN | Identificador único da sessão, gerado automaticamente. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo ao qual a sessão pertence. Removida em cascata se o espetáculo for excluído. |
+| `id_teatro` | `INTEGER` | FK → `teatro(id_teatro)` ON DELETE RESTRICT, NN | Teatro onde a sessão ocorre. Não pode ser excluído enquanto houver sessões vinculadas. |
+| `data` | `DATE` | NN | Data da apresentação. |
+| `horario` | `TIME` | NN | Horário de início da apresentação. |
+| `preco_minimo` | `NUMERIC(10,2)` | CK `(preco_minimo >= 0)` | Menor valor de ingresso disponível. Deve ser não-negativo. |
+| `preco_maximo` | `NUMERIC(10,2)` | CK `(preco_maximo >= 0)`, CK `(preco_maximo >= preco_minimo)` | Maior valor de ingresso disponível. Deve ser maior ou igual ao preço mínimo quando ambos informados. |
+| `disponibilidade` | `INTEGER` | NN, DF `0`, CK `(disponibilidade >= 0)` | Quantidade de ingressos disponíveis. Cache atualizado por integração com a ticketeira. |
+| `link_compra` | `TEXT` | — | URL externa para compra de ingressos na plataforma parceira (Sympla, Blueticket, etc.). |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+
+**Índices:** `idx_sessao_espetaculo`, `idx_sessao_data`, `idx_sessao_teatro`.
+
+---
+
+#### Tabela: `avaliacao`
+
+Registra as notas e comentários explícitos de usuários sobre espetáculos. Cada usuário pode avaliar um espetáculo apenas uma vez (constraint UNIQUE). Os dados desta tabela alimentam o cálculo da `nota_media` em `espetaculo`.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_avaliacao` | `SERIAL` | PK, NN | Identificador único da avaliação, gerado automaticamente. |
+| `id_usuario` | `UUID` | FK → `usuario(id_usuario)` ON DELETE CASCADE, NN | Usuário que realizou a avaliação. Removida em cascata se o usuário for excluído. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo avaliado. Removida em cascata se o espetáculo for excluído. |
+| `nota` | `NUMERIC(4,2)` | NN, CK `BETWEEN 0 AND 5` | Nota atribuída pelo usuário, entre 0 e 5. |
+| `comentario` | `TEXT` | — | Comentário textual opcional do usuário sobre o espetáculo. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de registro da avaliação. |
+
+**Chave Única:** `(id_usuario, id_espetaculo)` — impede avaliações duplicadas do mesmo usuário para o mesmo espetáculo. **Índice:** `idx_avaliacao_espetaculo`.
+
+---
+
+#### Tabela: `recomendacao`
+
+Armazena os resultados gerados pelos algoritmos de Machine Learning para cada usuário. O campo `referencia_origem_id` vincula a recomendação ao evento de telemetria do MongoDB que a originou, garantindo rastreabilidade e auditabilidade do modelo.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_recomendacao` | `SERIAL` | PK, NN | Identificador único da recomendação, gerado automaticamente. |
+| `id_usuario` | `UUID` | FK → `usuario(id_usuario)` ON DELETE CASCADE, NN | Usuário para quem a recomendação foi gerada. Removida em cascata se o usuário for excluído. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo recomendado. Removida em cascata se o espetáculo for excluído. |
+| `tipo_algoritmo` | `VARCHAR(50)` | NN, CK `IN ('k-NN', 'SVD', 'k-means')` | Algoritmo utilizado para gerar a recomendação. Valores aceitos: `'k-NN'`, `'SVD'` ou `'k-means'`. |
+| `score_recomendacao` | `NUMERIC(8,6)` | NN, CK `(score_recomendacao >= 0)` | Pontuação de relevância calculada pelo algoritmo. Valor não-negativo; quanto maior, mais relevante. |
+| `motivo_recomendacao` | `TEXT` | — | Justificativa textual da recomendação exibida ao usuário (ex: "Porque você gostou de musicais"). |
+| `data_geracao` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora em que a recomendação foi gerada. |
+| `prioridade_manual` | `BOOLEAN` | NN, DF `FALSE` | Indica se um administrador sobrescreveu a prioridade gerada pelo algoritmo para fins de campanha. |
+| `referencia_origem_id` | `VARCHAR(50)` | — | ID do documento no MongoDB (`interacoes`) que serviu de gatilho para esta recomendação. Permite rastrear qual evento comportamental originou a sugestão. |
+
+**Índices:** `idx_recomendacao_usuario`, `idx_recomendacao_score` (por `id_usuario`, `score_recomendacao DESC` — otimiza a exibição das recomendações ordenadas por relevância).
+
+---
+
+#### ENUMs Customizados
+
+| Tipo | Valores | Utilização |
+|---|---|---|
+| `tipo_usuario_enum` | `'visitante'`, `'cadastrado'`, `'administrador'` | Campo `tipo_usuario` da tabela `usuario` |
+| `status_espetaculo_enum` | `'em_cartaz'`, `'em_breve'`, `'encerrado'` | Campo `status` da tabela `espetaculo` |
+
+---
+
+#### Visão Geral das Chaves Estrangeiras
+
+| Tabela | Coluna | Referencia | Comportamento |
+|---|---|---|---|
+| `usuario` | `id_usuario` | `auth.users(id)` | CASCADE DELETE |
+| `espetaculo` | `id_admin` | `usuario(id_usuario)` | SET NULL |
+| `espetaculo_categoria` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `espetaculo_categoria` | `id_categoria` | `categoria(id_categoria)` | CASCADE DELETE |
+| `espetaculo_ator` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `espetaculo_ator` | `id_ator` | `ator(id_ator)` | CASCADE DELETE |
+| `sessao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `sessao` | `id_teatro` | `teatro(id_teatro)` | RESTRICT DELETE |
+| `avaliacao` | `id_usuario` | `usuario(id_usuario)` | CASCADE DELETE |
+| `avaliacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `recomendacao` | `id_usuario` | `usuario(id_usuario)` | CASCADE DELETE |
+| `recomendacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+
+---
 
 ## 4.4 Modelo Físico de Dados
 _conteúdo_
