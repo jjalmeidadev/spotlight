@@ -143,6 +143,7 @@
   - [4.3 Modelo Lógico de Dados](#43-modelo-lógico-de-dados)
     - [4.3.3 Dicionário de Dados](#433-dicionário-de-dados)
     - [4.3.4 Normalização do Modelo Relacional](#434-normalização-do-modelo-relacional)
+    - [4.3.5 Tabelas Associativas dos Relacionamentos N:N](#435-tabelas-associativas-dos-relacionamentos-nn)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
@@ -2038,6 +2039,167 @@ Este campo armazena o ID de um documento no MongoDB que originou a recomendaçã
 | **3FN** | Eliminação de dependências transitivas | Dados de `teatro` (cidade, endereço) não são copiados em `sessao`; dados de `ator` não são duplicados em `espetaculo_ator` |
 
 &emsp;O modelo relacional do Spotlight atende integralmente às três primeiras formas normais nas tabelas transacionais do PostgreSQL. A única exceção deliberada — os campos de cache `popularidade` e `nota_media` em `espetaculo` — é uma desnormalização justificada por critérios de desempenho, documentada como decisão arquitetural consciente e não como descuido de modelagem.
+
+---
+
+### 4.3.5 Tabelas Associativas dos Relacionamentos N:N
+
+&emsp;Relacionamentos muitos-para-muitos (N:N) não podem ser representados diretamente em um banco relacional. A solução padrão é introduzir uma **tabela associativa** (também chamada de tabela de junção ou tabela pivot) que resolve o relacionamento em dois relacionamentos 1:N, um para cada entidade participante. Cada linha da tabela associativa representa exatamente uma combinação válida entre os dois lados do relacionamento.
+
+&emsp;O modelo lógico do Spotlight possui dois relacionamentos N:N, ambos implementados com tabelas associativas no PostgreSQL: `espetaculo_categoria` e `espetaculo_ator`. Ambas utilizam **chave primária composta** formada pelas duas chaves estrangeiras, garantindo que a mesma combinação não seja registrada mais de uma vez.
+
+---
+
+#### 4.3.5.1 `espetaculo_categoria`
+
+**Relacionamento representado:** Um espetáculo pode pertencer a múltiplas categorias e uma categoria pode classificar múltiplos espetáculos.
+
+**Motivação:** O campo `genero VARCHAR` da tabela `espetaculo` poderia conter apenas um gênero por espetáculo. Para que uma peça como "O Rei Leão" seja simultaneamente classificada como "Musical" e "Infantil", é necessária uma estrutura relacional separada que permita múltiplos vínculos sem repetição de linhas na tabela principal.
+
+**Estrutura:**
+
+```
+espetaculo_categoria
+┌─────────────────────┬─────────────────────┐
+│  id_espetaculo (FK) │  id_categoria (FK)  │
+│  INTEGER  NOT NULL  │  INTEGER  NOT NULL  │
+│  PK ─────────────── ┼ ─────────────── PK  │
+└──────────┬──────────┴──────────┬──────────┘
+           │                     │
+           ▼                     ▼
+    espetaculo(id_espetaculo)  categoria(id_categoria)
+```
+
+**Definição SQL:**
+
+```sql
+CREATE TABLE espetaculo_categoria (
+    id_espetaculo  INTEGER  NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    id_categoria   INTEGER  NOT NULL REFERENCES categoria(id_categoria)   ON DELETE CASCADE,
+    PRIMARY KEY (id_espetaculo, id_categoria)
+);
+```
+
+**Chave Primária Composta:** `(id_espetaculo, id_categoria)`
+A PK composta impede que o mesmo espetáculo seja vinculado à mesma categoria mais de uma vez. Inserir uma segunda linha com `(1, 3)` quando já existe `(1, 3)` resultará em violação de unicidade.
+
+**Chaves Estrangeiras e Comportamentos:**
+
+| Coluna | Referencia | ON DELETE |
+|---|---|---|
+| `id_espetaculo` | `espetaculo(id_espetaculo)` | `CASCADE` — ao excluir um espetáculo, todos os seus vínculos de categoria são removidos automaticamente |
+| `id_categoria` | `categoria(id_categoria)` | `CASCADE` — ao excluir uma categoria, todos os vínculos com espetáculos são removidos automaticamente |
+
+**Atributos adicionais:** nenhum. A tabela registra apenas a existência do vínculo; qualquer informação descritiva pertence às tabelas `espetaculo` ou `categoria`.
+
+**Exemplos de uso:**
+
+```sql
+-- Classificar um espetáculo em múltiplas categorias
+INSERT INTO espetaculo_categoria VALUES (1, 2); -- Musical
+INSERT INTO espetaculo_categoria VALUES (1, 5); -- Infantil
+
+-- Buscar todas as categorias de um espetáculo
+SELECT c.nome
+FROM categoria c
+JOIN espetaculo_categoria ec ON ec.id_categoria = c.id_categoria
+WHERE ec.id_espetaculo = 1;
+
+-- Buscar todos os espetáculos de uma categoria
+SELECT e.titulo
+FROM espetaculo e
+JOIN espetaculo_categoria ec ON ec.id_espetaculo = e.id_espetaculo
+WHERE ec.id_categoria = 2;
+```
+
+**Consistência com o modelo conceitual:** corresponde ao relacionamento "Pertence a" (N:M) entre `Espetáculo` e `Categoria` descrito na seção 4.2.3, relacionamento nº 8.
+
+---
+
+#### 4.3.5.2 `espetaculo_ator`
+
+**Relacionamento representado:** Um espetáculo conta com múltiplos atores em seu elenco e um ator pode participar de múltiplos espetáculos ao longo da carreira.
+
+**Motivação:** Além de resolver o N:N entre `espetaculo` e `ator`, esta tabela é uma **classe associativa** — ela carrega atributos próprios que descrevem o contexto específico da participação de um ator em uma determinada peça. Esses atributos (`papel` e `ordem_exibicao`) não pertencem nem ao espetáculo nem ao ator isoladamente; eles só fazem sentido no contexto da combinação dos dois.
+
+**Estrutura:**
+
+```
+espetaculo_ator
+┌─────────────────────┬─────────────────────┬──────────────┬──────────────────┐
+│  id_espetaculo (FK) │    id_ator (FK)     │    papel     │  ordem_exibicao  │
+│  INTEGER  NOT NULL  │  INTEGER  NOT NULL  │ VARCHAR(150) │     INTEGER      │
+│  PK ─────────────── ┼ ─────────────── PK  │   opcional   │   CK > 0         │
+└──────────┬──────────┴──────────┬──────────┴──────────────┴──────────────────┘
+           │                     │
+           ▼                     ▼
+    espetaculo(id_espetaculo)  ator(id_ator)
+```
+
+**Definição SQL:**
+
+```sql
+CREATE TABLE espetaculo_ator (
+    id_espetaculo  INTEGER      NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    id_ator        INTEGER      NOT NULL REFERENCES ator(id_ator)             ON DELETE CASCADE,
+    papel          VARCHAR(150),
+    ordem_exibicao INTEGER      CHECK (ordem_exibicao > 0),
+    PRIMARY KEY (id_espetaculo, id_ator)
+);
+```
+
+**Chave Primária Composta:** `(id_espetaculo, id_ator)`
+A PK composta garante que um ator apareça no elenco de um dado espetáculo no máximo uma vez. Para representar um ator em múltiplos papéis na mesma peça, a modelagem exigiria uma extensão futura com um terceiro componente na chave.
+
+**Chaves Estrangeiras e Comportamentos:**
+
+| Coluna | Referencia | ON DELETE |
+|---|---|---|
+| `id_espetaculo` | `espetaculo(id_espetaculo)` | `CASCADE` — ao excluir um espetáculo, todo o elenco vinculado é removido |
+| `id_ator` | `ator(id_ator)` | `CASCADE` — ao excluir um ator, seus vínculos com todos os espetáculos são removidos |
+
+**Atributos da classe associativa:**
+
+| Coluna | Tipo | Restrição | Descrição |
+|---|---|---|---|
+| `papel` | `VARCHAR(150)` | Opcional | Personagem ou função do ator neste espetáculo específico (ex: "Protagonista", "Simba", "Ensemble"). Varia por espetáculo — não pode residir na tabela `ator`. |
+| `ordem_exibicao` | `INTEGER` | `CHECK > 0`, opcional | Posição do ator na listagem de créditos deste espetáculo. Determina a ordem de exibição na interface. Deve ser positivo quando informado. |
+
+**Índice:** `idx_espetaculo_ator_ator` em `id_ator` — permite buscar todos os espetáculos de um ator com eficiência sem varrer a tabela inteira.
+
+**Exemplos de uso:**
+
+```sql
+-- Montar o elenco de um espetáculo ordenado pelos créditos
+SELECT a.nome, ea.papel, ea.ordem_exibicao
+FROM ator a
+JOIN espetaculo_ator ea ON ea.id_ator = a.id_ator
+WHERE ea.id_espetaculo = 1
+ORDER BY ea.ordem_exibicao;
+
+-- Buscar todos os espetáculos de um ator específico
+SELECT e.titulo, ea.papel
+FROM espetaculo e
+JOIN espetaculo_ator ea ON ea.id_espetaculo = e.id_espetaculo
+WHERE ea.id_ator = 7;
+```
+
+**Consistência com o modelo conceitual:** corresponde ao relacionamento "Atua em" (N:M) entre `Espetáculo` e `Ator` descrito na seção 4.2.3, relacionamento nº 11. A existência de atributos próprios (`papel`, `ordem_exibicao`) é exatamente o que justifica a modelagem como **classe associativa** no diagrama de classes (seção 5.1.3).
+
+---
+
+#### Comparativo entre as duas tabelas associativas
+
+| Característica | `espetaculo_categoria` | `espetaculo_ator` |
+|---|---|---|
+| **Entidades relacionadas** | `espetaculo` ↔ `categoria` | `espetaculo` ↔ `ator` |
+| **Chave primária** | `(id_espetaculo, id_categoria)` | `(id_espetaculo, id_ator)` |
+| **Atributos próprios** | Nenhum | `papel`, `ordem_exibicao` |
+| **Tipo no diagrama de classes** | Associação simples | Classe associativa |
+| **ON DELETE FK esquerda** | CASCADE | CASCADE |
+| **ON DELETE FK direita** | CASCADE | CASCADE |
+| **Índice adicional** | Nenhum | `idx_espetaculo_ator_ator` |
+| **Relacionamento no conceitual** | Nº 8 — "Pertence a" | Nº 11 — "Atua em" |
 
 ---
 
