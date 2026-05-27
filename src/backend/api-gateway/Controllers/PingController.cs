@@ -4,7 +4,7 @@ namespace Spotlight.Gateway.Controllers;
 
 /// <summary>
 /// Controller de smoke test do gateway (valida roteamento e Swagger).
-/// O roteamento real para os serviços é feito pelo YARP (T16/T18).
+/// O roteamento real para os serviços é feito pelo YARP.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]

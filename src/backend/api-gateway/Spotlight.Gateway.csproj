@@ -20,7 +20,7 @@
     <!-- Carregamento do arquivo .env -->
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
 
-    <!-- Roteamento/proxy reverso para os serviços (configuração entra no T16/T18) -->
+    <!-- Roteamento/proxy reverso para os serviços -->
     <PackageReference Include="Yarp.ReverseProxy" Version="2.2.0" />
   </ItemGroup>
 
