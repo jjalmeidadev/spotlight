@@ -2095,7 +2095,7 @@ Contém o **Spotlight App**, responsável pela interface com o usuário final e 
 
 ### Serviços Externos
 
-Engloba a infraestrutura de identidade (**Supabase Auth**) e a API das Ticketeiras, provendo dados de inventário e emissão de ingressos.
+Engloba a infraestrutura de identidade (**Supabase Auth**), a API das Ticketeiras e a **Google Maps Platform API**, utilizada para apoio à geolocalização e ao cálculo de proximidade.
 
 ### API Gateway
 
@@ -2107,6 +2107,7 @@ Camada central de processamento contendo:
 - Serviço do Usuário
 - Serviço do Catálogo
 - Serviço de Recomendação
+- Serviço de Geolocalização
 
 Cada domínio gerencia sua própria regra de negócio isoladamente.
 
@@ -2136,9 +2137,11 @@ Infraestrutura de persistência segregada por perfil de carga, contendo:
 | **Serviço de Catálogo** | Gerenciamento de domínio de espetáculos, teatros, gêneros e precificação. | ASP.NET Core Web API |
 | **Serviço de Usuário** | Gestão de perfis, preferências explícitas e histórico de consumo. | ASP.NET Core Web API |
 | **Serviço de Recomendação** | Orquestração do fluxo de sugestões, consultando predições pré-processadas pelo Motor de ML. | ASP.NET Core Web API |
+| **Serviço de Geolocalização** | Normalização de localização, consulta de proximidade e integração com a Google Maps Platform API para apoiar recomendações contextuais. | ASP.NET Core Web API |
 | **Motor de ML** | Processamento de algoritmos de filtragem colaborativa (k-NN, SVD) para geração de recomendações. | C# + ML.NET |
 | **RabbitMQ** | Message Broker dedicado ao enfileiramento de eventos assíncronos de telemetria e interações. | RabbitMQ |
 | **Supabase Auth** | Provedor de Identidade, responsável por autenticação e emissão de tokens JWT. | Supabase Auth |
+| **Google Maps Platform API** | API externa para geolocalização, rotas e cálculo de proximidade entre usuário e eventos. | Google Maps Platform |
 | **Supabase DB (PostgreSQL)** | Banco de dados relacional primário para perfis, catálogo e metadados transacionais. | PostgreSQL via Supabase |
 | **MongoDB** | Repositório de alto volume para armazenamento de logs comportamentais e eventos de telemetria brutos. | MongoDB |
 
@@ -2181,9 +2184,11 @@ O diagrama estabelece portas e interfaces estritas (conectores e receptores) ent
 | **ISpotlightAPI** | Interface de consumo central exposta ao App (REST/GraphQL). |
 | **IAuth** | Interface de comunicação direta com o Supabase Auth para delegação de credenciais. |
 | **ITickets** | Integração de saída para APIs de terceiros (Ticketeiras). |
+| **IMaps** | Integração de saída do Serviço de Geolocalização com a Google Maps Platform API. |
 | **IUserPrefs** | Contrato interno roteado pelo Gateway para o Serviço do Usuário. |
 | **ICatalog** | Contrato interno roteado pelo Gateway para o Serviço de Catálogo. |
 | **IRecommendation** | Contrato interno roteado pelo Gateway para o Serviço de Recomendação. |
+| **IGeolocation** | Contrato interno roteado pelo Gateway para o Serviço de Geolocalização. |
 | **IEvents** | Contrato de publicação de mensagens (*Producer*) em tópicos/filas do RabbitMQ. |
 | **Worker** | Interface de consumo (*Consumer*) onde o ML Engine extrai lotes de eventos do RabbitMQ continuamente e de forma desacoplada. |
 | **SQL / NoSQL** | Abstrações de conexão de persistência (EF Core / MongoDB Driver). |
@@ -2722,14 +2727,15 @@ Regras desta camada:
 
 ##### 2. Serviços Externos
 
-&emsp;Infraestrutura de identidade e de inventário de ingressos, consumidos pelo app e pelo Gateway.
+&emsp;Infraestrutura de identidade, inventário de ingressos e geolocalização, consumida pelo app, pelo Gateway e pelos serviços internos autorizados.
 
 | Componente | Tecnologia | Responsabilidade |
 |---|---|---|
 | Supabase Auth | Supabase Auth | Provedor de identidade: autenticação, emissão e validação de tokens JWT, OAuth |
 | API das Ticketeiras | API externa | Inventário de ingressos, emissão e validação |
+| Google Maps Platform API | Google Maps Platform | Geolocalização, rotas e cálculo de proximidade para recomendações contextuais |
 
-Interfaces: `IAuth` · `ITickets`
+Interfaces: `IAuth` · `ITickets` · `IMaps`
 
 ##### 3. API Gateway
 
@@ -2768,7 +2774,14 @@ Responsabilidades detalhadas:
 
 - Orquestra o fluxo de sugestões personalizadas para o usuário.
 - Consulta predições pré-processadas pelo ML Engine via interface `Worker`.
+- Consulta o Serviço de Geolocalização quando a recomendação utiliza contexto geográfico.
 - Persiste resultados no Supabase DB (PostgreSQL).
+
+**Serviço de Geolocalização (`IGeolocation`)**
+
+- Normaliza dados de localização consentidos pelo usuário.
+- Consulta a Google Maps Platform API via interface `IMaps`.
+- Retorna informações de proximidade para apoiar recomendações contextuais e geográficas.
 
 ##### 5. Infraestrutura de Processamento
 
@@ -2811,9 +2824,11 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 | `ISpotlightAPI` | App → API Gateway | Contrato REST do frontend com o backend |
 | `IAuth` | App → Supabase Auth | Autenticação e emissão de JWT |
 | `ITickets` | Gateway → API Ticketeiras | Consulta e emissão de ingressos |
+| `IMaps` | Serv. Geolocalização → Google Maps Platform API | Consulta de geolocalização, rotas e proximidade |
 | `IUserPrefs` | Gateway → Serv. Usuário | Perfis e preferências |
 | `ICatalog` | Gateway → Serv. Catálogo | Espetáculos e metadados |
 | `IRecommendation` | Gateway → Serv. Recomendação | Sugestões personalizadas |
+| `IGeolocation` | Gateway / Serv. Recomendação → Serv. Geolocalização | Contexto geográfico e proximidade |
 | `Worker` | Serv. Recomendação → ML Engine | Predições e vetores de afinidade |
 | `IEvents` | Gateway → RabbitMQ | Publicação assíncrona de eventos de telemetria |
 | `SQL` | Serviços SOA + ML Engine → PostgreSQL | Leitura/escrita relacional |
@@ -2829,12 +2844,37 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 3. Gateway valida JWT com Supabase Auth
 4. Gateway → Serviço de Recomendação (IRecommendation)
 5. Serviço de Recomendação → ML Engine (Worker): solicita predições
-6. ML Engine consulta PostgreSQL (vetores de afinidade pré-calculados)
-7. ML Engine retorna lista ranqueada ao Serviço de Recomendação
-8. Serviço de Recomendação retorna ao Gateway → App
-9. App registra interação do usuário (clique, tempo de tela)
-10. Gateway publica evento no RabbitMQ (IEvents) — assíncrono
-11. Consumer do RabbitMQ persiste evento no MongoDB
+6. Quando há localização consentida, Serviço de Recomendação → Serviço de Geolocalização (IGeolocation)
+7. Serviço de Geolocalização → Google Maps Platform API (IMaps): consulta proximidade
+8. ML Engine consulta PostgreSQL (vetores de afinidade pré-calculados)
+9. Serviço de Recomendação combina afinidade e contexto geográfico
+10. Serviço de Recomendação retorna lista ranqueada ao Gateway → App
+11. App registra interação do usuário (clique, tempo de tela)
+12. Gateway publica evento no RabbitMQ (IEvents) — assíncrono
+13. Consumer do RabbitMQ persiste evento no MongoDB
+```
+
+**Consulta de Geolocalização**
+
+<div align="center">
+
+### Figura X – Fluxo de Geolocalização com Google Maps Platform API
+
+![Fluxo de Geolocalização](./img/fluxo_geolocalizacao_google_maps.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+```
+1. Usuário autoriza compartilhamento de localização no Spotlight App
+2. App → API Gateway com requisição protegida por JWT
+3. Gateway → Serviço de Geolocalização (IGeolocation)
+4. Serviço de Geolocalização → Google Maps Platform API (IMaps)
+5. Google Maps retorna dados de localização, rotas ou proximidade
+6. Serviço de Geolocalização normaliza o retorno
+7. Serviço de Recomendação utiliza o contexto geográfico na ordenação das sugestões
+8. Gateway retorna recomendações contextuais ao App
 ```
 
 **Compra de Ingresso**
@@ -2857,6 +2897,7 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 |---|---|---|
 | Protocolo cliente–backend | REST (HTTPS) | Simplicidade, compatibilidade com React Native |
 | Autenticação | JWT + Supabase Auth | Stateless, escalável, OAuth integrado |
+| Geolocalização | Google Maps Platform API | Apoia recomendações contextuais por proximidade, sem alterar a lógica principal do ML |
 | Controle de acesso | RBAC (usuario, admin) | Separação clara entre perfis de uso |
 | Banco relacional | PostgreSQL via Supabase | Dados estruturados, integridade referencial |
 | Banco de telemetria | MongoDB | Alto volume, esquema flexível, sem onerar o relacional |
