@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
 using Serilog;
 using Spotlight.Recomendacao.Presentation.Middleware;
@@ -41,6 +42,14 @@ var healthChecks = builder.Services.AddHealthChecks();
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
     healthChecks.AddNpgSql(connectionString, name: "postgres", tags: ["ready"]);
+}
+else
+{
+    // Sem connection string o serviço NÃO está pronto para tráfego —
+    // readiness deve falhar (evita falso positivo no /health/ready).
+    healthChecks.AddCheck("postgres", () =>
+        HealthCheckResult.Unhealthy("Connection string do banco não configurada."),
+        tags: ["ready"]);
 }
 
 // ---------------------------------------------------------------------------
