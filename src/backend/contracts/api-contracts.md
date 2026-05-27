@@ -43,6 +43,14 @@ Níveis (campo `tipo_usuario`): `visitante`, `cadastrado`, `administrador`.
 | Avaliações, perfil próprio, recomendações próprias | `cadastrado` |
 | Criar/editar/excluir espetáculo | `administrador` |
 
+**401 vs 403** (vale para **todas** as rotas protegidas, não só as de admin):
+- `401 Unauthorized` → token **ausente ou inválido** (não autenticado).
+- `403 Forbidden` → token **válido**, mas o nível do usuário é **insuficiente** para a
+  rota. Ex.: um `visitante` autenticado chamando uma rota de `cadastrado`, ou um
+  `cadastrado` chamando uma rota de `administrador`.
+
+Portanto, toda rota que exige `cadastrado` ou `administrador` documenta **401 e 403**.
+
 ### 1.3 Formato
 - `Content-Type: application/json` em requests com body e em todas as responses.
 - Datas em **ISO 8601** (`date`: `YYYY-MM-DD`; `date-time`: `YYYY-MM-DDTHH:mm:ssZ`).
@@ -58,7 +66,7 @@ Query params `page` (default 1) e `pageSize` (default 20, máx 100). Resposta:
 ```
 
 ### 1.5 Padrão de erro
-Alinhado ao `ErrorHandlingMiddleware` já implementado. Toda resposta de erro segue:
+Toda resposta de erro segue este envelope:
 ```json
 {
   "error": "Mensagem legível do erro.",
@@ -76,6 +84,13 @@ Em erros de validação (400), inclui `details` por campo:
   }
 }
 ```
+
+> **Estado da implementação:** o `ErrorHandlingMiddleware` **atual** trata apenas
+> exceções **não capturadas**, retornando `500` com `error` e `traceId`. O envelope
+> acima para os demais casos (`400` com `details`, `401`, `403`, `404`, `409`)
+> é o **alvo do contrato** e **ainda precisa ser implementado** — seja estendendo o
+> middleware, seja tratando esses status nos controllers/serviços. Até lá, considere
+> este formato como especificação, não como comportamento já garantido.
 
 ### 1.6 Códigos de status usados
 | Código | Significado |
@@ -343,7 +358,8 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 { "id": 41, "nota": 4.5, "comentario": "...", "createdAt": "2026-05-26T19:00:00Z" }
 ```
 - `400` — nota fora de 0–5 (`Erro` com `details`).
-- `401` — sem token.
+- `401` — token ausente ou inválido. `Erro`.
+- `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `404` — espetáculo inexistente.
 - `409 Conflict` — usuário já avaliou este espetáculo:
 ```json
@@ -374,7 +390,8 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
   "dataCadastro": "2026-03-01T10:00:00Z"
 }
 ```
-- `401` — sem token / inválido. `Erro`.
+- `401` — token ausente ou inválido. `Erro`.
+- `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `500` — `Erro`.
 
 ---
@@ -392,7 +409,8 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 **Responses**
 - `200 OK` — perfil atualizado (mesmo schema de 4.1).
 - `400` — validação (`Erro` com `details`).
-- `401` — `Erro`.
+- `401` — token ausente ou inválido. `Erro`.
+- `403` — token válido, mas usuário sem permissão. `Erro`.
 - `500` — `Erro`.
 
 ---
@@ -406,7 +424,7 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 ```json
 { "generosFavoritos": ["Comédia", "Musical"], "categoriasFavoritas": [3, 7], "faixaPrecoMax": 150.00 }
 ```
-- `401` / `500` — `Erro`.
+- `401` — token ausente ou inválido. `403` — token válido sem permissão. `500` — `Erro`.
 
 ---
 
@@ -421,7 +439,7 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 **Responses**
 - `200 OK` — preferências atualizadas (mesmo schema).
-- `400` / `401` / `500` — `Erro`.
+- `400` — validação. `401` — token ausente/inválido. `403` — sem permissão. `500` — `Erro`.
 
 ---
 
@@ -440,7 +458,7 @@ Mapeia o campo `perfil_preferencias` (JSONB).
   "pagination": { "page": 1, "pageSize": 20, "totalItems": 8, "totalPages": 1 }
 }
 ```
-- `401` / `500` — `Erro`.
+- `401` — token ausente/inválido. `403` — sem permissão. `500` — `Erro`.
 
 ---
 
@@ -473,13 +491,21 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
   ]
 }
 ```
-- `401` — `Erro`.
+- `401` — token ausente ou inválido. `Erro`.
+- `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `500` — `Erro`.
 
 ---
 
 ### 5.2 `GET /recomendacao/espetaculos/{id}/similares`
-**Finalidade:** espetáculos similares a um dado espetáculo (item-item). Público.
+**Finalidade:** espetáculos similares a um dado espetáculo (item-item). **Público.**
+
+> **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os
+> usuários), então **não** sai da tabela `recomendacao` — essa é por-usuário e
+> protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm de uma
+> **estrutura dedicada de similaridade global**, populada em batch pelo k-NN, com
+> leitura pública. (Tabela proposta: `similaridade_item` — ver seção 6; ainda
+> **precisa ser criada** no schema do banco.)
 
 **Request**
 - Path param: `id`. Query: `limite` (default 10, máx 50).
@@ -509,7 +535,15 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 | `/catalogo/.../sessoes` | `sessao`, `teatro` |
 | `/catalogo/.../avaliacoes` | `avaliacao`, `usuario` |
 | `/usuario/me*` | `usuario` (inclui `perfil_preferencias` JSONB) |
-| `/recomendacao/*` | `recomendacao`, `espetaculo` |
+| `/recomendacao/me` | `recomendacao` (por-usuário, RLS), `espetaculo` |
+| `/recomendacao/espetaculos/{id}/similares` | `similaridade_item` (global, leitura pública — **a criar**), `espetaculo` |
+
+> **`similaridade_item` (proposta — ainda não existe no schema):** estrutura para
+> similaridade global item-item, populada em batch pelo k-NN. Campos sugeridos:
+> `id_espetaculo_origem` (FK), `id_espetaculo_similar` (FK), `score` (NUMERIC),
+> `tipo_algoritmo` (VARCHAR), com RLS de **leitura pública** (espelhando
+> `espetaculo`/`avaliacao`). A criação dessa tabela deve ser combinada com a equipe
+> de banco/ML antes de implementar a rota.
 
 ---
 
