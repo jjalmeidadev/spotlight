@@ -30,4 +30,16 @@ public class HealthEndpointsTests(WebApplicationFactory<Program> factory)
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Get_HealthReady_Returns_503_SemBanco()
+    {
+        // Sem connection string configurada (ambiente de teste), o readiness
+        // deve falhar — evita falso positivo de "pronto para tráfego".
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/health/ready");
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+    }
 }
