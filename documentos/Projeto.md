@@ -2095,7 +2095,7 @@ Contém o **Spotlight App**, responsável pela interface com o usuário final e 
 
 ### Serviços Externos
 
-Engloba a infraestrutura de identidade (**Supabase Auth**) e a API das Ticketeiras, provendo dados de inventário e emissão de ingressos.
+Engloba a infraestrutura de identidade (**Supabase Auth**), a API das Ticketeiras e a **Google Maps Platform API**, utilizada para apoio à geolocalização e ao cálculo de proximidade.
 
 ### API Gateway
 
@@ -2107,6 +2107,7 @@ Camada central de processamento contendo:
 - Serviço do Usuário
 - Serviço do Catálogo
 - Serviço de Recomendação
+- Serviço de Geolocalização
 
 Cada domínio gerencia sua própria regra de negócio isoladamente.
 
@@ -2136,9 +2137,11 @@ Infraestrutura de persistência segregada por perfil de carga, contendo:
 | **Serviço de Catálogo** | Gerenciamento de domínio de espetáculos, teatros, gêneros e precificação. | ASP.NET Core Web API |
 | **Serviço de Usuário** | Gestão de perfis, preferências explícitas e histórico de consumo. | ASP.NET Core Web API |
 | **Serviço de Recomendação** | Orquestração do fluxo de sugestões, consultando predições pré-processadas pelo Motor de ML. | ASP.NET Core Web API |
+| **Serviço de Geolocalização** | Normalização de localização, consulta de proximidade e integração com a Google Maps Platform API para apoiar recomendações contextuais. | ASP.NET Core Web API |
 | **Motor de ML** | Processamento de algoritmos de filtragem colaborativa (k-NN, SVD) para geração de recomendações. | C# + ML.NET |
 | **RabbitMQ** | Message Broker dedicado ao enfileiramento de eventos assíncronos de telemetria e interações. | RabbitMQ |
 | **Supabase Auth** | Provedor de Identidade, responsável por autenticação e emissão de tokens JWT. | Supabase Auth |
+| **Google Maps Platform API** | API externa para geolocalização, rotas e cálculo de proximidade entre usuário e eventos. | Google Maps Platform |
 | **Supabase DB (PostgreSQL)** | Banco de dados relacional primário para perfis, catálogo e metadados transacionais. | PostgreSQL via Supabase |
 | **MongoDB** | Repositório de alto volume para armazenamento de logs comportamentais e eventos de telemetria brutos. | MongoDB |
 
@@ -2181,9 +2184,11 @@ O diagrama estabelece portas e interfaces estritas (conectores e receptores) ent
 | **ISpotlightAPI** | Interface de consumo central exposta ao App (REST/GraphQL). |
 | **IAuth** | Interface de comunicação direta com o Supabase Auth para delegação de credenciais. |
 | **ITickets** | Integração de saída para APIs de terceiros (Ticketeiras). |
+| **IMaps** | Integração de saída do Serviço de Geolocalização com a Google Maps Platform API. |
 | **IUserPrefs** | Contrato interno roteado pelo Gateway para o Serviço do Usuário. |
 | **ICatalog** | Contrato interno roteado pelo Gateway para o Serviço de Catálogo. |
 | **IRecommendation** | Contrato interno roteado pelo Gateway para o Serviço de Recomendação. |
+| **IGeolocation** | Contrato interno roteado pelo Gateway para o Serviço de Geolocalização. |
 | **IEvents** | Contrato de publicação de mensagens (*Producer*) em tópicos/filas do RabbitMQ. |
 | **Worker** | Interface de consumo (*Consumer*) onde o ML Engine extrai lotes de eventos do RabbitMQ continuamente e de forma desacoplada. |
 | **SQL / NoSQL** | Abstrações de conexão de persistência (Npgsql/ADO.NET — SQL puro, sem ORM / MongoDB Driver). |
@@ -2351,8 +2356,216 @@ _conteúdo_
 ## 6.2 Justificativa das Escolhas de Implantação
 _conteúdo_
 
-## 6.3 Considerações sobre Desempenho e Segurança
-_conteúdo_
+## 6.3 Autenticação e Segurança
+
+Esta seção apresenta uma análise detalhada sobre o Supabase Auth e sua integração de forma robusta e otimizada, abordando diretamente as preocupações sobre hospedagem, infraestrutura e comparação com o Auth0, serviço de autenticação anteriormente utilizado em outro projeto do Inteli.
+
+---
+
+### 6.3.1 Supabase Auth vs. Auth0
+
+Abaixo está um comparativo focado em infraestrutura, custos e facilidade de deploy:
+
+| Critério | Auth0 | Supabase Auth |
+|---|---|---|
+| **Limite Grátis (MAUs)** | Até 7.000 ou 10.000 usuários ativos mensais (varia conforme a política recente). | Até 50.000 usuários ativos mensais. |
+| **Exigência de Domínio Pago** | Sim/Recomendado. Exige domínio customizado configurado (`auth.suaempresa.com`) para evitar bloqueio de cookies de terceiros e garantir callbacks estáveis. | Não. O Supabase fornece um subdomínio padrão gratuito (`https://xyz.supabase.co`) funcionando diretamente em produção. |
+| **Uso em Mobile (React Native)** | Exige integração com WebViews ou Browser do sistema para login social e callbacks OIDC complexos. | Permite chamadas diretas via API REST ou SDK nativo sem obrigatoriedade de Browser pop-ups. |
+| **Integração com Banco de Dados** | Dados residem nos servidores do Auth0. Sincronização exige Webhooks ou Actions. | Integração nativa com PostgreSQL. Usuários ficam na tabela `auth.users`. |
+| **Vendor Lock-in** | Alto. Exportar hashes e credenciais é complexo. | Baixo. O banco é PostgreSQL padrão e pode ser migrado livremente. |
+| **Row Level Security (RLS)** | Não possui suporte nativo. | Suporte nativo integrado ao PostgreSQL. |
+
+---
+
+### 6.3.2 Domínio no Supabase
+
+No Auth0, a dependência de um domínio customizado ocorre principalmente devido a duas restrições:
+
+#### Segurança e Cookies de Terceiros
+
+Navegadores modernos bloqueiam cookies de sites diferentes do domínio principal do app.
+
+Nesse cenário, os cookies podem ser tratados como cookies de terceiros e bloqueados.
+
+#### Redirect URIs
+
+O fluxo do Auth0 depende fortemente de redirecionamentos seguros entre domínios.
+
+---
+
+### 6.3.3 Por que no Supabase Auth + React Native isso não é um problema?
+
+#### Mobile não usa cookies
+
+Em aplicativos React Native (iOS/Android), não existe o conceito tradicional de cookies de terceiros como no navegador web.
+
+A autenticação funciona via:
+
+```http
+Authorization: Bearer <TOKEN>
+```
+
+#### Endpoints Nativos
+
+O SDK do Supabase no React Native realiza requisições HTTPS normais de autenticação para os endpoints REST do Supabase Auth. A URL base do serviço segue o padrão:
+
+```text
+https://<PROJECT_REF>.supabase.co/auth/v1
+```
+
+Os endpoints relevantes para o fluxo do Spotlight estão detalhados abaixo. Em chamadas públicas, o header `apikey` recebe a chave anônima do projeto (`SUPABASE_ANON_KEY`) e o header `Authorization` pode usar a mesma chave no formato `Bearer <SUPABASE_ANON_KEY>`. Em chamadas autenticadas, o header `Authorization` recebe o `access_token` do usuário no formato `Bearer <ACCESS_TOKEN>`.
+
+| Operação | Método e endpoint | Headers principais | Body da requisição | Exemplo de resposta |
+|---|---|---|---|---|
+| Cadastro de usuário | `POST /signup` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <SUPABASE_ANON_KEY>`<br>`Content-Type: application/json` | `{ "email": "ana@email.com", "password": "REDACTED_FOR_PUBLIC_RELEASE", "data": { "nome": "Ana" } }` | `{ "user": { "id": "uuid", "email": "ana@email.com" }, "session": { "access_token": "jwt", "refresh_token": "token" } }` |
+| Login com e-mail e senha | `POST /token?grant_type=password` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <SUPABASE_ANON_KEY>`<br>`Content-Type: application/json` | `{ "email": "ana@email.com", "password": "REDACTED_FOR_PUBLIC_RELEASE" }` | `{ "access_token": "jwt", "token_type": "bearer", "expires_in": 3600, "refresh_token": "token", "user": { "id": "uuid" } }` |
+| Renovação de sessão | `POST /token?grant_type=refresh_token` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <SUPABASE_ANON_KEY>`<br>`Content-Type: application/json` | `{ "refresh_token": "token" }` | `{ "access_token": "novo-jwt", "token_type": "bearer", "expires_in": 3600, "refresh_token": "novo-token" }` |
+| Consulta do usuário autenticado | `GET /user` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <ACCESS_TOKEN>` | Não possui body | `{ "id": "uuid", "email": "ana@email.com", "aud": "authenticated", "role": "authenticated" }` |
+| Atualização de dados do usuário | `PUT /user` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <ACCESS_TOKEN>`<br>`Content-Type: application/json` | `{ "data": { "nome": "Ana Clara" } }` | `{ "id": "uuid", "email": "ana@email.com", "user_metadata": { "nome": "Ana Clara" } }` |
+| Logout | `POST /logout` | `apikey: <SUPABASE_ANON_KEY>`<br>`Authorization: Bearer <ACCESS_TOKEN>` | Não possui body | `{}` |
+
+No backend do Spotlight, as rotas protegidas do API Gateway e dos serviços ASP.NET Core não recebem o `refresh_token`. Elas recebem apenas o JWT de acesso emitido pelo Supabase Auth:
+
+```http
+Authorization: Bearer <ACCESS_TOKEN>
+```
+
+Quando a sessão expira, o aplicativo React Native usa o `refresh_token` diretamente contra o Supabase Auth para obter um novo `access_token`, sem expor esse token de renovação aos serviços internos.
+
+Isso funciona perfeitamente em produção, independentemente do ambiente utilizado:
+
+- Aplicações publicadas na App Store
+- Aplicações publicadas na Google Play
+- Backend hospedado em VPS simples
+
+---
+
+#### Hospedagem Flexível
+
+O Supabase fornece o endpoint HTTPS de forma totalmente gratuita e gerenciada na própria infraestrutura da plataforma.
+
+Também é possível utilizar o Supabase em modo self-hosted, executando os serviços via Docker em uma VPS própria utilizando:
+
+- IP público
+- DuckDNS
+- No-IP
+- Outros serviços gratuitos de DNS dinâmico
+
+Com isso, nenhum domínio próprio pago é necessário para colocar o sistema em produção.
+
+---
+
+### 6.3.4 Como funciona o Supabase Auth na prática?
+
+O fluxo operacional no ecossistema do Spotlight funcionará conforme ilustrado abaixo.
+
+<div align="center">
+
+<sub>Figura X - Fluxo Supabase Auth</sub><br>
+
+  <img src="./img/fluxo_supabase_auth.png" width="100%" alt="Fluxo Supabase Auth"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+---
+
+### 6.3.5 Variáveis de Ambiente e Configuração
+
+As variáveis de ambiente separam configuração de código-fonte e evitam que chaves sensíveis sejam versionadas no repositório. A tabela abaixo descreve quais variáveis são necessárias, onde cada uma é consumida e como configurá-las por camada.
+
+| Variável | Camada que consome | Finalidade | Como configurar |
+|---|---|---|---|
+| `EXPO_PUBLIC_SUPABASE_URL` | React Native | URL pública do projeto Supabase, usada pelo SDK no app mobile. | Definir no `.env` do app Expo com o valor `https://<PROJECT_REF>.supabase.co`. |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | React Native | Chave pública anônima usada para chamadas públicas ao Supabase Auth e para iniciar sessões. | Definir no `.env` do app Expo. Por ser pública, pode ir para o bundle mobile, mas deve ser combinada com RLS no banco. |
+| `SUPABASE_URL` | API Gateway e serviços ASP.NET Core | URL do projeto Supabase para integrações server-side. | Definir como variável de ambiente do processo .NET ou em `appsettings.Development.json` apenas no ambiente local. |
+| `SUPABASE_JWT_SECRET` | API Gateway ASP.NET Core | Chave usada para validar localmente a assinatura dos JWTs emitidos pelo Supabase Auth. | Definir somente no backend. Em produção, armazenar no provedor de secrets da hospedagem e nunca expor ao frontend. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Serviços ASP.NET Core autorizados | Chave administrativa para operações server-side que precisam ignorar RLS em rotinas internas controladas. | Definir apenas nos serviços que realmente precisam dessa permissão. Não usar no React Native. |
+| `POSTGRES_CONNECTION_STRING` | Serviços ASP.NET Core e rotinas de migração | String de conexão com o PostgreSQL provisionado pelo Supabase. | Definir no formato `Host=<host>;Port=5432;Database=postgres;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true`. |
+| `POSTGRES_DB`, `POSTGRES_USER` e `POSTGRES_PASSWORD` | PostgreSQL local/self-hosted | Configuração do banco quando o Supabase é executado localmente ou via Docker. | Definir no arquivo `.env` usado pelo `docker compose` da infraestrutura local. |
+
+Exemplo de configuração local do React Native:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://<PROJECT_REF>.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
+```
+
+Exemplo de configuração local do API Gateway em ASP.NET Core:
+
+```env
+SUPABASE_URL=https://<PROJECT_REF>.supabase.co
+SUPABASE_JWT_SECRET=<supabase-jwt-secret>
+SUPABASE_SERVICE_ROLE_KEY=<supabase-service-role-key>
+POSTGRES_CONNECTION_STRING=Host=<host>;Port=5432;Database=postgres;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true
+```
+
+Exemplo de configuração local do PostgreSQL em ambiente self-hosted:
+
+```env
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<senha-forte>
+```
+
+A configuração em produção deve seguir três regras: o frontend recebe apenas URL pública e chave anônima; o backend recebe segredos de autenticação e conexão por meio do ambiente de execução; e o PostgreSQL recebe credenciais apenas na infraestrutura, sem exposição ao aplicativo mobile.
+
+---
+
+### 6.3.6 Componentes Chave
+
+#### Access Token (JWT)
+
+Token de curta duração (geralmente 1 hora).
+
+Contém informações codificadas e assinadas como:
+
+- ID do usuário (`sub`)
+- Email
+- Permissões (`role`)
+
+---
+
+#### Refresh Token
+
+Token de longa duração armazenado de forma segura no dispositivo.
+
+Responsável por solicitar automaticamente um novo JWT sem exigir que o usuário faça login novamente.
+
+---
+
+#### Validação Local
+
+O API Gateway em ASP.NET Core não precisa realizar requisições HTTP ao Supabase para verificar a validade do token.
+
+O processo consiste apenas em:
+
+- Decodificar o JWT
+- Validar sua assinatura criptográfica utilizando a chave secreta compartilhada (`JWT Secret`)
+
+#### Benefícios
+
+- Validação instantânea
+- Sem latência de rede
+- Menor custo operacional
+
+#### Row Level Security
+
+O Supabase expõe funções especiais diretamente no PostgreSQL, como:
+
+```sql
+auth.uid()
+```
+
+Caso o backend realize consultas "em nome do usuário" utilizando o JWT na conexão, o próprio PostgreSQL aplica automaticamente as regras de acesso.
+
+#### Benefícios do RLS
+
+- O banco impede acessos indevidos automaticamente
+- Segurança centralizada na camada de dados
+- Redução de lógica manual no backend
+- Melhor isolamento entre usuários
 
 # 7. Projeto Visual da Solução
 _conteúdo_
@@ -2370,7 +2583,327 @@ _conteúdo_
 _conteúdo_
 
 ## 8.1 Arquitetura de Codificação e Estrutura de Diretórios
-_conteúdo_
+
+&emsp;A solução foi organizada para separar a aplicação Expo do restante do ecossistema do projeto. A raiz concentra os arquivos de configuração do app e os ativos estáticos, enquanto `src/` reúne as camadas de código-fonte. Essa divisão segue dois objetivos principais: manter o frontend em uma estrutura MVVM clara e manter o backend como uma composição SOA explícita, com contratos, serviços e integração externa separados por responsabilidade.
+
+### Estrutura de diretórios
+
+```text
+g04/
+├─ app.json
+├─ babel.config.js
+├─ expo-env.d.ts
+├─ package.json
+├─ tsconfig.json
+├─ README.md
+├─ assets/
+├─ documentos/
+│  ├─ Projeto.md
+│  ├─ ProjetoVisual.md
+│  ├─ GestaoProjeto.md
+│  └─ Manual-instalacao.md
+└─ src/
+  ├─ backend/
+  │  ├─ api-gateway/
+  │  ├─ contracts/
+  │  │  ├─ dtos/
+  │  │  └─ events/
+  │  ├─ services/
+  │  │  ├─ catalogo/
+  │  │  ├─ recomendacao/
+  │  │  └─ usuario/
+  │  └─ ml-engine/
+  │     ├─ data-preparation/
+  │     ├─ inference/
+  │     └─ training/
+  ├─ frontend/
+  │  ├─ components/
+  │  ├─ screens/
+  │  ├─ viewmodels/
+  │  ├─ models/
+  │  ├─ repositories/
+  │  ├─ theme/
+  │  └─ types/
+  ├─ aad/
+  ├─ database/
+  ├─ dataset/
+  └─ models/
+```
+
+### Representação visual da arquitetura
+
+```mermaid
+flowchart TB
+  Root[Raiz do repositório] --> Expo[Configs do Expo\napp.json + babel.config.js + tsconfig.json]
+  Root --> Assets[assets/\nrecursos estáticos]
+  Root --> Docs[documentos/\nDocumentação do projeto]
+  Root --> Src[src/]
+
+  Src --> Backend[backend/\nAPI, contratos, serviços e ML]
+  Src --> Frontend[frontend/\nUI em MVVM]
+  Src --> Data[database/\ndatasets e scripts SQL]
+  Src --> Aad[aad/\nnotebooks de análise]
+  Src --> ProjectModels[models/\nmodelos e artefatos]
+
+  Backend --> Gateway[api-gateway/\nporta de entrada do backend]
+  Backend --> Contracts[contracts/\nDTOs e eventos]
+  Backend --> Services[services/\nregras de negócio]
+  Backend --> MLEngine[ml-engine/\npreparação, treino e inferência]
+
+  Contracts --> DTOs[dtos/\nmodelos de troca de dados]
+  Contracts --> Events[events/\neventos de integração]
+
+  Services --> Catalogo[catalogo/\noperações do catálogo]
+  Services --> Recomendacao[recomendacao/\nregras da recomendação]
+  Services --> Usuario[usuario/\nfluxos de usuário]
+
+  MLEngine --> Prep[data-preparation/\ntratamento de dados]
+  MLEngine --> Training[training/\nmodelagem e treino]
+  MLEngine --> Inference[inference/\nexecução de predição]
+
+  Frontend --> Screens[screens/\ntelas]
+  Frontend --> Components[components/\ncomponentes reutilizáveis]
+  Frontend --> ViewModels[viewmodels/\nregras de apresentação]
+  Frontend --> Repos[repositories/\nacesso a dados]
+  Frontend --> Theme[theme/\ncores e estilos]
+  Frontend --> FrontendModels[models/\nentidades e mocks]
+  Frontend --> Types[types/\ntipos compartilhados]
+```
+
+### Critérios de organização
+
+- `assets/` guarda imagens e recursos estáticos consumidos pelo app; isso evita misturar conteúdo visual com código e facilita manutenção do pacote do Expo.
+- `documentos/` reúne a documentação do artefato e das entregas do projeto; centralizar isso melhora rastreabilidade e revisão.
+- `src/aad/` concentra notebooks e análises exploratórias; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
+- `src/database/` contém scripts SQL de criação e carga inicial; isso torna o banco reproduzível.
+- `src/dataset/` armazena dados de apoio e amostras do projeto; separar os dados do código facilita reprocessamento e versionamento.
+- `src/models/` guarda notebooks e artefatos de modelagem; isso isola experimentos de ML do restante da aplicação.
+- `src/frontend/` concentra a interface e segue o padrão MVVM. `screens/` representam a visão, `viewmodels/` concentram a lógica de apresentação, `repositories/` isolam o acesso a dados, `components/` reaproveitam UI, `models/` guardam entidades e mocks de apoio, `types/` concentram contratos compartilhados e `theme/` padroniza cores, tipografia e estilos.
+- `src/backend/` é organizado segundo SOA. `api-gateway/` funciona como porta de entrada das requisições, `contracts/` define os contratos compartilhados, `services/` contém a regra de negócio por domínio e `ml-engine/` isola o ciclo de dados e modelo.
+- `src/backend/contracts/dtos/` define os objetos de transferência usados nas fronteiras dos serviços; `events/` registra mensagens e eventos de integração entre módulos. Essa separação evita acoplamento entre emissores e consumidores.
+- `src/backend/services/catalogo/`, `recomendacao/` e `usuario/` separam responsabilidades por domínio, reduzindo acoplamento e facilitando testes e manutenção. Em cada serviço, `application/` orquestra casos de uso, `domain/` guarda entidades e value objects, `infrastructure/` implementa persistência e integrações, e `presentation/` expõe controllers ou adaptadores de entrada.
+- `src/backend/services/*/application/dtos/` reúne os dados de entrada e saída dos casos de uso; isso protege o domínio de formatos externos.
+- `src/backend/services/*/application/usecases/` concentra as regras de aplicação; aqui fica a coordenação das operações do domínio.
+- `src/backend/services/*/domain/entities/` guarda as entidades centrais do negócio; `value-objects/` mantém valores imutáveis e validados. Essa camada é importante porque preserva as regras críticas do domínio independentemente da interface ou da persistência.
+- `src/backend/services/*/infrastructure/persistence/` implementa o acesso a dados; separar isso permite trocar a tecnologia de armazenamento sem alterar o domínio.
+- `src/backend/services/*/presentation/controllers/` expõe os pontos de entrada de cada serviço; essa camada adapta requisições externas para os casos de uso internos.
+- `src/backend/ml-engine/data-preparation/`, `training/` e `inference/` organizam o ciclo de dados e modelo de forma independente, permitindo evoluir o motor de recomendação sem misturar preparo, treino e predição.
+
+As pastas vazias preservadas com `.gitkeep` existem para manter essa estrutura visível no Git até que os arquivos reais sejam implementados.
+
+### Justificativa da arquitetura
+
+&emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o MVVM facilita a separação entre interface e regra de apresentação, deixando as telas mais simples e os comportamentos reutilizáveis em ViewModels. No backend, a abordagem SOA permite expor serviços com fronteiras claras, usar contratos estáveis entre componentes e isolar o motor de recomendação em uma camada própria de ML. Isso reduz acoplamento, melhora a testabilidade e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
+
+### 8.1.2 Arquitetura de Codificação — Spotlight
+
+&emsp;Representação visual e descritiva da arquitetura de codificação da solução, evidenciando camadas, componentes principais, fluxo de dados e responsabilidades de cada parte do sistema.
+
+<div align="center">
+
+### Figura X – Arquitetura de Codificação do Spotlight
+
+![Arquitetura de Codificação](./img/arquiteturacodificação%20.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+#### Descrição das Camadas
+
+##### 1. Camada de Apresentação
+
+&emsp;Contém o Spotlight App, responsável pela interface com o usuário final e pela captura contínua de interações (telemetria).
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| Spotlight App | React Native + TypeScript | Interface do usuário, onboarding de preferências, coleta de telemetria (cliques, tempo de tela, navegação) |
+
+Regras desta camada:
+
+- Toda comunicação com o backend passa exclusivamente pelo API Gateway via HTTPS.
+- Tokens JWT armazenados de forma segura (Keychain no iOS, Keystore no Android).
+- Estado local mínimo; dados persistentes vivem no backend.
+
+##### 2. Serviços Externos
+
+&emsp;Infraestrutura de identidade, inventário de ingressos e geolocalização, consumida pelo app, pelo Gateway e pelos serviços internos autorizados.
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| Supabase Auth | Supabase Auth | Provedor de identidade: autenticação, emissão e validação de tokens JWT, OAuth |
+| API das Ticketeiras | API externa | Inventário de ingressos, emissão e validação |
+| Google Maps Platform API | Google Maps Platform | Geolocalização, rotas e cálculo de proximidade para recomendações contextuais |
+
+Interfaces: `IAuth` · `ITickets` · `IMaps`
+
+##### 3. API Gateway
+
+&emsp;Ponto único de entrada para todas as requisições do frontend. Nenhum serviço SOA é acessível diretamente pelo app.
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| API Gateway | ASP.NET Core (.NET 9) | BFF/Gateway: roteamento, terminação SSL, validação de JWT, rate limiting, orquestração de chamadas aos serviços SOA |
+
+Interface exposta: `ISpotlightAPI`
+
+Responsabilidades detalhadas:
+
+- Valida o token emitido pelo Supabase Auth antes de rotear qualquer requisição.
+- Publica eventos de telemetria de forma assíncrona no RabbitMQ via interface `IEvents`.
+- Roteia para o serviço SOA correto com base no recurso solicitado.
+
+##### 4. Serviços de Negócio (SOA)
+
+&emsp;Cada serviço encapsula um domínio de negócio isolado. Implementados como ASP.NET Core Web APIs.
+
+**Serviço do Usuário (`IUserPrefs`)**
+
+- Gestão de perfis de usuário.
+- Preferências explícitas selecionadas na onboarding (tags e categorias).
+- Histórico de consumo (espetáculos visualizados, avaliados, favoritados).
+- Persiste no Supabase DB (PostgreSQL).
+
+**Serviço do Catálogo (`ICatalog`)**
+
+- Domínio de espetáculos: criação, edição, publicação e remoção.
+- Gestão de teatros, gêneros e precificação.
+- Persiste no Supabase DB (PostgreSQL).
+
+**Serviço de Recomendação (`IRecommendation`)**
+
+- Orquestra o fluxo de sugestões personalizadas para o usuário.
+- Consulta predições pré-processadas pelo ML Engine via interface `Worker`.
+- Consulta o Serviço de Geolocalização quando a recomendação utiliza contexto geográfico.
+- Persiste resultados no Supabase DB (PostgreSQL).
+
+**Serviço de Geolocalização (`IGeolocation`)**
+
+- Normaliza dados de localização consentidos pelo usuário.
+- Consulta a Google Maps Platform API via interface `IMaps`.
+- Retorna informações de proximidade para apoiar recomendações contextuais e geográficas.
+
+##### 5. Infraestrutura de Processamento
+
+**ML Engine**
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| ML Engine | C# + ML.NET | Algoritmos de filtragem colaborativa (k-NN, SVD), geração de vetores de afinidade, predições pré-processadas consumidas pelo Serviço de Recomendação |
+
+- Lê dados estruturados do Supabase DB (PostgreSQL) via interface SQL.
+- Componente isolado — não exposto diretamente ao Gateway.
+
+**RabbitMQ**
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| RabbitMQ | RabbitMQ | Message broker para enfileiramento de eventos assíncronos de telemetria e interações comportamentais |
+
+- Recebe eventos publicados pelo API Gateway (interface `IEvents`).
+- Descarrega o banco relacional de escritas de alto volume.
+- Eventos consumidos são persistidos no MongoDB.
+
+##### 6. Camada de Dados (Persistência Poliglota)
+
+&emsp;A arquitetura segue o princípio da persistência poliglota — tecnologia adequada ao perfil de carga de cada domínio.
+
+| Componente | Tecnologia | Responsabilidade |
+|---|---|---|
+| Supabase DB | PostgreSQL via Supabase | Banco relacional principal: perfis, catálogo, recomendações, metadados transacionais |
+| MongoDB | MongoDB | Repositório de alto volume: logs comportamentais brutos, telemetria, cliques, tempo de tela |
+
+Supabase DB é utilizado por: Serviço do Usuário, Serviço do Catálogo, Serviço de Recomendação e ML Engine (leitura via SQL).
+
+MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
+
+#### Interfaces do Sistema
+
+| Interface | Entre | Descrição |
+|---|---|---|
+| `ISpotlightAPI` | App → API Gateway | Contrato REST do frontend com o backend |
+| `IAuth` | App → Supabase Auth | Autenticação e emissão de JWT |
+| `ITickets` | Gateway → API Ticketeiras | Consulta e emissão de ingressos |
+| `IMaps` | Serv. Geolocalização → Google Maps Platform API | Consulta de geolocalização, rotas e proximidade |
+| `IUserPrefs` | Gateway → Serv. Usuário | Perfis e preferências |
+| `ICatalog` | Gateway → Serv. Catálogo | Espetáculos e metadados |
+| `IRecommendation` | Gateway → Serv. Recomendação | Sugestões personalizadas |
+| `IGeolocation` | Gateway / Serv. Recomendação → Serv. Geolocalização | Contexto geográfico e proximidade |
+| `Worker` | Serv. Recomendação → ML Engine | Predições e vetores de afinidade |
+| `IEvents` | Gateway → RabbitMQ | Publicação assíncrona de eventos de telemetria |
+| `SQL` | Serviços SOA + ML Engine → PostgreSQL | Leitura/escrita relacional |
+| `NoSQL` | RabbitMQ consumer → MongoDB | Ingestão de telemetria bruta |
+
+#### Fluxo de Dados — Exemplos
+
+**Busca de Recomendações**
+
+```
+1. Usuário abre tela de descoberta no Spotlight App
+2. App → HTTPS GET /recomendacoes → API Gateway (ISpotlightAPI)
+3. Gateway valida JWT com Supabase Auth
+4. Gateway → Serviço de Recomendação (IRecommendation)
+5. Serviço de Recomendação → ML Engine (Worker): solicita predições
+6. Quando há localização consentida, Serviço de Recomendação → Serviço de Geolocalização (IGeolocation)
+7. Serviço de Geolocalização → Google Maps Platform API (IMaps): consulta proximidade
+8. ML Engine consulta PostgreSQL (vetores de afinidade pré-calculados)
+9. Serviço de Recomendação combina afinidade e contexto geográfico
+10. Serviço de Recomendação retorna lista ranqueada ao Gateway → App
+11. App registra interação do usuário (clique, tempo de tela)
+12. Gateway publica evento no RabbitMQ (IEvents) — assíncrono
+13. Consumer do RabbitMQ persiste evento no MongoDB
+```
+
+**Consulta de Geolocalização**
+
+<div align="center">
+
+### Figura X – Fluxo de Geolocalização com Google Maps Platform API
+
+![Fluxo de Geolocalização](./img/fluxo_geolocalizacao_google_maps.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+```
+1. Usuário autoriza compartilhamento de localização no Spotlight App
+2. App → API Gateway com requisição protegida por JWT
+3. Gateway → Serviço de Geolocalização (IGeolocation)
+4. Serviço de Geolocalização → Google Maps Platform API (IMaps)
+5. Google Maps retorna dados de localização, rotas ou proximidade
+6. Serviço de Geolocalização normaliza o retorno
+7. Serviço de Recomendação utiliza o contexto geográfico na ordenação das sugestões
+8. Gateway retorna recomendações contextuais ao App
+```
+
+**Compra de Ingresso**
+
+```
+1. Usuário seleciona sessão e clica em "Comprar"
+2. App → HTTPS POST /ingressos → API Gateway
+3. Gateway valida JWT → roteia para Serviço do Catálogo
+4. Serviço do Catálogo consulta disponibilidade no PostgreSQL
+5. Serviço do Catálogo aciona API das Ticketeiras (ITickets)
+6. Confirmação → ingresso gravado no PostgreSQL
+7. Gateway publica evento de compra no RabbitMQ
+8. Consumer persiste log no MongoDB
+9. Resposta de sucesso retorna ao App
+```
+
+#### Padrões e Decisões de Projeto
+
+| Decisão | Escolha | Justificativa |
+|---|---|---|
+| Protocolo cliente–backend | REST (HTTPS) | Simplicidade, compatibilidade com React Native |
+| Autenticação | JWT + Supabase Auth | Stateless, escalável, OAuth integrado |
+| Geolocalização | Google Maps Platform API | Apoia recomendações contextuais por proximidade, sem alterar a lógica principal do ML |
+| Controle de acesso | RBAC (usuario, admin) | Separação clara entre perfis de uso |
+| Banco relacional | PostgreSQL via Supabase | Dados estruturados, integridade referencial |
+| Banco de telemetria | MongoDB | Alto volume, esquema flexível, sem onerar o relacional |
+| Mensageria | RabbitMQ | Desacoplamento de eventos, resiliência a picos |
+| Motor de ML | ML.NET | Ecossistema .NET, integração nativa com os serviços SOA |
+| Containerização | Docker + Docker Compose | Portabilidade entre ambientes dev/prod |
 
 ## 8.2 Modelo de Recomendação
 _conteúdo_
