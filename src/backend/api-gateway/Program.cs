@@ -32,7 +32,7 @@ builder.Services.AddCors(options =>
 // ---------------------------------------------------------------------------
 // Reverse proxy (YARP) — roteamento para os serviços de negócio.
 // As rotas/clusters são lidos da seção "ReverseProxy" do appsettings; a
-// configuração real (destinos, validação de JWT, rate limiting) entra no T16/T18.
+// configuração real (destinos, validação de JWT, rate limiting) entra posteriormente.
 // ---------------------------------------------------------------------------
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
@@ -44,7 +44,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Spotlight — API Gateway",
         Version = "v1",
-        Description = "Ponto único de entrada: roteamento para os serviços e validação de JWT (T16/T18)."
+        Description = "Ponto único de entrada: roteamento para os serviços e validação de JWT."
     }));
 
 var app = builder.Build();
