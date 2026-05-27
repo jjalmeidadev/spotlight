@@ -4,7 +4,7 @@ namespace Spotlight.Catalogo.Presentation.Controllers;
 
 /// <summary>
 /// Controller de smoke test do serviço de catálogo (valida roteamento e Swagger).
-/// As rotas reais de negócio (espetáculos, teatros, gêneros) entram no T16.
+/// As rotas reais de negócio (espetáculos, teatros, gêneros) entram depois.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
