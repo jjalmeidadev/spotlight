@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.Json;
 
-namespace Spotlight.Api.Middleware;
+namespace Spotlight.Gateway.Middleware;
 
 /// <summary>
 /// Captura exceções não tratadas e devolve uma resposta JSON padronizada,

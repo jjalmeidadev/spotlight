@@ -2,7 +2,7 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Npgsql;
 using Serilog;
-using Spotlight.Api.Middleware;
+using Spotlight.Catalogo.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
 // TraversePath() procura o .env subindo a árvore de diretórios.
@@ -23,8 +23,8 @@ builder.Host.UseSerilog((context, configuration) =>
 // Configuração / variáveis de ambiente
 // ---------------------------------------------------------------------------
 // A connection string vem de DATABASE_CONNECTION_STRING (.env) e, na ausência
-// dela, do appsettings.json. Mantemos string vazia como fallback para que a
-// aplicação suba mesmo sem banco configurado (a checagem real fica no
+// dela, do appsettings.json. Mantemos string vazia como fallback para que o
+// serviço suba mesmo sem banco configurado (a checagem real fica no
 // endpoint /health/ready).
 var connectionString =
     Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
@@ -32,11 +32,11 @@ var connectionString =
     ?? string.Empty;
 
 // ---------------------------------------------------------------------------
-// Banco de dados (Npgsql / ADO.NET — sem ORM — PostgreSQL/Supabase do T1/T6)
+// Banco de dados (Npgsql / ADO.NET — sem ORM — PostgreSQL/Supabase)
 // Registramos um NpgsqlDataSource (singleton, thread-safe, com pool de conexões)
-// que os repositórios do T16 injetam para abrir conexões e executar SQL puro.
-// Só é registrado quando há connection string, para a API subir mesmo sem banco
-// configurado (ex.: testes) — a checagem real fica no /health/ready.
+// que os repositórios de infrastructure/persistence injetam para executar SQL puro.
+// Só é registrado quando há connection string, para o serviço subir mesmo sem
+// banco configurado (ex.: testes) — a checagem real fica no /health/ready.
 // ---------------------------------------------------------------------------
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
@@ -45,9 +45,6 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 
 // ---------------------------------------------------------------------------
 // Health checks: liveness (sempre 200) + readiness (checa o Postgres)
-// O check do Postgres só é registrado quando há connection string — assim a
-// API sobe mesmo sem banco configurado (ex.: testes), e /health/ready apenas
-// não terá o check "ready" nesse caso.
 // ---------------------------------------------------------------------------
 var healthChecks = builder.Services.AddHealthChecks();
 if (!string.IsNullOrWhiteSpace(connectionString))
@@ -71,9 +68,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new()
     {
-        Title = "Spotlight API",
+        Title = "Spotlight — Serviço de Catálogo",
         Version = "v1",
-        Description = "Backend do sistema de recomendação Spotlight (Portal Aventura)."
+        Description = "Gerenciamento de espetáculos, teatros, gêneros e precificação."
     }));
 
 var app = builder.Build();

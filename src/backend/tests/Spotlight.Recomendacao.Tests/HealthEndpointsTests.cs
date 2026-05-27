@@ -2,11 +2,11 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
-namespace Spotlight.Api.Tests;
+namespace Spotlight.Recomendacao.Tests;
 
 /// <summary>
-/// Testes de integração do esqueleto: garantem que a API sobe e que o
-/// endpoint de liveness responde 200 sem depender de um banco real.
+/// Testes de integração do esqueleto do serviço de recomendação: garantem que o
+/// serviço sobe e que os endpoints respondem sem depender de um banco real.
 /// </summary>
 public class HealthEndpointsTests(WebApplicationFactory<Program> factory)
     : IClassFixture<WebApplicationFactory<Program>>
