@@ -1803,7 +1803,7 @@ Tabela central do catálogo, armazena os metadados de cada peça teatral dispon�
 | `produtora` | `VARCHAR(150)` | — | Nome da produtora responsável. Pode ser utilizado em filtros administrativos. |
 | `status` | `status_espetaculo_enum` | NN, DF `'em_breve'` | Situação atual: `'em_cartaz'`, `'em_breve'` ou `'encerrado'`. Indexado para filtragem rápida. |
 | `popularidade` | `NUMERIC(10,4)` | NN, DF `0` | Indicador de popularidade calculado a partir das interações no MongoDB. Cache de leitura atualizado por Workers. |
-| `nota_media` | `NUMERIC(3,2)` | NN, DF `0`, CK `BETWEEN 0 AND 5` | Média das avaliações recebidas. Valor entre 0 e 5. Cache atualizado ao registrar novas avaliações. |
+| `nota_media` | `NUMERIC(4,2)` | NN, DF `0`, CK `BETWEEN 0 AND 5` | Média das avaliações recebidas. Valor entre 0 e 5. Cache atualizado ao registrar novas avaliações. |
 | `id_admin` | `UUID` | FK → `usuario(id_usuario)` ON DELETE SET NULL | Administrador responsável pelo cadastro e gestão do espetáculo. Nulo quando o administrador é removido. |
 | `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
 | `updated_at` | `TIMESTAMP` | NN, DF `NOW()` | Data da última atualização. Deve ser mantida pelo aplicativo ou por trigger ao editar. |
@@ -2027,6 +2027,10 @@ Esses dois campos merecem atenção especial. Na lógica estrita de normalizaç�
 **Atributo `referencia_origem_id` em `recomendacao`:**
 
 Este campo armazena o ID de um documento no MongoDB que originou a recomendação. Ele não depende de nenhum outro campo não-chave da tabela `recomendacao` — depende exclusivamente da chave `id_recomendacao`. Não há, portanto, dependência transitiva.
+
+**Campo `tipo_algoritmo` em `recomendacao`:**
+
+Este campo usa `VARCHAR(50)` com `CHECK IN ('k-NN', 'SVD', 'k-means')` em vez de um tipo ENUM customizado, seguindo padrão diferente dos campos `tipo_usuario` e `status_espetaculo`. A decisão é intencional: algoritmos de recomendação têm ciclo de atualização frequente ao longo do projeto, e adicionar um novo valor a um ENUM em PostgreSQL exige uma migration `ALTER TYPE`, operação que bloqueia a tabela brevemente. O `VARCHAR+CHECK` permite estender os valores aceitos com um simples `ALTER TABLE ... DROP CONSTRAINT ... / ADD CONSTRAINT ...`, sem impacto em produção. O trade-off aceito é a perda da garantia semântica de tipo nativo do banco.
 
 ---
 
@@ -2309,7 +2313,7 @@ O RLS é a camada de segurança de dados mais próxima do banco. Mesmo que um to
 | `idx_sessao_data` | `sessao` | `data` | Sessões por data |
 | `idx_sessao_teatro` | `sessao` | `id_teatro` | Sessões de um teatro |
 | `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | Recomendações de um usuário |
-| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score DESC` | Top recomendações por usuário |
+| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | Top recomendações por usuário |
 | `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Avaliações de um espetáculo |
 | `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Espetáculos de um ator |
 
