@@ -1,8 +1,7 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Serilog;
-using Spotlight.Api.Data;
 using Spotlight.Api.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
@@ -33,10 +32,16 @@ var connectionString =
     ?? string.Empty;
 
 // ---------------------------------------------------------------------------
-// Banco de dados (EF Core + PostgreSQL / Supabase — banco do T1/T6)
+// Banco de dados (Npgsql / ADO.NET — sem ORM — PostgreSQL/Supabase do T1/T6)
+// Registramos um NpgsqlDataSource (singleton, thread-safe, com pool de conexões)
+// que os repositórios do T16 injetam para abrir conexões e executar SQL puro.
+// Só é registrado quando há connection string, para a API subir mesmo sem banco
+// configurado (ex.: testes) — a checagem real fica no /health/ready.
 // ---------------------------------------------------------------------------
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
+}
 
 // ---------------------------------------------------------------------------
 // Health checks: liveness (sempre 200) + readiness (checa o Postgres)

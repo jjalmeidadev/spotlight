@@ -3,7 +3,7 @@
 Esqueleto do backend do sistema de recomendação **Spotlight**, pronto para
 receber as features do T16. Stack conforme a arquitetura documentada em
 `documentos/Projeto.md` (seção 5.2): **ASP.NET Core (.NET 9)** + **PostgreSQL
-(Supabase)**.
+(Supabase)**, com acesso a dados em **SQL puro via Npgsql (sem ORM)**.
 
 ## O que já vem montado
 
@@ -11,7 +11,7 @@ receber as features do T16. Stack conforme a arquitetura documentada em
 |---|---|
 | Inicialização ASP.NET Core (.NET 9) | `src/Spotlight.Api/Program.cs` |
 | Variáveis de ambiente (`.env`) | `.env.example` + `DotNetEnv` |
-| Conexão com o banco (EF Core + Npgsql) | `src/Spotlight.Api/Data/AppDbContext.cs` |
+| Conexão com o banco (Npgsql / ADO.NET, sem ORM) | `Program.cs` (`NpgsqlDataSource`) + `src/Spotlight.Api/Data/README.md` |
 | Logger (Serilog) | `Program.cs` (`UseSerilog`) |
 | Middlewares: CORS, error handler, request logging | `Program.cs` + `Middleware/ErrorHandlingMiddleware.cs` |
 | Health check `GET /health` | `Program.cs` |
@@ -32,7 +32,7 @@ src/backend/
 │       ├── appsettings.json
 │       ├── appsettings.Development.json
 │       ├── Controllers/PingController.cs
-│       ├── Data/AppDbContext.cs
+│       ├── Data/README.md                # padrão de repositório (SQL puro)
 │       ├── Middleware/ErrorHandlingMiddleware.cs
 │       └── Properties/launchSettings.json
 └── tests/
@@ -100,8 +100,8 @@ dotnet test
 - **`/health` x `/health/ready`** — `/health` é *liveness* (a API está de pé) e
   não toca no banco; `/health/ready` é *readiness* e só retorna 200 quando o
   Postgres responde. Isso garante que a API suba mesmo com o banco indisponível.
-- **Entidades e rotas de negócio** (catálogo, usuário, recomendação) e as
-  migrations do EF Core entram no **T16**. O `AppDbContext` está vazio de
-  propósito.
+- **Entidades, repositórios e rotas de negócio** (catálogo, usuário,
+  recomendação) entram no **T16**. O acesso ao banco é **sem ORM** — repositórios
+  com SQL puro via Npgsql; veja o padrão em `src/Spotlight.Api/Data/README.md`.
 - **Swagger documentado** propriamente (descrições, exemplos) é o **T18**; aqui
   fica apenas o setup.

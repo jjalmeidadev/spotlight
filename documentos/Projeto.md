@@ -2186,7 +2186,7 @@ O diagrama estabelece portas e interfaces estritas (conectores e receptores) ent
 | **IRecommendation** | Contrato interno roteado pelo Gateway para o Serviço de Recomendação. |
 | **IEvents** | Contrato de publicação de mensagens (*Producer*) em tópicos/filas do RabbitMQ. |
 | **Worker** | Interface de consumo (*Consumer*) onde o ML Engine extrai lotes de eventos do RabbitMQ continuamente e de forma desacoplada. |
-| **SQL / NoSQL** | Abstrações de conexão de persistência (EF Core / MongoDB Driver). |
+| **SQL / NoSQL** | Abstrações de conexão de persistência (Npgsql/ADO.NET — SQL puro, sem ORM / MongoDB Driver). |
 
 ---
 
