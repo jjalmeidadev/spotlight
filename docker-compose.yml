@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: spotlight-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - spotlight_db_data:/var/lib/postgresql/data
+      - ./src/database/00_supabase_compat.sql:/docker-entrypoint-initdb.d/00_supabase_compat.sql:ro
+      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create_database.sql:ro
+      - ./src/database/02_initial_data.sql:/docker-entrypoint-initdb.d/02_initial_data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - spotlight_network
+
+volumes:
+  spotlight_db_data:
+
+networks:
+  spotlight_network:
+    driver: bridge
