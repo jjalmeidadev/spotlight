@@ -5,20 +5,42 @@ import { colors, spacing, typography } from '@/frontend/theme';
 type ChipProps = PressableProps & {
   label: string;
   active?: boolean;
+  tone?: 'light' | 'dark';
 };
 
-export function Chip({ label, active = false, ...props }: ChipProps) {
+export function Chip({ label, active = false, tone = 'light', ...props }: ChipProps) {
+  const isDarkTone = tone === 'dark';
+
   return (
     <Pressable
       accessibilityRole="button"
       style={({ pressed }) => [
         styles.base,
-        active ? styles.active : styles.inactive,
+        isDarkTone
+          ? active
+            ? styles.darkActive
+            : styles.darkInactive
+          : active
+            ? styles.lightActive
+            : styles.lightInactive,
         pressed && styles.pressed,
       ]}
       {...props}
     >
-      <Text style={[styles.label, active ? styles.activeLabel : styles.inactiveLabel]}>{label}</Text>
+      <Text
+        style={[
+          styles.label,
+          isDarkTone
+            ? active
+              ? styles.darkActiveLabel
+              : styles.darkInactiveLabel
+            : active
+              ? styles.lightActiveLabel
+              : styles.lightInactiveLabel,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -32,15 +54,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  active: {
+  lightActive: {
     backgroundColor: colors.text,
     borderWidth: 1,
     borderColor: colors.text,
   },
-  inactive: {
+  lightInactive: {
     backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.borderSoft,
+  },
+  darkActive: {
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.background,
+  },
+  darkInactive: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.textStrong,
   },
   pressed: {
     opacity: 0.85,
@@ -48,10 +80,16 @@ const styles = StyleSheet.create({
   label: {
     ...typography.chip,
   },
-  activeLabel: {
+  lightActiveLabel: {
     color: colors.background,
   },
-  inactiveLabel: {
+  lightInactiveLabel: {
     color: colors.text,
+  },
+  darkActiveLabel: {
+    color: colors.text,
+  },
+  darkInactiveLabel: {
+    color: colors.textStrong,
   },
 });
