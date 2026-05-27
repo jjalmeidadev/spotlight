@@ -4,7 +4,7 @@ namespace Spotlight.Recomendacao.Presentation.Controllers;
 
 /// <summary>
 /// Controller de smoke test do serviço de recomendação (valida roteamento e Swagger).
-/// As rotas reais de negócio (sugestões, ranking) entram no T16.
+/// As rotas reais de negócio (sugestões, ranking) entram depois.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]

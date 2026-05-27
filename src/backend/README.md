@@ -1,7 +1,7 @@
-# Spotlight — Backend (T15)
+# Spotlight — Backend
 
 Estrutura base do backend do sistema de recomendação **Spotlight**, pronta para
-receber as features do T16. Segue a arquitetura **SOA** documentada em
+receber as features de negócio. Segue a arquitetura **SOA** documentada em
 `documentos/Projeto.md` (seção 5.2/5.3): **ASP.NET Core (.NET 9)** + **PostgreSQL
 (Supabase)**, com acesso a dados em **SQL puro via Npgsql (sem ORM)**.
 
@@ -14,7 +14,7 @@ se for chamado diretamente (sem passar pelo gateway), continua funcionando.
 
 | Projeto | Pasta | Porta | Responsabilidade |
 |---|---|---|---|
-| **Spotlight.Gateway** | `api-gateway/` | 5000 | Ponto único de entrada; roteia para os serviços (YARP) e validará JWT (T16/T18) |
+| **Spotlight.Gateway** | `api-gateway/` | 5000 | Ponto único de entrada; roteia para os serviços (YARP) e validará JWT |
 | **Spotlight.Catalogo** | `services/catalogo/` | 5001 | Espetáculos, teatros, gêneros e precificação |
 | **Spotlight.Usuario** | `services/usuario/` | 5002 | Perfis, preferências declaradas e histórico |
 | **Spotlight.Recomendacao** | `services/recomendacao/` | 5003 | Orquestra sugestões consultando o Motor de ML |
@@ -53,14 +53,14 @@ src/backend/
 │   ├── catalogo/                     # Spotlight.Catalogo (porta 5001)
 │   │   ├── Spotlight.Catalogo.csproj
 │   │   ├── Program.cs
-│   │   ├── application/{dtos,usecases}/        # DTOs e Services (T16)
-│   │   ├── domain/{entities,value-objects}/    # Models do domínio (T16)
-│   │   ├── infrastructure/persistence/         # Repositórios SQL puro (T16)
+│   │   ├── application/{dtos,usecases}/        # DTOs e Services
+│   │   ├── domain/{entities,value-objects}/    # Models do domínio
+│   │   ├── infrastructure/persistence/         # Repositórios SQL puro
 │   │   └── presentation/{controllers,middleware}/
 │   ├── usuario/                      # Spotlight.Usuario (porta 5002) — mesma estrutura
 │   └── recomendacao/                 # Spotlight.Recomendacao (porta 5003) — mesma estrutura
 ├── ml-engine/                        # Motor de ML (fora do escopo do backend de APIs)
-├── contracts/{dtos,events}/          # Contratos de API/eventos (T17)
+├── contracts/{dtos,events}/          # Contratos de API/eventos
 └── tests/
     ├── Spotlight.Gateway.Tests/
     ├── Spotlight.Catalogo.Tests/
@@ -71,7 +71,7 @@ src/backend/
 ## Pré-requisitos
 
 - [.NET SDK 9.0+](https://dotnet.microsoft.com/download)
-- Acesso ao PostgreSQL/Supabase do projeto (T1/T6)
+- Acesso ao PostgreSQL/Supabase do projeto
 
 > **No WSL/Windows:** o repositório fica no sistema de arquivos do Windows
 > (`/mnt/c/...`). Use o `dotnet` do Windows — no WSL chame `dotnet.exe`.
@@ -157,8 +157,8 @@ Registre cada repositório no `Program.cs` com
   não toca no banco; `/health/ready` é *readiness* e só retorna 200 quando o
   Postgres responde. Isso garante que o serviço suba mesmo com o banco indisponível.
 - **Entidades, repositórios e rotas de negócio** (catálogo, usuário, recomendação)
-  entram no **T16**, preenchendo as pastas `application`/`domain`/`infrastructure`/
-  `presentation` de cada serviço.
-- **Contratos de API** (entrada/saída) são o **T17** e ficam em `contracts/`.
-- **Swagger documentado** propriamente (descrições, exemplos) é o **T18**; aqui
+  serão implementadas depois, preenchendo as pastas `application`/`domain`/
+  `infrastructure`/`presentation` de cada serviço.
+- **Contratos de API** (entrada/saída) ficam em `contracts/`.
+- **Swagger documentado** propriamente (descrições, exemplos) virá depois; aqui
   fica apenas o setup.

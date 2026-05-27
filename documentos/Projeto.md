@@ -2957,6 +2957,8 @@ O **ASP.NET Core Web API** foi escolhido por ser o framework mais maduro do ecos
 
 Um **API Gateway** centraliza o roteamento entre os três serviços, valida o JWT emitido pelo Supabase Auth e aplica rate limiting.
 
+> **Contratos de API:** a especificação completa das rotas — método, path, finalidade, schemas de request/response por status code e exemplos de payload em JSON — está em [`src/backend/contracts/api-contracts.md`](../src/backend/contracts/api-contracts.md). Esse documento é a **fonte da verdade** para a implementação das features do backend e para a documentação Swagger.
+
 ### 5.3.4 Frontend: React Native + TypeScript
 
 O React Native foi adotado como framework de desenvolvimento mobile por permitir base de código única para Android e iOS, reduzindo o esforço de manutenção sem abrir mão de performance nativa. 
