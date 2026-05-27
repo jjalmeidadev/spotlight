@@ -4,6 +4,12 @@ Especificação das rotas que serão implementadas no backend, servindo como
 **fonte da verdade** para o desenvolvimento, para o Swagger  e para o
 frontend. Baseado no modelo de dados em `src/database/01_create_database.sql`.
 
+> **Versão legível por máquina:** estes contratos também estão formalizados em
+> [`openapi.json`](./openapi.json) (OpenAPI 3.0.3), que pode ser carregado no
+> Swagger UI / Redoc e usado para validação e geração de clientes. Este `.md` é a
+> referência narrativa; o `openapi.json` é o artefato consumível. Ao alterar um,
+> atualize o outro.
+
 > **Status:**
 > As convenções abaixo (envelope de resposta, erros, paginação, autenticação)
 > precisam ser ratificadas pela equipe antes do início da implementação.
