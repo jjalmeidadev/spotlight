@@ -347,6 +347,17 @@ docker compose down -v
 docker compose up -d db
 ```
 
+### 6.7 Conclusão da implantação
+
+Ao final da implantação, o ambiente estará pronto quando:
+
+- o PostgreSQL/Supabase estiver acessível pelo Supabase SQL Editor, DBeaver, `psql` ou container Docker;
+- o script `01_create_database.sql` tiver criado as 10 tabelas do schema `public`;
+- o script `02_initial_data.sql` tiver populado os dados iniciais sem erros de integridade referencial;
+- as consultas de validação retornarem registros em `usuario`, `espetaculo` e `sessao`.
+
+Com esses passos concluídos, o banco estará apto para uso pelo frontend, API Gateway, serviços SOA e rotinas de recomendação em ambiente de desenvolvimento, homologação ou implantação no servidor Inteli.
+
 ---
 
 ## Dicionário de Dados
