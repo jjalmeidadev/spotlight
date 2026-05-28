@@ -14,6 +14,9 @@
     <!-- Banco relacional (PostgreSQL / Supabase) via Npgsql / ADO.NET — sem ORM -->
     <PackageReference Include="Npgsql" Version="9.0.2" />
 
+    <!-- Autenticação JWT (Supabase emite tokens HS256) -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
+
     <!-- Health checks com checagem do Postgres -->
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
 
