@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
 using Serilog;
+using Spotlight.Usuario.Application.UseCases;
+using Spotlight.Usuario.Infrastructure.Auth;
+using Spotlight.Usuario.Infrastructure.Persistence;
 using Spotlight.Usuario.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
@@ -33,7 +36,25 @@ var connectionString =
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
     builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
+
+    // Repositórios (SQL puro Npgsql) — só registram com banco configurado,
+    // pra manter o serviço subindo sem DB (testes, smoke local).
+    builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+    builder.Services.AddScoped<IAvaliacaoUsuarioRepository, AvaliacaoUsuarioRepository>();
+
+    // Casos de uso (1 por rota).
+    builder.Services.AddScoped<ObterUsuarioMeUseCase>();
+    builder.Services.AddScoped<AtualizarUsuarioMeUseCase>();
+    builder.Services.AddScoped<ObterPreferenciasUseCase>();
+    builder.Services.AddScoped<AtualizarPreferenciasUseCase>();
+    builder.Services.AddScoped<ListarAvaliacoesUsuarioUseCase>();
 }
+
+// ---------------------------------------------------------------------------
+// Autenticação JWT (Supabase) + autorização por papel.
+// Só registra se SUPABASE_JWT_SECRET estiver definido (ver AuthSetup).
+// ---------------------------------------------------------------------------
+builder.AdicionarAutenticacaoESupabase();
 
 // ---------------------------------------------------------------------------
 // Health checks: liveness (sempre 200) + readiness (checa o Postgres)
@@ -87,6 +108,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Auth: precisa vir antes do MapControllers para que [Authorize] funcione.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
