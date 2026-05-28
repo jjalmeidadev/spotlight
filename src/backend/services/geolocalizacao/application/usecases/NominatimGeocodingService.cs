@@ -1,7 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Caching.Memory;
 using Spotlight.Geolocalizacao.Application.Dtos;
+using Spotlight.Geolocalizacao.Domain.Entities;
 
 namespace Spotlight.Geolocalizacao.Application.UseCases;
 
@@ -12,58 +14,97 @@ public interface IGeocodingService
     Task<GeocodingResponse> ReverseGeocodeAsync(double latitude, double longitude, CancellationToken cancellationToken);
 }
 
-public sealed class NominatimGeocodingService(HttpClient httpClient)
+public sealed class NominatimGeocodingService(HttpClient httpClient, IMemoryCache cache)
     : IGeocodingService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(6);
 
     public async Task<GeocodingResponse> GeocodeAsync(string address, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(address))
         {
-            throw new GeocodingRequestException("O endereco e obrigatorio.", StatusCodes.Status400BadRequest);
+            throw new ValidationException(new Dictionary<string, string[]>
+            {
+                ["address"] = ["O endereco e obrigatorio."]
+            });
         }
 
-        var path = $"/search?q={Uri.EscapeDataString(address.Trim())}&format=jsonv2&addressdetails=1&limit=1";
+        var normalizedAddress = NormalizeAddress(address);
+        var cacheKey = $"geocode:{normalizedAddress}";
+        if (cache.TryGetValue(cacheKey, out GeocodingResponse? cached) && cached is not null)
+        {
+            return cached;
+        }
+
+        var path = $"/search?q={Uri.EscapeDataString(normalizedAddress)}&format=jsonv2&addressdetails=1&limit=1";
         var payload = await SendAsync<IReadOnlyList<NominatimPlace>>(path, cancellationToken);
         var place = payload.FirstOrDefault()
-            ?? throw new GeocodingNotFoundException("Localizacao nao encontrada.");
+            ?? throw new NotFoundException("Localizacao nao encontrada.");
 
-        return ToResponse(place);
+        var response = ToResponse(place);
+        cache.Set(cacheKey, response, CacheTtl);
+        return response;
     }
 
     public async Task<GeocodingResponse> ReverseGeocodeAsync(double latitude, double longitude, CancellationToken cancellationToken)
     {
         if (latitude is < -90 or > 90 || longitude is < -180 or > 180)
         {
-            throw new GeocodingRequestException("Coordenadas invalidas.", StatusCodes.Status400BadRequest);
+            throw new ValidationException(new Dictionary<string, string[]>
+            {
+                ["latitude"] = ["Latitude deve estar entre -90 e 90."],
+                ["longitude"] = ["Longitude deve estar entre -180 e 180."]
+            });
         }
 
-        var lat = latitude.ToString(CultureInfo.InvariantCulture);
-        var lon = longitude.ToString(CultureInfo.InvariantCulture);
+        var roundedLatitude = Math.Round(latitude, 5);
+        var roundedLongitude = Math.Round(longitude, 5);
+        var cacheKey = FormattableString.Invariant($"reverse:{roundedLatitude}:{roundedLongitude}");
+        if (cache.TryGetValue(cacheKey, out GeocodingResponse? cached) && cached is not null)
+        {
+            return cached;
+        }
+
+        var lat = roundedLatitude.ToString(CultureInfo.InvariantCulture);
+        var lon = roundedLongitude.ToString(CultureInfo.InvariantCulture);
         var path = $"/reverse?lat={lat}&lon={lon}&format=jsonv2&addressdetails=1";
         var place = await SendAsync<NominatimPlace>(path, cancellationToken);
 
         if (string.IsNullOrWhiteSpace(place.DisplayName))
         {
-            throw new GeocodingNotFoundException("Localizacao nao encontrada.");
+            throw new NotFoundException("Localizacao nao encontrada.");
         }
 
-        return ToResponse(place);
+        var response = ToResponse(place);
+        cache.Set(cacheKey, response, CacheTtl);
+        return response;
     }
 
     private async Task<TPayload> SendAsync<TPayload>(string path, CancellationToken cancellationToken)
     {
-        using var response = await httpClient.GetAsync(path, cancellationToken);
+        using var response = await SendRequestAsync(path, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new GeocodingRequestException("Falha ao consultar OpenStreetMap/Nominatim.", (int)response.StatusCode);
+            throw new ConflictException("Falha ao consultar OpenStreetMap/Nominatim.");
         }
 
         return JsonSerializer.Deserialize<TPayload>(body, JsonOptions)
-            ?? throw new GeocodingRequestException("Resposta vazia do OpenStreetMap/Nominatim.", StatusCodes.Status502BadGateway);
+            ?? throw new ConflictException("Resposta vazia do OpenStreetMap/Nominatim.");
+    }
+
+    private async Task<HttpResponseMessage> SendRequestAsync(string path, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await httpClient.GetAsync(path, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new ConflictException($"Falha ao consultar OpenStreetMap/Nominatim: {ex.Message}");
+        }
     }
 
     private static GeocodingResponse ToResponse(NominatimPlace place)
@@ -79,16 +120,12 @@ public sealed class NominatimGeocodingService(HttpClient httpClient)
             "openstreetmap_nominatim");
     }
 
+    private static string NormalizeAddress(string address) =>
+        string.Join(' ', address.Trim().ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
     private sealed record NominatimPlace(
         [property: JsonPropertyName("place_id")] long PlaceId,
         [property: JsonPropertyName("display_name")] string DisplayName,
         [property: JsonPropertyName("lat")] string Lat,
         [property: JsonPropertyName("lon")] string Lon);
 }
-
-public sealed class GeocodingRequestException(string message, int statusCode) : Exception(message)
-{
-    public int StatusCode { get; } = statusCode;
-}
-
-public sealed class GeocodingNotFoundException(string message) : Exception(message);

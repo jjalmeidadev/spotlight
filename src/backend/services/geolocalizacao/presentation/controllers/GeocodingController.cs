@@ -5,51 +5,19 @@ using Spotlight.Geolocalizacao.Application.UseCases;
 namespace Spotlight.Geolocalizacao.Presentation.Controllers;
 
 [ApiController]
-[Route("api/geocoding")]
+[Route("geocoding")]
 public sealed class GeocodingController(IGeocodingService geocodingService) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(GeocodingResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Geocode([FromQuery] string address, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return Ok(await geocodingService.GeocodeAsync(address, cancellationToken));
-        }
-        catch (GeocodingRequestException ex)
-        {
-            return StatusCode(ex.StatusCode, Error(ex.Message));
-        }
-        catch (GeocodingNotFoundException ex)
-        {
-            return NotFound(Error(ex.Message));
-        }
-    }
+    public async Task<ActionResult<GeocodingResponse>> Geocode([FromQuery] string address, CancellationToken cancellationToken) =>
+        Ok(await geocodingService.GeocodeAsync(address, cancellationToken));
 
     [HttpGet("reverse")]
     [ProducesResponseType(typeof(GeocodingResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ReverseGeocode(
+    public async Task<ActionResult<GeocodingResponse>> ReverseGeocode(
         [FromQuery] double latitude,
         [FromQuery] double longitude,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            return Ok(await geocodingService.ReverseGeocodeAsync(latitude, longitude, cancellationToken));
-        }
-        catch (GeocodingRequestException ex)
-        {
-            return StatusCode(ex.StatusCode, Error(ex.Message));
-        }
-        catch (GeocodingNotFoundException ex)
-        {
-            return NotFound(Error(ex.Message));
-        }
-    }
-
-    private object Error(string message) => new
-    {
-        error = message,
-        traceId = HttpContext.TraceIdentifier
-    };
+        CancellationToken cancellationToken) =>
+        Ok(await geocodingService.ReverseGeocodeAsync(latitude, longitude, cancellationToken));
 }

@@ -1754,7 +1754,7 @@ Armazena os dados dos usuários cadastrados na plataforma, integrada ao sistema 
 | `nome` | `VARCHAR(150)` | NN | Nome completo ou nome de exibição do usuário. Preenchido automaticamente pelo trigger a partir dos metadados do cadastro. |
 | `email` | `VARCHAR(255)` | NN, UQ, CK (`email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'`) | E-mail do usuário. Deve ter formato válido. Único na tabela. |
 | `data_nascimento` | `DATE` | — | Data de nascimento. Opcional; utilizada para filtros de faixa etária em recomendações. |
-| `localizacao` | `VARCHAR(150)` | — | Cidade ou região informada pelo usuário. Utilizada como sinal de contexto para recomendações baseadas em localização. |
+| `localizacao` | `JSONB` | — | Localização consentida do usuário, incluindo endereço normalizado, coordenadas, identificador do provedor e origem da geocodificação. Utilizada como sinal de contexto para recomendações baseadas em localização. |
 | `data_cadastro` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
 | `tipo_usuario` | `tipo_usuario_enum` | NN, DF `'cadastrado'` | Papel do usuário: `'visitante'`, `'cadastrado'` ou `'administrador'`. Controla o acesso a funcionalidades administrativas. |
 | `nivel_acesso` | `JSONB` | NN, DF `'{}'` | Permissões granulares em formato JSON. Permite definir capacidades específicas dentro do papel sem criar tabelas de controle adicionais. |
@@ -2446,7 +2446,7 @@ _conteúdo_
 | `email` | `varchar` | E-mail utilizado para autenticação |
 | `senha` | `varchar` | Senha criptografada |
 | `data_nascimento` | `date` | Data de nascimento |
-| `localizacao` | `varchar` | Cidade ou região do usuário |
+| `localizacao` | `jsonb` | Localização consentida do usuário, com endereço normalizado, coordenadas e provedor |
 | `data_cadastro` | `timestamp` | Data de criação da conta |
 | `tipo_usuario` | `varchar` | Papel do usuário no sistema (ex: `comum`, `admin`) |
 | `nivel_acesso` | `jsonb` | Permissões granulares em formato JSON |

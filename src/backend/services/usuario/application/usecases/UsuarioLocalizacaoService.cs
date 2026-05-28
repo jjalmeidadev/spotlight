@@ -1,13 +1,15 @@
-using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 using Npgsql;
+using NpgsqlTypes;
 using Spotlight.Usuario.Application.Dtos;
+using Spotlight.Usuario.Domain.Entities;
 
 namespace Spotlight.Usuario.Application.UseCases;
 
 public interface IUsuarioLocalizacaoService
 {
     Task AtualizarLocalizacaoAsync(
-        string? authorizationHeader,
+        Guid idUsuario,
         AtualizarLocalizacaoRequest request,
         CancellationToken cancellationToken);
 }
@@ -18,16 +20,15 @@ public sealed class UsuarioLocalizacaoService(IEnumerable<NpgsqlDataSource> data
     private readonly NpgsqlDataSource? dataSource = dataSources.FirstOrDefault();
 
     public async Task AtualizarLocalizacaoAsync(
-        string? authorizationHeader,
+        Guid idUsuario,
         AtualizarLocalizacaoRequest request,
         CancellationToken cancellationToken)
     {
-        var idUsuario = GetUserIdFromBearerToken(authorizationHeader);
         Validate(request);
 
         if (dataSource is null)
         {
-            throw new UsuarioPersistenceException("DATABASE_CONNECTION_STRING nao configurada.");
+            throw new ConflictException("DATABASE_CONNECTION_STRING nao configurada.");
         }
 
         await using var command = dataSource.CreateCommand("""
@@ -37,51 +38,32 @@ public sealed class UsuarioLocalizacaoService(IEnumerable<NpgsqlDataSource> data
             """);
 
         command.Parameters.AddWithValue("id_usuario", idUsuario);
-        command.Parameters.AddWithValue("localizacao", TrimToColumn(request.FormattedAddress, 150));
+        command.Parameters.Add("localizacao", NpgsqlDbType.Jsonb).Value = JsonSerializer.Serialize(request);
 
         var affectedRows = await command.ExecuteNonQueryAsync(cancellationToken);
         if (affectedRows == 0)
         {
-            throw new UsuarioPersistenceException("Usuario nao encontrado para atualizar localizacao.");
+            throw new NotFoundException("Usuario nao encontrado para atualizar localizacao.");
         }
-    }
-
-    private static Guid GetUserIdFromBearerToken(string? authorizationHeader)
-    {
-        if (string.IsNullOrWhiteSpace(authorizationHeader)
-            || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new UsuarioUnauthorizedException("Token de acesso ausente.");
-        }
-
-        var token = authorizationHeader["Bearer ".Length..].Trim();
-        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        var sub = jwt.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
-
-        return Guid.TryParse(sub, out var idUsuario)
-            ? idUsuario
-            : throw new UsuarioUnauthorizedException("Token de acesso invalido.");
     }
 
     private static void Validate(AtualizarLocalizacaoRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.FormattedAddress))
         {
-            throw new UsuarioValidationException("Endereco formatado e obrigatorio.");
+            throw new ValidationException(new Dictionary<string, string[]>
+            {
+                ["formattedAddress"] = ["Endereco formatado e obrigatorio."]
+            });
         }
 
         if (request.Latitude is < -90 or > 90 || request.Longitude is < -180 or > 180)
         {
-            throw new UsuarioValidationException("Coordenadas invalidas.");
+            throw new ValidationException(new Dictionary<string, string[]>
+            {
+                ["latitude"] = ["Latitude deve estar entre -90 e 90."],
+                ["longitude"] = ["Longitude deve estar entre -180 e 180."]
+            });
         }
     }
-
-    private static string TrimToColumn(string value, int maxLength) =>
-        value.Length <= maxLength ? value : value[..maxLength];
 }
-
-public sealed class UsuarioValidationException(string message) : Exception(message);
-
-public sealed class UsuarioUnauthorizedException(string message) : Exception(message);
-
-public sealed class UsuarioPersistenceException(string message) : Exception(message);

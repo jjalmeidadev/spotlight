@@ -7,6 +7,7 @@ export type Usuario = {
   dataNascimento: string;
   genero: Genero;
   compartilharLocalizacao: boolean;
+  requerConfirmacaoEmail?: boolean;
   localizacao?: {
     formattedAddress: string;
     latitude: number;
@@ -34,6 +35,7 @@ export type CadastroPayload = {
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
+const AUTH_REDIRECT_URL = process.env.EXPO_PUBLIC_AUTH_REDIRECT_URL ?? 'spotlightmobile://email-confirmado';
 
 type SupabaseAuthResponse = {
   access_token?: string;
@@ -73,7 +75,7 @@ export async function cadastrarUsuario(payload: CadastroPayload): Promise<Usuari
     throw new Error('Informe uma data de nascimento valida no formato DD/MM/AAAA.');
   }
 
-  const usuario = await requestSupabaseAuth('/auth/v1/signup', {
+  const usuario = await requestSupabaseAuth(`/auth/v1/signup?redirect_to=${encodeURIComponent(AUTH_REDIRECT_URL)}`, {
     email: payload.email.trim(),
     password: payload.senha,
     data: {
@@ -88,17 +90,14 @@ export async function cadastrarUsuario(payload: CadastroPayload): Promise<Usuari
     return usuario;
   }
 
-  const usuarioLogado = await loginUsuario({
-    email: payload.email,
-    senha: payload.senha,
-  });
-
   return {
-    ...usuarioLogado,
-    nome: usuario.nome || usuarioLogado.nome,
-    dataNascimento: usuario.dataNascimento || usuarioLogado.dataNascimento,
-    genero: usuario.genero || usuarioLogado.genero,
+    ...usuario,
+    nome: usuario.nome || payload.nome.trim(),
+    email: usuario.email || payload.email.trim(),
+    dataNascimento: usuario.dataNascimento || dataNascimento,
+    genero: usuario.genero || payload.genero,
     compartilharLocalizacao: payload.compartilharLocalizacao,
+    requerConfirmacaoEmail: true,
   };
 }
 
@@ -139,11 +138,15 @@ async function requestSupabaseAuth(path: string, body: unknown): Promise<Usuario
 }
 
 function getSupabaseErrorMessage(payload: any) {
-  return payload?.msg
+  const message = payload?.msg
     ?? payload?.message
     ?? payload?.error_description
     ?? payload?.error
     ?? 'Nao foi possivel concluir a autenticacao.';
+
+  return /email not confirmed/i.test(message)
+    ? 'Confirme seu e-mail antes de entrar.'
+    : message;
 }
 
 function toIsoDate(value: string) {

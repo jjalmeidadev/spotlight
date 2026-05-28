@@ -1,46 +1,36 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
 using Spotlight.Usuario.Application.UseCases;
+using Spotlight.Usuario.Infrastructure.Auth;
 using Spotlight.Usuario.Presentation.Middleware;
 
-// Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
 Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ---------------------------------------------------------------------------
-// Logger (Serilog)
-// ---------------------------------------------------------------------------
 builder.Host.UseSerilog((context, configuration) =>
     configuration
         .ReadFrom.Configuration(context.Configuration)
         .Enrich.FromLogContext()
         .WriteTo.Console());
 
-// ---------------------------------------------------------------------------
-// Configuração / variáveis de ambiente
-// ---------------------------------------------------------------------------
 var connectionString =
     Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
     ?? builder.Configuration.GetConnectionString("Default")
     ?? string.Empty;
 
-// ---------------------------------------------------------------------------
-// Banco de dados (Npgsql / ADO.NET — sem ORM — PostgreSQL/Supabase)
-// ---------------------------------------------------------------------------
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
     builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
 }
 
 builder.Services.AddScoped<IUsuarioLocalizacaoService, UsuarioLocalizacaoService>();
+builder.AdicionarAutenticacaoESupabase();
 
-// ---------------------------------------------------------------------------
-// Health checks: liveness (sempre 200) + readiness (checa o Postgres)
-// ---------------------------------------------------------------------------
 var healthChecks = builder.Services.AddHealthChecks();
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
@@ -48,40 +38,55 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 }
 else
 {
-    // Sem connection string o serviço NÃO está pronto para tráfego —
-    // readiness deve falhar (evita falso positivo no /health/ready).
     healthChecks.AddCheck("postgres", () =>
-        HealthCheckResult.Unhealthy("Connection string do banco não configurada."),
+        HealthCheckResult.Unhealthy("Connection string do banco nao configurada."),
         tags: ["ready"]);
 }
 
-// ---------------------------------------------------------------------------
-// CORS
-// ---------------------------------------------------------------------------
 const string CorsPolicy = "SpotlightCors";
 builder.Services.AddCors(options =>
     options.AddPolicy(CorsPolicy, policy =>
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
-// ---------------------------------------------------------------------------
-// Controllers + Swagger / OpenAPI
-// ---------------------------------------------------------------------------
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
+{
     options.SwaggerDoc("v1", new()
     {
-        Title = "Spotlight — Serviço de Usuário",
+        Title = "Spotlight - Servico de Usuario",
         Version = "v1",
-        Description = "Gestão de perfis, preferências declaradas e histórico de consumo."
-    }));
+        Description = "Gestao de perfis, preferencias declaradas e historico de consumo."
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT do Supabase Auth. Informe: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
-// ---------------------------------------------------------------------------
-// Pipeline de middlewares
-// ---------------------------------------------------------------------------
-app.UseMiddleware<ErrorHandlingMiddleware>(); // error handler global (primeiro)
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSerilogRequestLogging();
 app.UseCors(CorsPolicy);
 
@@ -90,6 +95,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
@@ -102,13 +110,11 @@ app.MapGet("/", () => Results.Ok(new
         health = "/health",
         readiness = "/health/ready",
         ping = "/api/ping",
+        localizacao = "/me/localizacao",
         swagger = "/swagger"
     }
 }));
 
-// ---------------------------------------------------------------------------
-// Rotas de health check
-// ---------------------------------------------------------------------------
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     Predicate = _ => false
@@ -121,5 +127,4 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 
 app.Run();
 
-// Expõe a classe Program para o WebApplicationFactory dos testes de integração.
 public partial class Program;

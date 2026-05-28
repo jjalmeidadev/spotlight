@@ -1,44 +1,39 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Application.UseCases;
+using Spotlight.Usuario.Infrastructure.Auth;
 
 namespace Spotlight.Usuario.Presentation.Controllers;
 
 [ApiController]
-[Route("api/me")]
+[Authorize(Policy = AuthSetup.PolicyCadastrado)]
+[Route("me")]
 public sealed class MeController(IUsuarioLocalizacaoService localizacaoService) : ControllerBase
 {
     [HttpPut("localizacao")]
-    public async Task<IActionResult> AtualizarLocalizacao(
+    public async Task<ActionResult> AtualizarLocalizacao(
         AtualizarLocalizacaoRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            await localizacaoService.AtualizarLocalizacaoAsync(
-                Request.Headers.Authorization,
-                request,
-                cancellationToken);
+        var idUsuario = GetUsuarioId();
 
-            return Ok(new { message = "Localizacao atualizada com sucesso." });
-        }
-        catch (UsuarioValidationException ex)
-        {
-            return BadRequest(Error(ex.Message));
-        }
-        catch (UsuarioUnauthorizedException ex)
-        {
-            return Unauthorized(Error(ex.Message));
-        }
-        catch (UsuarioPersistenceException ex)
-        {
-            return StatusCode(StatusCodes.Status503ServiceUnavailable, Error(ex.Message));
-        }
+        await localizacaoService.AtualizarLocalizacaoAsync(
+            idUsuario,
+            request,
+            cancellationToken);
+
+        return Ok(new { message = "Localizacao atualizada com sucesso." });
     }
 
-    private object Error(string message) => new
+    private Guid GetUsuarioId()
     {
-        error = message,
-        traceId = HttpContext.TraceIdentifier
-    };
+        var sub = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+
+        return Guid.TryParse(sub, out var idUsuario)
+            ? idUsuario
+            : throw new UnauthorizedAccessException("Token sem identificador de usuario valido.");
+    }
 }

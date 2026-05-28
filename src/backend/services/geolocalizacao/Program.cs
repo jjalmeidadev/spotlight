@@ -31,6 +31,7 @@ builder.Services.AddHttpClient<IGeocodingService, NominatimGeocodingService>(cli
 });
 
 builder.Services.AddHealthChecks();
+builder.Services.AddMemoryCache();
 
 const string CorsPolicy = "SpotlightCors";
 builder.Services.AddCors(options =>
@@ -70,8 +71,8 @@ app.MapGet("/", () => Results.Ok(new
         health = "/health",
         readiness = "/health/ready",
         ping = "/api/ping",
-        geocoding = "/api/geocoding?address=Sao Paulo, SP",
-        reverse = "/api/geocoding/reverse?latitude=-23.55052&longitude=-46.633308",
+        geocoding = "/geocoding?address=Sao Paulo, SP",
+        reverse = "/geocoding/reverse?latitude=-23.55052&longitude=-46.633308",
         swagger = "/swagger"
     }
 }));

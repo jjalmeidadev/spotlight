@@ -15,7 +15,7 @@ CREATE TABLE usuario (
     nome                VARCHAR(150)        NOT NULL,
     email               VARCHAR(255)        NOT NULL UNIQUE,
     data_nascimento     DATE,
-    localizacao         VARCHAR(150),
+    localizacao         JSONB,
     data_cadastro       TIMESTAMP           NOT NULL DEFAULT NOW(),
     tipo_usuario        tipo_usuario_enum   NOT NULL DEFAULT 'cadastrado',
     nivel_acesso        JSONB               NOT NULL DEFAULT '{}'::JSONB,

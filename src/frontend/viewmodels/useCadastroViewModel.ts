@@ -13,11 +13,13 @@ export function useCadastroViewModel(onSuccess?: (usuario: Usuario) => void) {
   const [compartilharLocalizacao, setCompartilharLocalizacao] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function criarConta() {
     try {
       setLoading(true);
       setError(null);
+      setSuccess(null);
       const usuario = await cadastrarUsuario({
         nome,
         email,
@@ -26,6 +28,11 @@ export function useCadastroViewModel(onSuccess?: (usuario: Usuario) => void) {
         genero,
         compartilharLocalizacao,
       });
+
+      if (usuario.requerConfirmacaoEmail) {
+        onSuccess?.(usuario);
+        return;
+      }
 
       if (compartilharLocalizacao) {
         try {
@@ -36,6 +43,10 @@ export function useCadastroViewModel(onSuccess?: (usuario: Usuario) => void) {
           return;
         } catch (locationError) {
           console.warn(locationError);
+          setError(locationError instanceof Error
+            ? locationError.message
+            : 'Nao foi possivel salvar sua localizacao.');
+          return;
         }
       }
 
@@ -66,6 +77,7 @@ export function useCadastroViewModel(onSuccess?: (usuario: Usuario) => void) {
     compartilharLocalizacao,
     loading,
     error,
+    success,
     setNome,
     setEmail,
     setSenha,

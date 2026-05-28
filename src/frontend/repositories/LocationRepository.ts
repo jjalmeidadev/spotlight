@@ -23,13 +23,13 @@ export async function obterLocalizacaoAtual(): Promise<LocalizacaoUsuario> {
 
   const { latitude, longitude } = position.coords;
   const response = await fetch(
-    `${API_BASE_URL}/geolocalizacao/api/geocoding/reverse?latitude=${latitude}&longitude=${longitude}`,
+    `${API_BASE_URL}/geolocalizacao/geocoding/reverse?latitude=${latitude}&longitude=${longitude}`,
   );
 
   const payload = await response.json();
 
   if (!response.ok) {
-    throw new Error(payload?.error ?? 'Nao foi possivel resolver sua localizacao.');
+    throw new Error(getApiErrorMessage(payload, 'Nao foi possivel resolver sua localizacao.'));
   }
 
   return payload as LocalizacaoUsuario;
@@ -43,7 +43,7 @@ export async function salvarLocalizacaoUsuario(
     throw new Error('Token de acesso ausente para salvar localizacao.');
   }
 
-  const response = await fetch(`${API_BASE_URL}/usuario/api/me/localizacao`, {
+  const response = await fetch(`${API_BASE_URL}/usuario/me/localizacao`, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -55,6 +55,14 @@ export async function salvarLocalizacaoUsuario(
   const payload = await response.json();
 
   if (!response.ok) {
-    throw new Error(payload?.error ?? 'Nao foi possivel salvar sua localizacao.');
+    throw new Error(getApiErrorMessage(payload, 'Nao foi possivel salvar sua localizacao.'));
   }
+}
+
+function getApiErrorMessage(payload: any, fallback: string) {
+  const details = typeof payload?.details === 'string'
+    ? ` (${payload.details})`
+    : '';
+
+  return `${payload?.error ?? fallback}${details}`;
 }

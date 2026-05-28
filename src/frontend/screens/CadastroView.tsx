@@ -90,6 +90,7 @@ export default function CadastroView({ onCadastro, onBackPress }: CadastroViewPr
           </View>
 
           {vm.error ? <Text style={styles.error}>{vm.error}</Text> : null}
+          {vm.success ? <Text style={styles.success}>{vm.success}</Text> : null}
 
           <Pressable
             accessibilityRole="button"
@@ -240,6 +241,12 @@ const styles = StyleSheet.create({
   },
   error: {
     color: '#c94f3a',
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: 'center',
+  },
+  success: {
+    color: '#2f6d45',
     fontSize: 12,
     lineHeight: 16,
     textAlign: 'center',
