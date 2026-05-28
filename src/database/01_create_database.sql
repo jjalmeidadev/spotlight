@@ -45,11 +45,22 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-    INSERT INTO public.usuario (id_usuario, nome, email)
+    INSERT INTO public.usuario (
+        id_usuario,
+        nome,
+        email,
+        data_nascimento,
+        perfil_preferencias
+    )
     VALUES (
         NEW.id,
         COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
-        NEW.email
+        NEW.email,
+        NULLIF(NEW.raw_user_meta_data->>'dataNascimento', '')::DATE,
+        jsonb_build_object(
+            'genero', COALESCE(NEW.raw_user_meta_data->>'genero', 'Prefiro nao informar'),
+            'compartilharLocalizacao', COALESCE((NEW.raw_user_meta_data->>'compartilharLocalizacao')::BOOLEAN, FALSE)
+        )
     );
     RETURN NEW;
 END;

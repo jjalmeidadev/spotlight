@@ -90,6 +90,19 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 
+app.MapGet("/", () => Results.Ok(new
+{
+    service = "usuario",
+    status = "running",
+    endpoints = new
+    {
+        health = "/health",
+        readiness = "/health/ready",
+        ping = "/api/ping",
+        swagger = "/swagger"
+    }
+}));
+
 // ---------------------------------------------------------------------------
 // Rotas de health check
 // ---------------------------------------------------------------------------

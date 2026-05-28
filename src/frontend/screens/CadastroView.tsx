@@ -56,9 +56,11 @@ export default function CadastroView({ onCadastro, onBackPress }: CadastroViewPr
           <Field label="Senha" onChangeText={vm.setSenha} secureTextEntry value={vm.senha} />
           <Field
             keyboardType="number-pad"
-            label="Idade"
-            onChangeText={vm.setIdade}
-            value={vm.idade}
+            label="Data de nascimento"
+            onChangeText={vm.setDataNascimento}
+            placeholder="DD/MM/AAAA"
+            placeholderTextColor="#a7afa9"
+            value={vm.dataNascimento}
           />
 
           <Text style={styles.label}>Gênero</Text>

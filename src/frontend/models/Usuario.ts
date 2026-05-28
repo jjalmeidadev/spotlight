@@ -1,12 +1,14 @@
-export type Genero = 'Feminino' | 'Masculino' | 'Outro' | 'Prefiro não informar';
+export type Genero = 'Feminino' | 'Masculino' | 'Outro' | 'Prefiro nao informar';
 
 export type Usuario = {
   id: string;
   nome: string;
   email: string;
-  idade: number;
+  dataNascimento: string;
   genero: Genero;
   compartilharLocalizacao: boolean;
+  accessToken?: string | null;
+  refreshToken?: string | null;
 };
 
 export type LoginPayload = {
@@ -18,58 +20,120 @@ export type CadastroPayload = {
   nome: string;
   email: string;
   senha: string;
-  idade: string;
+  dataNascimento: string;
   genero: Genero;
   compartilharLocalizacao: boolean;
 };
 
-const MOCK_USER: Usuario = {
-  id: '1',
-  nome: 'Mariana',
-  email: 'mariana@aventura.app',
-  idade: 24,
-  genero: 'Feminino',
-  compartilharLocalizacao: true,
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
+
+type SupabaseAuthResponse = {
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+  user?: {
+    id: string;
+    email?: string;
+    user_metadata?: {
+      nome?: string;
+      dataNascimento?: string;
+      genero?: Genero;
+      compartilharLocalizacao?: boolean;
+    };
+  };
 };
 
-function wait(ms = 450) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 export async function loginUsuario(payload: LoginPayload): Promise<Usuario> {
-  await wait();
-
   if (!payload.email.trim() || !payload.senha.trim()) {
     throw new Error('Preencha e-mail e senha para entrar.');
   }
 
-  return {
-    ...MOCK_USER,
+  return requestSupabaseAuth('/auth/v1/token?grant_type=password', {
     email: payload.email.trim(),
-  };
+    password: payload.senha,
+  });
 }
 
 export async function cadastrarUsuario(payload: CadastroPayload): Promise<Usuario> {
-  await wait();
-
   if (!payload.nome.trim() || !payload.email.trim() || !payload.senha.trim()) {
     throw new Error('Preencha nome, e-mail e senha.');
   }
 
-  const idade = Number(payload.idade);
+  const dataNascimento = toIsoDate(payload.dataNascimento);
 
-  if (!Number.isFinite(idade) || idade <= 0) {
-    throw new Error('Informe uma idade válida.');
+  if (!dataNascimento) {
+    throw new Error('Informe uma data de nascimento valida no formato DD/MM/AAAA.');
   }
 
-  return {
-    id: String(Date.now()),
-    nome: payload.nome.trim(),
+  return requestSupabaseAuth('/auth/v1/signup', {
     email: payload.email.trim(),
-    idade,
-    genero: payload.genero,
-    compartilharLocalizacao: payload.compartilharLocalizacao,
+    password: payload.senha,
+    data: {
+      nome: payload.nome.trim(),
+      dataNascimento,
+      genero: payload.genero,
+      compartilharLocalizacao: payload.compartilharLocalizacao,
+    },
+  });
+}
+
+async function requestSupabaseAuth(path: string, body: unknown): Promise<Usuario> {
+  if (!SUPABASE_ANON_KEY) {
+    throw new Error('Configure EXPO_PUBLIC_SUPABASE_ANON_KEY para autenticar.');
+  }
+
+  const response = await fetch(`${SUPABASE_URL}${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(getSupabaseErrorMessage(payload));
+  }
+
+  const auth = payload as SupabaseAuthResponse;
+  const metadata = auth.user?.user_metadata;
+
+  return {
+    id: auth.user?.id ?? '',
+    nome: metadata?.nome ?? auth.user?.email?.split('@')[0] ?? '',
+    email: auth.user?.email ?? '',
+    dataNascimento: metadata?.dataNascimento ?? '',
+    genero: metadata?.genero ?? 'Prefiro nao informar',
+    compartilharLocalizacao: metadata?.compartilharLocalizacao ?? false,
+    accessToken: auth.access_token ?? null,
+    refreshToken: auth.refresh_token ?? null,
   };
+}
+
+function getSupabaseErrorMessage(payload: any) {
+  return payload?.msg
+    ?? payload?.message
+    ?? payload?.error_description
+    ?? payload?.error
+    ?? 'Nao foi possivel concluir a autenticacao.';
+}
+
+function toIsoDate(value: string) {
+  const trimmed = value.trim();
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(trimmed);
+  if (!match) {
+    return null;
+  }
+
+  const [, day, month, year] = match;
+  const isoDate = `${year}-${month}-${day}`;
+  const date = new Date(`${isoDate}T00:00:00Z`);
+
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(isoDate)
+    ? isoDate
+    : null;
 }
