@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { cadastrarUsuario, Genero, Usuario } from '../models/Usuario';
+import { obterLocalizacaoAtual, salvarLocalizacaoUsuario } from '../repositories/LocationRepository';
 
 const GENEROS: Genero[] = ['Feminino', 'Masculino', 'Outro', 'Prefiro nao informar'];
 
@@ -25,6 +26,19 @@ export function useCadastroViewModel(onSuccess?: (usuario: Usuario) => void) {
         genero,
         compartilharLocalizacao,
       });
+
+      if (compartilharLocalizacao) {
+        try {
+          const localizacao = await obterLocalizacaoAtual();
+          await salvarLocalizacaoUsuario(usuario.accessToken, localizacao);
+          console.log('Localizacao resolvida:', localizacao);
+          onSuccess?.({ ...usuario, localizacao });
+          return;
+        } catch (locationError) {
+          console.warn(locationError);
+        }
+      }
+
       onSuccess?.(usuario);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Nao foi possivel criar a conta.');

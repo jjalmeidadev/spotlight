@@ -7,6 +7,13 @@ export type Usuario = {
   dataNascimento: string;
   genero: Genero;
   compartilharLocalizacao: boolean;
+  localizacao?: {
+    formattedAddress: string;
+    latitude: number;
+    longitude: number;
+    placeId: string;
+    provider: string;
+  };
   accessToken?: string | null;
   refreshToken?: string | null;
 };
@@ -66,7 +73,7 @@ export async function cadastrarUsuario(payload: CadastroPayload): Promise<Usuari
     throw new Error('Informe uma data de nascimento valida no formato DD/MM/AAAA.');
   }
 
-  return requestSupabaseAuth('/auth/v1/signup', {
+  const usuario = await requestSupabaseAuth('/auth/v1/signup', {
     email: payload.email.trim(),
     password: payload.senha,
     data: {
@@ -76,6 +83,23 @@ export async function cadastrarUsuario(payload: CadastroPayload): Promise<Usuari
       compartilharLocalizacao: payload.compartilharLocalizacao,
     },
   });
+
+  if (usuario.accessToken) {
+    return usuario;
+  }
+
+  const usuarioLogado = await loginUsuario({
+    email: payload.email,
+    senha: payload.senha,
+  });
+
+  return {
+    ...usuarioLogado,
+    nome: usuario.nome || usuarioLogado.nome,
+    dataNascimento: usuario.dataNascimento || usuarioLogado.dataNascimento,
+    genero: usuario.genero || usuarioLogado.genero,
+    compartilharLocalizacao: payload.compartilharLocalizacao,
+  };
 }
 
 async function requestSupabaseAuth(path: string, body: unknown): Promise<Usuario> {
