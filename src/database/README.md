@@ -21,7 +21,11 @@
 
 O **Spotlight** é uma plataforma de recomendação de espetáculos teatrais que conecta usuários ao catálogo da Aventura Teatros por meio de algoritmos de Machine Learning (k-NN, SVD, k-means). O banco de dados relacional é o núcleo da solução: armazena o catálogo de espetáculos, perfis de usuários, avaliações explícitas e as recomendações geradas pelo motor de ML.
 
-**SGBD:** PostgreSQL 15+ provisionado via **Supabase**
+**SGBD:** PostgreSQL 15.x provisionado via **Supabase**
+
+**Projeto Supabase:** `nyaxqgujyyvkjnqzbklf`
+
+**URL do projeto Supabase:** `https://nyaxqgujyyvkjnqzbklf.supabase.co`
 
 **Por que dois bancos?** O PostgreSQL (Supabase) guarda dados transacionais e estruturados — catálogo, perfis, avaliações e recomendações processadas. O MongoDB armazena os eventos brutos de telemetria (cliques, tempo de tela) em alta volumetria. Os workers de ML consomem o MongoDB e escrevem os resultados processados de volta no PostgreSQL, na tabela `recomendacao`.
 
@@ -46,12 +50,16 @@ src/database/
 
 | Dependência | Versão mínima | Observação |
 |---|---|---|
-| PostgreSQL | 15.0 | Executado via imagem Docker `postgres:15-alpine` |
-| Docker | 24.0 | Para implantação local ou no servidor Inteli |
-| Docker Compose | 2.20 | Para orquestração dos containers |
-| Supabase CLI | 1.150 | Opcional — facilita o gerenciamento local |
+| PostgreSQL | 15.x | Compatível com Supabase Postgres. Para Docker local, usar `supabase/postgres:15.1.0.147`. |
+| Docker | 24.0 | Para implantação local ou no servidor Inteli. |
+| Docker Compose | 2.20 | Para orquestração dos containers. |
+| Supabase CLI | 1.150 | Opcional — facilita o gerenciamento local. |
+| DBeaver | 24.x | Opcional e recomendado para visualizar tabelas e executar scripts por interface gráfica. |
+| `psql` | 15.x | Necessário para executar e validar scripts por linha de comando. |
 
 > Para execução apenas via SQL Editor do Supabase (cloud), Docker não é necessário.
+
+> O script de carga inicial pode usar `crypt()` e `gen_salt()`. Portanto, o ambiente precisa ter a extensão `pgcrypto` disponível quando `02_initial_data.sql` for executado.
 
 ---
 
@@ -70,12 +78,12 @@ POSTGRES_CONNECTION_STRING=postgresql://postgres:password@localhost:5432/postgre
 # ─── Supabase Auth ───────────────────────────────────────────
 # Gerados via: supabase start  ou  supabase gen keys
 JWT_SECRET=seu_jwt_secret_com_minimo_32_caracteres
-ANON_KEY=REDACTED_FOR_PUBLIC_RELEASE
-SERVICE_ROLE_KEY=REDACTED_FOR_PUBLIC_RELEASE
+ANON_KEY=chave_anon_do_supabase
+SERVICE_ROLE_KEY=chave_service_role_do_supabase
 
 # ─── URL pública do Supabase ─────────────────────────────────
-SUPABASE_URL=http://localhost:8000
-# Em produção (cloud): https://<project-ref>.supabase.co
+SUPABASE_URL=https://nyaxqgujyyvkjnqzbklf.supabase.co
+# Em ambiente local Supabase: http://localhost:8000
 
 # ─── Frontend / API Gateway ──────────────────────────────────
 SITE_URL=http://localhost:3000
@@ -85,8 +93,11 @@ SITE_URL=http://localhost:3000
 
 | Variável | Consumido por |
 |---|---|
-| `POSTGRES_DB` | Container PostgreSQL (Docker) |
-| `POSTGRES_USER` | Container PostgreSQL (Docker) |
+| `DB_HOST` | `psql`, API Gateway e ferramentas de administração do banco |
+| `DB_PORT` | `psql`, API Gateway e ferramentas de administração do banco |
+| `DB_NAME` | Nome do banco usado nas conexões locais |
+| `DB_USER` | Usuário usado nas conexões locais |
+| `DB_PASSWORD` | Senha usada por `psql` e serviços que conectam no PostgreSQL |
 | `POSTGRES_PASSWORD` | Container PostgreSQL (Docker) |
 | `POSTGRES_PORT` | Docker Compose — porta exposta no host |
 | `POSTGRES_CONNECTION_STRING` | Clientes locais, API Gateway e scripts de migração |
@@ -102,30 +113,79 @@ SITE_URL=http://localhost:3000
 ### 5.1 Via SQL Editor do Supabase
 
 1. Acesse o [Supabase Dashboard](https://supabase.com/dashboard) e abra o projeto
-2. Vá em **SQL Editor → New Query**
-3. Cole e execute `01_create_database.sql`
-4. Aguarde a confirmação de sucesso
-5. Cole e execute `02_initial_data.sql`
+2. Confirme que o projeto aberto é `nyaxqgujyyvkjnqzbklf`
+3. Vá em **SQL Editor → New Query**
+4. Cole e execute `01_create_database.sql`
+5. Aguarde a confirmação de sucesso
+6. Cole e execute `02_initial_data.sql`
 
-**Validação:** Acesse **Table Editor** e confirme que as 11 tabelas aparecem no schema `public`.
+**Validação:** Acesse **Table Editor** e confirme que as 10 tabelas aparecem no schema `public`.
 
-### 5.2 Via `psql` (linha de comando)
+> Atenção: o `01_create_database.sql` é um script de criação para ambiente limpo. Ele não apaga estruturas existentes. Para resetar um ambiente de desenvolvimento, execute primeiro `03_rollback.sql` e depois rode novamente `01_create_database.sql` e `02_initial_data.sql`.
+
+### 5.2 Via DBeaver
+
+O DBeaver pode ser usado como ferramenta visual para conectar ao PostgreSQL do Supabase, ao banco local via Docker ou ao servidor Inteli.
+
+1. Abra o DBeaver
+2. Vá em **Banco de Dados → Nova Conexão**
+3. Selecione **PostgreSQL**
+4. Preencha os dados de conexão conforme o ambiente:
+
+| Campo | Valor |
+|---|---|
+| Host | valor de `DB_HOST` ou host informado pelo Supabase/Inteli |
+| Porta | valor de `DB_PORT` |
+| Database | valor de `DB_NAME` |
+| Usuário | valor de `DB_USER` |
+| Senha | valor de `DB_PASSWORD` |
+
+5. Clique em **Testar Conexão**
+6. Se a conexão funcionar, clique em **Concluir**
+7. Abra um editor SQL na conexão criada
+8. Execute o conteúdo de `01_create_database.sql`
+9. Execute o conteúdo de `02_initial_data.sql`
+10. Valide a criação das tabelas com:
+
+```sql
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+ORDER BY table_name;
+```
+
+Validação funcional:
+
+```sql
+SELECT
+  (SELECT COUNT(*) FROM public.usuario) AS usuarios,
+  (SELECT COUNT(*) FROM public.espetaculo) AS espetaculos,
+  (SELECT COUNT(*) FROM public.sessao) AS sessoes;
+```
+
+> O DBeaver não armazena o banco. Ele apenas conecta em um PostgreSQL existente, como Supabase, Docker local ou servidor Inteli.
+
+### 5.3 Via `psql` (linha de comando)
 
 ```bash
-# Substitua <host>, <porta> e <senha> pelos valores do seu ambiente
-export PGPASSWORD=<senha>
+# Substitua os valores conforme seu ambiente
+export PGPASSWORD=$DB_PASSWORD
 
 # 1. Cria todas as estruturas
-psql -h <host> -p <porta> -U postgres -d postgres \
+psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME \
   -f src/database/01_create_database.sql
 
 # 2. Insere os dados iniciais
-psql -h <host> -p <porta> -U postgres -d postgres \
+psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME \
   -f src/database/02_initial_data.sql
 
 # Validação: lista as tabelas criadas
-psql -h <host> -p <porta> -U postgres -d postgres \
+psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME \
   -c "\dt public.*"
+
+# Validação funcional: conta registros principais
+psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME \
+  -c "SELECT 'usuarios' AS tabela, COUNT(*) FROM public.usuario UNION ALL SELECT 'espetaculos', COUNT(*) FROM public.espetaculo UNION ALL SELECT 'sessoes', COUNT(*) FROM public.sessao;"
 ```
 
 **Saída esperada na validação:**
@@ -147,7 +207,7 @@ psql -h <host> -p <porta> -U postgres -d postgres \
 (10 rows)
 ```
 
-### 5.3 Rollback (desfaz tudo)
+### 5.4 Rollback (desfaz tudo)
 
 ```bash
 psql -h <host> -p <porta> -U postgres -d postgres \
@@ -156,13 +216,19 @@ psql -h <host> -p <porta> -U postgres -d postgres \
 
 > O rollback é **destrutivo**. Apaga todos os dados e estruturas. Use apenas em desenvolvimento ou para reset total do ambiente.
 
-### 5.4 Ordem obrigatória de execução
+### 5.5 Ordem obrigatória de execução
 
 ```
 01_create_database.sql  →  02_initial_data.sql
 ```
 
 O `02_initial_data.sql` depende das tabelas criadas pelo `01`. Nunca inverta a ordem.
+
+Na organização das tasks, essa ordem corresponde a:
+
+```
+T1 — criação do schema  →  T2 — carga inicial de dados
+```
 
 ---
 
@@ -199,6 +265,10 @@ docker compose logs -f db
 
 # Saída esperada ao final:
 # db  | database system is ready to accept connections
+
+# Validação funcional
+docker compose exec db psql -U postgres -d postgres \
+  -c "SELECT COUNT(*) AS total_espetaculos FROM public.espetaculo;"
 ```
 
 Valide as tabelas e os dados iniciais:
@@ -207,10 +277,27 @@ Valide as tabelas e os dados iniciais:
 docker compose exec db psql -U postgres -d postgres -c "\dt public.*"
 docker compose exec db psql -U postgres -d postgres -c "SELECT COUNT(*) FROM espetaculo;"
 ```
-
 ### 6.3 Instruções específicas
 
-O servidor Inteli exige que os containers sejam executados com configurações específicas de rede e porta. Siga os passos abaixo após obter acesso ao servidor:
+Para o projeto Supabase cloud (`nyaxqgujyyvkjnqzbklf`), execute os scripts pelo **SQL Editor** ou por `psql` usando a connection string do painel do Supabase.
+
+Ordem:
+
+```
+01_create_database.sql
+02_initial_data.sql
+```
+
+Validação recomendada no SQL Editor:
+
+```sql
+SELECT
+  (SELECT COUNT(*) FROM public.usuario) AS usuarios,
+  (SELECT COUNT(*) FROM public.espetaculo) AS espetaculos,
+  (SELECT COUNT(*) FROM public.sessao) AS sessoes;
+```
+
+> Não execute `03_rollback.sql` no Supabase cloud se o ambiente já tiver dados úteis. O rollback é destrutivo e deve ser usado apenas para reset autorizado do ambiente.
 
 ```bash
 # 1. Clone o repositório no servidor
@@ -231,7 +318,16 @@ docker compose exec db psql -U postgres -d postgres -c "\dt public.*"
 
 > A porta `5432` deve estar liberada no firewall do servidor Inteli. Confirme com o professor/tutor responsável pela infraestrutura antes de subir.
 
-### 6.4 Reinicialização e reset
+### 6.5 Ajustes e quirks conhecidos
+
+- **Encoding:** use UTF-8 (`LANG=C.UTF-8`) para evitar problemas com acentos em dados textuais.
+- **Timezone:** use `America/Sao_Paulo` quando o ambiente permitir configuração de `TZ`.
+- **Extensão `pgcrypto`:** necessária para `crypt()` e `gen_salt()` no seed de usuários do Supabase Auth.
+- **Script de criação:** `01_create_database.sql` deve ser executado em ambiente limpo. Ele não deve ser usado como migração incremental.
+- **Reset destrutivo:** use `03_rollback.sql` apenas quando houver intenção explícita de apagar as estruturas e dados do ambiente.
+- **Dados iniciais do Auth:** se o seed inserir registros em `auth.users`, os UUIDs precisam respeitar o formato válido `8-4-4-4-12` e a execução deve ocorrer em ambiente com permissão para escrita no schema `auth`.
+
+### 6.6 Reinicialização e reset
 
 ```bash
 # Parar e remover containers sem apagar dados
@@ -241,6 +337,17 @@ docker compose down
 docker compose down -v
 docker compose up -d db
 ```
+
+### 6.7 Conclusão da implantação
+
+Ao final da implantação, o ambiente estará pronto quando:
+
+- o PostgreSQL/Supabase estiver acessível pelo Supabase SQL Editor, DBeaver, `psql` ou container Docker;
+- o script `01_create_database.sql` tiver criado as 10 tabelas do schema `public`;
+- o script `02_initial_data.sql` tiver populado os dados iniciais sem erros de integridade referencial;
+- as consultas de validação retornarem registros em `usuario`, `espetaculo` e `sessao`.
+
+Com esses passos concluídos, o banco estará apto para uso pelo frontend, API Gateway, serviços SOA e rotinas de recomendação em ambiente de desenvolvimento, homologação ou implantação no servidor Inteli.
 
 ---
 

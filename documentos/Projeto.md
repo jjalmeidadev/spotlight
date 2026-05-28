@@ -141,6 +141,9 @@
   - [4.1 Especificação da Base de Dados para Modelo de Recomendação](#41-especificação-da-base-de-dados-para-modelo-de-recomendação)
   - [4.2 Modelo Conceitual de Dados](#42-modelo-conceitual-de-dados)
   - [4.3 Modelo Lógico de Dados](#43-modelo-lógico-de-dados)
+    - [4.3.3 Dicionário de Dados](#433-dicionário-de-dados)
+    - [4.3.4 Normalização do Modelo Relacional](#434-normalização-do-modelo-relacional)
+    - [4.3.5 Tabelas Associativas dos Relacionamentos N:N](#435-tabelas-associativas-dos-relacionamentos-nn)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
@@ -1724,10 +1727,658 @@ O PostgreSQL garante a consistência e a riqueza relacional do catálogo e do el
 
 Essa separação de responsabilidades assegura que o sistema seja performático, escalável e otimizado para alimentar os algoritmos de recomendação.
 
-## 4.4 Modelo Físico de Dados
-_conteúdo_
+### 4.3.3 Dicionário de Dados
 
-**Nota:** Insira uma explicação e direcionamento para o readme.md da pasta database.
+&emsp;O dicionário de dados descreve em detalhe cada tabela do banco relacional PostgreSQL, especificando o tipo de dado, as restrições e o significado semântico de cada coluna. As informações são derivadas diretamente do script `src/database/01_create_database.sql` e estão alinhadas ao modelo lógico apresentado nas seções anteriores.
+
+As abreviações utilizadas nas colunas de restrição são:
+
+| Abreviação | Significado |
+|---|---|
+| PK | Primary Key — chave primária, identifica unicamente cada linha |
+| FK | Foreign Key — chave estrangeira, referencia outra tabela |
+| NN | Not Null — valor obrigatório |
+| UQ | Unique — valor único na tabela |
+| CK | Check — constraint de validação de domínio |
+| DF | Default — valor padrão quando não informado |
+
+---
+
+#### Tabela: `usuario`
+
+Armazena os dados dos usuários cadastrados na plataforma, integrada ao sistema de autenticação do Supabase Auth via chave primária. O controle de acesso a linhas é feito por Row Level Security (RLS), garantindo que cada usuário só leia e edite o próprio perfil.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_usuario` | `UUID` | PK, FK → `auth.users(id)` ON DELETE CASCADE, NN | Identificador único do usuário, espelhado do Supabase Auth. Gerado automaticamente pelo trigger `on_auth_user_created` no cadastro. |
+| `nome` | `VARCHAR(150)` | NN | Nome completo ou nome de exibição do usuário. Preenchido automaticamente pelo trigger a partir dos metadados do cadastro. |
+| `email` | `VARCHAR(255)` | NN, UQ, CK (`email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'`) | E-mail do usuário. Deve ter formato válido. Único na tabela. |
+| `data_nascimento` | `DATE` | — | Data de nascimento. Opcional; utilizada para filtros de faixa etária em recomendações. |
+| `localizacao` | `VARCHAR(150)` | — | Cidade ou região informada pelo usuário. Utilizada como sinal de contexto para recomendações baseadas em localização. |
+| `data_cadastro` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
+| `tipo_usuario` | `tipo_usuario_enum` | NN, DF `'cadastrado'` | Papel do usuário: `'visitante'`, `'cadastrado'` ou `'administrador'`. Controla o acesso a funcionalidades administrativas. |
+| `nivel_acesso` | `JSONB` | NN, DF `'{}'` | Permissões granulares em formato JSON. Permite definir capacidades específicas dentro do papel sem criar tabelas de controle adicionais. |
+| `perfil_preferencias` | `JSONB` | NN, DF `'{}'` | Preferências declaradas pelo usuário (gêneros, faixa de preço, etc.). Alimenta o motor de recomendação no cold start. |
+
+---
+
+#### Tabela: `categoria`
+
+Classifica os espetáculos por gênero ou tema. Um espetáculo pode pertencer a múltiplas categorias através da tabela associativa `espetaculo_categoria`.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_categoria` | `SERIAL` | PK, NN | Identificador único da categoria, gerado automaticamente. |
+| `nome` | `VARCHAR(100)` | NN, UQ | Nome da categoria (ex: "Musical", "Infantil", "Drama"). Único na tabela para evitar duplicidade. |
+| `descricao` | `TEXT` | — | Descrição textual do escopo da categoria. Opcional. |
+
+---
+
+#### Tabela: `ator`
+
+Representa os artistas do elenco dos espetáculos. Substituiu o campo textual `elenco` da tabela `espetaculo`, permitindo consultas estruturadas por artista e exibição ordenada dos créditos.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_ator` | `SERIAL` | PK, NN | Identificador único do ator, gerado automaticamente. |
+| `nome` | `VARCHAR(150)` | NN | Nome artístico ou completo do ator. |
+| `biografia` | `TEXT` | — | Texto descritivo com a trajetória profissional do ator. Opcional. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente. |
+
+---
+
+#### Tabela: `espetaculo`
+
+Tabela central do catálogo, armazena os metadados de cada peça teatral disponível na plataforma. Os campos `popularidade` e `nota_media` funcionam como cache de leitura, atualizados periodicamente por Workers que consomem dados do MongoDB.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `SERIAL` | PK, NN | Identificador único do espetáculo, gerado automaticamente. |
+| `titulo` | `VARCHAR(200)` | NN | Nome do espetáculo. Obrigatório. |
+| `descricao` | `TEXT` | — | Sinopse ou descrição detalhada do conteúdo. Opcional. |
+| `genero` | `VARCHAR(100)` | — | Gênero artístico principal (ex: "Musical", "Drama", "Dança"). Complementado pela relação com `categoria`. |
+| `faixa_etaria` | `VARCHAR(50)` | — | Faixa etária recomendada (ex: "Livre", "12 anos"). Exibida na interface para filtro de conteúdo. |
+| `duracao` | `INTEGER` | CK `(duracao > 0)` | Duração em minutos. Deve ser positivo quando informado. |
+| `classificacao_indicativa` | `VARCHAR(20)` | — | Classificação indicativa oficial (ex: "L", "10", "14", "18"). |
+| `produtora` | `VARCHAR(150)` | — | Nome da produtora responsável. Pode ser utilizado em filtros administrativos. |
+| `status` | `status_espetaculo_enum` | NN, DF `'em_breve'` | Situação atual: `'em_cartaz'`, `'em_breve'` ou `'encerrado'`. Indexado para filtragem rápida. |
+| `popularidade` | `NUMERIC(10,4)` | NN, DF `0` | Indicador de popularidade calculado a partir das interações no MongoDB. Cache de leitura atualizado por Workers. |
+| `nota_media` | `NUMERIC(4,2)` | NN, DF `0`, CK `BETWEEN 0 AND 5` | Média das avaliações recebidas. Valor entre 0 e 5. Cache atualizado ao registrar novas avaliações. |
+| `id_admin` | `UUID` | FK → `usuario(id_usuario)` ON DELETE SET NULL | Administrador responsável pelo cadastro e gestão do espetáculo. Nulo quando o administrador é removido. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+| `updated_at` | `TIMESTAMP` | NN, DF `NOW()` | Data da última atualização. Deve ser mantida pelo aplicativo ou por trigger ao editar. |
+
+**Índices:** `idx_espetaculo_status`, `idx_espetaculo_nota_media` (DESC), `idx_espetaculo_popularidade` (DESC).
+
+---
+
+#### Tabela: `espetaculo_categoria`
+
+Tabela associativa que implementa o relacionamento N:M entre espetáculos e categorias. Permite que uma peça seja classificada em múltiplos gêneros ou coleções temáticas.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `INTEGER` | PK (composta), FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Referência ao espetáculo. Removido em cascata se o espetáculo for excluído. |
+| `id_categoria` | `INTEGER` | PK (composta), FK → `categoria(id_categoria)` ON DELETE CASCADE, NN | Referência à categoria. Removido em cascata se a categoria for excluída. |
+
+**Chave Primária:** composta por `(id_espetaculo, id_categoria)`.
+
+---
+
+#### Tabela: `espetaculo_ator`
+
+Tabela associativa com atributos que implementa o relacionamento N:M entre espetáculos e atores. Registra o papel desempenhado e a ordem de exibição nos créditos de cada produção.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `INTEGER` | PK (composta), FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Referência ao espetáculo. Removido em cascata se o espetáculo for excluído. |
+| `id_ator` | `INTEGER` | PK (composta), FK → `ator(id_ator)` ON DELETE CASCADE, NN | Referência ao ator. Removido em cascata se o ator for excluído. |
+| `papel` | `VARCHAR(150)` | — | Personagem ou função desempenhada pelo ator no espetáculo. |
+| `ordem_exibicao` | `INTEGER` | CK `(ordem_exibicao > 0)` | Ordem do ator na listagem de créditos. Deve ser positivo quando informado. |
+
+**Chave Primária:** composta por `(id_espetaculo, id_ator)`. **Índice:** `idx_espetaculo_ator_ator` em `id_ator` para buscas por ator.
+
+---
+
+#### Tabela: `teatro`
+
+Armazena os dados dos espaços físicos onde os espetáculos são realizados.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_teatro` | `SERIAL` | PK, NN | Identificador único do teatro, gerado automaticamente. |
+| `nome` | `VARCHAR(200)` | NN | Nome oficial do teatro (pode incluir o nome do parceiro de naming rights). |
+| `endereco` | `VARCHAR(300)` | NN | Endereço completo (rua, número, bairro). |
+| `cidade` | `VARCHAR(100)` | NN | Cidade onde o teatro está localizado. Utilizada em filtros de localização. |
+| `estado` | `CHAR(2)` | NN | Sigla do estado (UF), dois caracteres (ex: "SP", "RJ"). |
+| `capacidade` | `INTEGER` | CK `(capacidade > 0)` | Número máximo de espectadores. Deve ser positivo quando informado. |
+| `acessibilidade` | `BOOLEAN` | NN, DF `FALSE` | Indica se o teatro possui recursos de acessibilidade (rampa, elevador, etc.). |
+| `parceiro_naming_rights` | `VARCHAR(200)` | — | Nome da empresa parceira vinculada ao naming rights do teatro. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+
+---
+
+#### Tabela: `sessao`
+
+Representa uma apresentação específica de um espetáculo em um teatro, em data e horário determinados. É o elo temporal e espacial do catálogo.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_sessao` | `SERIAL` | PK, NN | Identificador único da sessão, gerado automaticamente. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo ao qual a sessão pertence. Removida em cascata se o espetáculo for excluído. |
+| `id_teatro` | `INTEGER` | FK → `teatro(id_teatro)` ON DELETE RESTRICT, NN | Teatro onde a sessão ocorre. Não pode ser excluído enquanto houver sessões vinculadas. |
+| `data` | `DATE` | NN | Data da apresentação. |
+| `horario` | `TIME` | NN | Horário de início da apresentação. |
+| `preco_minimo` | `NUMERIC(10,2)` | CK `(preco_minimo >= 0)` | Menor valor de ingresso disponível. Deve ser não-negativo. |
+| `preco_maximo` | `NUMERIC(10,2)` | CK `(preco_maximo >= 0)`, CK `(preco_maximo >= preco_minimo)` | Maior valor de ingresso disponível. Deve ser maior ou igual ao preço mínimo quando ambos informados. |
+| `disponibilidade` | `INTEGER` | NN, DF `0`, CK `(disponibilidade >= 0)` | Quantidade de ingressos disponíveis. Cache atualizado por integração com a ticketeira. |
+| `link_compra` | `TEXT` | — | URL externa para compra de ingressos na plataforma parceira (Sympla, Blueticket, etc.). |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+
+**Índices:** `idx_sessao_espetaculo`, `idx_sessao_data`, `idx_sessao_teatro`.
+
+---
+
+#### Tabela: `avaliacao`
+
+Registra as notas e comentários explícitos de usuários sobre espetáculos. Cada usuário pode avaliar um espetáculo apenas uma vez (constraint UNIQUE). Os dados desta tabela alimentam o cálculo da `nota_media` em `espetaculo`.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_avaliacao` | `SERIAL` | PK, NN | Identificador único da avaliação, gerado automaticamente. |
+| `id_usuario` | `UUID` | FK → `usuario(id_usuario)` ON DELETE CASCADE, NN | Usuário que realizou a avaliação. Removida em cascata se o usuário for excluído. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo avaliado. Removida em cascata se o espetáculo for excluído. |
+| `nota` | `NUMERIC(4,2)` | NN, CK `BETWEEN 0 AND 5` | Nota atribuída pelo usuário, entre 0 e 5. |
+| `comentario` | `TEXT` | — | Comentário textual opcional do usuário sobre o espetáculo. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de registro da avaliação. |
+
+**Chave Única:** `(id_usuario, id_espetaculo)` — impede avaliações duplicadas do mesmo usuário para o mesmo espetáculo. **Índice:** `idx_avaliacao_espetaculo`.
+
+---
+
+#### Tabela: `recomendacao`
+
+Armazena os resultados gerados pelos algoritmos de Machine Learning para cada usuário. O campo `referencia_origem_id` vincula a recomendação ao evento de telemetria do MongoDB que a originou, garantindo rastreabilidade e auditabilidade do modelo.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_recomendacao` | `SERIAL` | PK, NN | Identificador único da recomendação, gerado automaticamente. |
+| `id_usuario` | `UUID` | FK → `usuario(id_usuario)` ON DELETE CASCADE, NN | Usuário para quem a recomendação foi gerada. Removida em cascata se o usuário for excluído. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo recomendado. Removida em cascata se o espetáculo for excluído. |
+| `tipo_algoritmo` | `VARCHAR(50)` | NN, CK `IN ('k-NN', 'SVD', 'k-means')` | Algoritmo utilizado para gerar a recomendação. Valores aceitos: `'k-NN'`, `'SVD'` ou `'k-means'`. |
+| `score_recomendacao` | `NUMERIC(8,6)` | NN, CK `(score_recomendacao >= 0)` | Pontuação de relevância calculada pelo algoritmo. Valor não-negativo; quanto maior, mais relevante. |
+| `motivo_recomendacao` | `TEXT` | — | Justificativa textual da recomendação exibida ao usuário (ex: "Porque você gostou de musicais"). |
+| `data_geracao` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora em que a recomendação foi gerada. |
+| `prioridade_manual` | `BOOLEAN` | NN, DF `FALSE` | Indica se um administrador sobrescreveu a prioridade gerada pelo algoritmo para fins de campanha. |
+| `referencia_origem_id` | `VARCHAR(50)` | — | ID do documento no MongoDB (`interacoes`) que serviu de gatilho para esta recomendação. Permite rastrear qual evento comportamental originou a sugestão. |
+
+**Índices:** `idx_recomendacao_usuario`, `idx_recomendacao_score` (por `id_usuario`, `score_recomendacao DESC` — otimiza a exibição das recomendações ordenadas por relevância).
+
+---
+
+#### ENUMs Customizados
+
+| Tipo | Valores | Utilização |
+|---|---|---|
+| `tipo_usuario_enum` | `'visitante'`, `'cadastrado'`, `'administrador'` | Campo `tipo_usuario` da tabela `usuario` |
+| `status_espetaculo_enum` | `'em_cartaz'`, `'em_breve'`, `'encerrado'` | Campo `status` da tabela `espetaculo` |
+
+---
+
+#### Visão Geral das Chaves Estrangeiras
+
+| Tabela | Coluna | Referencia | Comportamento |
+|---|---|---|---|
+| `usuario` | `id_usuario` | `auth.users(id)` | CASCADE DELETE |
+| `espetaculo` | `id_admin` | `usuario(id_usuario)` | SET NULL |
+| `espetaculo_categoria` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `espetaculo_categoria` | `id_categoria` | `categoria(id_categoria)` | CASCADE DELETE |
+| `espetaculo_ator` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `espetaculo_ator` | `id_ator` | `ator(id_ator)` | CASCADE DELETE |
+| `sessao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `sessao` | `id_teatro` | `teatro(id_teatro)` | RESTRICT DELETE |
+| `avaliacao` | `id_usuario` | `usuario(id_usuario)` | CASCADE DELETE |
+| `avaliacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `recomendacao` | `id_usuario` | `usuario(id_usuario)` | CASCADE DELETE |
+| `recomendacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+
+---
+
+### 4.3.4 Normalização do Modelo Relacional
+
+&emsp;A normalização é o processo de organizar as tabelas de um banco de dados relacional de forma a reduzir redundâncias, evitar anomalias de inserção, atualização e exclusão, e garantir a integridade dos dados. O modelo lógico do Spotlight foi projetado seguindo as três primeiras formas normais (1FN, 2FN e 3FN), cujas aplicações são detalhadas abaixo com exemplos reais das tabelas do projeto.
+
+---
+
+#### 4.3.4.1 Primeira Forma Normal (1FN)
+
+**Definição:** Uma tabela está na 1FN quando todos os seus atributos contêm apenas valores atômicos (indivisíveis) e não há grupos repetitivos de colunas.
+
+**Violação típica:** armazenar múltiplos valores em uma única coluna, como uma lista de categorias separada por vírgulas no campo `genero` da tabela `espetaculo`, ou um campo `elenco TEXT` com vários nomes concatenados.
+
+**Aplicação no Spotlight:**
+
+A decisão mais representativa da 1FN no projeto foi a **eliminação do campo `elenco TEXT`** da tabela `espetaculo`. Em uma modelagem sem normalização, esse campo poderia conter valores como `"João Silva, Maria Souza, Pedro Lima"` — um único atributo com múltiplos valores embutidos, violando diretamente a 1FN. A solução adotada foi criar a entidade `ator` e a tabela associativa `espetaculo_ator`, garantindo que cada célula da tabela contenha exatamente um valor atômico:
+
+| Antes (viola 1FN) | Depois (1FN atendida) |
+|---|---|
+| `espetaculo.elenco = 'João Silva, Maria Souza'` | `espetaculo_ator(id_espetaculo=1, id_ator=10, papel='Protagonista')` |
+| Não é possível filtrar por ator específico | `SELECT * FROM espetaculo_ator WHERE id_ator = 10` funciona diretamente |
+
+O mesmo raciocínio se aplica às **categorias**: em vez de armazenar `genero = 'Musical, Infantil'` na tabela `espetaculo`, foi criada a tabela associativa `espetaculo_categoria`, permitindo que cada linha represente exatamente uma relação espetáculo–categoria.
+
+Quanto ao campo `perfil_preferencias JSONB` da tabela `usuario`, sua natureza semiestruturada é intencional e justificada: preferências do usuário são dinâmicas e evoluem sem esquema fixo. O uso de `JSONB` é um padrão reconhecido no PostgreSQL para dados flexíveis, e não constitui violação da 1FN, pois o campo em si é atômico do ponto de vista da tabela relacional — o conteúdo interno é tratado como um documento opaco com estrutura gerenciada pela aplicação.
+
+---
+
+#### 4.3.4.2 Segunda Forma Normal (2FN)
+
+**Definição:** Uma tabela está na 2FN quando está na 1FN e todos os seus atributos não-chave dependem **completamente** da chave primária. A 2FN é relevante apenas para tabelas com **chave primária composta**: se algum atributo depende apenas de parte da chave, há dependência parcial, caracterizando violação da forma normal.
+
+**Violação típica:** em uma tabela com PK `(id_espetaculo, id_ator)`, incluir uma coluna `titulo_espetaculo` — que depende somente de `id_espetaculo`, não da combinação completa.
+
+**Aplicação no Spotlight:**
+
+As duas tabelas com chaves primárias compostas no projeto são `espetaculo_categoria` e `espetaculo_ator`. Ambas foram analisadas para garantir ausência de dependências parciais:
+
+**Tabela `espetaculo_ator` — PK `(id_espetaculo, id_ator)`:**
+
+| Atributo | Depende de `id_espetaculo` sozinho? | Depende de `id_ator` sozinho? | Depende da PK completa? |
+|---|---|---|---|
+| `papel` | Não — o mesmo espetáculo pode ter vários papéis | Não — o mesmo ator pode ter papéis diferentes em peças distintas | **Sim** — o papel é específico ao vínculo espetáculo+ator |
+| `ordem_exibicao` | Não | Não | **Sim** — a ordem nos créditos é específica a cada par |
+
+Nenhuma informação sobre o espetáculo (como `titulo` ou `status`) foi incluída nesta tabela. Da mesma forma, nenhuma informação sobre o ator (como `biografia`) foi duplicada aqui — ambas residem em suas respectivas tabelas de origem, eliminando qualquer dependência parcial.
+
+**Tabela `espetaculo_categoria` — PK `(id_espetaculo, id_categoria)`:**
+
+Esta tabela não possui atributos além das chaves estrangeiras que formam a PK, portanto está trivialmente na 2FN. A relação apenas registra a existência do vínculo; qualquer detalhe adicional pertence às tabelas `espetaculo` ou `categoria`.
+
+Para as demais tabelas com chaves primárias simples (`usuario`, `espetaculo`, `teatro`, `sessao`, `avaliacao`, `recomendacao`, `ator`, `categoria`), a 2FN é automaticamente satisfeita, pois chaves simples não podem gerar dependências parciais.
+
+---
+
+#### 4.3.4.3 Terceira Forma Normal (3FN)
+
+**Definição:** Uma tabela está na 3FN quando está na 2FN e nenhum atributo não-chave depende de outro atributo não-chave (ausência de **dependências transitivas**). Uma dependência transitiva ocorre quando o atributo A determina B, e B determina C — sendo C transitivamente dependente de A via B, em vez de ser diretamente dependente da chave primária.
+
+**Violação típica:** incluir `cidade_teatro` e `estado_teatro` na tabela `sessao`. Esses atributos dependeriam de `id_teatro`, não de `id_sessao`, criando uma cadeia: `id_sessao → id_teatro → cidade_teatro`.
+
+**Aplicação no Spotlight:**
+
+**Separação de `teatro` e `sessao`:**
+
+A decisão de manter `teatro` como entidade independente elimina a principal fonte potencial de dependência transitiva no projeto. Se os dados do teatro fossem desnormalizados em `sessao`, campos como `endereco`, `cidade` e `acessibilidade` dependeriam de `id_teatro` (que por sua vez depende de `id_sessao`), não da chave da sessão diretamente. Ao referenciar o teatro via FK `id_teatro`, cada atributo de localização do teatro permanece em sua tabela de origem, onde depende diretamente de `id_teatro`:
+
+```
+sessao.id_sessao → sessao.id_teatro → teatro.cidade  ← dependência transitiva se cidade estivesse em sessao
+sessao.id_sessao → sessao.id_teatro                   ← correto: apenas a FK fica em sessao
+teatro.id_teatro → teatro.cidade                      ← correto: cidade depende diretamente de id_teatro
+```
+
+**Separação de `ator` e `espetaculo_ator`:**
+
+Sem a entidade `ator`, a tabela `espetaculo_ator` poderia conter `nome_ator` e `biografia_ator` diretamente. Esses campos dependeriam de `id_ator` (não da PK composta da tabela associativa), criando dependência transitiva. A solução adotada mantém todos os atributos do ator na tabela `ator`, onde dependem diretamente de `id_ator`.
+
+**Campos `popularidade` e `nota_media` em `espetaculo`:**
+
+Esses dois campos merecem atenção especial. Na lógica estrita de normalização, `nota_media` poderia ser considerado um valor derivado das linhas de `avaliacao` — calculável a partir de `AVG(nota) WHERE id_espetaculo = X`. No entanto, a equipe optou por mantê-los desnormalizados intencionalmente, pois representam um **cache de leitura** atualizado periodicamente por Workers que processam dados do MongoDB. Essa decisão é uma **desnormalização controlada e justificada**, padrão reconhecido em sistemas de alta leitura para evitar agregações custosas em tempo real. O trade-off é explícito: aceita-se eventual inconsistência temporal (cache ligeiramente desatualizado) em troca de consultas ao catálogo extremamente rápidas sem JOINs de agregação.
+
+**Atributo `referencia_origem_id` em `recomendacao`:**
+
+Este campo armazena o ID de um documento no MongoDB que originou a recomendação. Ele não depende de nenhum outro campo não-chave da tabela `recomendacao` — depende exclusivamente da chave `id_recomendacao`. Não há, portanto, dependência transitiva.
+
+**Campo `tipo_algoritmo` em `recomendacao`:**
+
+Este campo usa `VARCHAR(50)` com `CHECK IN ('k-NN', 'SVD', 'k-means')` em vez de um tipo ENUM customizado, seguindo padrão diferente dos campos `tipo_usuario` e `status_espetaculo`. A decisão é intencional: algoritmos de recomendação têm ciclo de atualização frequente ao longo do projeto, e adicionar um novo valor a um ENUM em PostgreSQL exige uma migration `ALTER TYPE`, operação que bloqueia a tabela brevemente. O `VARCHAR+CHECK` permite estender os valores aceitos com um simples `ALTER TABLE ... DROP CONSTRAINT ... / ADD CONSTRAINT ...`, sem impacto em produção. O trade-off aceito é a perda da garantia semântica de tipo nativo do banco.
+
+---
+
+#### Síntese
+
+| Forma Normal | Decisão de Modelagem | Exemplo no Projeto |
+|---|---|---|
+| **1FN** | Eliminação de listas e grupos repetitivos | Tabelas `ator` + `espetaculo_ator` substituem campo `elenco TEXT`; `espetaculo_categoria` substitui `genero` com múltiplos valores |
+| **2FN** | Eliminação de dependências parciais em chaves compostas | `espetaculo_ator.papel` depende do par `(id_espetaculo, id_ator)`, nunca de apenas um dos dois |
+| **3FN** | Eliminação de dependências transitivas | Dados de `teatro` (cidade, endereço) não são copiados em `sessao`; dados de `ator` não são duplicados em `espetaculo_ator` |
+
+&emsp;O modelo relacional do Spotlight atende integralmente às três primeiras formas normais nas tabelas transacionais do PostgreSQL. A única exceção deliberada — os campos de cache `popularidade` e `nota_media` em `espetaculo` — é uma desnormalização justificada por critérios de desempenho, documentada como decisão arquitetural consciente e não como descuido de modelagem.
+
+---
+
+### 4.3.5 Tabelas Associativas dos Relacionamentos N:N
+
+&emsp;Relacionamentos muitos-para-muitos (N:N) não podem ser representados diretamente em um banco relacional. A solução padrão é introduzir uma **tabela associativa** (também chamada de tabela de junção ou tabela pivot) que resolve o relacionamento em dois relacionamentos 1:N, um para cada entidade participante. Cada linha da tabela associativa representa exatamente uma combinação válida entre os dois lados do relacionamento.
+
+&emsp;O modelo lógico do Spotlight possui dois relacionamentos N:N, ambos implementados com tabelas associativas no PostgreSQL: `espetaculo_categoria` e `espetaculo_ator`. Ambas utilizam **chave primária composta** formada pelas duas chaves estrangeiras, garantindo que a mesma combinação não seja registrada mais de uma vez.
+
+---
+
+#### 4.3.5.1 `espetaculo_categoria`
+
+**Relacionamento representado:** Um espetáculo pode pertencer a múltiplas categorias e uma categoria pode classificar múltiplos espetáculos.
+
+**Motivação:** O campo `genero VARCHAR` da tabela `espetaculo` poderia conter apenas um gênero por espetáculo. Para que uma peça como "O Rei Leão" seja simultaneamente classificada como "Musical" e "Infantil", é necessária uma estrutura relacional separada que permita múltiplos vínculos sem repetição de linhas na tabela principal.
+
+**Estrutura:**
+
+```
+espetaculo_categoria
+┌─────────────────────┬─────────────────────┐
+│  id_espetaculo (FK) │  id_categoria (FK)  │
+│  INTEGER  NOT NULL  │  INTEGER  NOT NULL  │
+│  PK ─────────────── ┼ ─────────────── PK  │
+└──────────┬──────────┴──────────┬──────────┘
+           │                     │
+           ▼                     ▼
+    espetaculo(id_espetaculo)  categoria(id_categoria)
+```
+
+**Definição SQL:**
+
+```sql
+CREATE TABLE espetaculo_categoria (
+    id_espetaculo  INTEGER  NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    id_categoria   INTEGER  NOT NULL REFERENCES categoria(id_categoria)   ON DELETE CASCADE,
+    PRIMARY KEY (id_espetaculo, id_categoria)
+);
+```
+
+**Chave Primária Composta:** `(id_espetaculo, id_categoria)`
+A PK composta impede que o mesmo espetáculo seja vinculado à mesma categoria mais de uma vez. Inserir uma segunda linha com `(1, 3)` quando já existe `(1, 3)` resultará em violação de unicidade.
+
+**Chaves Estrangeiras e Comportamentos:**
+
+| Coluna | Referencia | ON DELETE |
+|---|---|---|
+| `id_espetaculo` | `espetaculo(id_espetaculo)` | `CASCADE` — ao excluir um espetáculo, todos os seus vínculos de categoria são removidos automaticamente |
+| `id_categoria` | `categoria(id_categoria)` | `CASCADE` — ao excluir uma categoria, todos os vínculos com espetáculos são removidos automaticamente |
+
+**Atributos adicionais:** nenhum. A tabela registra apenas a existência do vínculo; qualquer informação descritiva pertence às tabelas `espetaculo` ou `categoria`.
+
+**Exemplos de uso:**
+
+```sql
+-- Classificar um espetáculo em múltiplas categorias
+INSERT INTO espetaculo_categoria VALUES (1, 2); -- Musical
+INSERT INTO espetaculo_categoria VALUES (1, 5); -- Infantil
+
+-- Buscar todas as categorias de um espetáculo
+SELECT c.nome
+FROM categoria c
+JOIN espetaculo_categoria ec ON ec.id_categoria = c.id_categoria
+WHERE ec.id_espetaculo = 1;
+
+-- Buscar todos os espetáculos de uma categoria
+SELECT e.titulo
+FROM espetaculo e
+JOIN espetaculo_categoria ec ON ec.id_espetaculo = e.id_espetaculo
+WHERE ec.id_categoria = 2;
+```
+
+**Consistência com o modelo conceitual:** corresponde ao relacionamento "Pertence a" (N:M) entre `Espetáculo` e `Categoria` descrito na seção 4.2.3, relacionamento nº 8.
+
+---
+
+#### 4.3.5.2 `espetaculo_ator`
+
+**Relacionamento representado:** Um espetáculo conta com múltiplos atores em seu elenco e um ator pode participar de múltiplos espetáculos ao longo da carreira.
+
+**Motivação:** Além de resolver o N:N entre `espetaculo` e `ator`, esta tabela é uma **classe associativa** — ela carrega atributos próprios que descrevem o contexto específico da participação de um ator em uma determinada peça. Esses atributos (`papel` e `ordem_exibicao`) não pertencem nem ao espetáculo nem ao ator isoladamente; eles só fazem sentido no contexto da combinação dos dois.
+
+**Estrutura:**
+
+```
+espetaculo_ator
+┌─────────────────────┬─────────────────────┬──────────────┬──────────────────┐
+│  id_espetaculo (FK) │    id_ator (FK)     │    papel     │  ordem_exibicao  │
+│  INTEGER  NOT NULL  │  INTEGER  NOT NULL  │ VARCHAR(150) │     INTEGER      │
+│  PK ─────────────── ┼ ─────────────── PK  │   opcional   │   CK > 0         │
+└──────────┬──────────┴──────────┬──────────┴──────────────┴──────────────────┘
+           │                     │
+           ▼                     ▼
+    espetaculo(id_espetaculo)  ator(id_ator)
+```
+
+**Definição SQL:**
+
+```sql
+CREATE TABLE espetaculo_ator (
+    id_espetaculo  INTEGER      NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    id_ator        INTEGER      NOT NULL REFERENCES ator(id_ator)             ON DELETE CASCADE,
+    papel          VARCHAR(150),
+    ordem_exibicao INTEGER      CHECK (ordem_exibicao > 0),
+    PRIMARY KEY (id_espetaculo, id_ator)
+);
+```
+
+**Chave Primária Composta:** `(id_espetaculo, id_ator)`
+A PK composta garante que um ator apareça no elenco de um dado espetáculo no máximo uma vez. Para representar um ator em múltiplos papéis na mesma peça, a modelagem exigiria uma extensão futura com um terceiro componente na chave.
+
+**Chaves Estrangeiras e Comportamentos:**
+
+| Coluna | Referencia | ON DELETE |
+|---|---|---|
+| `id_espetaculo` | `espetaculo(id_espetaculo)` | `CASCADE` — ao excluir um espetáculo, todo o elenco vinculado é removido |
+| `id_ator` | `ator(id_ator)` | `CASCADE` — ao excluir um ator, seus vínculos com todos os espetáculos são removidos |
+
+**Atributos da classe associativa:**
+
+| Coluna | Tipo | Restrição | Descrição |
+|---|---|---|---|
+| `papel` | `VARCHAR(150)` | Opcional | Personagem ou função do ator neste espetáculo específico (ex: "Protagonista", "Simba", "Ensemble"). Varia por espetáculo — não pode residir na tabela `ator`. |
+| `ordem_exibicao` | `INTEGER` | `CHECK > 0`, opcional | Posição do ator na listagem de créditos deste espetáculo. Determina a ordem de exibição na interface. Deve ser positivo quando informado. |
+
+**Índice:** `idx_espetaculo_ator_ator` em `id_ator` — permite buscar todos os espetáculos de um ator com eficiência sem varrer a tabela inteira.
+
+**Exemplos de uso:**
+
+```sql
+-- Montar o elenco de um espetáculo ordenado pelos créditos
+SELECT a.nome, ea.papel, ea.ordem_exibicao
+FROM ator a
+JOIN espetaculo_ator ea ON ea.id_ator = a.id_ator
+WHERE ea.id_espetaculo = 1
+ORDER BY ea.ordem_exibicao;
+
+-- Buscar todos os espetáculos de um ator específico
+SELECT e.titulo, ea.papel
+FROM espetaculo e
+JOIN espetaculo_ator ea ON ea.id_espetaculo = e.id_espetaculo
+WHERE ea.id_ator = 7;
+```
+
+**Consistência com o modelo conceitual:** corresponde ao relacionamento "Atua em" (N:M) entre `Espetáculo` e `Ator` descrito na seção 4.2.3, relacionamento nº 11. A existência de atributos próprios (`papel`, `ordem_exibicao`) é exatamente o que justifica a modelagem como **classe associativa** no diagrama de classes (seção 5.1.3).
+
+---
+
+#### Comparativo entre as duas tabelas associativas
+
+| Característica | `espetaculo_categoria` | `espetaculo_ator` |
+|---|---|---|
+| **Entidades relacionadas** | `espetaculo` ↔ `categoria` | `espetaculo` ↔ `ator` |
+| **Chave primária** | `(id_espetaculo, id_categoria)` | `(id_espetaculo, id_ator)` |
+| **Atributos próprios** | Nenhum | `papel`, `ordem_exibicao` |
+| **Tipo no diagrama de classes** | Associação simples | Classe associativa |
+| **ON DELETE FK esquerda** | CASCADE | CASCADE |
+| **ON DELETE FK direita** | CASCADE | CASCADE |
+| **Índice adicional** | Nenhum | `idx_espetaculo_ator_ator` |
+| **Relacionamento no conceitual** | Nº 8 — "Pertence a" | Nº 11 — "Atua em" |
+
+---
+
+## 4.4 Modelo Físico de Dados
+
+&emsp;O modelo físico de dados descreve como a estrutura lógica definida na seção 4.3 foi concretizada em tecnologias específicas de armazenamento, incluindo tipos de dados nativos do SGBD, mecanismos de segurança em nível de linha, índices de performance, triggers e a organização dos scripts de provisionamento. A documentação técnica completa do banco, incluindo instruções de instalação, rollback e dicionário detalhado, está disponível em [`src/database/README.md`](../src/database/README.md).
+
+---
+
+### 4.4.1 Tecnologias de Persistência
+
+O Spotlight adota uma estratégia de **persistência poliglota**, utilizando dois SGBDs com responsabilidades complementares:
+
+| SGBD | Versão | Provisionamento | Responsabilidade |
+|---|---|---|---|
+| **PostgreSQL** | 15+ | Supabase (cloud ou self-hosted via Docker) | Dados transacionais e estruturados: catálogo, perfis, avaliações e recomendações processadas |
+| **MongoDB** | 7+ | Container Docker independente | Eventos de telemetria comportamental em alta volumetria (cliques, tempo de tela) |
+
+A separação é justificada pela diferença de padrão de acesso: o PostgreSQL serve consultas relacionais complexas com JOINs e filtros compostos, enquanto o MongoDB absorve escritas massivas e contínuas sem impactar o banco principal.
+
+---
+
+### 4.4.2 Scripts SQL de Provisionamento
+
+Todos os scripts estão em `src/database/` e devem ser executados na ordem indicada:
+
+| Arquivo | Função | Ordem |
+|---|---|---|
+| [`01_create_database.sql`](../src/database/01_create_database.sql) | Cria os tipos ENUM, as 10 tabelas, as políticas de RLS, os 10 índices e o trigger de integração com o Supabase Auth | 1º |
+| [`02_initial_data.sql`](../src/database/02_initial_data.sql) | Insere dados de seed (categorias, teatros, atores, espetáculos e sessões iniciais) | 2º |
+| [`03_rollback.sql`](../src/database/03_rollback.sql) | Desfaz completamente o `01_create_database.sql` — destrutivo, uso exclusivo em desenvolvimento | — |
+
+**Execução via SQL Editor do Supabase:**
+1. Acesse o Supabase Dashboard → SQL Editor → New Query
+2. Cole e execute `01_create_database.sql`
+3. Cole e execute `02_initial_data.sql`
+
+**Execução via `psql`:**
+```bash
+export PGPASSWORD=<senha>
+psql -h <host> -p <porta> -U postgres -d postgres -f src/database/01_create_database.sql
+psql -h <host> -p <porta> -U postgres -d postgres -f src/database/02_initial_data.sql
+```
+
+---
+
+### 4.4.3 Implementação Física no PostgreSQL
+
+#### Tipos Enumerados (ENUMs)
+
+Dois tipos customizados são criados antes das tabelas e utilizados como domínio restrito de valores:
+
+| Tipo | Valores | Tabela que utiliza |
+|---|---|---|
+| `tipo_usuario_enum` | `'visitante'`, `'cadastrado'`, `'administrador'` | `usuario.tipo_usuario` |
+| `status_espetaculo_enum` | `'em_cartaz'`, `'em_breve'`, `'encerrado'` | `espetaculo.status` |
+
+O uso de ENUMs em vez de `VARCHAR` com CHECK garante que o banco rejeite valores inválidos sem a necessidade de manter a lógica de validação duplicada na aplicação.
+
+#### Integração com Supabase Auth via Trigger
+
+A tabela `usuario` não armazena senhas. A autenticação é delegada integralmente ao Supabase Auth, cujo estado reside na tabela `auth.users` (schema gerenciado). A sincronização entre o cadastro de um novo usuário no Supabase Auth e a criação do perfil no schema público é feita automaticamente por um trigger:
+
+```sql
+-- Função executada após INSERT em auth.users
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+    INSERT INTO public.usuario (id_usuario, nome, email)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
+        NEW.email
+    );
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+Isso garante que toda conta criada via Supabase Auth resulte automaticamente em um perfil na tabela `usuario`, sem necessidade de chamada explícita pela aplicação.
+
+#### Row Level Security (RLS)
+
+Todas as 10 tabelas têm RLS habilitado. As políticas implementadas seguem dois padrões:
+
+| Padrão | Tabelas | Regra |
+|---|---|---|
+| **Leitura pública** | `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao`, `avaliacao` | `USING (true)` — qualquer requisição pode ler |
+| **Acesso restrito ao próprio usuário** | `usuario`, `avaliacao` (INSERT/DELETE), `recomendacao` | `USING (auth.uid() = id_usuario)` — apenas o titular acessa |
+
+O RLS é a camada de segurança de dados mais próxima do banco. Mesmo que um token com permissões elevadas chegue ao banco, as políticas garantem que cada usuário só enxerga e modifica seus próprios registros onde aplicável.
+
+#### Índices de Performance
+
+10 índices explícitos foram criados para otimizar os padrões de consulta mais frequentes da aplicação:
+
+| Índice | Tabela | Colunas | Consulta otimizada |
+|---|---|---|---|
+| `idx_espetaculo_status` | `espetaculo` | `status` | Filtrar espetáculos em cartaz |
+| `idx_espetaculo_nota_media` | `espetaculo` | `nota_media DESC` | Ranking por avaliação |
+| `idx_espetaculo_popularidade` | `espetaculo` | `popularidade DESC` | Ranking por popularidade |
+| `idx_sessao_espetaculo` | `sessao` | `id_espetaculo` | Sessões de um espetáculo |
+| `idx_sessao_data` | `sessao` | `data` | Sessões por data |
+| `idx_sessao_teatro` | `sessao` | `id_teatro` | Sessões de um teatro |
+| `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | Recomendações de um usuário |
+| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | Top recomendações por usuário |
+| `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Avaliações de um espetáculo |
+| `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Espetáculos de um ator |
+
+Além desses, o PostgreSQL cria automaticamente índices para todas as chaves primárias e constraints UNIQUE.
+
+---
+
+### 4.4.4 Implementação Física no MongoDB
+
+O MongoDB armazena os eventos de telemetria comportamental gerados pelos usuários durante a navegação. A estrutura física é composta por uma única coleção principal:
+
+**Coleção: `interacoes`**
+
+Cada documento representa um evento de comportamento de um usuário em relação a um espetáculo:
+
+```json
+{
+  "_id": "ObjectId(...)",
+  "user_id": "uuid-do-usuario",
+  "espetaculo_id": 42,
+  "tipo_interacao": "visualizacao",
+  "timestamp": "2026-05-26T14:32:00.000Z",
+  "tempo_permanencia": 87,
+  "session_id": "sess_abc123",
+  "dispositivo": "mobile"
+}
+```
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `_id` | `ObjectId` | Sim (automático) | Identificador único gerado pelo MongoDB |
+| `user_id` | `String` (UUID) | Sim | ID do usuário — corresponde a `usuario.id_usuario` no PostgreSQL |
+| `espetaculo_id` | `Integer` | Sim | ID do espetáculo — corresponde a `espetaculo.id_espetaculo` |
+| `tipo_interacao` | `String` | Sim | Tipo do evento: `"visualizacao"`, `"clique"`, `"favorito"` |
+| `timestamp` | `Date` | Sim | Momento do evento em ISO 8601 |
+| `tempo_permanencia` | `Integer` | Não | Segundos de permanência na página do espetáculo |
+| `session_id` | `String` | Não | Identificador da sessão de navegação |
+| `dispositivo` | `String` | Não | Plataforma de origem: `"mobile"`, `"web"` |
+
+Os Workers do ML Engine consomem esta coleção em lote, calculam os scores de recomendação e escrevem os resultados processados de volta na tabela `recomendacao` do PostgreSQL, completando o ciclo de dados do sistema.
+
+---
+
+### 4.4.5 Implantação Local com Docker
+
+Para desenvolvimento local, o banco PostgreSQL é provisionado via Docker usando a imagem oficial do Supabase:
+
+```yaml
+services:
+  db:
+    image: supabase/postgres:15.1.0.147
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create.sql
+      - ./src/database/02_initial_data.sql:/docker-entrypoint-initdb.d/02_seed.sql
+```
+
+Os scripts mapeados em `docker-entrypoint-initdb.d/` são executados automaticamente na **primeira inicialização** do container, em ordem alfabética. Em reinicializações subsequentes, o volume já contém os dados e os scripts não são reexecutados.
+
+Para instruções completas de execução, variáveis de ambiente necessárias e procedimentos de rollback, consulte [`src/database/README.md`](../src/database/README.md).
 
 # 5. Solução Técnica (Design)
 _conteúdo_
@@ -2191,7 +2842,7 @@ O diagrama estabelece portas e interfaces estritas (conectores e receptores) ent
 | **IGeolocation** | Contrato interno roteado pelo Gateway para o Serviço de Geolocalização. |
 | **IEvents** | Contrato de publicação de mensagens (*Producer*) em tópicos/filas do RabbitMQ. |
 | **Worker** | Interface de consumo (*Consumer*) onde o ML Engine extrai lotes de eventos do RabbitMQ continuamente e de forma desacoplada. |
-| **SQL / NoSQL** | Abstrações de conexão de persistência (EF Core / MongoDB Driver). |
+| **SQL / NoSQL** | Abstrações de conexão de persistência (Npgsql/ADO.NET — SQL puro, sem ORM / MongoDB Driver). |
 
 ---
 
@@ -2305,6 +2956,8 @@ A API de negócio é organizada em três serviços independentes, seguindo a arq
 O **ASP.NET Core Web API** foi escolhido por ser o framework mais maduro do ecossistema .NET para APIs RESTful, com suporte robusto a middleware de autenticação JWT, injeção de dependência nativa e compatibilidade total com .NET 9. O .NET 10 foi descartado por ainda estar em preview no período de desenvolvimento.
 
 Um **API Gateway** centraliza o roteamento entre os três serviços, valida o JWT emitido pelo Supabase Auth e aplica rate limiting.
+
+> **Contratos de API:** a especificação completa das rotas — método, path, finalidade, schemas de request/response por status code e exemplos de payload em JSON — está em [`src/backend/contracts/api-contracts.md`](../src/backend/contracts/api-contracts.md). Esse documento é a **fonte da verdade** para a implementação das features do backend e para a documentação Swagger.
 
 ### 5.3.4 Frontend: React Native + TypeScript
 
