@@ -1,5 +1,7 @@
 export type Genero = 'Feminino' | 'Masculino' | 'Outro' | 'Prefiro não informar';
 
+export type TipoUsuario = 'cadastrado' | 'administrador';
+
 export type Usuario = {
   id: string;
   nome: string;
@@ -7,6 +9,7 @@ export type Usuario = {
   idade: number;
   genero: Genero;
   compartilharLocalizacao: boolean;
+  tipoUsuario: TipoUsuario;
 };
 
 export type LoginPayload = {
@@ -30,6 +33,7 @@ const MOCK_USER: Usuario = {
   idade: 24,
   genero: 'Feminino',
   compartilharLocalizacao: true,
+  tipoUsuario: 'cadastrado',
 };
 
 function wait(ms = 450) {
@@ -45,9 +49,14 @@ export async function loginUsuario(payload: LoginPayload): Promise<Usuario> {
     throw new Error('Preencha e-mail e senha para entrar.');
   }
 
+  const email = payload.email.trim();
+  const isAdmin = email.toLowerCase().includes('admin');
+
   return {
     ...MOCK_USER,
-    email: payload.email.trim(),
+    nome: isAdmin ? 'Admin' : MOCK_USER.nome,
+    email,
+    tipoUsuario: isAdmin ? 'administrador' : 'cadastrado',
   };
 }
 
@@ -71,5 +80,6 @@ export async function cadastrarUsuario(payload: CadastroPayload): Promise<Usuari
     idade,
     genero: payload.genero,
     compartilharLocalizacao: payload.compartilharLocalizacao,
+    tipoUsuario: 'cadastrado',
   };
 }
