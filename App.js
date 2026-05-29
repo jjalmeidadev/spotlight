@@ -6,11 +6,12 @@ import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
 import CadastroView from './src/frontend/screens/CadastroView';
 import CatalogView from './src/frontend/screens/CatalogView';
 import DetalhesView from './src/frontend/screens/DetalhesView';
+import LoadingScreen from './src/frontend/screens/LoadingScreen';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
 
 export default function App() {
-	const [screen, setScreen] = React.useState('login');
+	const [screen, setScreen] = React.useState('loading');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
 	const [userName, setUserName] = React.useState('Leonardo');
 
@@ -37,17 +38,27 @@ export default function App() {
 		return () => subscription.remove();
 	}, []);
 
+	function handleLogin(usuario) {
+		setUserName(usuario.nome);
+		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
+	}
+
+	if (screen === 'loading') {
+		return (
+			<LoadingScreen
+				onFinish={(status) => {
+					setScreen(status === 'authenticated' ? 'preferencias' : 'login');
+				}}
+			/>
+		);
+	}
+
 	if (!fontsLoaded) {
 		return (
 			<View style={styles.loading}>
 				<ActivityIndicator color="#111412" />
 			</View>
 		);
-	}
-
-	function handleLogin(usuario) {
-		setUserName(usuario.nome);
-		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
 	}
 
 	if (screen === 'cadastro') {
