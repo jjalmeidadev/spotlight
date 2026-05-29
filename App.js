@@ -1,7 +1,6 @@
 import React from 'react';
-import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
-import { ActivityIndicator } from 'react-native';
 
 import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
 import CadastroView from './src/frontend/screens/CadastroView';
@@ -16,18 +15,11 @@ export default function App() {
 	const [userName, setUserName] = React.useState('Leonardo');
 
 	const [fontsLoaded] = useFonts({
-	'Gotham-Bold': require('./assets/fonts/Gotham Bold.otf'),
-	'Gotham-Medium': require('./assets/fonts/Gotham Medium.otf'),
-	'Gotham-Book': require('./assets/fonts/Gotham Book.otf'),
-});
+		'Gotham-Bold': require('./assets/fonts/Gotham Bold.otf'),
+		'Gotham-Medium': require('./assets/fonts/Gotham Medium.otf'),
+		'Gotham-Book': require('./assets/fonts/Gotham Book.otf'),
+	});
 
-if (!fontsLoaded) {
-	return (
-		<View style={styles.loading}>
-			<ActivityIndicator color="#111412" />
-		</View>
-	);
-}
 	React.useEffect(() => {
 		function handleUrl(url) {
 			if (url.includes('email-confirmado')) {
@@ -44,6 +36,14 @@ if (!fontsLoaded) {
 		const subscription = Linking.addEventListener('url', ({ url }) => handleUrl(url));
 		return () => subscription.remove();
 	}, []);
+
+	if (!fontsLoaded) {
+		return (
+			<View style={styles.loading}>
+				<ActivityIndicator color="#111412" />
+			</View>
+		);
+	}
 
 	function handleLogin(usuario) {
 		setUserName(usuario.nome);
@@ -130,6 +130,12 @@ if (!fontsLoaded) {
 }
 
 const styles = StyleSheet.create({
+	loading: {
+		alignItems: 'center',
+		backgroundColor: '#eef7f2',
+		flex: 1,
+		justifyContent: 'center',
+	},
 	preferenciasWrapper: {
 		flex: 1,
 	},
