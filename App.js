@@ -1,8 +1,10 @@
 import React from 'react';
-import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useFonts } from 'expo-font';
 
 import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
 import CadastroView from './src/frontend/screens/CadastroView';
+import CatalogView from './src/frontend/screens/CatalogView';
 import DetalhesView from './src/frontend/screens/DetalhesView';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
@@ -10,6 +12,13 @@ import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectio
 export default function App() {
 	const [screen, setScreen] = React.useState('login');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
+	const [userName, setUserName] = React.useState('Leonardo');
+
+	const [fontsLoaded] = useFonts({
+		'Gotham-Bold': require('./assets/fonts/Gotham Bold.otf'),
+		'Gotham-Medium': require('./assets/fonts/Gotham Medium.otf'),
+		'Gotham-Book': require('./assets/fonts/Gotham Book.otf'),
+	});
 
 	React.useEffect(() => {
 		function handleUrl(url) {
@@ -28,9 +37,19 @@ export default function App() {
 		return () => subscription.remove();
 	}, []);
 
+	if (!fontsLoaded) {
+		return (
+			<View style={styles.loading}>
+				<ActivityIndicator color="#111412" />
+			</View>
+		);
+	}
+
 	function handleLogin(usuario) {
+		setUserName(usuario.nome);
 		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
 	}
+
 
 	if (screen === 'cadastro') {
 		return (
@@ -98,6 +117,10 @@ export default function App() {
 		);
 	}
 
+	if (screen === 'catalogo') {
+		return <CatalogView profileName={userName} />;
+	}
+
 	return (
 		<LoginView
 			onCadastroPress={() => setScreen('cadastro')}
@@ -107,6 +130,12 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+	loading: {
+		alignItems: 'center',
+		backgroundColor: '#eef7f2',
+		flex: 1,
+		justifyContent: 'center',
+	},
 	preferenciasWrapper: {
 		flex: 1,
 	},

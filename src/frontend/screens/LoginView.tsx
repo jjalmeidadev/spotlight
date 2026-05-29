@@ -84,14 +84,14 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingTop: 56,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
   },
   title: {
     color: '#eef7f2',
-    fontSize: 46,
+    fontSize: 54,
     fontWeight: '800',
     letterSpacing: 0,
-    lineHeight: 54,
+    lineHeight: 60,
     marginTop: 4,
   },
   subtitle: {
