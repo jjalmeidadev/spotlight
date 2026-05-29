@@ -7,13 +7,15 @@ import { HeroFloatingArtwork } from '../components/HeroFloatingArtwork';
 import { CatalogRail } from '../components/CatalogRail';
 import { FilterDropdown } from '../components/FilterDropdown';
 import { SearchBar } from '../components/SearchBar';
+import type { CatalogItem } from '../models/CatalogItem';
 import { useCatalogViewModel } from '../viewmodels/useCatalogViewModel';
 
 type CatalogViewProps = {
 	profileName?: string;
+	onItemPress?: (item: CatalogItem) => void;
 };
 
-export default function CatalogView({ profileName }: CatalogViewProps) {
+export default function CatalogView({ profileName, onItemPress }: CatalogViewProps) {
 	const { width } = useWindowDimensions();
 	const vm = useCatalogViewModel();
 	const horizontalPadding = Math.max(16, Math.round(width * 0.044));
@@ -48,13 +50,15 @@ export default function CatalogView({ profileName }: CatalogViewProps) {
 						</View>
 
 						<View style={[styles.preExpansiveArea, { paddingHorizontal: horizontalPadding }]}>
-							{firstSection ? <CatalogRail items={firstSection.items} title={firstSection.title} /> : null}
+							{firstSection ? (
+								<CatalogRail items={firstSection.items} title={firstSection.title} onItemPress={onItemPress} />
+							) : null}
 						</View>
 
 						<View style={[styles.expansiveWhiteArea, { paddingHorizontal: horizontalPadding }]}>
 							{remainingSections.map((section) => (
 								<View key={section.id} style={styles.sectionGap}>
-									<CatalogRail items={section.items} title={section.title} />
+									<CatalogRail items={section.items} title={section.title} onItemPress={onItemPress} />
 								</View>
 							))}
 						</View>

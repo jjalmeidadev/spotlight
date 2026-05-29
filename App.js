@@ -50,7 +50,6 @@ export default function App() {
 		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
 	}
 
-
 	if (screen === 'cadastro') {
 		return (
 			<CadastroView
@@ -71,29 +70,30 @@ export default function App() {
 		);
 	}
 
-	if (screen === 'detalhes') {
+	if (screen === 'preferencias') {
+		return <PreferenceSelectionScreen onComplete={() => setScreen('catalogo')} />;
+	}
+
+	if (screen === 'catalogo') {
 		return (
-			<DetalhesView
-				espetaculoId={espetaculoId}
-				onClose={() => setScreen('preferencias')}
-				onEspetaculoSemelhantePress={(id) => setEspetaculoId(id)}
-				onComprarIngresso={(link) => Linking.openURL(link)}
+			<CatalogView
+				profileName={userName}
+				onItemPress={(item) => {
+					setEspetaculoId(item.id);
+					setScreen('detalhes');
+				}}
 			/>
 		);
 	}
 
-	if (screen === 'preferencias') {
+	if (screen === 'detalhes') {
 		return (
-			<View style={styles.preferenciasWrapper}>
-				<PreferenceSelectionScreen />
-				<Pressable
-					accessibilityRole="button"
-					onPress={() => setScreen('detalhes')}
-					style={({ pressed }) => [styles.detalhesEntry, pressed && styles.detalhesEntryPressed]}
-				>
-					<Text style={styles.detalhesEntryLabel}>Ver detalhes do espetáculo</Text>
-				</Pressable>
-			</View>
+			<DetalhesView
+				espetaculoId={espetaculoId}
+				onClose={() => setScreen('catalogo')}
+				onEspetaculoSemelhantePress={(id) => setEspetaculoId(id)}
+				onComprarIngresso={(link) => Linking.openURL(link)}
+			/>
 		);
 	}
 
@@ -117,10 +117,6 @@ export default function App() {
 		);
 	}
 
-	if (screen === 'catalogo') {
-		return <CatalogView profileName={userName} />;
-	}
-
 	return (
 		<LoginView
 			onCadastroPress={() => setScreen('cadastro')}
@@ -135,29 +131,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#eef7f2',
 		flex: 1,
 		justifyContent: 'center',
-	},
-	preferenciasWrapper: {
-		flex: 1,
-	},
-	detalhesEntry: {
-		position: 'absolute',
-		left: 24,
-		right: 24,
-		bottom: 24,
-		minHeight: 44,
-		borderRadius: 999,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#eff4ef',
-		paddingHorizontal: 16,
-	},
-	detalhesEntryPressed: {
-		opacity: 0.85,
-	},
-	detalhesEntryLabel: {
-		color: '#111412',
-		fontSize: 12,
-		fontWeight: '700',
 	},
 	confirmedContainer: {
 		alignItems: 'center',

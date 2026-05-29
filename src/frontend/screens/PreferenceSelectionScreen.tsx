@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Alert,
   Image,
   Pressable,
   SafeAreaView,
@@ -18,7 +17,11 @@ import { usePreferenceSelectionViewModel } from '@/frontend/viewmodels/usePrefer
 const preferenceIcon = require('../../../documentos/img/preferential_icon.png');
 const priceIcon = require('../../../documentos/img/preco_icon.png');
 
-export default function PreferenceSelectionScreen() {
+type PreferenceSelectionScreenProps = {
+  onComplete?: () => void;
+};
+
+export default function PreferenceSelectionScreen({ onComplete }: PreferenceSelectionScreenProps) {
   const viewModel = usePreferenceSelectionViewModel();
 
   function handleContinue() {
@@ -28,10 +31,7 @@ export default function PreferenceSelectionScreen() {
       return;
     }
 
-    Alert.alert(
-      'Preferências salvas',
-      `Preço: ${selection.priceRangeId}\nTags: ${selection.genreIds.join(', ')}`,
-    );
+    onComplete?.();
   }
 
   return (
