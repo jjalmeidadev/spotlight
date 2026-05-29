@@ -19,17 +19,15 @@ import {
 
 const logoAventura = require('../../../assets/images/logo-aventura-branca.png');
 
-/**
- * Paleta das cortinas — alternando luz/sombra simula pregas verticais de veludo.
- * Cores são derivadas do colors.primary (#ff5a2f) clareando e escurecendo.
- */
+// Paleta das cortinas — alternar luz/sombra simula pregas verticais de veludo;
+// derivada de colors.primary (#ff5a2f) clareando e escurecendo.
 const PLEAT_HIGHLIGHT = '#ff7a50';
 const PLEAT_BASE = colors.primary;
 const PLEAT_SHADOW = '#b03b1f';
 const PLEAT_DEEP_EDGE = '#5a1c0f';
 const PLEAT_MEETING_EDGE = '#3a0f08';
 
-/** 4 pregas com sombra profunda no encontro central (lado direito da cortina esquerda). */
+// Sombra profunda no encontro central (lado interno da cortina); arranjo espelhado entre as duas.
 const PLEAT_COLORS_ESQ = [
   PLEAT_DEEP_EDGE,
   PLEAT_HIGHLIGHT,
@@ -42,7 +40,6 @@ const PLEAT_COLORS_ESQ = [
   PLEAT_MEETING_EDGE,
 ] as const;
 
-/** Espelhado: sombra profunda no encontro (lado esquerdo da cortina direita). */
 const PLEAT_COLORS_DIR = [
   PLEAT_MEETING_EDGE,
   PLEAT_BASE,
@@ -55,30 +52,22 @@ const PLEAT_COLORS_DIR = [
   PLEAT_DEEP_EDGE,
 ] as const;
 
-/** Tempo (ms) que a logo fica visível após entrar antes de chamar onFinish. */
 const MS_ADMIRACAO = 900;
-/** Duração (ms) do fade-in + scale da logo. */
 const MS_LOGO_ENTRA = 650;
 
-/** Fases da animação — separadas da checagem real da sessão pra orquestrar a coreografia. */
+// Fases da coreografia — desacopladas do SessionStatus do ViewModel para
+// permitir que a animação continue mesmo depois da checagem ter resolvido.
 type Fase = 'checking' | 'opening' | 'revealing' | 'done';
 
 interface LoadingScreenProps {
-  /**
-   * Chamado uma única vez quando a coreografia termina, com o status da sessão.
-   * O consumidor (root do app) decide pra qual rota navegar.
-   */
+  /** Chamado uma única vez no fim da coreografia; o root decide a navegação. */
   onFinish?: (status: SessionStatus) => void;
 }
 
 /**
- * Splash com encenação de teatro:
- *  1. Cortinas laranja fechadas + 3 dots brancos pulsando enquanto a sessão é verificada;
- *  2. Cortinas abrem pros lados revelando o palco escuro;
- *  3. Logo da Aventura aparece com fade + scale suave;
- *  4. Pausa curta e chama <c>onFinish</c>.
- *
- * Animações usam a API <c>Animated</c> nativa (sem Reanimated).
+ * Splash com encenação de teatro: cortinas fechadas + dots pulsando enquanto
+ * a sessão é verificada → cortinas abrem revelando o palco → logo entra com
+ * fade/scale → pausa curta e chama onFinish.
  */
 export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
   const viewModel = useLoadingScreenViewModel();
@@ -86,20 +75,18 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
 
   const [fase, setFase] = useState<Fase>('checking');
 
-  // Dots: 3 valores em loop escalonado (visíveis só na fase "checking").
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
   const dot3 = useRef(new Animated.Value(0)).current;
 
-  // Cortinas: 0 = fechadas (cobrem o palco), 1 = abertas (saíram pras laterais).
+  // 0 = cortinas fechadas (cobrem o palco), 1 = abertas (saíram pras laterais).
   const cortinasAbertura = useRef(new Animated.Value(0)).current;
 
-  // Entrada da logo: 0 = invisível, 1 = totalmente visível e no tamanho final.
+  // 0 = logo invisível, 1 = totalmente visível no tamanho final.
   const logoEntrada = useRef(new Animated.Value(0)).current;
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 1) Dots pulsando enquanto checking
   useEffect(() => {
     if (fase !== 'checking') return;
     const ciclo = Animated.parallel([
@@ -111,14 +98,12 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
     return () => ciclo.stop();
   }, [fase, dot1, dot2, dot3]);
 
-  // 2) Quando a checagem real termina, dispara a abertura das cortinas
   useEffect(() => {
     if (viewModel.status !== 'checking' && fase === 'checking') {
       setFase('opening');
     }
   }, [viewModel.status, fase]);
 
-  // 3) Coreografia da abertura das cortinas
   useEffect(() => {
     if (fase !== 'opening') return;
     Animated.timing(cortinasAbertura, {
@@ -131,7 +116,6 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
     });
   }, [fase, cortinasAbertura]);
 
-  // 4) Logo da Aventura entrando com fade + scale, depois aguarda admiração e finaliza
   useEffect(() => {
     if (fase !== 'revealing') return;
     Animated.timing(logoEntrada, {
@@ -148,7 +132,6 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
     };
   }, [fase, logoEntrada]);
 
-  // 5) Fim da coreografia
   useEffect(() => {
     if (fase === 'done') onFinish?.(viewModel.status);
   }, [fase, onFinish, viewModel.status]);
@@ -190,7 +173,6 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={colors.surface} />
 
-      {/* PALCO — fundo escuro com a logo aparecendo (só visível quando cortinas abrem) */}
       <View style={styles.palco}>
         {palcoVisivel && (
           <Animated.Image
@@ -202,7 +184,6 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
         )}
       </View>
 
-      {/* CORTINAS — duas metades laterais com pregas verticais (gradient) que abrem do centro pros lados */}
       <Animated.View
         pointerEvents="none"
         style={[styles.cortinaEsquerda, cortinaEsquerdaStyle]}
@@ -213,7 +194,7 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}
         />
-        {/* Sombra sutil no rodapé pra dar peso ao tecido */}
+        {/* Sombra no rodapé pra dar peso ao tecido. */}
         <LinearGradient
           colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.25)']}
           start={{ x: 0, y: 0.7 }}
@@ -240,7 +221,6 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
         />
       </Animated.View>
 
-      {/* DOTS — overlay no centro, visível só enquanto as cortinas estão fechadas */}
       {dotsVisiveis && (
         <View pointerEvents="none" style={styles.dotsOverlay}>
           <View style={styles.dotsRow} accessibilityLabel="Carregando">
@@ -254,7 +234,6 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
   );
 }
 
-/** Pulso de cada dot: 0 → 1 → 0 em ~900 ms, com atraso inicial pra escalonar. */
 function criarPulsoEmLoop(valor: Animated.Value, delay: number): Animated.CompositeAnimation {
   return Animated.loop(
     Animated.sequence([
@@ -275,7 +254,6 @@ function criarPulsoEmLoop(valor: Animated.Value, delay: number): Animated.Compos
   );
 }
 
-/** Map do valor 0..1 para opacity e scale do dot. */
 function estiloDoDot(valor: Animated.Value) {
   return {
     opacity: valor.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }),

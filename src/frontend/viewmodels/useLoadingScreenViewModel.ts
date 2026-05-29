@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Estado da verificação de sessão no boot do app.
- * - `checking`: ainda decidindo;
- * - `authenticated`: token salvo e válido → app vai pra Home;
- * - `unauthenticated`: sem token (ou expirado) → app vai pra Login;
- * - `error`: falha inesperada (rede, decode) → app vai pra Login com aviso.
+ * Estado da verificação de sessão no boot.
+ * - `authenticated` → app vai pra Home; `unauthenticated` → Login;
+ *   `error` → Login com aviso de falha.
  */
 export type SessionStatus =
   | 'checking'
@@ -17,14 +15,9 @@ export interface LoadingScreenViewModel {
   status: SessionStatus;
 }
 
-/** Mínimo de exibição do splash, em ms — evita "flash" quando a checagem é instantânea. */
+// Evita "flash" quando a checagem real é instantânea.
 const MIN_SPLASH_DURATION_MS = 1500;
 
-/**
- * ViewModel do splash inicial. Hoje só simula a verificação da sessão
- * com um delay; o ponto exato pra plugar a integração real está marcado
- * com `TODO`. Quando integrar o storage do JWT, troque o trecho indicado.
- */
 export function useLoadingScreenViewModel(): LoadingScreenViewModel {
   const [status, setStatus] = useState<SessionStatus>('checking');
 
