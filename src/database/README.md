@@ -424,7 +424,7 @@ Entidade principal.
 | `nome` | `VARCHAR(150)` | Não | - | - | - | Nome exibido do usuário. |
 | `email` | `VARCHAR(255)` | Não | - | - | `UNIQUE`, `chk_email_formato` | E-mail do usuário. Deve ser único e seguir formato válido. |
 | `data_nascimento` | `DATE` | Sim | - | - | - | Data de nascimento do usuário. |
-| `localizacao` | `VARCHAR(150)` | Sim | - | - | - | Localização informada pelo usuário. |
+| `localizacao` | `JSONB` | Sim | - | - | - | Localização consentida do usuário, com endereço normalizado, coordenadas e provedor. |
 | `data_cadastro` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de criação do perfil. |
 | `tipo_usuario` | `tipo_usuario_enum` | Não | `'cadastrado'` | - | Valores do ENUM | Tipo do usuário no sistema. |
 | `nivel_acesso` | `JSONB` | Não | `'{}'::JSONB` | - | - | Estrutura flexível para permissões, papéis ou escopos adicionais. |

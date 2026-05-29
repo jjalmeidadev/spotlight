@@ -1758,7 +1758,7 @@ Armazena os dados dos usuários cadastrados na plataforma, integrada ao sistema 
 | `nome` | `VARCHAR(150)` | NN | Nome completo ou nome de exibição do usuário. Preenchido automaticamente pelo trigger a partir dos metadados do cadastro. |
 | `email` | `VARCHAR(255)` | NN, UQ, CK (`email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'`) | E-mail do usuário. Deve ter formato válido. Único na tabela. |
 | `data_nascimento` | `DATE` | — | Data de nascimento. Opcional; utilizada para filtros de faixa etária em recomendações. |
-| `localizacao` | `VARCHAR(150)` | — | Cidade ou região informada pelo usuário. Utilizada como sinal de contexto para recomendações baseadas em localização. |
+| `localizacao` | `JSONB` | — | Localização consentida do usuário, incluindo endereço normalizado, coordenadas, identificador do provedor e origem da geocodificação. Utilizada como sinal de contexto para recomendações baseadas em localização. |
 | `data_cadastro` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
 | `tipo_usuario` | `tipo_usuario_enum` | NN, DF `'cadastrado'` | Papel do usuário: `'visitante'`, `'cadastrado'` ou `'administrador'`. Controla o acesso a funcionalidades administrativas. |
 | `nivel_acesso` | `JSONB` | NN, DF `'{}'` | Permissões granulares em formato JSON. Permite definir capacidades específicas dentro do papel sem criar tabelas de controle adicionais. |
@@ -2450,7 +2450,7 @@ _conteúdo_
 | `email` | `varchar` | E-mail utilizado para autenticação |
 | `senha` | `varchar` | Senha criptografada |
 | `data_nascimento` | `date` | Data de nascimento |
-| `localizacao` | `varchar` | Cidade ou região do usuário |
+| `localizacao` | `jsonb` | Localização consentida do usuário, com endereço normalizado, coordenadas e provedor |
 | `data_cadastro` | `timestamp` | Data de criação da conta |
 | `tipo_usuario` | `varchar` | Papel do usuário no sistema (ex: `comum`, `admin`) |
 | `nivel_acesso` | `jsonb` | Permissões granulares em formato JSON |
@@ -2750,7 +2750,7 @@ Contém o **Spotlight App**, responsável pela interface com o usuário final e 
 
 ### Serviços Externos
 
-Engloba a infraestrutura de identidade (**Supabase Auth**), a API das Ticketeiras e a **Google Maps Platform API**, utilizada para apoio à geolocalização e ao cálculo de proximidade.
+Engloba a infraestrutura de identidade (**Supabase Auth**), a API das Ticketeiras e a **OpenStreetMap/Nominatim API**, utilizada para apoio à geolocalização e ao cálculo de proximidade no MVP sem dependência de billing proprietário.
 
 ### API Gateway
 
@@ -2792,11 +2792,11 @@ Infraestrutura de persistência segregada por perfil de carga, contendo:
 | **Serviço de Catálogo** | Gerenciamento de domínio de espetáculos, teatros, gêneros e precificação. | ASP.NET Core Web API |
 | **Serviço de Usuário** | Gestão de perfis, preferências explícitas e histórico de consumo. | ASP.NET Core Web API |
 | **Serviço de Recomendação** | Orquestração do fluxo de sugestões, consultando predições pré-processadas pelo Motor de ML. | ASP.NET Core Web API |
-| **Serviço de Geolocalização** | Normalização de localização, consulta de proximidade e integração com a Google Maps Platform API para apoiar recomendações contextuais. | ASP.NET Core Web API |
+| **Serviço de Geolocalização** | Normalização de localização, consulta de proximidade e integração com OpenStreetMap/Nominatim para apoiar recomendações contextuais. | ASP.NET Core Web API |
 | **Motor de ML** | Processamento de algoritmos de filtragem colaborativa (k-NN, SVD) para geração de recomendações. | C# + ML.NET |
 | **RabbitMQ** | Message Broker dedicado ao enfileiramento de eventos assíncronos de telemetria e interações. | RabbitMQ |
 | **Supabase Auth** | Provedor de Identidade, responsável por autenticação e emissão de tokens JWT. | Supabase Auth |
-| **Google Maps Platform API** | API externa para geolocalização, rotas e cálculo de proximidade entre usuário e eventos. | Google Maps Platform |
+| **OpenStreetMap/Nominatim API** | API externa para geocodificação e geocodificação reversa entre localização do usuário e endereços normalizados. | OpenStreetMap/Nominatim |
 | **Supabase DB (PostgreSQL)** | Banco de dados relacional primário para perfis, catálogo e metadados transacionais. | PostgreSQL via Supabase |
 | **MongoDB** | Repositório de alto volume para armazenamento de logs comportamentais e eventos de telemetria brutos. | MongoDB |
 
@@ -2839,7 +2839,7 @@ O diagrama estabelece portas e interfaces estritas (conectores e receptores) ent
 | **ISpotlightAPI** | Interface de consumo central exposta ao App (REST/GraphQL). |
 | **IAuth** | Interface de comunicação direta com o Supabase Auth para delegação de credenciais. |
 | **ITickets** | Integração de saída para APIs de terceiros (Ticketeiras). |
-| **IMaps** | Integração de saída do Serviço de Geolocalização com a Google Maps Platform API. |
+| **IGeocoding** | Integração de saída do Serviço de Geolocalização com OpenStreetMap/Nominatim. |
 | **IUserPrefs** | Contrato interno roteado pelo Gateway para o Serviço do Usuário. |
 | **ICatalog** | Contrato interno roteado pelo Gateway para o Serviço de Catálogo. |
 | **IRecommendation** | Contrato interno roteado pelo Gateway para o Serviço de Recomendação. |
@@ -3390,9 +3390,9 @@ Regras desta camada:
 |---|---|---|
 | Supabase Auth | Supabase Auth | Provedor de identidade: autenticação, emissão e validação de tokens JWT, OAuth |
 | API das Ticketeiras | API externa | Inventário de ingressos, emissão e validação |
-| Google Maps Platform API | Google Maps Platform | Geolocalização, rotas e cálculo de proximidade para recomendações contextuais |
+| OpenStreetMap/Nominatim API | OpenStreetMap/Nominatim | Geocodificação, geocodificação reversa e normalização de localização para recomendações contextuais |
 
-Interfaces: `IAuth` · `ITickets` · `IMaps`
+Interfaces: `IAuth` · `ITickets` · `IGeocoding`
 
 ##### 3. API Gateway
 
@@ -3437,7 +3437,7 @@ Responsabilidades detalhadas:
 **Serviço de Geolocalização (`IGeolocation`)**
 
 - Normaliza dados de localização consentidos pelo usuário.
-- Consulta a Google Maps Platform API via interface `IMaps`.
+- Consulta OpenStreetMap/Nominatim via interface `IGeocoding`.
 - Retorna informações de proximidade para apoiar recomendações contextuais e geográficas.
 
 ##### 5. Infraestrutura de Processamento
@@ -3481,7 +3481,7 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 | `ISpotlightAPI` | App → API Gateway | Contrato REST do frontend com o backend |
 | `IAuth` | App → Supabase Auth | Autenticação e emissão de JWT |
 | `ITickets` | Gateway → API Ticketeiras | Consulta e emissão de ingressos |
-| `IMaps` | Serv. Geolocalização → Google Maps Platform API | Consulta de geolocalização, rotas e proximidade |
+| `IGeocoding` | Serv. Geolocalização → OpenStreetMap/Nominatim | Consulta de geocodificação e geocodificação reversa |
 | `IUserPrefs` | Gateway → Serv. Usuário | Perfis e preferências |
 | `ICatalog` | Gateway → Serv. Catálogo | Espetáculos e metadados |
 | `IRecommendation` | Gateway → Serv. Recomendação | Sugestões personalizadas |
@@ -3502,7 +3502,7 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 4. Gateway → Serviço de Recomendação (IRecommendation)
 5. Serviço de Recomendação → ML Engine (Worker): solicita predições
 6. Quando há localização consentida, Serviço de Recomendação → Serviço de Geolocalização (IGeolocation)
-7. Serviço de Geolocalização → Google Maps Platform API (IMaps): consulta proximidade
+7. Serviço de Geolocalização → OpenStreetMap/Nominatim (IGeocoding): normaliza localização
 8. ML Engine consulta PostgreSQL (vetores de afinidade pré-calculados)
 9. Serviço de Recomendação combina afinidade e contexto geográfico
 10. Serviço de Recomendação retorna lista ranqueada ao Gateway → App
@@ -3515,9 +3515,9 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 
 <div align="center">
 
-### Figura X – Fluxo de Geolocalização com Google Maps Platform API
+### Figura X – Fluxo de Geolocalização com OpenStreetMap/Nominatim
 
-![Fluxo de Geolocalização](./img/fluxo_geolocalizacao_google_maps.png)
+![Fluxo de Geolocalização](./img/fluxo_geolocalizacao_openstreetmap.png)
 
 Fonte: Material produzido pelos autores (2026).
 
@@ -3527,8 +3527,8 @@ Fonte: Material produzido pelos autores (2026).
 1. Usuário autoriza compartilhamento de localização no Spotlight App
 2. App → API Gateway com requisição protegida por JWT
 3. Gateway → Serviço de Geolocalização (IGeolocation)
-4. Serviço de Geolocalização → Google Maps Platform API (IMaps)
-5. Google Maps retorna dados de localização, rotas ou proximidade
+4. Serviço de Geolocalização → OpenStreetMap/Nominatim (IGeocoding)
+5. OpenStreetMap/Nominatim retorna endereço normalizado e coordenadas
 6. Serviço de Geolocalização normaliza o retorno
 7. Serviço de Recomendação utiliza o contexto geográfico na ordenação das sugestões
 8. Gateway retorna recomendações contextuais ao App
@@ -3554,7 +3554,7 @@ Fonte: Material produzido pelos autores (2026).
 |---|---|---|
 | Protocolo cliente–backend | REST (HTTPS) | Simplicidade, compatibilidade com React Native |
 | Autenticação | JWT + Supabase Auth | Stateless, escalável, OAuth integrado |
-| Geolocalização | Google Maps Platform API | Apoia recomendações contextuais por proximidade, sem alterar a lógica principal do ML |
+| Geolocalização | OpenStreetMap/Nominatim | Apoia recomendações contextuais no MVP sem dependência de billing proprietário, sem alterar a lógica principal do ML |
 | Controle de acesso | RBAC (usuario, admin) | Separação clara entre perfis de uso |
 | Banco relacional | PostgreSQL via Supabase | Dados estruturados, integridade referencial |
 | Banco de telemetria | MongoDB | Alto volume, esquema flexível, sem onerar o relacional |
@@ -4138,4 +4138,3 @@ _conteúdo_
 
 # Referências
 _conteúdo_
-
