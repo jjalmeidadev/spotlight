@@ -39,7 +39,7 @@ O **Spotlight** é uma plataforma de recomendação de espetáculos teatrais que
 src/database/
 ├── 00_supabase_compat.sql   — prepara extensões e objetos mínimos do schema auth para execução local em Docker
 ├── 01_create_database.sql   — criação de tabelas, tipos ENUM, índices, RLS e trigger do Auth
-├── 02_initial_data.sql      — seed com dados iniciais (categorias, teatros, atores, espetáculos e sessões)
+├── 02_initial_data.sql      — seed com dados iniciais (usuários, categorias, teatros, atores, espetáculos, sessões, avaliações, recomendações e similaridade item-item)
 ├── 03_rollback.sql          — desfaz completamente a execução do 01_create_database.sql
 └── README.md                — este arquivo
 ```
@@ -93,12 +93,9 @@ SITE_URL=http://localhost:3000
 
 | Variável | Consumido por |
 |---|---|
-| `DB_HOST` | `psql`, API Gateway e ferramentas de administração do banco |
-| `DB_PORT` | `psql`, API Gateway e ferramentas de administração do banco |
-| `DB_NAME` | Nome do banco usado nas conexões locais |
-| `DB_USER` | Usuário usado nas conexões locais |
-| `DB_PASSWORD` | Senha usada por `psql` e serviços que conectam no PostgreSQL |
-| `POSTGRES_PASSWORD` | Container PostgreSQL (Docker) |
+| `POSTGRES_DB` | Container PostgreSQL (Docker) — nome do banco padrão |
+| `POSTGRES_USER` | Container PostgreSQL (Docker) — usuário padrão |
+| `POSTGRES_PASSWORD` | Container PostgreSQL (Docker) — senha do usuário |
 | `POSTGRES_PORT` | Docker Compose — porta exposta no host |
 | `POSTGRES_CONNECTION_STRING` | Clientes locais, API Gateway e scripts de migração |
 | `JWT_SECRET` | API Gateway (ASP.NET Core) — validação offline do JWT |
@@ -219,16 +216,12 @@ psql -h <host> -p <porta> -U postgres -d postgres \
 ### 5.5 Ordem obrigatória de execução
 
 ```
-01_create_database.sql  →  02_initial_data.sql
+00_supabase_compat.sql  →  01_create_database.sql  →  02_initial_data.sql
 ```
 
-O `02_initial_data.sql` depende das tabelas criadas pelo `01`. Nunca inverta a ordem.
-
-Na organização das tasks, essa ordem corresponde a:
-
-```
-T1 — criação do schema  →  T2 — carga inicial de dados
-```
+- `00_supabase_compat.sql` prepara extensões e o schema `auth` mínimo (necessário apenas para execução **local em Docker** — no Supabase cloud esses objetos já existem nativamente).
+- `01_create_database.sql` cria todas as estruturas do schema `public`.
+- `02_initial_data.sql` depende das tabelas criadas pelo `01`. Nunca inverta a ordem.
 
 ---
 
@@ -343,7 +336,7 @@ docker compose up -d db
 Ao final da implantação, o ambiente estará pronto quando:
 
 - o PostgreSQL/Supabase estiver acessível pelo Supabase SQL Editor, DBeaver, `psql` ou container Docker;
-- o script `01_create_database.sql` tiver criado as 10 tabelas do schema `public`;
+- o script `01_create_database.sql` tiver criado as 11 tabelas do schema `public`;
 - o script `02_initial_data.sql` tiver populado os dados iniciais sem erros de integridade referencial;
 - as consultas de validação retornarem registros em `usuario`, `espetaculo` e `sessao`.
 
@@ -355,15 +348,15 @@ Com esses passos concluídos, o banco estará apto para uso pelo frontend, API G
 
 ### 1. Visão Geral
 
-O banco de dados modela o domínio de um sistema de consulta, avaliação e recomendação de espetáculos teatrais. Ele contempla o cadastro de usuários, espetáculos, categorias, atores, teatros, sessões, avaliações e recomendações personalizadas.
+O banco de dados modela o domínio de um sistema de consulta, avaliação e recomendação de espetáculos teatrais. Ele contempla o cadastro de usuários, espetáculos, categorias, atores, teatros, sessões, avaliações, recomendações personalizadas e similaridade item-item entre espetáculos.
 
 | Item | Quantidade |
 |---|---:|
-| Tabelas | 10 |
+| Tabelas | 11 |
 | Tipos enumerados | 2 |
 | Funções | 1 |
 | Triggers | 1 |
-| Índices explícitos | 10 |
+| Índices explícitos | 11 |
 
 #### Tabelas do Modelo
 
@@ -379,6 +372,7 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 | 8 | `sessao` | Agenda de apresentações dos espetáculos nos teatros. |
 | 9 | `avaliacao` | Avaliações de usuários sobre espetáculos. |
 | 10 | `recomendacao` | Recomendações personalizadas geradas para usuários. |
+| 11 | `similaridade_item` | Similaridade item-item global entre espetáculos (populada em batch pelo k-NN). |
 
 #### Tipos Enumerados
 
@@ -969,7 +963,63 @@ Entidade transacional / saída de algoritmo de recomendação.
 
 Não há triggers ou functions associadas diretamente.
 
-### 12. Relacionamentos Gerais do Modelo
+### 12. Tabela `similaridade_item`
+
+#### Descrição
+
+Armazena a similaridade item-item entre espetáculos calculada de forma **global** (igual para todos os usuários) pelo motor de Machine Learning. Suporta a rota pública `GET /recomendacao/espetaculos/{id}/similares`, que apresenta espetáculos parecidos com um de referência (ex.: na tela de detalhes do app).
+
+#### Tipo de Tabela
+
+Saída de algoritmo de recomendação / artefato de cache de similaridade global.
+
+#### Políticas de Row Level Security
+
+| Política | Operação | Regra |
+|---|---|---|
+| `similaridade_item: leitura pública` | `SELECT` | Permite leitura pública: `USING (true)`. Os dados são globais e não envolvem identidade de usuário. |
+
+#### Colunas
+
+| Coluna | Tipo | Nulo? | Default | PK / FK | Restrições | Descrição |
+|---|---|---|---|---|---|---|
+| `id_similaridade` | `SERIAL` | Não | Sequência automática | PK | - | Identificador único do registro de similaridade. |
+| `id_espetaculo_origem` | `INTEGER` | Não | - | FK | Referencia `espetaculo(id_espetaculo) ON DELETE CASCADE` | Espetáculo de referência. |
+| `id_espetaculo_similar` | `INTEGER` | Não | - | FK | Referencia `espetaculo(id_espetaculo) ON DELETE CASCADE` | Espetáculo apontado como similar ao de origem. |
+| `tipo_algoritmo` | `VARCHAR(50)` | Não | - | - | `chk_tipo_algoritmo_similar` | Algoritmo utilizado para calcular a similaridade. |
+| `score_similaridade` | `NUMERIC(8,6)` | Não | - | - | `CHECK (score_similaridade BETWEEN 0 AND 1)` | Pontuação de similaridade normalizada no intervalo [0,1]. |
+| `data_geracao` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de geração do registro pelo batch de ML. |
+
+#### Constraints
+
+| Nome | Tipo | Definição |
+|---|---|---|
+| `similaridade_item_pkey` | Primary Key | `id_similaridade` |
+| Check implícito | Check | `score_similaridade BETWEEN 0 AND 1` |
+| `chk_tipo_algoritmo_similar` | Check | `tipo_algoritmo IN ('k-NN', 'SVD', 'k-means')` |
+| `chk_espetaculos_distintos` | Check | `id_espetaculo_origem <> id_espetaculo_similar` |
+| `uq_similaridade_item` | Unique | `(id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo)` |
+| FK implícita | Foreign Key | `id_espetaculo_origem -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
+| FK implícita | Foreign Key | `id_espetaculo_similar -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
+
+#### Relacionamentos
+
+| Tipo | Tabela / Coluna | Cardinalidade |
+|---|---|---|
+| FK | `espetaculo(id_espetaculo)` <- `similaridade_item(id_espetaculo_origem)` | Um espetáculo pode ter vários similares apontando para ele como origem. |
+| FK | `espetaculo(id_espetaculo)` <- `similaridade_item(id_espetaculo_similar)` | Um espetáculo pode ser apontado como similar de vários outros. |
+
+#### Índices
+
+| Índice | Colunas | Objetivo |
+|---|---|---|
+| `idx_similaridade_item_origem` | `id_espetaculo_origem, score_similaridade DESC` | Otimiza a consulta "dado um espetáculo, listar similares ordenados por score". |
+
+#### Triggers e Functions
+
+Não há triggers ou functions associadas diretamente. A tabela é populada em batch pelo pipeline de ML (k-NN).
+
+### 13. Relacionamentos Gerais do Modelo
 
 | Relacionamento | Cardinalidade | Implementação |
 |---|---|---|
@@ -983,8 +1033,10 @@ Não há triggers ou functions associadas diretamente.
 | `espetaculo` -> `avaliacao` | 1:N | `avaliacao.id_espetaculo`. |
 | `usuario` -> `recomendacao` | 1:N | `recomendacao.id_usuario`. |
 | `espetaculo` -> `recomendacao` | 1:N | `recomendacao.id_espetaculo`. |
+| `espetaculo` -> `similaridade_item` | 1:N | `similaridade_item.id_espetaculo_origem`. |
+| `espetaculo` -> `similaridade_item` | 1:N | `similaridade_item.id_espetaculo_similar`. |
 
-### 13. Índices Criados
+### 14. Índices Criados
 
 | Índice | Tabela | Colunas | Finalidade |
 |---|---|---|---|
@@ -998,6 +1050,7 @@ Não há triggers ou functions associadas diretamente.
 | `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | Otimiza ranking de recomendações por usuário. |
 | `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Otimiza busca de avaliações por espetáculo. |
 | `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Otimiza busca de espetáculos por ator. |
+| `idx_similaridade_item_origem` | `similaridade_item` | `id_espetaculo_origem, score_similaridade DESC` | Otimiza a consulta dos similares de um espetáculo de referência. |
 
 ## Regras de Negócio Implementadas no Banco de Dados
 
@@ -1034,4 +1087,9 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-27 | O algoritmo de recomendação deve pertencer à lista de algoritmos aceitos. | Constraint `CHECK`. | `chk_tipo_algoritmo` |
 | RN-BD-28 | O score de recomendação não pode ser negativo. | Constraint `CHECK`. | `recomendacao.score_recomendacao CHECK (score_recomendacao >= 0)` |
 | RN-BD-29 | Recomendações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `recomendacao.id_usuario`, `recomendacao.id_espetaculo` |
+| RN-BD-30 | O score de similaridade entre dois espetáculos deve estar normalizado no intervalo [0, 1]. | Constraint `CHECK`. | `similaridade_item.score_similaridade CHECK (score_similaridade BETWEEN 0 AND 1)` |
+| RN-BD-31 | Um espetáculo não pode ser registrado como similar de si mesmo. | Constraint `CHECK`. | `chk_espetaculos_distintos CHECK (id_espetaculo_origem <> id_espetaculo_similar)` |
+| RN-BD-32 | Não pode existir mais de um registro de similaridade para o mesmo par de espetáculos sob o mesmo algoritmo. | Constraint `UNIQUE`. | `uq_similaridade_item (id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo)` |
+| RN-BD-33 | A similaridade item-item deve ser legível publicamente, pois é global (não vinculada a usuário). | Política de Row Level Security permissiva para leitura. | Política `similaridade_item: leitura pública` |
+| RN-BD-34 | Os registros de similaridade devem ser removidos quando qualquer um dos espetáculos envolvidos for excluído. | Chaves estrangeiras com `ON DELETE CASCADE` em ambos os FKs. | `similaridade_item.id_espetaculo_origem`, `similaridade_item.id_espetaculo_similar` |
 | RN-BD-30 | Dados de catálogo e agenda devem ser públicos para consulta. | Políticas de Row Level Security com `USING (true)`. | Políticas de `SELECT` em `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao` e `avaliacao` |
