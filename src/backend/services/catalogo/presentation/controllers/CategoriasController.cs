@@ -9,8 +9,10 @@ namespace Spotlight.Catalogo.Presentation.Controllers;
 [Route("categorias")]
 public class CategoriasController : ControllerBase
 {
+    /// <summary>Lista todas as categorias disponíveis para classificação de espetáculos.</summary>
     [HttpGet]
     [ProducesResponseType(typeof(ListaDto<CategoriaDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErroDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Listar(
         [FromServices] ListarCategoriasUseCase listar, CancellationToken cancellationToken)
     {

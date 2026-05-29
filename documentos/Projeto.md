@@ -166,7 +166,7 @@
     - [8.3.2 Sprint 4](#832-sprint-4)
     - [8.3.3 Sprint 5](#833-sprint-5)
   - [8.4 Testes Unitários e de Integração](#84-testes-unitários-e-de-integração)
-  - [8.5 Documentações automáticas](#85-documentações-automáticas)
+  - [8.5 Documentações automáticas (Swagger)](#85-documentações-automáticas-swagger)
 - [9. Planejamento e Execução de Testes](#9-planejamento-e-execução-de-testes)
   - [9.1 Testes Funcionais](#91-testes-funcionais)
     - [9.1.1 Planejamento](#911-planejamento)
@@ -3759,9 +3759,74 @@ _conteúdo_
 _conteúdo_
 Obs.: Insira informações sobre estratégias para realização dos testes
 
-## 8.5 Documentações automáticas
-_conteúdo_
-Obs.: Insira informações sobre quais frameworks foram usados e como acessar.
+## 8.5 Documentações automáticas (Swagger)
+
+O backend expõe **documentação Swagger/OpenAPI 3.0** gerada automaticamente
+a partir do código (anotações `[ProducesResponseType]`, contratos de DTO e
+XML comments). A UI é interativa — permite executar requisições direto do
+navegador com **"Try it out"** — e cobre todas as rotas implementadas
+descritas na seção 8.3.
+
+### Framework
+
+Swashbuckle.AspNetCore 7.2.0 em todos os projetos `.NET 9` do backend (4
+serviços + gateway). Cada `Spotlight.<Servico>.csproj` tem
+`<GenerateDocumentationFile>true</GenerateDocumentationFile>`, e o
+`Program.cs` faz `IncludeXmlComments(...)` no `AddSwaggerGen` para enriquecer
+a UI com os `<summary>` das ações e DTOs.
+
+### Documentação unificada (recomendado)
+
+Subindo o backend localmente (`src/backend/run-all.ps1`), a UI agregada fica em:
+
+> **http://localhost:5000/swagger**
+
+O dropdown "Select a definition" no canto superior direito alterna entre:
+
+| Definição | Fonte | Rotas |
+|---|---|---|
+| Gateway | gateway próprio | — |
+| Catálogo | proxy YARP → `/catalogo/swagger/v1/swagger.json` | 11 |
+| Usuário | proxy YARP → `/usuario/swagger/v1/swagger.json` | 6 |
+| Recomendação | proxy YARP → `/recomendacao/swagger/v1/swagger.json` | 2 |
+| Geolocalização | proxy YARP → `/geolocalizacao/swagger/v1/swagger.json` | 2 |
+
+Como o gateway proxia os `swagger.json` dos serviços, **não há problemas de
+CORS no navegador** — todas as requisições saem da mesma origem.
+
+### Documentação por serviço (acesso direto)
+
+Para depuração isolada (sem passar pelo gateway), cada serviço também expõe
+sua própria UI:
+
+| Serviço | URL local |
+|---|---|
+| Catálogo       | http://localhost:5001/swagger |
+| Usuário        | http://localhost:5002/swagger |
+| Recomendação   | http://localhost:5003/swagger |
+| Geolocalização | http://localhost:5004/swagger |
+
+### Como acessar
+
+1. Subir o backend completo: `pwsh src/backend/run-all.ps1` (ou `dotnet run`
+   em cada `Spotlight.<Servico>.csproj`).
+2. Abrir **http://localhost:5000/swagger** no navegador.
+3. Escolher o serviço no dropdown.
+4. Clicar em uma rota → **"Try it out"** → preencher parâmetros → **"Execute"**.
+
+> Para rotas que exigem JWT (`cadastrado` ou `administrador`), clique em
+> **"Authorize"** no topo da UI e cole o token no formato
+> `Bearer <token-jwt>`.
+
+### Especificação OpenAPI escrita à mão
+
+Em paralelo à documentação auto-gerada, o repositório versiona um contrato
+**fonte da verdade** consolidado em
+[`src/backend/contracts/openapi.json`](../src/backend/contracts/openapi.json)
+(narrativa em
+[`src/backend/contracts/api-contracts.md`](../src/backend/contracts/api-contracts.md)).
+Esse arquivo serve para revisão humana, geração de clientes e validação de
+divergências entre o contrato negociado e o que está implementado.
 
 # 9. Planejamento e Execução de Testes
 _conteúdo_

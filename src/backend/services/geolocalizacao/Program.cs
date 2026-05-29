@@ -41,12 +41,17 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
+{
     options.SwaggerDoc("v1", new()
     {
         Title = "Spotlight — Servico de Geolocalizacao",
         Version = "v1",
         Description = "Normalizacao de enderecos e coordenadas via OpenStreetMap/Nominatim."
-    }));
+    });
+
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
@@ -54,11 +59,9 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSerilogRequestLogging();
 app.UseCors(CorsPolicy);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger sempre habilitado: o gateway agrega as specs dos serviços em /swagger.
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 
