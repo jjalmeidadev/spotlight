@@ -3756,8 +3756,50 @@ _conteúdo_
 _conteúdo_
 
 ## 8.4 Testes Unitários e de Integração
-_conteúdo_
-Obs.: Insira informações sobre estratégias para realização dos testes
+
+&emsp;Na Sprint 4, a cobertura automatizada do backend foi ampliada com testes unitários focados nos Services/UseCases entregues na Sprint 3. A motivação principal foi proteger a lógica de negócio contra regressões sem depender de banco de dados, rede, variáveis de ambiente ou serviços externos. Essa decisão torna a execução mais rápida, reproduzível e adequada à abordagem TDD, pois cada regra pode ser validada de forma isolada antes de sua integração com infraestrutura real.
+
+&emsp;A estratégia adotada foi isolar as dependências externas por meio de fakes locais para repositórios, contexto de usuário, `HttpMessageHandler` e cache em memória. Assim, os testes exercitam diretamente validações, normalização de parâmetros, mapeamento de DTOs, paginação, tratamento de erros e cenários de borda. Esse recorte é importante porque os UseCases concentram as regras de aplicação do backend; controllers e repositórios ficam em camadas diferentes e devem ser complementados por testes de integração.
+
+&emsp;A suíte foi organizada por microserviço dentro de `src/backend/tests/`, mantendo um projeto de testes para cada service. O módulo de Catálogo cobre listagem, obtenção, criação, atualização e exclusão de espetáculos, avaliações, sessões, categorias e teatros, incluindo cenários positivos, negativos e de borda. O módulo de Usuário cobre perfil autenticado, preferências, histórico de avaliações e validações da atualização de localização. O módulo de Recomendação cobre normalização de limites e mapeamento de recomendações e similares. O módulo de Geolocalização cobre validação de endereço/coordenadas, uso de cache, resposta vazia, falha HTTP e conversão da resposta do Nominatim.
+
+&emsp;Os testes usam xUnit e são executados pela solution .NET com o comando:
+
+```bash
+dotnet test src/backend/Spotlight.sln
+```
+
+&emsp;Para gerar métricas de cobertura, os projetos de teste foram configurados com `coverlet.collector`. A execução com coleta de cobertura é feita com:
+
+```bash
+dotnet test src/backend/Spotlight.sln --collect:"XPlat Code Coverage"
+```
+
+&emsp;Esse comando gera arquivos `coverage.cobertura.xml` dentro das pastas `TestResults/` de cada projeto de teste. A pasta `TestResults/` é ignorada pelo Git porque representa artefatos locais de execução, não código-fonte do produto.
+
+&emsp;A última execução local da suíte resultou em 60 testes aprovados e 0 falhas, distribuídos entre testes unitários dos Services/UseCases e testes de health endpoints já existentes. A cobertura geral do backend ficou em 43,16% de linhas, considerando todo o assembly medido pelo Coverlet. Esse percentual inclui `Program.cs`, controllers, middlewares, autenticação, repositórios SQL, DTOs e infraestrutura. Por isso, ele é útil como indicador global, mas não deve ser lido isoladamente como medida da qualidade dos testes unitários de regra de negócio.
+
+| Projeto de teste | Cobertura de linhas geral | Cobertura de branches geral |
+|---|---:|---:|
+| `Spotlight.Catalogo.Tests` | 37,97% | 19,53% |
+| `Spotlight.Usuario.Tests` | 49,33% | 36,75% |
+| `Spotlight.Recomendacao.Tests` | 44,51% | 29,87% |
+| `Spotlight.Geolocalizacao.Tests` | 43,00% | 53,70% |
+| `Spotlight.Gateway.Tests` | 76,36% | 100,00% |
+| **Total ponderado por linhas** | **43,16%** | - |
+
+&emsp;O lado positivo das métricas aparece quando a análise é feita sobre o recorte correto para testes unitários: a camada `Application.UseCases`. Nessa camada, que concentra os Services e regras de aplicação desenvolvidos na Sprint 3, a cobertura de linhas é alta em todos os serviços.
+
+| Camada analisada | Cobertura de linhas dos UseCases |
+|---|---:|
+| `Catalogo.Application.UseCases` | 94,44% |
+| `Usuario.Application.UseCases` | 89,71% |
+| `Recomendacao.Application.UseCases` | 100,00% |
+| `Geolocalizacao.Application.UseCases` | 96,25% |
+
+&emsp;Esses resultados indicam que os testes unitários cumprem bem o objetivo definido para os Services do backend: cobrem os fluxos principais, erros esperados e limites de entrada das regras de negócio. A diferença entre a cobertura geral e a cobertura dos UseCases é esperada, pois a suíte unitária substitui repositórios e integrações por fakes; consequentemente, código de infraestrutura, autenticação, controllers e persistência não são exercitados de forma significativa por esse tipo de teste.
+
+&emsp;Para ampliar a cobertura da estrutura completa do backend, o próximo passo é complementar essa base com testes de integração para controllers, middlewares, autenticação e repositórios conectados a um banco controlado. Dessa forma, a cobertura unitária continua protegendo a lógica de negócio, enquanto os testes de integração passam a validar as fronteiras reais da aplicação.
 
 ## 8.5 Documentações automáticas
 _conteúdo_
