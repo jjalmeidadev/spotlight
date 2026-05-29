@@ -3591,10 +3591,698 @@ Obs.: Insira informações sobre quais frameworks foram usados e como acessar.
 _conteúdo_
 
 ## 9.1 Testes Funcionais
-_conteúdo_
+
+&emsp;Os testes funcionais têm como objetivo verificar se cada funcionalidade do Spotlight se comporta conforme o especificado nos Requisitos Funcionais (RF01 a RF16) descritos na seção [3.1 Requisitos Funcionais](#31-requisitos-funcionais-rfs). Diferentemente dos testes de integração — que validam fronteiras entre componentes — e dos testes de RNFs — focados em qualidades transversais como desempenho, segurança e usabilidade —, os testes funcionais validam o **comportamento de cada caso de uso** sob a perspectiva do ator que o executa: o consumidor (Ana Clara, Mariana, Ronaldo, Pedro, Carlos), o administrador (Cintia) e o próprio Sistema de Recomendação.
+
+&emsp;O planejamento desta seção evolui o esforço iniciado em sprints anteriores. Para cada requisito, são detalhados: propósito do teste, instruções de execução, pré-condições, cenários positivos, cenários negativos, pós-condições e, ao final da seção, uma discussão sobre a abrangência da bateria.
 
 ## 9.1.1 Planejamento
-_conteúdo_
+
+#### Estratégia Geral
+
+&emsp;A estratégia de testes funcionais combina três abordagens complementares, distribuídas conforme a natureza do RF:
+
+| Camada | Abordagem | Ferramentas | Quando se aplica |
+|---|---|---|---|
+| Backend (APIs SOA) | Testes automatizados de contrato e comportamento sobre `WebApplicationFactory`, exercitando o pipeline real de middlewares, autorização e persistência | `xUnit`, `Microsoft.AspNetCore.Mvc.Testing`, `FluentAssertions`, `Bogus`, `Respawn` (reset de DB entre testes) | RFs com lógica de negócio ou regras de domínio (RF01, RF02, RF03, RF09, RF10, RF11, RF12, RF13, RF14, RF15, RF16) |
+| Frontend Mobile (React Native) | Testes E2E automatizados em emuladores/dispositivos físicos cobrindo o fluxo do usuário tela a tela | `Detox` (E2E), `React Native Testing Library` (componentes), `MSW` (mock de rede para componentes) | RFs com forte componente de interface (RF04, RF05, RF06, RF07, RF08) |
+| Exploratório assistido | Roteiro manual por persona, executado por 2 avaliadores independentes em planilha estruturada | Roteiro em Google Sheets, gravação de tela via `scrcpy` (Android) e `QuickTime` (iOS) | RFs com critério subjetivo: relevância de recomendação (RF12, RF14, RF15), legibilidade de detalhes (RF07) |
+
+&emsp;A bateria completa é executada em três momentos: (i) **localmente**, antes de cada *push* pelo autor da mudança; (ii) **automaticamente**, no pipeline de CI da GitLab para todo *merge request* tocando o backend ou frontend; (iii) **manualmente**, em sessão de QA semanal antes do encerramento da sprint, focando os roteiros exploratórios.
+
+&emsp;Cada caso de teste possui código no formato **TF-RFXX-{P\|N}YY**, em que `TF` indica Teste Funcional, `RFXX` referencia o requisito funcional, `P` ou `N` distingue cenário positivo ou negativo, e `YY` é o número sequencial dentro do cenário.
+
+#### Ambiente e Pré-condições Comuns
+
+&emsp;As pré-condições abaixo são compartilhadas por toda a bateria e, portanto, não são repetidas em cada caso de teste:
+
+- Containers Docker do stack provisionados via `docker compose up -d` (PostgreSQL, MongoDB, RabbitMQ, ML Engine — ver seção [4.4.5 Implantação Local com Docker](#445-implantação-local-com-docker))
+- Massa de dados seed carregada (script `dotnet run --project src/backend/seed`) garantindo: 20 espetáculos em 4+ categorias (drama, comédia, infantil, musical), 5 teatros em São Paulo, 50 sessões nos próximos 60 dias, 30 usuários sintéticos com histórico de interações
+- Três usuários de teste cadastrados no Supabase Auth:
+  - `usuario.comum@spotlighttest.com` — `tipo_usuario=comum`, com histórico de 10+ interações
+  - `usuario.novo@spotlighttest.com` — `tipo_usuario=comum`, sem histórico (cenário cold start)
+  - `admin.test@spotlighttest.com` — `tipo_usuario=admin`
+- Aplicativo mobile instalado em pelo menos um dispositivo físico Android (≥ 10) e um iOS (≥ 15) ou em emuladores equivalentes
+- Variáveis de ambiente `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_JWT_SECRET`, `POSTGRES_CONNECTION_STRING`, `MONGO_CONNECTION_STRING`, `RABBITMQ_URL` definidas no arquivo `.env.test`
+
+#### Instruções de Execução Globais
+
+```bash
+# Backend — bateria completa de testes funcionais
+dotnet test src/backend.sln --filter "Category=Functional" \
+  --logger "trx;LogFileName=tf-results.trx" \
+  --collect:"XPlat Code Coverage"
+
+# Frontend — testes E2E com Detox em Android
+cd src/frontend
+detox build --configuration android.emu.release
+detox test --configuration android.emu.release --record-logs all
+
+# Frontend — testes E2E em iOS
+detox build --configuration ios.sim.release
+detox test --configuration ios.sim.release
+
+# Geração de relatório consolidado HTML
+dotnet tool run reportgenerator \
+  -reports:**/tf-results.trx \
+  -targetdir:./TestReports/Functional \
+  -reporttypes:Html
+```
+
+---
+
+### Grupo 1 — Autenticação e Perfil (RF01, RF02, RF03)
+
+#### TF-RF01 — Cadastro de Usuário
+
+**Propósito:** Verificar que o fluxo de cadastro registra corretamente um novo usuário no Supabase Auth e dispara, via trigger, a criação da linha correspondente na tabela `usuario` do PostgreSQL. Cobrir validações de campos obrigatórios, formato de email, força de senha e proteção contra cadastros duplicados.
+
+**Pré-condições específicas:**
+
+- Aplicativo aberto na tela "Criar conta"
+- Email `novo.usuario@spotlighttest.com` NÃO previamente cadastrado
+- `AsyncStorage` do app limpo (`detox.cleanup` executado antes de cada caso)
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/usuario-service --filter "Category=Functional&RF=RF01"
+detox test --testNamePattern "RF01"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF01-P01 | Cadastro com dados válidos | Preencher nome="Ana Costa", email="novo.usuario@spotlighttest.com", senha="Senh@Forte123" e confirmação idêntica; tocar "Cadastrar" | HTTP 201 do endpoint `POST /auth/signup`; tela de definição de preferências (RF03) é exibida; toast "Cadastro realizado" aparece por 3 s | Linha inserida em `auth.users` e replicada em `public.usuario` via trigger `on_auth_user_created` |
+| TF-RF01-P02 | Senha com caracteres especiais aceita | Cadastrar com senha "P@ssw0rd!#$%" | HTTP 201; redirecionamento idêntico ao P01 | Hash bcrypt persistido com custo ≥ 10 conforme RNF05 |
+| TF-RF01-P03 | Mensagem de erro some após correção | Submeter com email inválido, observar erro inline; corrigir e submeter | Mensagem some assim que o campo recebe valor válido; cadastro conclui com sucesso | Estado de erro do formulário é limpo |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF01-N01 | Email malformado | Inserir email="naoemail"; submeter | Mensagem "Email inválido" abaixo do campo; botão "Cadastrar" desabilitado; nenhuma chamada de rede emitida | Nenhum registro criado |
+| TF-RF01-N02 | Senha fraca (< 8 caracteres) | Inserir senha="abc123"; submeter | Mensagem "Senha deve ter pelo menos 8 caracteres" | Nenhum registro criado |
+| TF-RF01-N03 | Senhas divergentes | Senha="Senh@Forte123", confirmação="Senh@Forte124" | Mensagem "Senhas não conferem"; foco volta ao campo de confirmação | Nenhum registro criado |
+| TF-RF01-N04 | Email já cadastrado | Inserir email="usuario.comum@spotlighttest.com" | HTTP 422; mensagem "Email já cadastrado" exibida | Nenhum registro criado; tentativa registrada em log |
+| TF-RF01-N05 | Campo obrigatório vazio | Submeter sem informar nome | Mensagem "Nome é obrigatório"; botão "Cadastrar" desabilitado | Nenhum registro criado |
+
+**Pós-condições gerais:** Usuário cadastrado fica imediatamente apto a realizar login (RF02). Em falha, o formulário preserva os valores válidos preenchidos para evitar retrabalho.
+
+---
+
+#### TF-RF02 — Login
+
+**Propósito:** Verificar que usuários previamente cadastrados conseguem autenticar-se com email e senha, recebem um `access_token` JWT válido (com `sub` igual ao `user.id` e expiração de 3600 s) e um `refresh_token`, e que tentativas inválidas são rejeitadas sem vazar informação sobre a existência do email.
+
+**Pré-condições específicas:**
+
+- Aplicativo aberto na tela "Entrar"
+- Usuário `usuario.comum@spotlighttest.com` cadastrado com senha "Senh@Forte123"
+- Nenhuma sessão ativa em `AsyncStorage`
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/usuario-service --filter "Category=Functional&RF=RF02"
+detox test --testNamePattern "RF02"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF02-P01 | Login com credenciais corretas | Inserir email e senha válidos; tocar "Entrar" | HTTP 200; `access_token` e `refresh_token` armazenados em `SecureStore`; navegação para Home (RF04) | Sessão registrada em `auth.sessions`; última atividade atualizada |
+| TF-RF02-P02 | Manter sessão entre aberturas do app | Fazer login, fechar o app, reabrir | App restaura sessão a partir do `refresh_token`; Home exibida sem nova solicitação de credenciais | Sessão renovada silenciosamente |
+| TF-RF02-P03 | Logout encerra sessão | A partir do perfil, tocar "Sair" | Token removido de `SecureStore`; app retorna à tela de login | `auth.sessions` registra logout |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF02-N01 | Senha incorreta | Inserir email válido, senha errada | HTTP 400; mensagem genérica "Email ou senha inválidos" (sem revelar qual está errado) | Sessão não criada; tentativa registrada |
+| TF-RF02-N02 | Email não cadastrado | Inserir email="inexistente@spotlighttest.com" | HTTP 400; mesma mensagem genérica do N01 (evita user enumeration) | Nenhuma sessão criada |
+| TF-RF02-N03 | Campos vazios | Tocar "Entrar" sem preencher | Mensagens "Email é obrigatório" e "Senha é obrigatória"; botão desabilitado | Nenhuma chamada emitida |
+| TF-RF02-N04 | Após 5 tentativas falhas seguidas | Inserir senha errada 5x em < 1 minuto | A partir da 6ª tentativa, mensagem "Muitas tentativas, aguarde 60 s" | Bloqueio temporário em cache; demais usuários não afetados |
+
+**Pós-condições gerais:** Após login bem-sucedido, todas as próximas chamadas ao API Gateway são enviadas com o header `Authorization: Bearer <access_token>`. Sessões expiradas disparam tela de login.
+
+---
+
+#### TF-RF03 — Definir Preferências de Perfil
+
+**Propósito:** Verificar que o usuário consegue declarar suas preferências (gêneros, faixa de preço, localização), que as escolhas são persistidas em `usuario_preferencia` e que essas preferências passam a influenciar as recomendações (validado indiretamente em RF04 e RF12).
+
+**Pré-condições específicas:**
+
+- Usuário autenticado (RF02)
+- Categorias cadastradas: drama, comédia, infantil, musical
+- Localização: usuário em São Paulo/SP (com permissão de geolocalização concedida ou inserida manualmente)
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/usuario-service --filter "Category=Functional&RF=RF03"
+detox test --testNamePattern "RF03"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF03-P01 | Selecionar múltiplos gêneros | Marcar "drama" e "musical"; faixa de preço R$ 50–R$ 150; cidade "São Paulo"; salvar | HTTP 200; mensagem "Preferências salvas" | Linhas em `usuario_preferencia` para cada categoria |
+| TF-RF03-P02 | Editar preferências existentes | Em "Meu perfil", alterar gêneros para "comédia" apenas; salvar | HTTP 200; tela mostra apenas "comédia" marcada na próxima visita | Linhas antigas removidas, nova inserida |
+| TF-RF03-P03 | Pular definição inicial (skip) | Tocar "Pular" na tela pós-cadastro | Usuário direcionado para Home; recomendações usam fallback de popularidade (RF15) | Nenhuma preferência registrada; `onboarding_completed=true` |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF03-N01 | Faixa de preço inválida (mínimo > máximo) | Preço mínimo R$ 200, máximo R$ 50; salvar | Mensagem "Preço mínimo deve ser menor que o máximo" | Preferências não salvas |
+| TF-RF03-N02 | Tentativa de salvar sem autenticação | Forjar chamada `PUT /api/usuario/preferencias` sem JWT | HTTP 401 | Nenhuma alteração |
+| TF-RF03-N03 | Categoria inexistente | Forjar chamada com `categoria_id=99999` | HTTP 400; mensagem "Categoria inválida" | Nenhuma alteração |
+
+**Pós-condições gerais:** Após salvar, o evento `user_preferences_updated` é publicado em RabbitMQ para que o ML Engine recalcule recomendações sob demanda (RF13).
+
+---
+
+### Grupo 2 — Exploração e Navegação (RF04, RF05, RF06)
+
+#### TF-RF04 — Visualizar Recomendações Personalizadas
+
+**Propósito:** Verificar que a Home exibe ao menos 5 recomendações ordenadas por relevância, cada uma com título, categoria, data, miniatura e indicação de personalização (ex.: "baseado nas suas preferências"), e que a lista é distinta para usuários com históricos diferentes.
+
+**Pré-condições específicas:**
+
+- Usuário `usuario.comum@spotlighttest.com` autenticado com 10+ interações registradas
+- ML Engine respondendo em `http://ml-engine:5000/api/recomendacao`
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF04"
+detox test --testNamePattern "RF04"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF04-P01 | Home exibe ≥ 5 recomendações | Acessar Home após login | Lista com 5+ cards visíveis; cada card contém título, categoria, data, preço, label "Recomendado para você" | Evento `home_view` registrado |
+| TF-RF04-P02 | Personalização visível ao usuário | Acessar Home | Texto "Baseado nas suas preferências" presente em cabeçalho da seção | — |
+| TF-RF04-P03 | Histórico distinto gera lista distinta | Login com 2 usuários diferentes em sequência | As listas exibidas têm interseção < 80 % | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF04-N01 | ML Engine indisponível | Derrubar container `ml-engine`; acessar Home | Lista de fallback baseada em popularidade exibida (RF15); banner "Carregando recomendações personalizadas..." | Erro registrado em log; nenhuma quebra de interface |
+| TF-RF04-N02 | Usuário sem preferências e sem histórico | Login com `usuario.novo@spotlighttest.com` | Lista de cold start (RF15); label "Mais populares" no lugar de "Recomendado para você" | — |
+| TF-RF04-N03 | Resposta vazia do ML Engine | Forjar resposta vazia | Mensagem "Estamos preparando recomendações para você"; CTA "Explorar catálogo" | — |
+
+**Pós-condições gerais:** O `id` de cada recomendação exibida é registrado em `recomendacao_exibida` para futura análise de CTR.
+
+---
+
+#### TF-RF05 — Pesquisar Espetáculos
+
+**Propósito:** Verificar que a busca textual retorna resultados consistentes com o termo, com matching case-insensitive, suporte a termos parciais e tratamento adequado para resultados vazios.
+
+**Pré-condições específicas:**
+
+- Catálogo com pelo menos os espetáculos: "Hamlet", "Hamlet em Cordel", "A Megera Domada", "Cinderela — o Musical"
+- Usuário autenticado
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/catalogo-service --filter "Category=Functional&RF=RF05"
+detox test --testNamePattern "RF05"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF05-P01 | Busca exata | Digitar "Hamlet"; aguardar | Lista exibe "Hamlet" e "Hamlet em Cordel" ordenados por relevância | Evento `search_executed` com `query=Hamlet` |
+| TF-RF05-P02 | Busca case-insensitive | Digitar "hamlet" | Mesmo resultado de P01 | — |
+| TF-RF05-P03 | Busca parcial | Digitar "Cind" | "Cinderela — o Musical" exibida | — |
+| TF-RF05-P04 | Debounce reduz chamadas | Digitar "Hamlet" letra a letra rapidamente | Apenas 1 chamada de rede emitida após 300 ms de inatividade | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF05-N01 | Termo sem resultados | Digitar "xyz123" | Mensagem "Nenhum resultado encontrado para 'xyz123'"; CTA "Limpar busca" | — |
+| TF-RF05-N02 | Termo vazio | Limpar campo de busca | Lista volta ao estado inicial (catálogo sem filtro) | — |
+| TF-RF05-N03 | SQL injection no termo | Digitar `' OR 1=1 --` | Busca textual segura; nenhum resultado anômalo; nenhum erro 500 | Nenhuma exposição de schema |
+
+**Pós-condições gerais:** Cada busca é registrada em telemetria (RF11) para análise futura de termos mais buscados.
+
+---
+
+#### TF-RF06 — Filtrar Espetáculos
+
+**Propósito:** Verificar que filtros por categoria, data e faixa de preço atualizam corretamente a lista exibida, podem ser combinados e podem ser limpos individual ou totalmente.
+
+**Pré-condições específicas:**
+
+- Lista de espetáculos carregada
+- Pelo menos 3 categorias com 5+ espetáculos cada
+- Espetáculos com datas distribuídas em janelas de "Hoje", "Esta semana", "Este mês"
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/catalogo-service --filter "Category=Functional&RF=RF06"
+detox test --testNamePattern "RF06"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF06-P01 | Filtro por categoria | Selecionar categoria "drama"; aplicar | Lista exibe apenas espetáculos com `categoria_id=drama` | URL/estado contém `?categoria=drama` |
+| TF-RF06-P02 | Filtros combinados | "drama" + "Esta semana" + R$ 50–R$ 200; aplicar | Lista exibe apenas espetáculos que satisfazem as 3 condições simultaneamente | — |
+| TF-RF06-P03 | Limpar filtros | Tocar "Limpar tudo" | Lista volta ao estado sem filtro; chips de filtros desaparecem | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF06-N01 | Combinação sem resultados | Categoria "infantil" + preço R$ 0–R$ 5 | Mensagem "Nenhum espetáculo encontrado com esses filtros"; CTA "Limpar filtros" | — |
+| TF-RF06-N02 | Faixa de preço inválida | Mínimo > máximo na UI | Slider impede inversão; valores trocam automaticamente | — |
+| TF-RF06-N03 | Data passada selecionada | Selecionar data anterior a hoje | Date picker bloqueia datas no passado | — |
+
+**Pós-condições gerais:** Filtros aplicados persistem ao navegar para detalhes e voltar (RF07). Eventos de filtro são telemetrados (RF11).
+
+---
+
+### Grupo 3 — Conteúdo (RF07, RF08)
+
+#### TF-RF07 — Visualizar Detalhes do Espetáculo
+
+**Propósito:** Verificar que a tela de detalhes apresenta informações completas e corretas do espetáculo (descrição, categoria, data, horário, preço, local, elenco) e que dados ausentes são tratados sem quebrar a interface.
+
+**Pré-condições específicas:**
+
+- Espetáculo "Hamlet" cadastrado com todos os campos preenchidos
+- Espetáculo "Em Cartaz" cadastrado com `descricao=NULL` (campo opcional)
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/catalogo-service --filter "Category=Functional&RF=RF07"
+detox test --testNamePattern "RF07"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF07-P01 | Detalhes completos | Tocar card "Hamlet" na Home | Tela exibe título, sinopse, categoria, próxima sessão, faixa de preço, teatro, mapa, elenco e CTA "Comprar" (RF06 do IT) | Evento `detail_view` registrado para o espetáculo |
+| TF-RF07-P02 | Múltiplas sessões | Espetáculo com 3 sessões agendadas | Carrossel de sessões exibe todas com data/horário/disponibilidade | — |
+| TF-RF07-P03 | Compartilhamento | Tocar ícone de compartilhar | Sheet nativa do SO abre com link `spotlight://espetaculo/<id>` | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF07-N01 | Descrição ausente | Tocar card "Em Cartaz" | Tela carrega; bloco "Sinopse" é omitido sem quebrar layout | — |
+| TF-RF07-N02 | Espetáculo inexistente | Acessar deep link `spotlight://espetaculo/00000000-0000-0000-0000-000000000000` | Tela "Espetáculo não encontrado" com CTA "Voltar à Home" | — |
+| TF-RF07-N03 | Sem sessões futuras | Espetáculo com todas as sessões no passado | Bloco "Sessões" exibe mensagem "Sem sessões agendadas" e CTA "Avisar quando voltar" | — |
+
+**Pós-condições gerais:** Toda visualização de detalhe é registrada em telemetria (RF11) e influencia recomendações futuras (RF13).
+
+---
+
+#### TF-RF08 — Visualizar Avaliações de Outros Usuários
+
+**Propósito:** Verificar que avaliações cadastradas para o espetáculo aparecem com nota, comentário, autor (com privacidade respeitada) e data, e que a média é calculada corretamente.
+
+**Pré-condições específicas:**
+
+- Espetáculo "Hamlet" com 5 avaliações de notas distintas (1, 3, 4, 5, 5)
+- Espetáculo "Estreia" sem avaliações
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/catalogo-service --filter "Category=Functional&RF=RF08"
+detox test --testNamePattern "RF08"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF08-P01 | Lista de avaliações | Acessar detalhes de "Hamlet"; rolar até "Avaliações" | 5 avaliações exibidas com nota (estrelas), nome do autor (primeiro nome + inicial do sobrenome), data e comentário; média 3,6 ★ visível | — |
+| TF-RF08-P02 | Ordenação por data | Padrão é mais recente primeiro | Avaliações ordenadas por `data_avaliacao DESC` | — |
+| TF-RF08-P03 | Paginação | Espetáculo com 30 avaliações | Primeiras 10 exibidas; CTA "Ver mais" carrega próximas 10 | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF08-N01 | Espetáculo sem avaliações | Acessar detalhes de "Estreia" | Mensagem "Seja o primeiro a avaliar"; CTA leva a RF09 | — |
+| TF-RF08-N02 | Avaliação reportada/moderada | Avaliação com `status=moderada` | Não aparece na lista; média recalculada sem ela | — |
+| TF-RF08-N03 | Privacidade do autor | Avaliação de usuário com `perfil_publico=false` | Autor exibido como "Anônimo" | — |
+
+**Pós-condições gerais:** Acesso à seção de avaliações é telemetrado (RF11).
+
+---
+
+### Grupo 4 — Engajamento (RF09, RF10)
+
+#### TF-RF09 — Avaliar Espetáculo
+
+**Propósito:** Verificar que usuários autenticados conseguem submeter uma nota (1 a 5 estrelas), que apenas uma avaliação por usuário por espetáculo é permitida (com edição posterior), e que a média do espetáculo atualiza imediatamente.
+
+**Pré-condições específicas:**
+
+- Usuário autenticado
+- Espetáculo "Hamlet" disponível
+- Usuário ainda NÃO avaliou "Hamlet"
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/usuario-service --filter "Category=Functional&RF=RF09"
+detox test --testNamePattern "RF09"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF09-P01 | Submeter nota | Em detalhes de "Hamlet", tocar 4 estrelas; confirmar | HTTP 201; toast "Avaliação registrada"; estrelas exibidas como "Sua avaliação: 4 ★" | Linha em `avaliacao` com `usuario_id`, `espetaculo_id`, `nota=4` |
+| TF-RF09-P02 | Editar avaliação | Após P01, voltar e alterar para 5 estrelas | HTTP 200; "Sua avaliação: 5 ★"; média recalculada | Linha atualizada (não duplicada) |
+| TF-RF09-P03 | Avaliação atualiza média na hora | Submeter nota e verificar média | Média do espetáculo recalculada e exibida em ≤ 2 s | Evento `rating_submitted` publicado em RabbitMQ |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF09-N01 | Nota fora do intervalo | Forjar chamada `POST /api/avaliacao` com `nota=6` | HTTP 400; mensagem "Nota deve estar entre 1 e 5" | Nenhuma alteração |
+| TF-RF09-N02 | Sem autenticação | Forjar chamada sem JWT | HTTP 401 | Nenhuma alteração |
+| TF-RF09-N03 | Espetáculo inexistente | `espetaculo_id` inválido | HTTP 404 | — |
+
+**Pós-condições gerais:** Avaliação é considerada sinal forte para o ML Engine recalcular recomendações (RF13).
+
+---
+
+#### TF-RF10 — Comentar Espetáculo
+
+**Propósito:** Verificar que comentários são submetidos com sucesso, que conteúdo malicioso (XSS, HTML) é sanitizado, que tamanho máximo é respeitado e que o comentário aparece imediatamente na lista de avaliações (RF08).
+
+**Pré-condições específicas:**
+
+- Usuário autenticado
+- Espetáculo "Hamlet" com tela de avaliações aberta
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/usuario-service --filter "Category=Functional&RF=RF10"
+detox test --testNamePattern "RF10"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF10-P01 | Comentário simples | Digitar "Excelente atuação do elenco!" e enviar | HTTP 201; comentário aparece no topo da lista | Linha em `avaliacao` com `comentario` preenchido |
+| TF-RF10-P02 | Comentário acompanha nota | P01 combinado com TF-RF09-P01 | Comentário e nota persistidos na mesma linha | — |
+| TF-RF10-P03 | Editar próprio comentário | Tocar "Editar" em comentário próprio; alterar texto | HTTP 200; texto atualizado; selo "Editado" exibido | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF10-N01 | Comentário vazio | Tocar enviar com campo vazio | Botão "Enviar" desabilitado | — |
+| TF-RF10-N02 | Comentário excede 500 caracteres | Digitar 501 caracteres | Contador fica vermelho; envio bloqueado | — |
+| TF-RF10-N03 | Tentativa de XSS | Digitar `<script>alert(1)</script>` | Comentário salvo, mas renderizado como texto literal; alert não dispara | Sanitização aplicada no backend |
+| TF-RF10-N04 | Excluir comentário de outro usuário | Forjar chamada `DELETE /api/avaliacao/<id>` de outro usuário | HTTP 403 | Nenhuma alteração |
+
+**Pós-condições gerais:** Comentários ficam imediatamente visíveis em RF08 e contam para o motor de recomendação como sinal de engajamento.
+
+---
+
+### Grupo 5 — Coleta de Dados (RF11)
+
+#### TF-RF11 — Registrar Interações do Usuário
+
+**Propósito:** Verificar que toda interação significativa (clique em card, busca, visualização de detalhe, avaliação, scroll prolongado) gera um documento na coleção `interacoes` do MongoDB com `usuario_id`, `espetaculo_id` (quando aplicável), `tipo_acao`, `timestamp` e contexto. Confirmar que o registro acontece de forma assíncrona, sem impactar a UX.
+
+**Pré-condições específicas:**
+
+- Usuário autenticado
+- MongoDB acessível em `mongodb://localhost:27017`
+- RabbitMQ funcional para envio assíncrono
+- Coleção `interacoes` vazia ou com snapshot conhecido
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/telemetria-service --filter "Category=Functional&RF=RF11"
+detox test --testNamePattern "RF11"
+# Conferência manual
+mongosh "mongodb://localhost:27017/spotlight" --eval "db.interacoes.find().sort({timestamp:-1}).limit(20)"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF11-P01 | Clique em card é registrado | Tocar um card de espetáculo na Home | Documento `{tipo_acao:'click_card', espetaculo_id, usuario_id, timestamp, contexto:'home'}` aparece em ≤ 1 s | — |
+| TF-RF11-P02 | Busca é registrada | Executar busca por "Hamlet" | Documento `{tipo_acao:'search', query:'Hamlet', resultados:N}` | — |
+| TF-RF11-P03 | Visualização de detalhe é registrada | Acessar detalhes de espetáculo | Documento `{tipo_acao:'view_detail', espetaculo_id, dwell_time_ms}` | — |
+| TF-RF11-P04 | Avaliação é registrada como evento | Submeter avaliação | Além da linha em `avaliacao`, documento `{tipo_acao:'rate', nota:4}` em MongoDB | — |
+| TF-RF11-P05 | Registro não bloqueia UX | Tocar card e observar tempo até abrir detalhes | Tempo de abertura idêntico ao de cenário sem telemetria (variação ≤ 50 ms) | RNF02 preservado |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF11-N01 | MongoDB indisponível | Derrubar container MongoDB; gerar interação | Evento empilha em RabbitMQ; UX permanece fluida; processamento retoma após MongoDB voltar | Nenhum evento perdido (DLQ ativa) |
+| TF-RF11-N02 | Usuário sem sessão | Forjar evento sem JWT | Evento descartado em camada de coleta; HTTP 401 | Nenhum documento inserido |
+| TF-RF11-N03 | Volume burst (1 000 cliques/s) | Simular com `k6` | Sistema processa sem perda; backpressure ativa | Métricas confirmam ≥ 100 eventos/s (RNF09) |
+
+**Pós-condições gerais:** Documentos persistidos alimentam a base de dados comportamental que o ML Engine usa para recomputar recomendações (RF13, RF14).
+
+---
+
+### Grupo 6 — Recomendação (RF12, RF13, RF14, RF15)
+
+#### TF-RF12 — Gerar Recomendações Personalizadas
+
+**Propósito:** Verificar que, dado um usuário com preferências e histórico, o ML Engine retorna uma lista ranqueada de espetáculos coerente com o perfil declarado, em ≤ 2 s (RNF02).
+
+**Pré-condições específicas:**
+
+- `usuario.comum@spotlighttest.com` com preferência por "drama" e histórico de 5+ interações com peças de drama
+- ML Engine carregado com modelo treinado
+- Catálogo com 15+ espetáculos em "drama" e 5+ em "comédia"
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF12"
+# Validação subjetiva via roteiro exploratório
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF12-P01 | Lista ranqueada | `GET /api/recomendacao` para usuário | HTTP 200; lista com ≥ 5 itens; primeiros 3 são de "drama" | Tempo de resposta ≤ 2 s |
+| TF-RF12-P02 | Coerência com preferência | Usuário declara "infantil"; gerar recomendação | Lista predominantemente "infantil" (≥ 60 %) | — |
+| TF-RF12-P03 | Diversidade mínima | Lista de 10 itens | Pelo menos 2 categorias distintas representadas | Evita filter bubble |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF12-N01 | Catálogo insuficiente | Catálogo com apenas 3 espetáculos | Lista contém todos os 3 + mensagem "Voltaremos com mais" | — |
+| TF-RF12-N02 | Modelo de ML não carregado | Reiniciar ML Engine sem modelo | Fallback para popularidade (RF15); log de degradação registrado | Banner discreto "Recomendações em manutenção" |
+| TF-RF12-N03 | Timeout do ML Engine | Forçar latência > 5 s | API Gateway responde com fallback de popularidade após 3 s | RNF02 não violado para o usuário final |
+
+**Pós-condições gerais:** Itens recomendados são gravados em `recomendacao_exibida` para fechar o ciclo de feedback.
+
+---
+
+#### TF-RF13 — Atualizar Recomendações Após Novas Interações
+
+**Propósito:** Verificar que, após o usuário realizar novas interações relevantes (clique, avaliação, visualização longa), a próxima chamada de recomendação reflete essas mudanças.
+
+**Pré-condições específicas:**
+
+- Usuário com histórico inicial conhecido
+- Snapshot da lista de recomendações atual armazenado (`L0`)
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF13"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF13-P01 | Avaliação positiva ajusta lista | Avaliar com 5 ★ um espetáculo de "musical" (categoria pouco presente em `L0`); requisitar recomendação | Nova lista `L1` contém ≥ 2 espetáculos de "musical" a mais que `L0` | — |
+| TF-RF13-P02 | Comportamento de longo prazo prevalece | Após P01, voltar a interagir com "drama" por 5 ciclos | Lista volta a priorizar "drama" sem ignorar o sinal recente de "musical" | — |
+| TF-RF13-P03 | Atualização propaga em ≤ 1 min | Avaliar e requisitar recomendação após 60 s | Mudança refletida | Evento processado via RabbitMQ |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF13-N01 | Interação irrelevante não distorce | Apenas scroll sem clique | `L1 ≈ L0` (Jaccard ≥ 0,8) | — |
+| TF-RF13-N02 | Avaliação 1★ reduz exposição | Avaliar com 1★ um espetáculo presente em `L0` | Item removido da próxima `L1` | — |
+| TF-RF13-N03 | Falha de fila RabbitMQ | Derrubar fila; interagir | Evento bufferizado; após restabelecimento, recomendação se atualiza | Nenhum evento perdido |
+
+**Pós-condições gerais:** Recomputo é assíncrono e não impacta a latência da requisição original.
+
+---
+
+#### TF-RF14 — Recomendação por Filtragem Colaborativa
+
+**Propósito:** Verificar que, para um usuário com perfil similar a outros usuários (medido por interações em comum), o sistema sugere itens que esses usuários similares avaliaram positivamente mas que o usuário-alvo ainda não consumiu (item-based / user-based CF).
+
+**Pré-condições específicas:**
+
+- Pelo menos 10 usuários no banco com matriz de interações que produza pelo menos 3 vizinhos com similaridade ≥ 0,6 com o usuário-alvo
+- Modelo k-NN treinado
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF14"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF14-P01 | Recomendação vinda de vizinhos | Solicitar recomendação para usuário-alvo | Lista contém ≥ 2 itens consumidos por vizinhos (similaridade ≥ 0,6) e não pelo usuário-alvo | Trace do ML Engine confirma origem CF |
+| TF-RF14-P02 | Diversidade entre vizinhos | Lista | Itens vêm de ≥ 2 vizinhos distintos | Evita over-fit a um vizinho único |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF14-N01 | Sem vizinhos suficientes | Usuário com perfil único | Fallback para conteúdo + popularidade (RF15) | Sem erro ao usuário |
+| TF-RF14-N02 | Item já consumido pelo alvo | Verificar que itens com interação prévia do alvo não aparecem | Lista não contém itens já em `interacoes` do usuário | — |
+
+**Pós-condições gerais:** Justificativa "Quem gostou disso também gostou de..." pode ser exibida (a critério da UX).
+
+---
+
+#### TF-RF15 — Recomendar Conteúdos Populares (Cold Start)
+
+**Propósito:** Verificar que usuários novos ou com baixo histórico recebem recomendações baseadas em popularidade (espetáculos mais vistos, mais avaliados ou em alta nos últimos 7 dias).
+
+**Pré-condições específicas:**
+
+- `usuario.novo@spotlighttest.com` sem histórico
+- Catálogo com métricas de popularidade calculadas (job batch executado)
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF15"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF15-P01 | Cold start usa popularidade | Login com usuário novo; acessar Home | Lista exibida ordenada por `popularidade_score DESC` | Label "Mais populares" visível |
+| TF-RF15-P02 | Preferência declarada filtra | Usuário novo declara "infantil" antes do primeiro uso | Lista de cold start filtrada por "infantil" | — |
+| TF-RF15-P03 | Atualização semanal | Verificar refresh do ranking | Métrica calculada com janela móvel de 7 dias | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF15-N01 | Catálogo vazio | Limpar catálogo | Mensagem "Em breve, novos espetáculos"; nenhuma quebra | — |
+| TF-RF15-N02 | Job de popularidade não executado | Métricas com `updated_at` > 24 h | Fallback para `data_estreia DESC`; alerta gerado para SRE | — |
+
+**Pós-condições gerais:** Assim que o usuário acumular ≥ 3 interações, a lógica passa para RF12 (personalizada) automaticamente.
+
+---
+
+### Grupo 7 — Administração (RF16)
+
+#### TF-RF16 — Gerenciar Conteúdos da Plataforma
+
+**Propósito:** Verificar que administradores conseguem criar, editar e remover espetáculos, categorias e moderar avaliações, e que apenas usuários com `tipo_usuario=admin` têm acesso a essas operações.
+
+**Pré-condições específicas:**
+
+- `admin.test@spotlighttest.com` autenticado com `tipo_usuario=admin`
+- `usuario.comum@spotlighttest.com` autenticado como controle negativo
+- Painel administrativo (web) acessível em `https://admin.spotlight.local`
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/admin-service --filter "Category=Functional&RF=RF16"
+# Painel web — testes E2E
+cd src/admin-web && npx playwright test --grep "RF16"
+```
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF16-P01 | Criar espetáculo | Painel → "Novo espetáculo"; preencher campos obrigatórios; salvar | HTTP 201; espetáculo aparece no catálogo do app mobile em ≤ 30 s | Linha em `espetaculo`; evento `catalog_updated` em RabbitMQ |
+| TF-RF16-P02 | Editar espetáculo | Alterar título e salvar | HTTP 200; mudança visível no catálogo após refresh | Histórico de alteração em `audit_log` |
+| TF-RF16-P03 | Remover espetáculo | Excluir espetáculo sem sessões futuras | HTTP 204; espetáculo some do catálogo | Soft delete (`deleted_at` preenchido) |
+| TF-RF16-P04 | Criar categoria | Adicionar "dança contemporânea" | HTTP 201; disponível como filtro (RF06) | — |
+| TF-RF16-P05 | Moderar avaliação | Marcar avaliação ofensiva como `status=moderada` | HTTP 200; avaliação some da lista pública (RF08) | — |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| TF-RF16-N01 | Usuário comum tenta criar espetáculo | `POST /api/admin/espetaculo` com JWT comum | HTTP 403; mensagem "Permissão insuficiente" | Nenhuma alteração; tentativa registrada |
+| TF-RF16-N02 | Remover espetáculo com sessões futuras | Tentar excluir espetáculo com sessões agendadas | HTTP 409; mensagem "Cancele as sessões antes de excluir" | Nenhuma alteração |
+| TF-RF16-N03 | Criar espetáculo com campos obrigatórios faltando | Submeter sem título | HTTP 400; mensagem detalhando campos faltantes | Nenhuma alteração |
+| TF-RF16-N04 | Duplicidade de categoria | Criar categoria com nome existente | HTTP 422; mensagem "Categoria já existe" | Nenhuma alteração |
+
+**Pós-condições gerais:** Toda operação administrativa é registrada em `audit_log` com `admin_id`, `acao`, `entidade_id`, `payload_antes`, `payload_depois` e `timestamp`, atendendo ao RNF07.
+
+---
+
+### Discussão da Abrangência dos Testes Funcionais
+
+#### O que está coberto
+
+&emsp;A bateria descrita acima cobre integralmente os 16 RFs definidos na seção 3.1, em três dimensões complementares:
+
+| Dimensão | Cobertura |
+|---|---|
+| **Cobertura por requisito** | 16 / 16 RFs com pelo menos 3 cenários positivos e 2 cenários negativos cada (média: 3,1 positivos e 3,4 negativos por RF, totalizando ≈ 104 casos de teste) |
+| **Cobertura por persona** | Cada uma das 6 personas (seção 2.4) executa, no roteiro exploratório, ao menos um fluxo principal — Ana Clara/RF04+RF09, Mariana/RF06+RF07, Ronaldo/RF05+RF07, Pedro/RF03+RF15, Carlos/RF02+RF04 (com foco em acessibilidade), Cintia/RF16 |
+| **Cobertura por caso de uso** | Os 16 casos de uso da seção 3.4.2 são exercitados ao menos uma vez na bateria positiva |
+| **Cobertura por ator** | Os 3 atores (Usuário, Administrador, Sistema de Recomendação) têm cenários dedicados |
+| **Cobertura por camada técnica** | Backend (xUnit), Frontend mobile (Detox), Painel admin web (Playwright) e exploratório manual |
+
+#### O que NÃO está coberto e por quê
+
+| Item fora de escopo | Justificativa |
+|---|---|
+| Conformidade visual pixel-perfect com o protótipo Figma | Coberto por testes de regressão visual separados (não funcional); RNF10 cobre a usabilidade efetiva |
+| Acessibilidade total (WCAG 2.1 AA) | Será objeto de avaliação específica futura com `axe-core` e usuários com deficiência; cenário Carlos toca pontos críticos (contraste, tamanho de toque) mas não é exaustivo |
+| Internacionalização (i18n) além de pt-BR | MVP atende apenas ao mercado brasileiro; testes em outros idiomas seriam prematuros |
+| Compra efetiva de ingressos | O Spotlight redireciona para a API parceira (coberto em IT-06 nos testes de integração); o fluxo de checkout pertence à ticketeira |
+| Modos offline completos | O MVP exige conexão; cenários de degradação parcial estão cobertos em RF04-N01 e RF11-N01, mas funcionalidade offline plena não é requisito |
+| Migração de dados de produção | Não aplicável em sprints atuais; será coberto por playbook dedicado em fase de implantação |
+| Recomendação baseada em deep learning (modelos avançados) | Fora do escopo do MVP; o motor atual usa k-NN + SVD conforme seção 5.2.4 |
+
+#### Justificativa da abordagem positiva + negativa
+
+&emsp;A separação explícita entre cenários positivos e negativos para cada RF deriva de três premissas:
+
+1. **Sistemas reais falham mais do que sucedem.** Em produção, a maioria dos bugs reportados vêm de entradas inesperadas (campo vazio, formato errado, fila cheia, serviço indisponível). Por isso, cada RF tem pelo menos 2 cenários negativos cobrindo: (i) validação de entrada, (ii) autorização/autenticação e (iii) falha de infraestrutura adjacente.
+2. **Cenários negativos validam mensagens de erro.** A qualidade percebida pelo usuário depende tanto do que funciona quanto da clareza das mensagens quando algo dá errado. Os cenários N validam textos, códigos HTTP e ausência de vazamento de informação sensível (ex.: TF-RF02-N02 contra user enumeration).
+3. **Cobertura cruzada com RNFs.** Cenários como TF-RF11-N03 (volume burst) e TF-RF12-N03 (timeout) tocam diretamente os RNFs de desempenho e disponibilidade (RNF01, RNF02, RNF03, RNF09), economizando esforço de teste sem comprometer rigor.
+
+#### Limitações conhecidas e plano de mitigação
+
+| Limitação | Mitigação adotada |
+|---|---|
+| Cenários subjetivos de relevância (RF12, RF14) não têm pass/fail binário | Avaliação dupla por dois avaliadores independentes no roteiro exploratório, com critério "concordância ≥ 80 %"; métrica complementar de NDCG@5 calculada offline |
+| Detox pode produzir flakiness em pipelines de CI | Política de retry x3 com quarentena automática de testes intermitentes; reporte semanal de flakiness |
+| Massa de dados seed precisa ser determinística | Script `seed` aceita `--seed=<int>` para reprodutibilidade entre runs |
+| Roteiro exploratório consome tempo manual | Limitado a 1 sessão por sprint, focado nos RFs com critério subjetivo (RF12, RF14, RF15, RF08); automatização adicional planejada conforme maturidade de bibliotecas de testes visuais |
 
 ## 9.1.2 Resultados
 _conteúdo_
