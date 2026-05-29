@@ -3645,10 +3645,383 @@ _conteúdo_
 _conteúdo_
 
 ## 9.2 Testes de RNFs
-_conteúdo_
+
+&emsp;Os testes de requisitos não funcionais (RNFs) do Spotlight complementam os testes funcionais e de usabilidade ao validar **como** o sistema se comporta em termos de desempenho, confiabilidade, segurança, escalabilidade e experiência mobile. No contexto do Portal Aventura Teatros, trata-se de um sistema de recomendação de espetáculos com arquitetura SOA, aplicativo mobile first (React Native/Expo) e integração com serviços externos (autenticação, catálogo, fila de eventos e ticketeira). A validação sistemática desses aspectos de qualidade assegura que a descoberta cultural e o fluxo até a intenção de compra permaneçam utilizáveis sob carga, disponíveis em produção e adequados aos dispositivos-alvo.
+
+&emsp;Cada RNF está especificado na seção 3.2 com pré-condição, procedimento e resultado esperado. Esta seção evolui essa base para um planejamento formal de execução, com cenários positivos e negativos, ferramentas definidas, critérios objetivos de aprovação e rastreabilidade aos RFs associados. Os resultados consolidados serão documentados em [9.2.2 Resultados](#922-resultados).
 
 ## 9.2.1 Planejamento
-_conteúdo_
+
+&emsp;O planejamento abrange os doze RNFs do projeto (RNF01 a RNF12), organizados por identificador. A execução ocorrerá preferencialmente em ambiente de homologação ou produção controlada, conforme a natureza de cada teste, com registro de evidências para análise posterior.
+
+### 9.2.1.1 RNF01 — Tempo de carregamento das telas principais
+
+**Identificador e nome:** RNF01 — Tempo de carregamento das telas em até 2 segundos (aspecto: Desempenho).
+
+**Objetivo do teste:** Validar que as telas principais do aplicativo mobile (home, detalhes de espetáculo, categorias e calendário) atingem tempo de carregamento compatível com o uso em 4G, garantindo fluidez na navegação e no acesso às funcionalidades de catálogo e detalhes (RF04 a RF08).
+
+**Ferramenta(s):** Lighthouse no modo mobile.
+
+**Pré-condições:**
+
+- Sistema disponível em produção ou ambiente equivalente, acessível por URL ou build instalável.
+- Dispositivo mobile físico (Android ou iOS) com conexão 4G ativa (mínimo 20 Mbps de download), cenário de referência prioritário.
+- Lista das telas principais definida e URLs ou rotas de acesso documentadas.
+- Ferramenta Lighthouse configurada para emulação ou auditoria mobile conforme o canal de acesso (navegador WebView ou PWA, quando aplicável).
+
+**Cenário positivo:** Cada tela principal será acessada em condições normais de rede 4G. Serão registrados FCP (First Contentful Paint) e TTI (Time to Interactive). O teste será repetido **5 vezes por tela**, em horários distintos. Considera-se sucesso quando todas as execuções apresentarem carregamento completo em até **2 segundos**.
+
+**Cenário negativo:** Será aplicada limitação artificial de largura de banda (throttling) ou condição de rede degradada, de modo a simular conexão instável. Espera-se que o sistema sinalize carregamento ao usuário (indicador de progresso ou equivalente) e não apresente tela em branco indefinida; o desfecho será registrado como não conformidade de tempo quando o limite de 2 segundos for ultrapassado.
+
+**Pós-condições:** Métricas de performance mobile consolidadas por tela e por execução. Evidências: `[INSERIR_RELATORIO_LIGHTHOUSE_RNF01]`.
+
+**Critério de aceitação:** Todas as telas principais carregam completamente em até **2 segundos em 100% das execuções** no cenário mobile 4G.
+
+**RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07, RF08.
+
+---
+
+### 9.2.1.2 RNF02 — Tempo de geração de recomendações personalizadas
+
+**Identificador e nome:** RNF02 — Geração e exibição de recomendações em até 2 segundos (aspecto: Desempenho).
+
+**Objetivo do teste:** Validar que a atualização das recomendações após interação do usuário ocorre dentro do tempo máximo definido, assegurando responsividade do motor de recomendação no fluxo de descoberta (RF04, RF12 a RF15).
+
+**Ferramenta(s):** Lighthouse no modo mobile (medição de tempo percebido na interface); complementarmente, registro de timestamps em logs do cliente ou backend quando disponível.
+
+**Pré-condições:**
+
+- Usuário autenticado com histórico e preferências configurados.
+- Ambiente com serviço de recomendação e catálogo operacionais.
+- Três perfis de usuário de teste definidos (variação de preferências e histórico).
+- Dispositivo mobile com conexão 4G ativa.
+
+**Cenário positivo:** Para cada perfil, será registrado o timestamp da interação que dispara atualização de recomendações e o timestamp da exibição do novo conteúdo na interface. O procedimento será repetido **10 vezes por perfil**. Considera-se sucesso quando a diferença entre timestamps for ≤ **2 segundos em 100% das execuções**.
+
+**Cenário negativo:** Será simulada latência elevada no serviço de recomendação ou indisponibilidade momentânea da fila de processamento (RNF09). Espera-se exibição de spinner ou feedback de carregamento em caso de atraso; tempos acima de 2 segundos serão registrados como não conformidade.
+
+**Pós-condições:** Tempos registrados em planilha ou logs. Evidências: `[INSERIR_REGISTRO_TEMPOS_RNF02]`.
+
+**Critério de aceitação:** Diferença entre timestamps ≤ **2 segundos em 100% das execuções**; spinner exibido em caso de atraso.
+
+**RFs associados (rastreabilidade):** RF04, RF12, RF13, RF14, RF15.
+
+---
+
+### 9.2.1.3 RNF03 — Disponibilidade mensal do sistema
+
+**Identificador e nome:** RNF03 — Disponibilidade mínima de 99% (aspecto: Confiabilidade).
+
+**Objetivo do teste:** Verificar que o sistema permanece acessível aos usuários finais e aos serviços integrados dentro do limite mensal de indisponibilidade, condição necessária para login, catálogo e recomendações (RF01, RF02, RF04 a RF08).
+
+**Ferramenta(s):** UptimeRobot.
+
+**Pré-condições:**
+
+- Sistema em produção ou ambiente de homologação exposto publicamente.
+- Monitor configurado no UptimeRobot com intervalo de verificação de **5 minutos**.
+- Endpoints críticos cadastrados (API Gateway, health checks dos serviços SOA e rota principal do app, conforme escopo acordado).
+
+**Cenário positivo:** O monitoramento permanecerá ativo por **30 dias** consecutivos (ou período representativo acordado com a equipe). Cada verificação bem-sucedida incrementa a disponibilidade. Considera-se sucesso quando a disponibilidade mensal for ≥ **99%**, com incidentes documentados.
+
+**Cenário negativo:** Será simulada indisponibilidade controlada (manutenção programada ou parada de um serviço) para validar detecção pelo monitor e registro de incidente. Espera-se alerta configurado e registro do intervalo de indisponibilidade no relatório, sem perda de dados de monitoramento.
+
+**Pós-condições:** Relatório mensal de disponibilidade gerado pelo UptimeRobot. Evidências: `[INSERIR_RELATORIO_UPTIMEROBOT_RNF03]`.
+
+**Critério de aceitação:** Disponibilidade ≥ **99%** (máximo **7h18min** de indisponibilidade mensal), com incidentes registrados.
+
+**RFs associados (rastreabilidade):** RF01, RF02, RF04, RF05, RF06, RF07, RF08.
+
+---
+
+### 9.2.1.4 RNF04 — Abordagem mobile first
+
+**Identificador e nome:** RNF04 — Abordagem mobile first com áreas de toque mínimas (aspecto: Usabilidade).
+
+**Objetivo do teste:** Confirmar que a interface do aplicativo atende ao desenho mobile first, com elementos interativos dimensionados para toque confortável em smartphones, impactando preferências, navegação e interações (RF03 a RF10).
+
+**Ferramenta(s):** Dispositivos físicos Android e iOS.
+
+**Pré-condições:**
+
+- Build do aplicativo instalado em pelo menos um dispositivo Android 10+ e um iOS 15+.
+- Roteiro de telas principais definido (login, preferências, catálogo, busca, filtro, detalhes).
+- Método de inspeção de dimensões documentado (ferramentas de desenvolvedor do sistema ou overlay de layout, quando disponível).
+
+**Cenário positivo:** A interface será percorrida nos dispositivos físicos. Serão verificadas dimensões e funcionamento dos elementos interativos críticos (botões, links, cartazes, filtros). Considera-se sucesso quando **100%** dos elementos interativos avaliados apresentarem no mínimo **44×44 px** e operação completa em mobile.
+
+**Cenário negativo:** Será identificado elemento abaixo do tamanho mínimo ou inacessível por toque (sobreposição, área morta). O achado será registrado com captura de tela e referência à tela, classificando-se como não conformidade até correção.
+
+**Pós-condições:** Registro de validação da experiência mobile. Evidências: `[INSERIR_CHECKLIST_DIMENSOES_RNF04]`.
+
+**Critério de aceitação:** **100%** dos elementos interativos com no mínimo **44×44 px** e funcionamento completo em mobile.
+
+**RFs associados (rastreabilidade):** RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10.
+
+---
+
+### 9.2.1.5 RNF05 — Segurança (JWT, bcrypt e HTTPS)
+
+**Identificador e nome:** RNF05 — Segurança com JWT, bcrypt e HTTPS (aspecto: Segurança).
+
+**Objetivo do teste:** Assegurar que autenticação, transporte e armazenamento de credenciais atendem aos controles definidos, protegendo cadastro, login e interações do usuário (RF01, RF02, RF09 a RF11).
+
+**Ferramenta(s):** OWASP ZAP e Postman.
+
+**Pré-condições:**
+
+- Sistema com autenticação JWT implementada e endpoints de API acessíveis.
+- OWASP ZAP configurado para varredura passiva/ativa no escopo acordado (homologação).
+- Coleção Postman com rotas protegidas e credenciais de teste válidas e inválidas.
+- Acesso ao repositório ou banco de dados de homologação apenas para verificação de hash de senha (ambiente controlado).
+
+**Cenário positivo:** Requisições autenticadas via HTTPS com token JWT válido retornarão respostas esperadas. Senhas de usuários de teste serão verificadas quanto ao uso de bcrypt com custo ≥ **10**. Considera-se sucesso quando **100%** das requisições analisadas utilizarem HTTPS e não houver senha em texto plano.
+
+**Cenário negativo:** Serão enviadas requisições HTTP sem TLS, requisições sem token e com token expirado ou adulterado. Também será tentado acesso a rotas protegidas sem autenticação. Espera-se rejeição com **HTTP 401** (ou código adequado de não autorizado) e redirecionamento ou bloqueio de tráfego não criptografado.
+
+**Pós-condições:** Relatório de varredura OWASP ZAP e registro de requisições Postman arquivados. Evidências: `[INSERIR_RELATORIO_ZAP_RNF05]`, `[INSERIR_EVIDENCIAS_POSTMAN_RNF05]`.
+
+**Critério de aceitação:** **100%** das requisições via HTTPS; **0** senhas em texto plano; acesso inválido retorna **HTTP 401**.
+
+**RFs associados (rastreabilidade):** RF01, RF02, RF09, RF10, RF11.
+
+---
+
+### 9.2.1.6 RNF06 — Carga e escalabilidade
+
+**Identificador e nome:** RNF06 — Suporte a 200 usuários simultâneos (aspecto: Escalabilidade).
+
+**Objetivo do teste:** Verificar que o sistema sustenta carga representativa de uso concorrente nas funcionalidades de navegação e recomendação, mantendo tempo de resposta e taxa de erro dentro dos limites (RF04 a RF07, RF12).
+
+**Ferramenta(s):** k6.
+
+**Pré-condições:**
+
+- Ambiente de homologação ou staging com mesma topologia SOA da produção (API Gateway, serviços de catálogo, usuário e recomendação).
+- Scripts k6 versionados no repositório, simulando fluxos de leitura de catálogo, busca e obtenção de recomendações.
+- Ferramenta de carga autorizada a executar contra o ambiente alvo sem impacto em produção real de usuários.
+
+**Cenário positivo:** Serão simulados **200 usuários simultâneos** por **10 minutos contínuos**, executando scripts que representam os fluxos principais. Considera-se sucesso quando o tempo médio de resposta for ≤ **3 segundos**, a taxa de erro ≤ **1%** e não houver falhas críticas (queda total de serviço).
+
+**Cenário negativo:** Será aplicada carga acima de 200 usuários (ex.: 250) ou duração estendida para observar degradação. Espera-se aumento de latência e taxa de erro registrados; o sistema deve manter recuperação após redução da carga, sem corrupção de dados.
+
+**Pós-condições:** Relatório de carga k6 com gráficos de latência, throughput e erros. Evidências: `[INSERIR_RELATORIO_K6_RNF06]`.
+
+**Critério de aceitação:** Tempo médio ≤ **3 s**; taxa de erro ≤ **1%**; sem falhas críticas.
+
+**RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07, RF12.
+
+---
+
+### 9.2.1.7 RNF07 — Logs estruturados
+
+**Identificador e nome:** RNF07 — Registro de logs estruturados (aspecto: Manutenibilidade).
+
+**Objetivo do teste:** Validar que eventos relevantes do sistema geram logs estruturados no prazo e com campos obrigatórios, suportando rastreabilidade do algoritmo de recomendação e das interações (RF11 a RF13).
+
+**Ferramenta(s):** Inspeção manual dos logs gerados.
+
+**Pré-condições:**
+
+- Sistema com logging configurado em todos os serviços SOA e no API Gateway.
+- Acesso de leitura aos agregadores ou arquivos de log do ambiente de teste.
+- Lista de ações disparadoras definida (login, busca, interação com recomendação, publicação em fila).
+
+**Cenário positivo:** Serão executadas ações representativas no sistema. Para cada evento, será verificada a presença do log em até **1 segundo**, contendo os **5 campos obrigatórios**: timestamp, nível, serviço, sessão e dispositivo. Considera-se sucesso em **100%** dos eventos amostrados.
+
+**Cenário negativo:** Será provocada falha em um serviço ou requisição inválida. Espera-se log de erro estruturado com os mesmos campos obrigatórios; ausência de log ou atraso superior a 1 segundo será registrado como não conformidade.
+
+**Pós-condições:** Amostra de logs arquivada com referência ao evento disparador. Evidências: `[INSERIR_AMOSTRA_LOGS_RNF07]`.
+
+**Critério de aceitação:** **100%** dos logs registrados em até **1 s** com todos os campos obrigatórios.
+
+**RFs associados (rastreabilidade):** RF11, RF12, RF13.
+
+---
+
+### 9.2.1.8 RNF08 — Deploy independente de serviços SOA
+
+**Identificador e nome:** RNF08 — Deploy independente com indisponibilidade limitada (aspecto: Manutenibilidade).
+
+**Objetivo do teste:** Confirmar que a arquitetura SOA permite atualização de um serviço sem indisponibilizar o ecossistema completo, preservando catálogo, busca e recomendações durante deploys (RF04 a RF06, RF12).
+
+**Ferramenta(s):** Scripts shell e pipeline CI/CD.
+
+**Pré-condições:**
+
+- Pipeline de CI/CD configurado para build e deploy por serviço (catálogo, usuário, recomendação, gateway).
+- Scripts shell de deploy e health check versionados.
+- Ambiente de homologação com monitoramento de disponibilidade dos demais serviços durante o deploy.
+
+**Cenário positivo:** Será executado deploy de **um serviço isolado** (ex.: Serviço de Catálogo), medindo o intervalo de instabilidade apenas desse componente. Os demais serviços permanecerão sob verificação contínua. Considera-se sucesso quando a instabilidade do serviço alvo for ≤ **5 minutos** e **100%** dos demais serviços permanecerem operacionais.
+
+**Cenário negativo:** Será simulada falha no script de deploy (rollback necessário). Espera-se acionamento de rollback pelo pipeline ou procedimento manual documentado; o tempo de indisponibilidade e o impacto nos demais serviços serão registrados.
+
+**Pós-condições:** Serviço atualizado na versão alvo; registro de tempo de deploy e status dos health checks. Evidências: `[INSERIR_LOG_DEPLOY_RNF08]`.
+
+**Critério de aceitação:** Instabilidade ≤ **5 minutos** por serviço; **100%** dos demais serviços operacionais durante o deploy.
+
+**RFs associados (rastreabilidade):** RF04, RF05, RF06, RF12.
+
+---
+
+### 9.2.1.9 RNF09 — Processamento assíncrono com fila
+
+**Identificador e nome:** RNF09 — Processamento assíncrono de eventos (aspecto: Desempenho).
+
+**Objetivo do teste:** Validar que o processamento via fila (RabbitMQ) não degrada a experiência síncrona do usuário além do limite e atinge a taxa mínima de eventos, condição para telemetria e recomendações (RF11 a RF14).
+
+**Ferramenta(s):** k6 com cenário de eventos simultâneos.
+
+**Pré-condições:**
+
+- Sistema com fila configurada e consumidores ativos (ML Engine ou serviço de processamento).
+- Script k6 que publica interações de usuário e mede tempo de resposta das APIs síncronas em paralelo.
+- Baseline de tempo de resposta sem carga na fila estabelecida.
+
+**Cenário positivo:** Serão simulados **100 eventos simultâneos** na fila enquanto requisições síncronas de leitura são executadas. Considera-se sucesso quando o aumento médio do tempo de resposta for ≤ **500 ms** em relação à baseline e o processamento atingir ≥ **100 eventos/segundo** sem perda de mensagens.
+
+**Cenário negativo:** O consumidor da fila será pausado ou limitado artificialmente. Espera-se acúmulo de mensagens e possível aumento de latência; o sistema deve recuperar o processamento após retomada do consumidor, com registro de mensagens não processadas (dead letter ou equivalente), se houver.
+
+**Pós-condições:** Sistema estável após teste; métricas de fila e latência arquivadas. Evidências: `[INSERIR_RELATORIO_K6_FILA_RNF09]`.
+
+**Critério de aceitação:** Aumento de tempo ≤ **500 ms**; processamento ≥ **100 eventos/segundo** sem perda.
+
+**RFs associados (rastreabilidade):** RF11, RF12, RF13, RF14.
+
+---
+
+### 9.2.1.10 RNF10 — Usabilidade (toques e taxa de sucesso)
+
+**Identificador e nome:** RNF10 — Usabilidade: máximo de 3 toques e taxa de sucesso ≥ 85% (aspecto: Usabilidade).
+
+**Objetivo do teste:** Validar que as ações principais do aplicativo mobile podem ser concluídas com poucos toques e alta taxa de sucesso por usuários reais, requisito central para descoberta e navegação (RF04 a RF07).
+
+**Ferramenta(s):** Resultados dos testes de usabilidade (seção [9.3](#93-testes-de-usabilidade)).
+
+**Pré-condições:**
+
+- Rodada de testes de usabilidade planejada e executada conforme seção 9.3.1.
+- Mínimo de **5 participantes externos** ao grupo.
+- Planilha de campo com tarefas T01 a T09 e métricas de toques e conclusão.
+
+**Cenário positivo:** Os dados consolidados da seção 9.3 indicarão, por tarefa, percentual de conclusão sem auxílio que revele o caminho na interface e número de toques nas execuções bem-sucedidas. Considera-se sucesso quando **≥ 85%** dos participantes concluírem cada tarefa principal com **≤ 3 toques**.
+
+**Cenário negativo:** Tarefas com taxa de sucesso inferior a 85% ou média de toques superior a 3 serão classificadas como não conformes, com problemas de usabilidade priorizados no backlog de interface.
+
+**Pós-condições:** Relatório de usabilidade referenciado na seção 9.3.2. Evidências: `[INSERIR_REFERENCIA_RESULTADOS_USABILIDADE_RNF10]`.
+
+**Critério de aceitação:** **≥ 85%** de sucesso e **≤ 3 toques** por tarefa nas execuções que atingiram o critério de conclusão.
+
+**RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07.
+
+---
+
+### 9.2.1.11 RNF11 — Compatibilidade mobile (Android e iOS)
+
+**Identificador e nome:** RNF11 — Compatibilidade com Android 10+ e iOS 15+ (aspecto: Compatibilidade).
+
+**Objetivo do teste:** Assegurar que os fluxos principais do Spotlight operam corretamente nas plataformas mobile alvo, cobrindo todo o escopo funcional exposto no app (RF01 a RF10).
+
+**Ferramenta(s):** Dispositivos físicos Android e iOS.
+
+**Pré-condições:**
+
+- Build de homologação ou produção instalado.
+- **2 dispositivos por plataforma** (Android 10+ e iOS 15+), com variação de fabricante ou versão quando possível.
+- Roteiro de fluxo completo: splash, login, preferências, catálogo, busca, filtro, detalhes e ação de compra.
+
+**Cenário positivo:** O fluxo completo será executado em cada dispositivo. Falhas serão contabilizadas em relação ao total de passos ou requisições do roteiro. Considera-se sucesso quando a taxa de erro for ≤ **1%** em cada plataforma.
+
+**Cenário negativo:** Serão registrados crashes, telas não renderizadas, gestos não reconhecidos ou erros de API exibidos ao usuário. Cada ocorrência incrementará a taxa de erro; padrões repetidos por plataforma serão sinalizados para correção específica (Android ou iOS).
+
+**Pós-condições:** Matriz dispositivo × fluxo com status de aprovação. Evidências: `[INSERIR_MATRIZ_COMPATIBILIDADE_RNF11]`.
+
+**Critério de aceitação:** Funcionalidades dos fluxos principais com taxa de erro ≤ **1%** em Android 10+ e iOS 15+.
+
+**RFs associados (rastreabilidade):** RF01, RF02, RF04, RF05, RF06, RF07, RF08, RF09, RF10.
+
+---
+
+### 9.2.1.12 RNF12 — Containers Docker e tempo de reinicialização
+
+**Identificador e nome:** RNF12 — Execução em containers Docker (aspecto: Manutenibilidade).
+
+**Objetivo do teste:** Validar que cada serviço SOA executa em container isolado e recupera-se dentro do tempo máximo após falha, garantindo resiliência da infraestrutura transversal ao projeto.
+
+**Ferramenta(s):** Scripts shell e pipeline CI/CD.
+
+**Pré-condições:**
+
+- Ambiente Docker configurado (compose ou orquestrador usado pelo grupo).
+- Scripts shell para parada forçada de container (`docker stop` / `kill`) e medição de tempo até health check positivo.
+- Health checks HTTP configurados por serviço.
+
+**Cenário positivo:** O container de um serviço será derrubado e o tempo até retorno do health check será medido. O procedimento será repetido para cada serviço SOA. Considera-se sucesso quando a reinicialização for ≤ **30 segundos** e os demais containers permanecerem isolados e operacionais.
+
+**Cenário negativo:** Será simulada falha de imagem incorreta ou variável de ambiente ausente no deploy via pipeline. Espera-se falha detectada pelo CI/CD sem propagação para outros serviços; o tempo de recuperação após correção será registrado.
+
+**Pós-condições:** Infraestrutura documentada com tempos de recuperação por serviço. Evidências: `[INSERIR_LOG_REINICIALIZACAO_RNF12]`.
+
+**Critério de aceitação:** Reinicialização ≤ **30 s** após falha; **100%** dos serviços executando em containers isolados.
+
+**RFs associados (rastreabilidade):** RF01 a RF16 (transversal).
+
+---
+
+### 9.2.1.13 Tabela de rastreabilidade
+
+| RNF | Ferramenta principal | Cenário positivo (resumo) | Cenário negativo (resumo) | Critério de aceitação | RFs associados |
+|-----|----------------------|---------------------------|---------------------------|----------------------|----------------|
+| RNF01 | Lighthouse (mobile) | Telas principais ≤ 2 s em 4G, 5 execuções/tela | Rede degradada; registro de não conformidade | 100% execuções ≤ 2 s | RF04–RF08 |
+| RNF02 | Lighthouse (mobile) + timestamps | Recomendação ≤ 2 s, 10× por perfil (3 perfis) | Latência no serviço; spinner esperado | 100% execuções ≤ 2 s | RF04, RF12–RF15 |
+| RNF03 | UptimeRobot | Monitoramento 5 min × 30 dias | Indisponibilidade controlada detectada | Disponibilidade ≥ 99% | RF01, RF02, RF04–RF08 |
+| RNF04 | Dispositivos físicos | 100% elementos ≥ 44×44 px | Elemento subdimensionado registrado | 100% conformes | RF03–RF10 |
+| RNF05 | OWASP ZAP, Postman | HTTPS, bcrypt, JWT válido | HTTP, sem token, token inválido → 401 | 100% HTTPS; 0 texto plano; 401 | RF01, RF02, RF09–RF11 |
+| RNF06 | k6 | 200 VUs, 10 min | Carga acima do limite; degradação registrada | Média ≤ 3 s; erro ≤ 1% | RF04–RF07, RF12 |
+| RNF07 | Inspeção manual de logs | Log em 1 s com 5 campos | Falha sem log ou atraso | 100% em 1 s | RF11–RF13 |
+| RNF08 | Scripts shell, CI/CD | Deploy isolado ≤ 5 min | Rollback documentado | ≤ 5 min; demais OK | RF04–RF06, RF12 |
+| RNF09 | k6 (eventos simultâneos) | 100 eventos/s; +≤ 500 ms latência | Consumidor pausado | ≤ 500 ms; ≥ 100 evt/s | RF11–RF14 |
+| RNF10 | Seção 9.3 | ≥ 85% sucesso; ≤ 3 toques | Tarefas abaixo do limiar | ≥ 85%; ≤ 3 toques | RF04–RF07 |
+| RNF11 | Dispositivos físicos | 2 disp./plataforma; erro ≤ 1% | Crashes e erros por plataforma | Erro ≤ 1% | RF01–RF10 |
+| RNF12 | Scripts shell, CI/CD | Reinício ≤ 30 s | Deploy com imagem inválida | ≤ 30 s; containers isolados | Transversal |
+
+---
+
+### 9.2.1.14 Discussão de abrangência e limitações
+
+**Abrangência**
+
+- Os doze RNFs definidos na seção 3.2 possuem planejamento formal com cenários positivos e negativos, ferramentas indicadas e critérios objetivos de aprovação.
+- Aspectos de qualidade cobertos: desempenho (RNF01, RNF02, RNF09), confiabilidade (RNF03), usabilidade e mobile first (RNF04, RNF10), segurança (RNF05), escalabilidade (RNF06), manutenibilidade (RNF07, RNF08, RNF12) e compatibilidade (RNF11).
+- Rastreabilidade aos RFs associados está documentada em cada subseção e consolidada na tabela 9.2.1.13.
+- RNF10 integra-se explicitamente aos testes de usabilidade (9.3), evitando duplicação de execução com métricas divergentes.
+
+**Dependências entre RNFs**
+
+| Relação | RNFs | Impacto na validação |
+|---------|------|----------------------|
+| Desempenho percebido × backend | RNF01, RNF02, RNF06, RNF09 | Falha em fila ou carga elevada pode invalidar tempos de tela e recomendação |
+| Disponibilidade × segurança | RNF03, RNF05 | Indisponibilidade do gateway impede testes de JWT; varreduras ZAP dependem de ambiente estável |
+| Mobile × usabilidade | RNF04, RNF10, RNF11 | Compatibilidade e áreas de toque influenciam taxa de sucesso e número de toques |
+| Infraestrutura × deploy | RNF08, RNF12 | Containers e pipeline CI/CD são pré-requisito para deploy independente |
+| Observabilidade × recomendação | RNF07, RNF09, RNF02 | Logs e fila sustentam diagnóstico de atraso em recomendações |
+
+**Maior complexidade no contexto acadêmico**
+
+- **RNF03** (30 dias de monitoramento contínuo) e **RNF06** (200 usuários por 10 minutos) exigem ambiente estável e janela prolongada, nem sempre disponível em infraestrutura institucional gratuita.
+- **RNF05** (OWASP ZAP) demanda escopo bem delimitado para não impactar ambientes compartilhados.
+- **RNF09** depende de fila e consumidores configurados de forma equivalente à produção, o que pode não estar completo em todas as fases do projeto.
+
+**Limitações**
+
+- Testes em homologação podem não reproduzir latência real de 4G em todos os cenários; RNF01 e RNF02 priorizam dispositivo físico, mas variabilidade de rede externa permanece.
+- UptimeRobot monitora endpoints HTTP; não substitui validação de disponibilidade de push notifications ou de lojas de aplicativos.
+- k6 simula carga na API; não substitui teste de bateria ou memória no dispositivo mobile.
+- RNF04 e RNF11 com quatro dispositivos físicos cobrem amostra limitada de fabricantes e versões.
+- Resultados quantitativos finais dependem da execução e preenchimento das evidências indicadas por placeholders nas seções acima e na seção 9.2.2.
+
+&emsp;A consolidação dos vereditos por RNF (aprovado / reprovado / aprovado com ressalvas) será registrada na seção 9.2.2 após a execução da bateria de testes.
 
 ## 9.2.2 Resultados
 _conteúdo_
@@ -3832,7 +4205,7 @@ _conteúdo_
 
 ### 9.3.1.10 Planilha de anotações
 
-> Planilha de anotações e respostas SUS: [inserir link aqui]
+> Link da planilha de anotações e respostas SUS: [https://docs.google.com/spreadsheets/d/1LwK3aduFTjDxU4qhjU7b82aX2QDKCnXhXFzvBiHUFv8/edit?usp=sharing]
 
 ### 9.3.1.11 Tabela de rastreabilidade
 
