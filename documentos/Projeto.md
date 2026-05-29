@@ -3681,7 +3681,7 @@ _conteúdo_
 | Categoria | Pré-condição |
 |-----------|----------------|
 | Artefato | Protótipo instalável do aplicativo Spotlight (build de demonstração ou equivalente), com fluxos de splash, login, preferências, catálogo, busca, filtro e detalhes disponíveis para execução |
-| Dados de teste | Credenciais de acesso de teste definidas; espetáculo-alvo e categoria-alvo dos cenários T05 e T06 identificados no catálogo mockado (`[NOME_DO_ESPETACULO_ALVO]`, `[CATEGORIA_ALVO]`) |
+| Dados de teste | Credenciais de acesso de teste definidas; espetáculo e categoria utilizados nos cenários T05 e T06 identificados no catálogo mockado |
 | Participantes | Mínimo de cinco pessoas externas ao grupo de desenvolvimento, conforme perfil descrito na seção 9.3.1.4 |
 | Dispositivo | Smartphone com Android 10+ ou iOS 15+ (RNF11), preferencialmente o aparelho habitual do participante |
 | Ambiente | Local silencioso, iluminação adequada à leitura da tela, conexão estável quando o protótipo depender de rede |
@@ -3733,7 +3733,7 @@ _conteúdo_
 
 &emsp;A reserva de uma vaga para participante com 60 anos ou mais e baixa familiaridade tecnológica alinha a rodada ao requisito de acessibilidade mobile (RNF04) e à validação do público idoso previsto nas personas do projeto. Os demais participantes complementam a amostra com perfis predominantemente jovens, sem exigir duplicação artificial dos critérios de idade avançada e baixa alfabetização digital em pessoas distintas.
 
-&emsp;Os dados de recrutamento serão registrados na tabela de participantes (seção 9.3.1.10), respeitando restrições de privacidade acordadas com cada pessoa.
+&emsp;Os dados de recrutamento serão registrados na planilha de anotações (seção 9.3.1.10), respeitando restrições de privacidade acordadas com cada pessoa.
 
 ### 9.3.1.5 Metodologia SUS
 
@@ -3766,16 +3766,11 @@ _conteúdo_
 | T02 | Entre no aplicativo usando o e-mail e a senha que serão informados. Avise quando estiver logado. | Credenciais de teste aceitas; participante alcança tela posterior ao login (preferências ou catálogo). | RF02 | RNF10, RNF11 |
 | T03 | Escolha pelo menos um tipo de espetáculo que você gosta e uma faixa de preço que faz sentido para você. Avance até concluir essa configuração. | Preferências selecionadas e fluxo de onboarding concluído sem erro bloqueante. | RF03 | RNF04, RNF10, RNF11 |
 | T04 | Na tela principal, role a tela para baixo e diga quais espetáculos aparecem nas listas que deslizam para o lado. Toque em um cartaz que chame sua atenção. | Identificação de ao menos uma seção de recomendações e abertura ou indicação clara do cartaz selecionado. | RF04 | RNF04, RNF10, RNF11 |
-| T05 | Use a barra de busca para encontrar o espetáculo **[NOME_DO_ESPETACULO_ALVO]**. Avise quando achar o resultado. | Termo de busca aplicado; resultado esperado visível ou desfecho “não encontrou” registrado. | RF05 | RNF10, RNF11 |
-| T06 | Limpe ou ignore a busca anterior. Use o filtro para mostrar apenas espetáculos do tipo **[CATEGORIA_ALVO]**. Diga quando a lista estiver do jeito que pediu. | Filtro aplicado; lista percebida como refinada ou desfecho de não conclusão registrado. | RF06 | RNF10, RNF11 |
+| T05 | Use a barra de busca para encontrar um espetáculo disponível na plataforma. Avise quando achar o resultado. | Termo de busca aplicado; resultado esperado visível ou desfecho “não encontrou” registrado. | RF05 | RNF10, RNF11 |
+| T06 | Limpe ou ignore a busca anterior. Use o filtro para mostrar apenas espetáculos de uma categoria disponível. Diga quando a lista estiver do jeito que pediu. | Filtro aplicado; lista percebida como refinada ou desfecho de não conclusão registrado. | RF06 | RNF10, RNF11 |
 | T07 | Abra a página com informações completas de um espetáculo qualquer. Role até o final e diga o que entendeu sobre a peça (data, local ou resumo). | Tela de detalhes exibida; citação de ao menos um dado do espetáculo (título, descrição, data, preço ou local). | RF07 | RNF01, RNF04, RNF10, RNF11 |
 | T08 | Volte para a tela principal. Deslize o dedo horizontalmente em uma das listas de espetáculos e abra outro espetáculo diferente do anterior. | Gesto horizontal executado; segundo espetáculo acessado ou tentativa registrada. | RF04, RF07 | RNF04, RNF10, RNF11 |
 | T09 | Na página do espetáculo, encontre onde comprar ingresso ou seguir para compra. Toque nessa opção e diga o que aconteceu. | Botão ou link de compra localizado; ação executada (incluindo redirecionamento mockado, se houver). | RF07 | RNF10, RNF11 |
-
-&emsp;**Placeholders da rodada:**
-
-- `[NOME_DO_ESPETACULO_ALVO]`: título do espetáculo presente no protótipo de demonstração.
-- `[CATEGORIA_ALVO]`: categoria disponível no filtro do protótipo (ex.: Musical, Stand-up).
 
 &emsp;Credenciais de teste, versão do build e enunciados permanecem idênticos para todos os participantes de uma mesma rodada, a fim de assegurar comparabilidade dos resultados.
 
@@ -3785,7 +3780,7 @@ _conteúdo_
 
 **Momento preparatório**
 
-&emsp;Nesta fase, obtém-se o consentimento do participante, configura-se o dispositivo com o build de teste, define-se brilho e conectividade adequados, preenchem-se os placeholders das tarefas T05 e T06 e restabelece-se o estado inicial do aplicativo.
+&emsp;Nesta fase, obtém-se o consentimento do participante, configura-se o dispositivo com o build de teste, define-se brilho e conectividade adequados, estabelecem-se o espetáculo e a categoria de referência para as tarefas T05 e T06 e restabelece-se o estado inicial do aplicativo.
 
 **Momento de execução das tarefas (T01 a T09)**
 
@@ -3839,21 +3834,7 @@ _conteúdo_
 
 > Planilha de anotações e respostas SUS: [inserir link aqui]
 
-### 9.3.1.11 Tabela de participantes
-
-| ID | Faixa etária | Familiaridade tecnológica | Dispositivo | Data |
-|----|--------------|---------------------------|-------------|------|
-| P01 | | | | |
-| P02 | | | | |
-| P03 | | | | |
-| P04 | | | | |
-| P05 | | | | |
-| P06 | | | | |
-| P07 | | | | |
-
-&emsp;Os campos `Faixa etária` e `Familiaridade tecnológica` serão preenchidos com faixas padronizadas (ex.: 18–29, 30–44, 45–59, 60+; Baixa, Média, Alta). Recomenda-se identificar na planilha qual participante atende à vaga obrigatória 60+ com baixa familiaridade tecnológica.
-
-### 9.3.1.12 Tabela de rastreabilidade
+### 9.3.1.11 Tabela de rastreabilidade
 
 | Tarefa | RFs cobertos | RNFs cobertos | Critério de aceitação validado |
 |--------|--------------|---------------|--------------------------------|
@@ -3868,7 +3849,7 @@ _conteúdo_
 | T09 | RF07 | RNF10, RNF11 | Ação de compra localizada e executada |
 | SUS (pós-tarefas) | RF04, RF05, RF06, RF07 (transversal) | RNF04, RNF10 | Média SUS ≥ 68 |
 
-### 9.3.1.13 Discussão de abrangência e limitações
+### 9.3.1.12 Discussão de abrangência e limitações
 
 **Abrangência**
 
