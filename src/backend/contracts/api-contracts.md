@@ -27,6 +27,7 @@ para os serviços:
 | `/catalogo/*` | Catálogo | 5001 |
 | `/usuario/*` | Usuário | 5002 |
 | `/recomendacao/*` | Recomendação | 5003 |
+| `/geolocalizacao/*` | Geolocalização | 5004 |
 
 Os paths neste documento são relativos ao gateway (ex.: `GET /catalogo/espetaculos`).
 
@@ -403,7 +404,7 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 - Headers: `Authorization`, `Content-Type`.
 - Body (campos opcionais):
 ```json
-{ "nome": "string (máx 150)", "dataNascimento": "1995-04-12", "localizacao": "string (máx 150)" }
+{ "nome": "string (máx 150)", "dataNascimento": "1995-04-12", "localizacao": { "formattedAddress": "Campinas, SP", "latitude": -22.90556, "longitude": -47.06083, "placeId": "123", "provider": "openstreetmap_nominatim" } }
 ```
 
 **Responses**
@@ -415,7 +416,36 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 
 ---
 
-### 4.3 `GET /usuario/me/preferencias`
+### 4.3 `PUT /usuario/me/localizacao`
+**Finalidade:** atualizar a localização consentida do usuário autenticado. **Requer `cadastrado`.**
+
+**Request**
+- Headers: `Authorization`, `Content-Type`.
+- Body:
+```json
+{
+  "formattedAddress": "Rua Caetanopolis, Sao Paulo, SP",
+  "latitude": -23.5470245,
+  "longitude": -46.7542871,
+  "placeId": "8893681",
+  "provider": "openstreetmap_nominatim"
+}
+```
+
+**Responses**
+- `200 OK`:
+```json
+{ "message": "Localizacao atualizada com sucesso." }
+```
+- `400` — validação (`Erro` com `details`).
+- `401` — token ausente ou inválido. `Erro`.
+- `403` — token válido, mas usuário sem permissão. `Erro`.
+- `404` — usuário inexistente. `Erro`.
+- `500` — `Erro`.
+
+---
+
+### 4.4 `GET /usuario/me/preferencias`
 **Finalidade:** retornar as preferências declaradas (onboarding). **Requer `cadastrado`.**
 Mapeia o campo `perfil_preferencias` (JSONB).
 
@@ -428,7 +458,7 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 ---
 
-### 4.4 `PUT /usuario/me/preferencias`
+### 4.5 `PUT /usuario/me/preferencias`
 **Finalidade:** atualizar as preferências (usado no onboarding e ajustes). **Requer `cadastrado`.**
 
 **Request**
@@ -443,7 +473,7 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 ---
 
-### 4.5 `GET /usuario/me/avaliacoes`
+### 4.6 `GET /usuario/me/avaliacoes`
 **Finalidade:** histórico de avaliações do usuário autenticado. **Requer `cadastrado`.**
 
 **Responses**
@@ -462,9 +492,50 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 ---
 
-## 5. Serviço de Recomendação
+## 5. Serviço de Geolocalização
 
-### 5.1 `GET /recomendacao/me`
+### 5.1 `GET /geolocalizacao/geocoding`
+**Finalidade:** converter endereço textual em endereço normalizado e coordenadas via OpenStreetMap/Nominatim.
+
+**Request**
+- Query: `address`.
+
+**Responses**
+- `200 OK`:
+```json
+{
+  "formattedAddress": "Sao Paulo, Regiao Sudeste, Brasil",
+  "latitude": -23.55052,
+  "longitude": -46.633308,
+  "placeId": "298285",
+  "provider": "openstreetmap_nominatim"
+}
+```
+- `400` — validação (`Erro` com `details`).
+- `404` — localização não encontrada.
+- `409` — falha ao consultar provedor externo.
+- `500` — `Erro`.
+
+---
+
+### 5.2 `GET /geolocalizacao/geocoding/reverse`
+**Finalidade:** converter latitude/longitude em endereço normalizado via OpenStreetMap/Nominatim.
+
+**Request**
+- Query: `latitude`, `longitude`.
+
+**Responses**
+- `200 OK` — mesmo schema de 5.1.
+- `400` — validação (`Erro` com `details`).
+- `404` — localização não encontrada.
+- `409` — falha ao consultar provedor externo.
+- `500` — `Erro`.
+
+---
+
+## 6. Serviço de Recomendação
+
+### 6.1 `GET /recomendacao/me`
 **Finalidade:** recomendações personalizadas para o usuário autenticado, ordenadas
 por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `recomendacao`).
 
@@ -497,7 +568,7 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 
 ---
 
-### 5.2 `GET /recomendacao/espetaculos/{id}/similares`
+### 6.2 `GET /recomendacao/espetaculos/{id}/similares`
 **Finalidade:** espetáculos similares a um dado espetáculo (item-item). **Público.**
 
 > **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os
@@ -525,7 +596,7 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 
 ---
 
-## 6. Rastreabilidade (rota → entidade do banco)
+## 7. Rastreabilidade (rota → entidade do banco)
 
 | Rota | Tabela(s) principal(is) |
 |---|---|
@@ -535,6 +606,7 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 | `/catalogo/.../sessoes` | `sessao`, `teatro` |
 | `/catalogo/.../avaliacoes` | `avaliacao`, `usuario` |
 | `/usuario/me*` | `usuario` (inclui `perfil_preferencias` JSONB) |
+| `/geolocalizacao/geocoding*` | API externa OpenStreetMap/Nominatim; sem persistência direta |
 | `/recomendacao/me` | `recomendacao` (por-usuário, RLS), `espetaculo` |
 | `/recomendacao/espetaculos/{id}/similares` | `similaridade_item` (global, leitura pública — **a criar**), `espetaculo` |
 
@@ -546,4 +618,3 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 > de banco/ML antes de implementar a rota.
 
 ---
-

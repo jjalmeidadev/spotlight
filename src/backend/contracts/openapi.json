@@ -607,6 +607,62 @@
         }
       }
     },
+    "/usuario/me/localizacao": {
+      "put": {
+        "tags": [
+          "UsuÃ¡rio"
+        ],
+        "summary": "Atualizar localizacao consentida do usuario autenticado (cadastrado)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Localizacao"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Localizacao atualizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Localizacao atualizada com sucesso."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
     "/usuario/me/preferencias": {
       "get": {
         "tags": [
@@ -782,6 +838,104 @@
           },
           "403": {
             "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/geolocalizacao/geocoding": {
+      "get": {
+        "tags": [
+          "Geolocalizacao"
+        ],
+        "summary": "Geocodificar endereco via OpenStreetMap/Nominatim",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Localizacao resolvida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Localizacao"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Erro409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/geolocalizacao/geocoding/reverse": {
+      "get": {
+        "tags": [
+          "Geolocalizacao"
+        ],
+        "summary": "Geocodificacao reversa via OpenStreetMap/Nominatim",
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": -90,
+              "maximum": 90
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": -180,
+              "maximum": 180
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Localizacao resolvida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Localizacao"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Erro409"
           },
           "500": {
             "$ref": "#/components/responses/Erro500"
@@ -1600,9 +1754,12 @@
             "example": "1995-04-12"
           },
           "localizacao": {
-            "type": "string",
-            "nullable": true,
-            "example": "Campinas, SP"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Localizacao"
+              }
+            ],
+            "nullable": true
           },
           "tipoUsuario": {
             "type": "string",
@@ -1633,8 +1790,41 @@
             "format": "date"
           },
           "localizacao": {
+            "$ref": "#/components/schemas/Localizacao"
+          }
+        }
+      },
+      "Localizacao": {
+        "type": "object",
+        "required": [
+          "formattedAddress",
+          "latitude",
+          "longitude",
+          "placeId",
+          "provider"
+        ],
+        "properties": {
+          "formattedAddress": {
             "type": "string",
-            "maxLength": 150
+            "example": "Rua Caetanopolis, Sao Paulo, SP"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "example": -23.5470245
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "example": -46.7542871
+          },
+          "placeId": {
+            "type": "string",
+            "example": "8893681"
+          },
+          "provider": {
+            "type": "string",
+            "example": "openstreetmap_nominatim"
           }
         }
       },

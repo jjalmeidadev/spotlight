@@ -56,9 +56,11 @@ export default function CadastroView({ onCadastro, onBackPress }: CadastroViewPr
           <Field label="Senha" onChangeText={vm.setSenha} secureTextEntry value={vm.senha} />
           <Field
             keyboardType="number-pad"
-            label="Idade"
-            onChangeText={vm.setIdade}
-            value={vm.idade}
+            label="Data de nascimento"
+            onChangeText={vm.setDataNascimento}
+            placeholder="DD/MM/AAAA"
+            placeholderTextColor="#a7afa9"
+            value={vm.dataNascimento}
           />
 
           <Text style={styles.label}>Gênero</Text>
@@ -88,6 +90,7 @@ export default function CadastroView({ onCadastro, onBackPress }: CadastroViewPr
           </View>
 
           {vm.error ? <Text style={styles.error}>{vm.error}</Text> : null}
+          {vm.success ? <Text style={styles.success}>{vm.success}</Text> : null}
 
           <Pressable
             accessibilityRole="button"
@@ -238,6 +241,12 @@ const styles = StyleSheet.create({
   },
   error: {
     color: '#c94f3a',
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: 'center',
+  },
+  success: {
+    color: '#2f6d45',
     fontSize: 12,
     lineHeight: 16,
     textAlign: 'center',
