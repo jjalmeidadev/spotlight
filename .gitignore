@@ -7,6 +7,9 @@
 node_modules/
 /.expo/
 npm-debug.log*
+.env
+.env.*
+!.env.example
 
 # Artefatos gerados por notebooks e análises locais
 src/aad/*.png

@@ -33,11 +33,36 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Erro não tratado ao processar {Method} {Path}",
-                context.Request.Method, context.Request.Path);
-            await EscreverAsync(context, HttpStatusCode.InternalServerError, "Erro interno no servidor.");
+            var statusCode = GetStatusCode(ex);
+
+            if (statusCode == HttpStatusCode.InternalServerError)
+            {
+                logger.LogError(ex, "Erro não tratado ao processar {Method} {Path}",
+                    context.Request.Method, context.Request.Path);
+            }
+            else
+            {
+                logger.LogWarning(ex, "Falha de negócio ao processar {Method} {Path}",
+                    context.Request.Method, context.Request.Path);
+            }
+
+            await EscreverAsync(context, statusCode, GetMessage(ex, statusCode));
         }
     }
+
+    private static HttpStatusCode GetStatusCode(Exception ex) => ex switch
+    {
+        ValidationException => HttpStatusCode.BadRequest,
+        UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+        NotFoundException => HttpStatusCode.NotFound,
+        ConflictException => HttpStatusCode.Conflict,
+        _ => HttpStatusCode.InternalServerError
+    };
+
+    private static string GetMessage(Exception ex, HttpStatusCode statusCode) =>
+        statusCode == HttpStatusCode.InternalServerError
+            ? "Erro interno no servidor."
+            : ex.Message;
 
     private static Task EscreverAsync(
         HttpContext context,

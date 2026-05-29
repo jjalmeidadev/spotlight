@@ -106,11 +106,9 @@
   <img src="./img/bottom.png" alt="bottom">
 </p>
 
-# Spotlight <nome do projeto>
+# Spotlight
 
-## GESTÃO DE PROJETO <nome do arquivo>
-
-
+## Gestão de Projeto
 
 # Sumário
 - [1. Introdução](#1-introdução)
@@ -397,7 +395,64 @@ Todas as tasks acima devem ser registradas no quadro Kanban com os campos obriga
 ---
 
 ## 2.3 Sprint 3  
-Nota: Insira informações sobre mudanças realizadas.
+
+### 2.3.1 Retrospectiva da Sprint 3
+
+Ao final da Sprint 3, a equipe realizou a retrospectiva do ciclo com foco em avaliar a evolução do processo após as ações pactuadas na Sprint 2. A sprint marcou uma transição importante do projeto, pois concentrou atividades de maior densidade técnica, como implementação de banco de dados, backend, frontend, testes, documentação e preparação das evidências de entrega.
+
+De forma geral, a Sprint 3 apresentou avanço relevante na organização do fluxo de desenvolvimento. Problemas identificados no ciclo anterior, como acúmulo de revisões, ausência de priorização clara e falta de mapeamento de dependências, foram tratados com maior disciplina. Por outro lado, a execução ainda revelou fragilidades na distribuição de carga entre os integrantes, na clareza das descrições das tasks e no planejamento antecipado dos materiais de apresentação.
+
+---
+
+### 2.3.2 Análise dos Pontos Identificados
+
+#### Pontos Fortes
+
+| Ponto forte | Evidência observada na Sprint 3 | Impacto no processo |
+|-------------|----------------------------------|---------------------|
+| Revisões contínuas nos Pull Requests | As revisões deixaram de se concentrar apenas no fim da sprint e passaram a ocorrer ao longo do ciclo, em resposta ao SLA interno definido na Sprint 2. | Reduziu gargalos próximos à entrega, aumentou a qualidade das validações e diminuiu o risco de retrabalho tardio. |
+| Priorização das tasks | O backlog da Sprint 3 foi estruturado em 8 blocos e 32 tasks, separando banco de dados, arquitetura, APIs externas, backend, frontend, testes, evidências e gestão. | A equipe conseguiu direcionar esforço primeiro para entregas estruturantes, evitando que tarefas menos críticas bloqueassem o avanço do produto. |
+| Mapeamento das dependências entre tasks | A matriz de dependências críticas planejada para a Sprint 3 explicitou relações como banco antes de backend, rotas antes de frontend e services antes de testes unitários. | Ajudou a reduzir incertezas sobre ordem de execução e tornou mais claro quais entregas precisavam estar prontas antes de outras avançarem. |
+| Dailys mais concretas | As dailys passaram a tratar andamento, impedimentos e próximos passos de forma mais objetiva, com maior conexão com o estado real das tasks no Kanban. | Melhorou a visibilidade do progresso e permitiu intervenções mais rápidas quando alguma tarefa apresentava risco de atraso. |
+| Ritual de fechamento mais esclarecido | A equipe chegou ao encerramento da sprint com maior entendimento sobre o que precisava ser validado, revisado e consolidado antes da entrega. | Aumentou a previsibilidade do fechamento e reduziu dúvidas sobre responsabilidades finais de revisão e documentação. |
+
+A principal evolução da Sprint 3 foi a correção de problemas diretamente herdados da Sprint 2. A equipe demonstrou maior maturidade ao transformar ações de melhoria em práticas observáveis, especialmente nas revisões contínuas de Pull Requests e na organização das dependências. Isso indica que a retrospectiva anterior não ficou apenas como registro documental, mas influenciou efetivamente a forma de trabalho do ciclo seguinte.
+
+Além disso, a priorização das tasks trouxe mais clareza para uma sprint tecnicamente mais complexa. Como havia dependências fortes entre banco de dados, backend, frontend e testes, a organização por ordem de execução foi essencial para evitar bloqueios previsíveis. As dailys também passaram a ter papel mais prático, funcionando como pontos de checagem para alinhar andamento, destravar dúvidas e reforçar o foco nas entregas prioritárias.
+
+#### Pontos Fracos
+
+| Ponto fraco | Evidência observada na Sprint 3 | Consequência |
+|-------------|----------------------------------|--------------|
+| Centralização de tarefas em poucas pessoas | Parte relevante das entregas técnicas e de fechamento ficou concentrada em um número reduzido de integrantes. | Aumentou a sobrecarga individual, reduziu a previsibilidade do ritmo coletivo e criou dependência excessiva de pessoas específicas. |
+| Distribuição desbalanceada de trabalho | A complexidade e o volume das tasks não ficaram igualmente distribuídos entre os membros da equipe. | Alguns integrantes ficaram com maior responsabilidade operacional, enquanto outros tiveram menor participação em entregas críticas. |
+| Dificuldade de visualizar o que deveria ser feito em cada task | O documento de gestão apresentava as tasks de forma resumida, enquanto a descrição detalhada estava concentrada apenas nos cards do Kanban. | A rastreabilidade documental ficou limitada e a consulta fora do quadro tornou-se insuficiente para entender escopo, DoR, DoD e critérios de conclusão. |
+| Apresentação de slides montada um dia antes da entrega | A montagem final dos slides ocorreu próxima ao prazo de entrega, repetindo parcialmente um risco já identificado em ciclos anteriores. | Reduziu o tempo disponível para revisão narrativa, padronização visual, ensaio e correção de inconsistências entre produto, documentação e apresentação. |
+
+O ponto mais crítico da Sprint 3 foi a centralização do trabalho. Embora a equipe tenha melhorado o controle do fluxo, a execução ainda dependeu demais de poucos integrantes em atividades de maior impacto. Esse comportamento é arriscado porque reduz a sustentabilidade do processo: quando uma entrega depende de poucas pessoas, qualquer indisponibilidade, dúvida técnica ou acúmulo de revisão pode comprometer o andamento da sprint inteira.
+
+A distribuição desbalanceada também indica que o planejamento precisa considerar não apenas a prioridade das tasks, mas também a capacidade real de execução de cada membro. O uso de t-shirt sizing ajudou a estimar esforço, mas ainda não foi suficiente para garantir divisão proporcional da carga. Para a Sprint 4, será necessário combinar tamanho, complexidade técnica e disponibilidade individual antes da alocação final.
+
+Outro ponto relevante foi a diferença entre o nível de detalhe presente nos cards do Kanban e o nível de detalhe registrado no documento de gestão. Como o documento continha descrições mais sintéticas, a equipe tinha dificuldade de compreender rapidamente o escopo completo de cada task sem acessar o card correspondente. Isso enfraquece a rastreabilidade e dificulta a consulta histórica, principalmente para revisores, professores e integrantes que não participaram diretamente da execução de determinada tarefa.
+
+Por fim, a apresentação de slides voltou a ser um ponto de atenção. Apesar de o ritual de fechamento estar mais claro, a montagem final ter ocorrido apenas um dia antes da entrega limitou a qualidade da revisão. Esse problema precisa ser tratado como parte do fluxo oficial da sprint, e não como uma atividade separada no final do ciclo.
+
+---
+
+### 2.3.3 Ações de Melhoria Propostas para a Sprint 4
+
+| Problema endereçado | Ação de melhoria | Responsável | Prazo de aplicação | Critério de sucesso |
+|---------------------|------------------|-------------|--------------------|---------------------|
+| Centralização de tarefas em poucas pessoas | Definir, no planejamento da Sprint 4, um limite de carga por integrante considerando quantidade de tasks, tamanho estimado e criticidade técnica. | Scrum Master | Planejamento da Sprint 4 | Nenhum integrante deve concentrar sozinho mais de uma entrega crítica sem dupla de apoio definida. |
+| Distribuição desbalanceada de trabalho | Criar uma tabela de alocação por pessoa, relacionando responsável, apoio, tamanho da task e dependências. | Scrum Master | Início da Sprint 4 | Todas as tasks priorizadas devem ter responsável principal e, quando forem M ou G, ao menos um apoio indicado. |
+| Baixa clareza das tasks no documento | Expandir a descrição das tasks em algum documento, incluindo objetivo, entrega esperada, DoR e DoD resumidos para cada item planejado. | Scrum Master | Durante o planejamento da Sprint 4 | Cada task deve ser compreensível pelo documento, sem depender exclusivamente da leitura do card no Kanban. |
+| Diferença entre documento e Kanban | Padronizar uma checagem entre Kanban e documentação ao final de cada daily, garantindo que mudanças relevantes de escopo estejam refletidas nos dois locais. | Equipe | Ao longo da Sprint 4 | Cards e documento devem permanecer consistentes quanto a descrição, responsável, prioridade e status. |
+| Slides montados próximos à entrega | Criar uma task específica para a apresentação já no início da sprint, com checkpoints obrigatórios de roteiro, versão preliminar e revisão final. | Responsável pelos slides e Scrum Master | Início e meio da Sprint 4 | A primeira versão dos slides deve estar pronta pelo menos dois dias antes da entrega. |
+| Pouco tempo para revisão da apresentação | Realizar ensaio interno antes da entrega, validando narrativa, tempo de fala, evidências do produto e coerência com a documentação. | Equipe | Até um dia antes da entrega | Apresentação validada com ajustes registrados antes do dia final de entrega. |
+
+Além das ações específicas, a equipe deve manter as práticas que funcionaram bem na Sprint 3. As revisões contínuas de Pull Requests, a matriz de dependências, as dailys objetivas e o ritual de fechamento devem permanecer como parte do processo padrão da Sprint 4, pois demonstraram impacto direto na organização do trabalho e na redução de riscos operacionais.
+
+Para evitar reincidência dos problemas, a Sprint 4 deve iniciar com dois controles adicionais: uma visão de capacidade por integrante e uma visão de qualidade da documentação das tasks. A primeira garante que a equipe distribua melhor o esforço; a segunda garante que o planejamento seja rastreável e compreensível mesmo fora do Kanban.
 
 ---
 
@@ -421,7 +476,7 @@ O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a 
 |----|------|--------------|---------|-------------|
 | R1 | Atraso na entrega de apresentações | Média | Alto | Scrum Master |
 | R2 | Falta de revisão de materiais | Alta | Médio | Equipe |
-| R3 | Desorganização no Kanban | Média | Médio | Product Owner |
+| R3 | Desorganização no Kanban | Média | Médio | Scrum Master |
 
 
 ## 3.2 Mitigação de Riscos

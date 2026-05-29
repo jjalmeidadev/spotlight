@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { loginUsuario, Usuario } from '../models/Usuario';
+import { obterLocalizacaoAtual, salvarLocalizacaoUsuario } from '../repositories/LocationRepository';
 
 export function useLoginViewModel(onSuccess?: (usuario: Usuario) => void) {
   const [email, setEmail] = useState('');
@@ -12,6 +13,22 @@ export function useLoginViewModel(onSuccess?: (usuario: Usuario) => void) {
       setLoading(true);
       setError(null);
       const usuario = await loginUsuario({ email, senha });
+
+      if (usuario.compartilharLocalizacao) {
+        try {
+          const localizacao = await obterLocalizacaoAtual();
+          await salvarLocalizacaoUsuario(usuario.accessToken, localizacao);
+          onSuccess?.({ ...usuario, localizacao });
+          return;
+        } catch (locationError) {
+          console.warn(locationError);
+          setError(locationError instanceof Error
+            ? locationError.message
+            : 'Nao foi possivel salvar sua localizacao.');
+          return;
+        }
+      }
+
       onSuccess?.(usuario);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Não foi possível entrar.');

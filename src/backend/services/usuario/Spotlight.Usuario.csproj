@@ -13,6 +13,7 @@
   <ItemGroup>
     <!-- Banco relacional (PostgreSQL / Supabase) via Npgsql / ADO.NET — sem ORM -->
     <PackageReference Include="Npgsql" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
 
     <!-- Autenticação JWT (Supabase emite tokens HS256) -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
