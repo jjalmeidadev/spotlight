@@ -3,9 +3,22 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Spotlight.Usuario.Application.UseCases;
 
 namespace Spotlight.Usuario.Infrastructure.Auth;
 
+/// <summary>
+/// Configuração de autenticação/autorização para o serviço de Usuário.
+/// Supabase Auth emite JWTs HS256 assinados com o segredo do projeto
+/// (env <c>SUPABASE_JWT_SECRET</c>) ou via JWKS público (env
+/// <c>SUPABASE_AUTH_JWKS_URL</c> / derivado de <c>SUPABASE_URL</c>).
+/// As policies <c>Cadastrado</c> e <c>Administrador</c> validam o claim custom
+/// <c>tipo_usuario</c> — esse claim precisa ser emitido pelo Supabase
+/// (via Auth Hook / Database Trigger).
+///
+/// Sem segredo nem JWKS configurados, o serviço sobe sem auth (rotas com
+/// <c>[Authorize]</c> devolvem 401). Esse modo é útil para testes locais sem Supabase.
+/// </summary>
 public static class AuthSetup
 {
     public const string PolicyCadastrado = "Cadastrado";
@@ -35,6 +48,9 @@ public static class AuthSetup
             builder.Services.AddAuthorization(AddPolicies);
             return;
         }
+
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<IUsuarioContexto, UsuarioContextoHttp>();
 
         var chaves = GetSigningKeys(jwtSecret, jwksUrl);
 
@@ -67,12 +83,12 @@ public static class AuthSetup
                             : null;
 
                         await EscreverErroAsync(ctx.Response, StatusCodes.Status401Unauthorized,
-                            "Token ausente ou invalido.", ctx.HttpContext.TraceIdentifier, details);
+                            "Token ausente ou inválido.", ctx.HttpContext.TraceIdentifier, details);
                     },
                     OnForbidden = async ctx =>
                     {
                         await EscreverErroAsync(ctx.Response, StatusCodes.Status403Forbidden,
-                            "Usuario sem permissao para esta operacao.", ctx.HttpContext.TraceIdentifier);
+                            "Usuário sem permissão para esta operação.", ctx.HttpContext.TraceIdentifier);
                     }
                 };
             });

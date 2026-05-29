@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
 import CadastroView from './src/frontend/screens/CadastroView';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
@@ -23,6 +24,10 @@ export default function App() {
 		const subscription = Linking.addEventListener('url', ({ url }) => handleUrl(url));
 		return () => subscription.remove();
 	}, []);
+
+	function handleLogin(usuario) {
+		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
+	}
 
 	if (screen === 'cadastro') {
 		return (
@@ -48,6 +53,10 @@ export default function App() {
 		return <PreferenceSelectionScreen />;
 	}
 
+	if (screen === 'dashboard') {
+		return <AdminDashboardScreen />;
+	}
+
 	if (screen === 'email-confirmado') {
 		return (
 			<View style={styles.confirmedContainer}>
@@ -67,7 +76,7 @@ export default function App() {
 	return (
 		<LoginView
 			onCadastroPress={() => setScreen('cadastro')}
-			onLogin={() => setScreen('preferencias')}
+			onLogin={handleLogin}
 		/>
 	);
 }

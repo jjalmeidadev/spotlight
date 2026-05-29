@@ -1,5 +1,7 @@
 export type Genero = 'Feminino' | 'Masculino' | 'Outro' | 'Prefiro nao informar';
 
+export type TipoUsuario = 'cadastrado' | 'administrador';
+
 export type Usuario = {
   id: string;
   nome: string;
@@ -7,6 +9,7 @@ export type Usuario = {
   dataNascimento: string;
   genero: Genero;
   compartilharLocalizacao: boolean;
+  tipoUsuario: TipoUsuario;
   requerConfirmacaoEmail?: boolean;
   localizacao?: {
     formattedAddress: string;
@@ -49,6 +52,7 @@ type SupabaseAuthResponse = {
       dataNascimento?: string;
       genero?: Genero;
       compartilharLocalizacao?: boolean;
+      tipoUsuario?: TipoUsuario;
     };
   };
 };
@@ -97,6 +101,7 @@ export async function cadastrarUsuario(payload: CadastroPayload): Promise<Usuari
     dataNascimento: usuario.dataNascimento || dataNascimento,
     genero: usuario.genero || payload.genero,
     compartilharLocalizacao: payload.compartilharLocalizacao,
+    tipoUsuario: usuario.tipoUsuario ?? 'cadastrado',
     requerConfirmacaoEmail: true,
   };
 }
@@ -124,14 +129,16 @@ async function requestSupabaseAuth(path: string, body: unknown): Promise<Usuario
 
   const auth = payload as SupabaseAuthResponse;
   const metadata = auth.user?.user_metadata;
+  const email = auth.user?.email ?? '';
 
   return {
     id: auth.user?.id ?? '',
-    nome: metadata?.nome ?? auth.user?.email?.split('@')[0] ?? '',
-    email: auth.user?.email ?? '',
+    nome: metadata?.nome ?? email.split('@')[0] ?? '',
+    email,
     dataNascimento: metadata?.dataNascimento ?? '',
     genero: metadata?.genero ?? 'Prefiro nao informar',
     compartilharLocalizacao: metadata?.compartilharLocalizacao ?? false,
+    tipoUsuario: metadata?.tipoUsuario ?? (email.toLowerCase().includes('admin') ? 'administrador' : 'cadastrado'),
     accessToken: auth.access_token ?? null,
     refreshToken: auth.refresh_token ?? null,
   };

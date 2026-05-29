@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
 using Serilog;
+using Spotlight.Recomendacao.Application.UseCases;
+using Spotlight.Recomendacao.Infrastructure.Auth;
+using Spotlight.Recomendacao.Infrastructure.Persistence;
 using Spotlight.Recomendacao.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
@@ -33,7 +36,15 @@ var connectionString =
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
     builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
+
+    builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
+    builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
 }
+
+// ---------------------------------------------------------------------------
+// Autenticação JWT (Supabase) + autorização por papel.
+// ---------------------------------------------------------------------------
+builder.AdicionarAutenticacaoESupabase();
 
 // ---------------------------------------------------------------------------
 // Health checks: liveness (sempre 200) + readiness (checa o Postgres)
@@ -87,6 +98,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Auth: precisa vir antes do MapControllers para que [Authorize] funcione.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

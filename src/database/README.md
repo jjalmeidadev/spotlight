@@ -37,6 +37,7 @@ O **Spotlight** é uma plataforma de recomendação de espetáculos teatrais que
 
 ```
 src/database/
+├── 00_supabase_compat.sql   — prepara extensões e objetos mínimos do schema auth para execução local em Docker
 ├── 01_create_database.sql   — criação de tabelas, tipos ENUM, índices, RLS e trigger do Auth
 ├── 02_initial_data.sql      — seed com dados iniciais (categorias, teatros, atores, espetáculos e sessões)
 ├── 03_rollback.sql          — desfaz completamente a execução do 01_create_database.sql
@@ -67,13 +68,12 @@ src/database/
 Crie um arquivo `.env` na **raiz do repositório** (nunca em `src/database`). O arquivo `.env` deve estar no `.gitignore` — **jamais commite segredos no repositório**.
 
 ```env
-# ─── PostgreSQL local / Docker ───────────────────────────────
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=postgres
-DB_USER=postgres
-DB_PASSWORD=sua_senha_segura_aqui
-POSTGRES_PASSWORD=sua_senha_segura_aqui
+# ─── PostgreSQL ──────────────────────────────────────────────
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_PORT=5432
+POSTGRES_CONNECTION_STRING=postgresql://postgres:password@localhost:5432/postgres
 
 # ─── Supabase Auth ───────────────────────────────────────────
 # Gerados via: supabase start  ou  supabase gen keys
@@ -99,6 +99,8 @@ SITE_URL=http://localhost:3000
 | `DB_USER` | Usuário usado nas conexões locais |
 | `DB_PASSWORD` | Senha usada por `psql` e serviços que conectam no PostgreSQL |
 | `POSTGRES_PASSWORD` | Container PostgreSQL (Docker) |
+| `POSTGRES_PORT` | Docker Compose — porta exposta no host |
+| `POSTGRES_CONNECTION_STRING` | Clientes locais, API Gateway e scripts de migração |
 | `JWT_SECRET` | API Gateway (ASP.NET Core) — validação offline do JWT |
 | `ANON_KEY` | React Native — chamadas públicas à API do Supabase |
 | `SERVICE_ROLE_KEY` | Workers de ML e API Gateway — bypass de RLS para operações administrativas |
@@ -232,43 +234,30 @@ T1 — criação do schema  →  T2 — carga inicial de dados
 
 ## 6. Implantação
 
-### 6.1 Docker Compose (local e servidor Inteli)
+### 6.1 Docker Compose 
 
-Crie o arquivo `docker-compose.yml` na raiz do repositório:
+A raiz do repositório contém o arquivo `docker-compose.yml` responsável por subir o banco `db`.
 
-```yaml
-version: "3.8"
+Ele usa a imagem `postgres:15-alpine`, expõe a porta configurada em `POSTGRES_PORT`, persiste os dados no volume nomeado `spotlight_db_data` e executa automaticamente os scripts de inicialização em ordem:
 
-services:
-  db:
-    image: supabase/postgres:15.1.0.147
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      TZ: America/Sao_Paulo
-      LANG: C.UTF-8
-    volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create.sql
-      - ./src/database/02_initial_data.sql:/docker-entrypoint-initdb.d/02_seed.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  db_data:
+```text
+00_supabase_compat.sql -> 01_create_database.sql -> 02_initial_data.sql
 ```
+
+O script `00_supabase_compat.sql` cria a extensão `pgcrypto`, o schema `auth`, a tabela mínima `auth.users` e a função `auth.uid()`. Isso permite executar localmente os scripts modelados para Supabase sem precisar subir toda a stack do Supabase Auth.
 
 > Os scripts em `docker-entrypoint-initdb.d/` são executados automaticamente na **primeira inicialização** do container, em ordem alfabética. Em reinicializações subsequentes, o volume já contém os dados e os scripts não são re-executados.
 
 ### 6.2 Subindo o banco
 
 ```bash
-# Na raiz do repositório, com o .env preenchido
+# Na raiz do repositório
+cp .env.example .env
+
+# Edite POSTGRES_PASSWORD antes de compartilhar o ambiente
+nano .env
+
+# Suba o banco
 docker compose up -d db
 
 # Acompanhe os logs para confirmar a inicialização
@@ -282,7 +271,13 @@ docker compose exec db psql -U postgres -d postgres \
   -c "SELECT COUNT(*) AS total_espetaculos FROM public.espetaculo;"
 ```
 
-### 6.3 Instruções específicas — Supabase Cloud
+Valide as tabelas e os dados iniciais:
+
+```bash
+docker compose exec db psql -U postgres -d postgres -c "\dt public.*"
+docker compose exec db psql -U postgres -d postgres -c "SELECT COUNT(*) FROM espetaculo;"
+```
+### 6.3 Instruções específicas
 
 Para o projeto Supabase cloud (`nyaxqgujyyvkjnqzbklf`), execute os scripts pelo **SQL Editor** ou por `psql` usando a connection string do painel do Supabase.
 
@@ -304,10 +299,6 @@ SELECT
 
 > Não execute `03_rollback.sql` no Supabase cloud se o ambiente já tiver dados úteis. O rollback é destrutivo e deve ser usado apenas para reset autorizado do ambiente.
 
-### 6.4 Instruções específicas — Servidor Inteli
-
-A implantação no servidor Inteli deve seguir a definição de ambiente da **T6**. Até a T6 ser incorporada, considere este passo como referência operacional, não como configuração final de produção.
-
 ```bash
 # 1. Clone o repositório no servidor
 git clone https://git.inteli.edu.br/graduacao/2026-1b/t17/g04.git
@@ -322,7 +313,7 @@ nano .env
 docker compose up -d db
 
 # 4. Valide a execução dos scripts de inicialização
-docker compose exec db psql -U postgres -c "\dt public.*"
+docker compose exec db psql -U postgres -d postgres -c "\dt public.*"
 ```
 
 > A porta `5432` deve estar liberada no firewall do servidor Inteli. Confirme com o professor/tutor responsável pela infraestrutura antes de subir.
