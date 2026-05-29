@@ -231,6 +231,27 @@ CREATE POLICY "recomendacao: leitura pelo próprio usuário"
     ON recomendacao FOR SELECT
     USING (auth.uid() = id_usuario);
 
+CREATE TABLE similaridade_item (
+    id_similaridade        SERIAL          PRIMARY KEY,
+    id_espetaculo_origem   INTEGER         NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    id_espetaculo_similar  INTEGER         NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    tipo_algoritmo         VARCHAR(50)     NOT NULL,
+    score_similaridade     NUMERIC(8, 6)   NOT NULL CHECK (score_similaridade >= 0 AND score_similaridade <= 1),
+    data_geracao           TIMESTAMP       NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_tipo_algoritmo_similar CHECK (
+        tipo_algoritmo IN ('k-NN', 'SVD', 'k-means')
+    ),
+    CONSTRAINT chk_espetaculos_distintos CHECK (id_espetaculo_origem <> id_espetaculo_similar),
+    CONSTRAINT uq_similaridade_item UNIQUE (id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo)
+);
+
+ALTER TABLE similaridade_item ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "similaridade_item: leitura pública"
+    ON similaridade_item FOR SELECT
+    USING (true);
+
 CREATE INDEX idx_espetaculo_status
     ON espetaculo(status);
 
@@ -254,6 +275,9 @@ CREATE INDEX idx_recomendacao_usuario
 
 CREATE INDEX idx_recomendacao_score
     ON recomendacao(id_usuario, score_recomendacao DESC);
+
+CREATE INDEX idx_similaridade_item_origem
+    ON similaridade_item(id_espetaculo_origem, score_similaridade DESC);
 
 CREATE INDEX idx_avaliacao_espetaculo
     ON avaliacao(id_espetaculo);

@@ -38,7 +38,9 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
 
     builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
+    builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
     builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
+    builder.Services.AddScoped<ListarSimilaresUseCase>();
 }
 
 // ---------------------------------------------------------------------------
