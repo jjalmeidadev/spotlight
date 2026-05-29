@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
 using Serilog;
+using Spotlight.Catalogo.Application.UseCases;
+using Spotlight.Catalogo.Infrastructure.Auth;
+using Spotlight.Catalogo.Infrastructure.Persistence;
 using Spotlight.Catalogo.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
@@ -42,7 +45,34 @@ var connectionString =
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
     builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
+
+    // Repositórios (SQL puro Npgsql) — dependem do NpgsqlDataSource, por isso
+    // só registram com banco configurado (mantém testes sem DB funcionando).
+    builder.Services.AddScoped<IEspetaculoRepository, EspetaculoRepository>();
+    builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+    builder.Services.AddScoped<ITeatroRepository, TeatroRepository>();
+    builder.Services.AddScoped<ISessaoRepository, SessaoRepository>();
+    builder.Services.AddScoped<IAvaliacaoRepository, AvaliacaoRepository>();
+
+    // Casos de uso das features do catálogo.
+    builder.Services.AddScoped<ListarEspetaculosUseCase>();
+    builder.Services.AddScoped<ObterEspetaculoUseCase>();
+    builder.Services.AddScoped<ListarCategoriasUseCase>();
+    builder.Services.AddScoped<ListarTeatrosUseCase>();
+    builder.Services.AddScoped<ObterTeatroUseCase>();
+    builder.Services.AddScoped<ListarSessoesUseCase>();
+    builder.Services.AddScoped<ListarAvaliacoesUseCase>();
+    builder.Services.AddScoped<CriarAvaliacaoUseCase>();
+    builder.Services.AddScoped<CriarEspetaculoUseCase>();
+    builder.Services.AddScoped<AtualizarEspetaculoUseCase>();
+    builder.Services.AddScoped<ExcluirEspetaculoUseCase>();
 }
+
+// ---------------------------------------------------------------------------
+// Autenticação JWT (Supabase) + autorização por papel
+// Só registra se SUPABASE_JWT_SECRET estiver definido (ver AuthSetup).
+// ---------------------------------------------------------------------------
+builder.AdicionarAutenticacaoESupabase();
 
 // ---------------------------------------------------------------------------
 // Health checks: liveness (sempre 200) + readiness (checa o Postgres)
@@ -96,6 +126,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Auth: precisa vir antes do MapControllers para que [Authorize] funcione.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

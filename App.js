@@ -1,5 +1,7 @@
 import React from 'react';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+
+import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
 import CadastroView from './src/frontend/screens/CadastroView';
 import DetalhesView from './src/frontend/screens/DetalhesView';
 import LoginView from './src/frontend/screens/LoginView';
@@ -8,6 +10,10 @@ import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectio
 export default function App() {
 	const [screen, setScreen] = React.useState('login');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
+
+	function handleLogin(usuario) {
+		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
+	}
 
 	if (screen === 'cadastro') {
 		return (
@@ -44,10 +50,14 @@ export default function App() {
 		);
 	}
 
+	if (screen === 'dashboard') {
+		return <AdminDashboardScreen />;
+	}
+
 	return (
 		<LoginView
 			onCadastroPress={() => setScreen('cadastro')}
-			onLogin={() => setScreen('preferencias')}
+			onLogin={handleLogin}
 		/>
 	);
 }
