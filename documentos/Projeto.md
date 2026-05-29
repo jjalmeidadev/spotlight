@@ -159,6 +159,7 @@
   - [7.3 Guia Visual](#73-guia-visual)
 - [8. Desenvolvimento do Projeto](#8-desenvolvimento-do-projeto)
   - [8.1 Arquitetura de Codificação e Estrutura de Diretórios](#81-arquitetura-de-codificação-e-estrutura-de-diretórios)
+    - [8.1.3 Composição da Tela de Catálogo no Frontend](#813-composição-da-tela-de-catálogo-no-frontend)
   - [8.2 Modelo de Recomendação](#82-modelo-de-recomendação)
   - [8.3 Desenvolvimento de Features](#83-desenvolvimento-de-features)
     - [8.3.1 Sprint 3](#831-sprint-3)
@@ -3562,6 +3563,42 @@ Fonte: Material produzido pelos autores (2026).
 | Motor de ML | ML.NET | Ecossistema .NET, integração nativa com os serviços SOA |
 | Containerização | Docker + Docker Compose | Portabilidade entre ambientes dev/prod |
 
+### 8.1.3 Composição da Tela de Catálogo no Frontend
+
+&emsp;A tela de catálogo é o principal exemplo de composição do frontend no MVP. Ela é montada em camadas para manter a responsabilidade de cada componente bem delimitada, facilitar testes visuais e permitir evolução incremental sem acoplamento entre a renderização e os dados.
+
+```mermaid
+flowchart TB
+  VM[useCatalogViewModel] --> Screen[CatalogView]
+  Screen --> Hero[CatalogHero]
+  Screen --> Shell[CatalogContentShell]
+  Screen --> Overlay[HeroFloatingArtwork]
+  Shell --> Search[SearchBar]
+  Shell --> Filter[FilterDropdown]
+  Shell --> Rail[CatalogRail]
+  Rail --> Title[SectionTitle]
+  Rail --> Card[CatalogPosterCard]
+  VM --> Assets[assets mockados]
+  VM --> Filters[filterOptions]
+  VM --> Sections[sections]
+  Sections --> CatalogItem[CatalogItem]
+```
+
+| Componente | Responsabilidade | Observação |
+|---|---|---|
+| `CatalogView` | Orquestra a tela e distribui os blocos visuais | Ponto de composição da página de catálogo |
+| `useCatalogViewModel` | Fornece estado de tela, assets, filtros e seções | Mantém a tela desacoplada da origem dos dados |
+| `CatalogHero` | Renderiza o topo do catálogo com imagem em destaque, saudação e CTA | Usa a imagem principal do espetáculo como foco visual |
+| `HeroFloatingArtwork` | Exibe o elemento artístico sobreposto ao topo | Funciona como camada flutuante acima do shell |
+| `CatalogContentShell` | Agrupa fundo branco, curva superior, logotipo e conteúdo | Define a área principal de leitura do catálogo |
+| `SearchBar` | Entrada de busca rápida | Permite refinar o catálogo por texto |
+| `FilterDropdown` | Filtro por categoria | Organiza a descoberta por tipo de espetáculo |
+| `CatalogRail` | Renderiza cada seção com carrossel horizontal | Reutiliza a mesma estrutura para múltiplas trilhas |
+| `SectionTitle` | Exibe o título de cada seção | Padroniza a hierarquia visual das seções |
+| `CatalogPosterCard` | Exibe o card visual do espetáculo | Usa imagem, overlay e área clicável |
+
+&emsp;Essa composição mantém a tela aderente ao padrão MVVM adotado no frontend: a View apenas orquestra componentes, o ViewModel fornece dados e a camada de apresentação mantém a lógica de exibição separada da origem das informações. Na Sprint 3, a implementação foi integrada com dados mockados, o que permitiu validar a experiência visual antes da integração definitiva com o backend.
+
 ## 8.2 Modelo de Recomendação
 _conteúdo_
 
@@ -3571,7 +3608,15 @@ _conteúdo_
 **Nota:** Insira uma explicação de entregas em cada Sprint.
 
 ## 8.3.1 Sprint 3
-_conteúdo_
+&emsp;A Sprint 3 concentrou a primeira entrega funcional da experiência de catálogo no frontend, consolidando a base visual da solução e validando a distribuição dos componentes que o usuário vê na tela principal.
+
+### Entrega incremental da tela de catálogo
+
+&emsp;A tela de catálogo foi implementada como uma composição de componentes reutilizáveis em React Native, organizada para manter o alinhamento com o padrão MVVM. O componente `CatalogView` atua como orquestrador da tela e consome os dados produzidos por `useCatalogViewModel`, que centraliza os assets mockados, as opções de filtro, os blocos de seções e o nome do usuário exibido no cabeçalho.
+
+&emsp;O topo da tela é composto por `CatalogHero`, que exibe a imagem principal do espetáculo, a saudação com o perfil e o CTA de compra. Sobre ele, `HeroFloatingArtwork` mantém o elemento visual flutuante do banner. A área principal de conteúdo é encapsulada em `CatalogContentShell`, que organiza o fundo branco, a curva superior, o logotipo da marca e o restante da hierarquia da página.
+
+&emsp;Abaixo do shell, a interface expõe `SearchBar` e `FilterDropdown` como controles de refinamento. As trilhas de conteúdo são apresentadas por `CatalogRail`, que reutiliza `SectionTitle` e `CatalogPosterCard` para cada conjunto de espetáculos. Esse arranjo reduz duplicação e facilita a expansão da tela para novas seções sem alterar a estrutura principal.
 
 ## 8.3.2 Sprint 4
 _conteúdo_
