@@ -141,6 +141,9 @@
   - [4.1 Especificação da Base de Dados para Modelo de Recomendação](#41-especificação-da-base-de-dados-para-modelo-de-recomendação)
   - [4.2 Modelo Conceitual de Dados](#42-modelo-conceitual-de-dados)
   - [4.3 Modelo Lógico de Dados](#43-modelo-lógico-de-dados)
+    - [4.3.3 Dicionário de Dados](#433-dicionário-de-dados)
+    - [4.3.4 Normalização do Modelo Relacional](#434-normalização-do-modelo-relacional)
+    - [4.3.5 Tabelas Associativas dos Relacionamentos N:N](#435-tabelas-associativas-dos-relacionamentos-nn)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
@@ -174,6 +177,10 @@
   - [9.3 Testes de Usabilidade](#93-testes-de-usabilidade)
     - [9.3.1 Planejamento](#931-planejamento)
     - [9.3.2 Resultados](#932-resultados)
+  - [9.4 Testes de Integração](#94-testes-de-integração)
+    - [9.4.1 Planejamento](#941-planejamento)
+      - [Abrangência dos Testes de Integração](#abrangência-dos-testes-de-integração)
+    - [9.4.2 Resultados](#942-resultados)
 - [10. Procedimentos de Implantação](#10-procedimentos-de-implantação)
   - [10.1 Implantação e Configuração do Banco de Dados](#101-implantação-e-configuração-do-banco-de-dados)
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
@@ -1725,10 +1732,658 @@ O PostgreSQL garante a consistência e a riqueza relacional do catálogo e do el
 
 Essa separação de responsabilidades assegura que o sistema seja performático, escalável e otimizado para alimentar os algoritmos de recomendação.
 
-## 4.4 Modelo Físico de Dados
-_conteúdo_
+### 4.3.3 Dicionário de Dados
 
-**Nota:** Insira uma explicação e direcionamento para o readme.md da pasta database.
+&emsp;O dicionário de dados descreve em detalhe cada tabela do banco relacional PostgreSQL, especificando o tipo de dado, as restrições e o significado semântico de cada coluna. As informações são derivadas diretamente do script `src/database/01_create_database.sql` e estão alinhadas ao modelo lógico apresentado nas seções anteriores.
+
+As abreviações utilizadas nas colunas de restrição são:
+
+| Abreviação | Significado |
+|---|---|
+| PK | Primary Key — chave primária, identifica unicamente cada linha |
+| FK | Foreign Key — chave estrangeira, referencia outra tabela |
+| NN | Not Null — valor obrigatório |
+| UQ | Unique — valor único na tabela |
+| CK | Check — constraint de validação de domínio |
+| DF | Default — valor padrão quando não informado |
+
+---
+
+#### Tabela: `usuario`
+
+Armazena os dados dos usuários cadastrados na plataforma, integrada ao sistema de autenticação do Supabase Auth via chave primária. O controle de acesso a linhas é feito por Row Level Security (RLS), garantindo que cada usuário só leia e edite o próprio perfil.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_usuario` | `UUID` | PK, FK → `auth.users(id)` ON DELETE CASCADE, NN | Identificador único do usuário, espelhado do Supabase Auth. Gerado automaticamente pelo trigger `on_auth_user_created` no cadastro. |
+| `nome` | `VARCHAR(150)` | NN | Nome completo ou nome de exibição do usuário. Preenchido automaticamente pelo trigger a partir dos metadados do cadastro. |
+| `email` | `VARCHAR(255)` | NN, UQ, CK (`email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'`) | E-mail do usuário. Deve ter formato válido. Único na tabela. |
+| `data_nascimento` | `DATE` | — | Data de nascimento. Opcional; utilizada para filtros de faixa etária em recomendações. |
+| `localizacao` | `JSONB` | — | Localização consentida do usuário, incluindo endereço normalizado, coordenadas, identificador do provedor e origem da geocodificação. Utilizada como sinal de contexto para recomendações baseadas em localização. |
+| `data_cadastro` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
+| `tipo_usuario` | `tipo_usuario_enum` | NN, DF `'cadastrado'` | Papel do usuário: `'visitante'`, `'cadastrado'` ou `'administrador'`. Controla o acesso a funcionalidades administrativas. |
+| `nivel_acesso` | `JSONB` | NN, DF `'{}'` | Permissões granulares em formato JSON. Permite definir capacidades específicas dentro do papel sem criar tabelas de controle adicionais. |
+| `perfil_preferencias` | `JSONB` | NN, DF `'{}'` | Preferências declaradas pelo usuário (gêneros, faixa de preço, etc.). Alimenta o motor de recomendação no cold start. |
+
+---
+
+#### Tabela: `categoria`
+
+Classifica os espetáculos por gênero ou tema. Um espetáculo pode pertencer a múltiplas categorias através da tabela associativa `espetaculo_categoria`.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_categoria` | `SERIAL` | PK, NN | Identificador único da categoria, gerado automaticamente. |
+| `nome` | `VARCHAR(100)` | NN, UQ | Nome da categoria (ex: "Musical", "Infantil", "Drama"). Único na tabela para evitar duplicidade. |
+| `descricao` | `TEXT` | — | Descrição textual do escopo da categoria. Opcional. |
+
+---
+
+#### Tabela: `ator`
+
+Representa os artistas do elenco dos espetáculos. Substituiu o campo textual `elenco` da tabela `espetaculo`, permitindo consultas estruturadas por artista e exibição ordenada dos créditos.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_ator` | `SERIAL` | PK, NN | Identificador único do ator, gerado automaticamente. |
+| `nome` | `VARCHAR(150)` | NN | Nome artístico ou completo do ator. |
+| `biografia` | `TEXT` | — | Texto descritivo com a trajetória profissional do ator. Opcional. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente. |
+
+---
+
+#### Tabela: `espetaculo`
+
+Tabela central do catálogo, armazena os metadados de cada peça teatral disponível na plataforma. Os campos `popularidade` e `nota_media` funcionam como cache de leitura, atualizados periodicamente por Workers que consomem dados do MongoDB.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `SERIAL` | PK, NN | Identificador único do espetáculo, gerado automaticamente. |
+| `titulo` | `VARCHAR(200)` | NN | Nome do espetáculo. Obrigatório. |
+| `descricao` | `TEXT` | — | Sinopse ou descrição detalhada do conteúdo. Opcional. |
+| `genero` | `VARCHAR(100)` | — | Gênero artístico principal (ex: "Musical", "Drama", "Dança"). Complementado pela relação com `categoria`. |
+| `faixa_etaria` | `VARCHAR(50)` | — | Faixa etária recomendada (ex: "Livre", "12 anos"). Exibida na interface para filtro de conteúdo. |
+| `duracao` | `INTEGER` | CK `(duracao > 0)` | Duração em minutos. Deve ser positivo quando informado. |
+| `classificacao_indicativa` | `VARCHAR(20)` | — | Classificação indicativa oficial (ex: "L", "10", "14", "18"). |
+| `produtora` | `VARCHAR(150)` | — | Nome da produtora responsável. Pode ser utilizado em filtros administrativos. |
+| `status` | `status_espetaculo_enum` | NN, DF `'em_breve'` | Situação atual: `'em_cartaz'`, `'em_breve'` ou `'encerrado'`. Indexado para filtragem rápida. |
+| `popularidade` | `NUMERIC(10,4)` | NN, DF `0` | Indicador de popularidade calculado a partir das interações no MongoDB. Cache de leitura atualizado por Workers. |
+| `nota_media` | `NUMERIC(4,2)` | NN, DF `0`, CK `BETWEEN 0 AND 5` | Média das avaliações recebidas. Valor entre 0 e 5. Cache atualizado ao registrar novas avaliações. |
+| `id_admin` | `UUID` | FK → `usuario(id_usuario)` ON DELETE SET NULL | Administrador responsável pelo cadastro e gestão do espetáculo. Nulo quando o administrador é removido. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+| `updated_at` | `TIMESTAMP` | NN, DF `NOW()` | Data da última atualização. Deve ser mantida pelo aplicativo ou por trigger ao editar. |
+
+**Índices:** `idx_espetaculo_status`, `idx_espetaculo_nota_media` (DESC), `idx_espetaculo_popularidade` (DESC).
+
+---
+
+#### Tabela: `espetaculo_categoria`
+
+Tabela associativa que implementa o relacionamento N:M entre espetáculos e categorias. Permite que uma peça seja classificada em múltiplos gêneros ou coleções temáticas.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `INTEGER` | PK (composta), FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Referência ao espetáculo. Removido em cascata se o espetáculo for excluído. |
+| `id_categoria` | `INTEGER` | PK (composta), FK → `categoria(id_categoria)` ON DELETE CASCADE, NN | Referência à categoria. Removido em cascata se a categoria for excluída. |
+
+**Chave Primária:** composta por `(id_espetaculo, id_categoria)`.
+
+---
+
+#### Tabela: `espetaculo_ator`
+
+Tabela associativa com atributos que implementa o relacionamento N:M entre espetáculos e atores. Registra o papel desempenhado e a ordem de exibição nos créditos de cada produção.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_espetaculo` | `INTEGER` | PK (composta), FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Referência ao espetáculo. Removido em cascata se o espetáculo for excluído. |
+| `id_ator` | `INTEGER` | PK (composta), FK → `ator(id_ator)` ON DELETE CASCADE, NN | Referência ao ator. Removido em cascata se o ator for excluído. |
+| `papel` | `VARCHAR(150)` | — | Personagem ou função desempenhada pelo ator no espetáculo. |
+| `ordem_exibicao` | `INTEGER` | CK `(ordem_exibicao > 0)` | Ordem do ator na listagem de créditos. Deve ser positivo quando informado. |
+
+**Chave Primária:** composta por `(id_espetaculo, id_ator)`. **Índice:** `idx_espetaculo_ator_ator` em `id_ator` para buscas por ator.
+
+---
+
+#### Tabela: `teatro`
+
+Armazena os dados dos espaços físicos onde os espetáculos são realizados.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_teatro` | `SERIAL` | PK, NN | Identificador único do teatro, gerado automaticamente. |
+| `nome` | `VARCHAR(200)` | NN | Nome oficial do teatro (pode incluir o nome do parceiro de naming rights). |
+| `endereco` | `VARCHAR(300)` | NN | Endereço completo (rua, número, bairro). |
+| `cidade` | `VARCHAR(100)` | NN | Cidade onde o teatro está localizado. Utilizada em filtros de localização. |
+| `estado` | `CHAR(2)` | NN | Sigla do estado (UF), dois caracteres (ex: "SP", "RJ"). |
+| `capacidade` | `INTEGER` | CK `(capacidade > 0)` | Número máximo de espectadores. Deve ser positivo quando informado. |
+| `acessibilidade` | `BOOLEAN` | NN, DF `FALSE` | Indica se o teatro possui recursos de acessibilidade (rampa, elevador, etc.). |
+| `parceiro_naming_rights` | `VARCHAR(200)` | — | Nome da empresa parceira vinculada ao naming rights do teatro. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+
+---
+
+#### Tabela: `sessao`
+
+Representa uma apresentação específica de um espetáculo em um teatro, em data e horário determinados. É o elo temporal e espacial do catálogo.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_sessao` | `SERIAL` | PK, NN | Identificador único da sessão, gerado automaticamente. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo ao qual a sessão pertence. Removida em cascata se o espetáculo for excluído. |
+| `id_teatro` | `INTEGER` | FK → `teatro(id_teatro)` ON DELETE RESTRICT, NN | Teatro onde a sessão ocorre. Não pode ser excluído enquanto houver sessões vinculadas. |
+| `data` | `DATE` | NN | Data da apresentação. |
+| `horario` | `TIME` | NN | Horário de início da apresentação. |
+| `preco_minimo` | `NUMERIC(10,2)` | CK `(preco_minimo >= 0)` | Menor valor de ingresso disponível. Deve ser não-negativo. |
+| `preco_maximo` | `NUMERIC(10,2)` | CK `(preco_maximo >= 0)`, CK `(preco_maximo >= preco_minimo)` | Maior valor de ingresso disponível. Deve ser maior ou igual ao preço mínimo quando ambos informados. |
+| `disponibilidade` | `INTEGER` | NN, DF `0`, CK `(disponibilidade >= 0)` | Quantidade de ingressos disponíveis. Cache atualizado por integração com a ticketeira. |
+| `link_compra` | `TEXT` | — | URL externa para compra de ingressos na plataforma parceira (Sympla, Blueticket, etc.). |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+
+**Índices:** `idx_sessao_espetaculo`, `idx_sessao_data`, `idx_sessao_teatro`.
+
+---
+
+#### Tabela: `avaliacao`
+
+Registra as notas e comentários explícitos de usuários sobre espetáculos. Cada usuário pode avaliar um espetáculo apenas uma vez (constraint UNIQUE). Os dados desta tabela alimentam o cálculo da `nota_media` em `espetaculo`.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_avaliacao` | `SERIAL` | PK, NN | Identificador único da avaliação, gerado automaticamente. |
+| `id_usuario` | `UUID` | FK → `usuario(id_usuario)` ON DELETE CASCADE, NN | Usuário que realizou a avaliação. Removida em cascata se o usuário for excluído. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo avaliado. Removida em cascata se o espetáculo for excluído. |
+| `nota` | `NUMERIC(4,2)` | NN, CK `BETWEEN 0 AND 5` | Nota atribuída pelo usuário, entre 0 e 5. |
+| `comentario` | `TEXT` | — | Comentário textual opcional do usuário sobre o espetáculo. |
+| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de registro da avaliação. |
+
+**Chave Única:** `(id_usuario, id_espetaculo)` — impede avaliações duplicadas do mesmo usuário para o mesmo espetáculo. **Índice:** `idx_avaliacao_espetaculo`.
+
+---
+
+#### Tabela: `recomendacao`
+
+Armazena os resultados gerados pelos algoritmos de Machine Learning para cada usuário. O campo `referencia_origem_id` vincula a recomendação ao evento de telemetria do MongoDB que a originou, garantindo rastreabilidade e auditabilidade do modelo.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| `id_recomendacao` | `SERIAL` | PK, NN | Identificador único da recomendação, gerado automaticamente. |
+| `id_usuario` | `UUID` | FK → `usuario(id_usuario)` ON DELETE CASCADE, NN | Usuário para quem a recomendação foi gerada. Removida em cascata se o usuário for excluído. |
+| `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo recomendado. Removida em cascata se o espetáculo for excluído. |
+| `tipo_algoritmo` | `VARCHAR(50)` | NN, CK `IN ('k-NN', 'SVD', 'k-means')` | Algoritmo utilizado para gerar a recomendação. Valores aceitos: `'k-NN'`, `'SVD'` ou `'k-means'`. |
+| `score_recomendacao` | `NUMERIC(8,6)` | NN, CK `(score_recomendacao >= 0)` | Pontuação de relevância calculada pelo algoritmo. Valor não-negativo; quanto maior, mais relevante. |
+| `motivo_recomendacao` | `TEXT` | — | Justificativa textual da recomendação exibida ao usuário (ex: "Porque você gostou de musicais"). |
+| `data_geracao` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora em que a recomendação foi gerada. |
+| `prioridade_manual` | `BOOLEAN` | NN, DF `FALSE` | Indica se um administrador sobrescreveu a prioridade gerada pelo algoritmo para fins de campanha. |
+| `referencia_origem_id` | `VARCHAR(50)` | — | ID do documento no MongoDB (`interacoes`) que serviu de gatilho para esta recomendação. Permite rastrear qual evento comportamental originou a sugestão. |
+
+**Índices:** `idx_recomendacao_usuario`, `idx_recomendacao_score` (por `id_usuario`, `score_recomendacao DESC` — otimiza a exibição das recomendações ordenadas por relevância).
+
+---
+
+#### ENUMs Customizados
+
+| Tipo | Valores | Utilização |
+|---|---|---|
+| `tipo_usuario_enum` | `'visitante'`, `'cadastrado'`, `'administrador'` | Campo `tipo_usuario` da tabela `usuario` |
+| `status_espetaculo_enum` | `'em_cartaz'`, `'em_breve'`, `'encerrado'` | Campo `status` da tabela `espetaculo` |
+
+---
+
+#### Visão Geral das Chaves Estrangeiras
+
+| Tabela | Coluna | Referencia | Comportamento |
+|---|---|---|---|
+| `usuario` | `id_usuario` | `auth.users(id)` | CASCADE DELETE |
+| `espetaculo` | `id_admin` | `usuario(id_usuario)` | SET NULL |
+| `espetaculo_categoria` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `espetaculo_categoria` | `id_categoria` | `categoria(id_categoria)` | CASCADE DELETE |
+| `espetaculo_ator` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `espetaculo_ator` | `id_ator` | `ator(id_ator)` | CASCADE DELETE |
+| `sessao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `sessao` | `id_teatro` | `teatro(id_teatro)` | RESTRICT DELETE |
+| `avaliacao` | `id_usuario` | `usuario(id_usuario)` | CASCADE DELETE |
+| `avaliacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+| `recomendacao` | `id_usuario` | `usuario(id_usuario)` | CASCADE DELETE |
+| `recomendacao` | `id_espetaculo` | `espetaculo(id_espetaculo)` | CASCADE DELETE |
+
+---
+
+### 4.3.4 Normalização do Modelo Relacional
+
+&emsp;A normalização é o processo de organizar as tabelas de um banco de dados relacional de forma a reduzir redundâncias, evitar anomalias de inserção, atualização e exclusão, e garantir a integridade dos dados. O modelo lógico do Spotlight foi projetado seguindo as três primeiras formas normais (1FN, 2FN e 3FN), cujas aplicações são detalhadas abaixo com exemplos reais das tabelas do projeto.
+
+---
+
+#### 4.3.4.1 Primeira Forma Normal (1FN)
+
+**Definição:** Uma tabela está na 1FN quando todos os seus atributos contêm apenas valores atômicos (indivisíveis) e não há grupos repetitivos de colunas.
+
+**Violação típica:** armazenar múltiplos valores em uma única coluna, como uma lista de categorias separada por vírgulas no campo `genero` da tabela `espetaculo`, ou um campo `elenco TEXT` com vários nomes concatenados.
+
+**Aplicação no Spotlight:**
+
+A decisão mais representativa da 1FN no projeto foi a **eliminação do campo `elenco TEXT`** da tabela `espetaculo`. Em uma modelagem sem normalização, esse campo poderia conter valores como `"João Silva, Maria Souza, Pedro Lima"` — um único atributo com múltiplos valores embutidos, violando diretamente a 1FN. A solução adotada foi criar a entidade `ator` e a tabela associativa `espetaculo_ator`, garantindo que cada célula da tabela contenha exatamente um valor atômico:
+
+| Antes (viola 1FN) | Depois (1FN atendida) |
+|---|---|
+| `espetaculo.elenco = 'João Silva, Maria Souza'` | `espetaculo_ator(id_espetaculo=1, id_ator=10, papel='Protagonista')` |
+| Não é possível filtrar por ator específico | `SELECT * FROM espetaculo_ator WHERE id_ator = 10` funciona diretamente |
+
+O mesmo raciocínio se aplica às **categorias**: em vez de armazenar `genero = 'Musical, Infantil'` na tabela `espetaculo`, foi criada a tabela associativa `espetaculo_categoria`, permitindo que cada linha represente exatamente uma relação espetáculo–categoria.
+
+Quanto ao campo `perfil_preferencias JSONB` da tabela `usuario`, sua natureza semiestruturada é intencional e justificada: preferências do usuário são dinâmicas e evoluem sem esquema fixo. O uso de `JSONB` é um padrão reconhecido no PostgreSQL para dados flexíveis, e não constitui violação da 1FN, pois o campo em si é atômico do ponto de vista da tabela relacional — o conteúdo interno é tratado como um documento opaco com estrutura gerenciada pela aplicação.
+
+---
+
+#### 4.3.4.2 Segunda Forma Normal (2FN)
+
+**Definição:** Uma tabela está na 2FN quando está na 1FN e todos os seus atributos não-chave dependem **completamente** da chave primária. A 2FN é relevante apenas para tabelas com **chave primária composta**: se algum atributo depende apenas de parte da chave, há dependência parcial, caracterizando violação da forma normal.
+
+**Violação típica:** em uma tabela com PK `(id_espetaculo, id_ator)`, incluir uma coluna `titulo_espetaculo` — que depende somente de `id_espetaculo`, não da combinação completa.
+
+**Aplicação no Spotlight:**
+
+As duas tabelas com chaves primárias compostas no projeto são `espetaculo_categoria` e `espetaculo_ator`. Ambas foram analisadas para garantir ausência de dependências parciais:
+
+**Tabela `espetaculo_ator` — PK `(id_espetaculo, id_ator)`:**
+
+| Atributo | Depende de `id_espetaculo` sozinho? | Depende de `id_ator` sozinho? | Depende da PK completa? |
+|---|---|---|---|
+| `papel` | Não — o mesmo espetáculo pode ter vários papéis | Não — o mesmo ator pode ter papéis diferentes em peças distintas | **Sim** — o papel é específico ao vínculo espetáculo+ator |
+| `ordem_exibicao` | Não | Não | **Sim** — a ordem nos créditos é específica a cada par |
+
+Nenhuma informação sobre o espetáculo (como `titulo` ou `status`) foi incluída nesta tabela. Da mesma forma, nenhuma informação sobre o ator (como `biografia`) foi duplicada aqui — ambas residem em suas respectivas tabelas de origem, eliminando qualquer dependência parcial.
+
+**Tabela `espetaculo_categoria` — PK `(id_espetaculo, id_categoria)`:**
+
+Esta tabela não possui atributos além das chaves estrangeiras que formam a PK, portanto está trivialmente na 2FN. A relação apenas registra a existência do vínculo; qualquer detalhe adicional pertence às tabelas `espetaculo` ou `categoria`.
+
+Para as demais tabelas com chaves primárias simples (`usuario`, `espetaculo`, `teatro`, `sessao`, `avaliacao`, `recomendacao`, `ator`, `categoria`), a 2FN é automaticamente satisfeita, pois chaves simples não podem gerar dependências parciais.
+
+---
+
+#### 4.3.4.3 Terceira Forma Normal (3FN)
+
+**Definição:** Uma tabela está na 3FN quando está na 2FN e nenhum atributo não-chave depende de outro atributo não-chave (ausência de **dependências transitivas**). Uma dependência transitiva ocorre quando o atributo A determina B, e B determina C — sendo C transitivamente dependente de A via B, em vez de ser diretamente dependente da chave primária.
+
+**Violação típica:** incluir `cidade_teatro` e `estado_teatro` na tabela `sessao`. Esses atributos dependeriam de `id_teatro`, não de `id_sessao`, criando uma cadeia: `id_sessao → id_teatro → cidade_teatro`.
+
+**Aplicação no Spotlight:**
+
+**Separação de `teatro` e `sessao`:**
+
+A decisão de manter `teatro` como entidade independente elimina a principal fonte potencial de dependência transitiva no projeto. Se os dados do teatro fossem desnormalizados em `sessao`, campos como `endereco`, `cidade` e `acessibilidade` dependeriam de `id_teatro` (que por sua vez depende de `id_sessao`), não da chave da sessão diretamente. Ao referenciar o teatro via FK `id_teatro`, cada atributo de localização do teatro permanece em sua tabela de origem, onde depende diretamente de `id_teatro`:
+
+```
+sessao.id_sessao → sessao.id_teatro → teatro.cidade  ← dependência transitiva se cidade estivesse em sessao
+sessao.id_sessao → sessao.id_teatro                   ← correto: apenas a FK fica em sessao
+teatro.id_teatro → teatro.cidade                      ← correto: cidade depende diretamente de id_teatro
+```
+
+**Separação de `ator` e `espetaculo_ator`:**
+
+Sem a entidade `ator`, a tabela `espetaculo_ator` poderia conter `nome_ator` e `biografia_ator` diretamente. Esses campos dependeriam de `id_ator` (não da PK composta da tabela associativa), criando dependência transitiva. A solução adotada mantém todos os atributos do ator na tabela `ator`, onde dependem diretamente de `id_ator`.
+
+**Campos `popularidade` e `nota_media` em `espetaculo`:**
+
+Esses dois campos merecem atenção especial. Na lógica estrita de normalização, `nota_media` poderia ser considerado um valor derivado das linhas de `avaliacao` — calculável a partir de `AVG(nota) WHERE id_espetaculo = X`. No entanto, a equipe optou por mantê-los desnormalizados intencionalmente, pois representam um **cache de leitura** atualizado periodicamente por Workers que processam dados do MongoDB. Essa decisão é uma **desnormalização controlada e justificada**, padrão reconhecido em sistemas de alta leitura para evitar agregações custosas em tempo real. O trade-off é explícito: aceita-se eventual inconsistência temporal (cache ligeiramente desatualizado) em troca de consultas ao catálogo extremamente rápidas sem JOINs de agregação.
+
+**Atributo `referencia_origem_id` em `recomendacao`:**
+
+Este campo armazena o ID de um documento no MongoDB que originou a recomendação. Ele não depende de nenhum outro campo não-chave da tabela `recomendacao` — depende exclusivamente da chave `id_recomendacao`. Não há, portanto, dependência transitiva.
+
+**Campo `tipo_algoritmo` em `recomendacao`:**
+
+Este campo usa `VARCHAR(50)` com `CHECK IN ('k-NN', 'SVD', 'k-means')` em vez de um tipo ENUM customizado, seguindo padrão diferente dos campos `tipo_usuario` e `status_espetaculo`. A decisão é intencional: algoritmos de recomendação têm ciclo de atualização frequente ao longo do projeto, e adicionar um novo valor a um ENUM em PostgreSQL exige uma migration `ALTER TYPE`, operação que bloqueia a tabela brevemente. O `VARCHAR+CHECK` permite estender os valores aceitos com um simples `ALTER TABLE ... DROP CONSTRAINT ... / ADD CONSTRAINT ...`, sem impacto em produção. O trade-off aceito é a perda da garantia semântica de tipo nativo do banco.
+
+---
+
+#### Síntese
+
+| Forma Normal | Decisão de Modelagem | Exemplo no Projeto |
+|---|---|---|
+| **1FN** | Eliminação de listas e grupos repetitivos | Tabelas `ator` + `espetaculo_ator` substituem campo `elenco TEXT`; `espetaculo_categoria` substitui `genero` com múltiplos valores |
+| **2FN** | Eliminação de dependências parciais em chaves compostas | `espetaculo_ator.papel` depende do par `(id_espetaculo, id_ator)`, nunca de apenas um dos dois |
+| **3FN** | Eliminação de dependências transitivas | Dados de `teatro` (cidade, endereço) não são copiados em `sessao`; dados de `ator` não são duplicados em `espetaculo_ator` |
+
+&emsp;O modelo relacional do Spotlight atende integralmente às três primeiras formas normais nas tabelas transacionais do PostgreSQL. A única exceção deliberada — os campos de cache `popularidade` e `nota_media` em `espetaculo` — é uma desnormalização justificada por critérios de desempenho, documentada como decisão arquitetural consciente e não como descuido de modelagem.
+
+---
+
+### 4.3.5 Tabelas Associativas dos Relacionamentos N:N
+
+&emsp;Relacionamentos muitos-para-muitos (N:N) não podem ser representados diretamente em um banco relacional. A solução padrão é introduzir uma **tabela associativa** (também chamada de tabela de junção ou tabela pivot) que resolve o relacionamento em dois relacionamentos 1:N, um para cada entidade participante. Cada linha da tabela associativa representa exatamente uma combinação válida entre os dois lados do relacionamento.
+
+&emsp;O modelo lógico do Spotlight possui dois relacionamentos N:N, ambos implementados com tabelas associativas no PostgreSQL: `espetaculo_categoria` e `espetaculo_ator`. Ambas utilizam **chave primária composta** formada pelas duas chaves estrangeiras, garantindo que a mesma combinação não seja registrada mais de uma vez.
+
+---
+
+#### 4.3.5.1 `espetaculo_categoria`
+
+**Relacionamento representado:** Um espetáculo pode pertencer a múltiplas categorias e uma categoria pode classificar múltiplos espetáculos.
+
+**Motivação:** O campo `genero VARCHAR` da tabela `espetaculo` poderia conter apenas um gênero por espetáculo. Para que uma peça como "O Rei Leão" seja simultaneamente classificada como "Musical" e "Infantil", é necessária uma estrutura relacional separada que permita múltiplos vínculos sem repetição de linhas na tabela principal.
+
+**Estrutura:**
+
+```
+espetaculo_categoria
+┌─────────────────────┬─────────────────────┐
+│  id_espetaculo (FK) │  id_categoria (FK)  │
+│  INTEGER  NOT NULL  │  INTEGER  NOT NULL  │
+│  PK ─────────────── ┼ ─────────────── PK  │
+└──────────┬──────────┴──────────┬──────────┘
+           │                     │
+           ▼                     ▼
+    espetaculo(id_espetaculo)  categoria(id_categoria)
+```
+
+**Definição SQL:**
+
+```sql
+CREATE TABLE espetaculo_categoria (
+    id_espetaculo  INTEGER  NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    id_categoria   INTEGER  NOT NULL REFERENCES categoria(id_categoria)   ON DELETE CASCADE,
+    PRIMARY KEY (id_espetaculo, id_categoria)
+);
+```
+
+**Chave Primária Composta:** `(id_espetaculo, id_categoria)`
+A PK composta impede que o mesmo espetáculo seja vinculado à mesma categoria mais de uma vez. Inserir uma segunda linha com `(1, 3)` quando já existe `(1, 3)` resultará em violação de unicidade.
+
+**Chaves Estrangeiras e Comportamentos:**
+
+| Coluna | Referencia | ON DELETE |
+|---|---|---|
+| `id_espetaculo` | `espetaculo(id_espetaculo)` | `CASCADE` — ao excluir um espetáculo, todos os seus vínculos de categoria são removidos automaticamente |
+| `id_categoria` | `categoria(id_categoria)` | `CASCADE` — ao excluir uma categoria, todos os vínculos com espetáculos são removidos automaticamente |
+
+**Atributos adicionais:** nenhum. A tabela registra apenas a existência do vínculo; qualquer informação descritiva pertence às tabelas `espetaculo` ou `categoria`.
+
+**Exemplos de uso:**
+
+```sql
+-- Classificar um espetáculo em múltiplas categorias
+INSERT INTO espetaculo_categoria VALUES (1, 2); -- Musical
+INSERT INTO espetaculo_categoria VALUES (1, 5); -- Infantil
+
+-- Buscar todas as categorias de um espetáculo
+SELECT c.nome
+FROM categoria c
+JOIN espetaculo_categoria ec ON ec.id_categoria = c.id_categoria
+WHERE ec.id_espetaculo = 1;
+
+-- Buscar todos os espetáculos de uma categoria
+SELECT e.titulo
+FROM espetaculo e
+JOIN espetaculo_categoria ec ON ec.id_espetaculo = e.id_espetaculo
+WHERE ec.id_categoria = 2;
+```
+
+**Consistência com o modelo conceitual:** corresponde ao relacionamento "Pertence a" (N:M) entre `Espetáculo` e `Categoria` descrito na seção 4.2.3, relacionamento nº 8.
+
+---
+
+#### 4.3.5.2 `espetaculo_ator`
+
+**Relacionamento representado:** Um espetáculo conta com múltiplos atores em seu elenco e um ator pode participar de múltiplos espetáculos ao longo da carreira.
+
+**Motivação:** Além de resolver o N:N entre `espetaculo` e `ator`, esta tabela é uma **classe associativa** — ela carrega atributos próprios que descrevem o contexto específico da participação de um ator em uma determinada peça. Esses atributos (`papel` e `ordem_exibicao`) não pertencem nem ao espetáculo nem ao ator isoladamente; eles só fazem sentido no contexto da combinação dos dois.
+
+**Estrutura:**
+
+```
+espetaculo_ator
+┌─────────────────────┬─────────────────────┬──────────────┬──────────────────┐
+│  id_espetaculo (FK) │    id_ator (FK)     │    papel     │  ordem_exibicao  │
+│  INTEGER  NOT NULL  │  INTEGER  NOT NULL  │ VARCHAR(150) │     INTEGER      │
+│  PK ─────────────── ┼ ─────────────── PK  │   opcional   │   CK > 0         │
+└──────────┬──────────┴──────────┬──────────┴──────────────┴──────────────────┘
+           │                     │
+           ▼                     ▼
+    espetaculo(id_espetaculo)  ator(id_ator)
+```
+
+**Definição SQL:**
+
+```sql
+CREATE TABLE espetaculo_ator (
+    id_espetaculo  INTEGER      NOT NULL REFERENCES espetaculo(id_espetaculo) ON DELETE CASCADE,
+    id_ator        INTEGER      NOT NULL REFERENCES ator(id_ator)             ON DELETE CASCADE,
+    papel          VARCHAR(150),
+    ordem_exibicao INTEGER      CHECK (ordem_exibicao > 0),
+    PRIMARY KEY (id_espetaculo, id_ator)
+);
+```
+
+**Chave Primária Composta:** `(id_espetaculo, id_ator)`
+A PK composta garante que um ator apareça no elenco de um dado espetáculo no máximo uma vez. Para representar um ator em múltiplos papéis na mesma peça, a modelagem exigiria uma extensão futura com um terceiro componente na chave.
+
+**Chaves Estrangeiras e Comportamentos:**
+
+| Coluna | Referencia | ON DELETE |
+|---|---|---|
+| `id_espetaculo` | `espetaculo(id_espetaculo)` | `CASCADE` — ao excluir um espetáculo, todo o elenco vinculado é removido |
+| `id_ator` | `ator(id_ator)` | `CASCADE` — ao excluir um ator, seus vínculos com todos os espetáculos são removidos |
+
+**Atributos da classe associativa:**
+
+| Coluna | Tipo | Restrição | Descrição |
+|---|---|---|---|
+| `papel` | `VARCHAR(150)` | Opcional | Personagem ou função do ator neste espetáculo específico (ex: "Protagonista", "Simba", "Ensemble"). Varia por espetáculo — não pode residir na tabela `ator`. |
+| `ordem_exibicao` | `INTEGER` | `CHECK > 0`, opcional | Posição do ator na listagem de créditos deste espetáculo. Determina a ordem de exibição na interface. Deve ser positivo quando informado. |
+
+**Índice:** `idx_espetaculo_ator_ator` em `id_ator` — permite buscar todos os espetáculos de um ator com eficiência sem varrer a tabela inteira.
+
+**Exemplos de uso:**
+
+```sql
+-- Montar o elenco de um espetáculo ordenado pelos créditos
+SELECT a.nome, ea.papel, ea.ordem_exibicao
+FROM ator a
+JOIN espetaculo_ator ea ON ea.id_ator = a.id_ator
+WHERE ea.id_espetaculo = 1
+ORDER BY ea.ordem_exibicao;
+
+-- Buscar todos os espetáculos de um ator específico
+SELECT e.titulo, ea.papel
+FROM espetaculo e
+JOIN espetaculo_ator ea ON ea.id_espetaculo = e.id_espetaculo
+WHERE ea.id_ator = 7;
+```
+
+**Consistência com o modelo conceitual:** corresponde ao relacionamento "Atua em" (N:M) entre `Espetáculo` e `Ator` descrito na seção 4.2.3, relacionamento nº 11. A existência de atributos próprios (`papel`, `ordem_exibicao`) é exatamente o que justifica a modelagem como **classe associativa** no diagrama de classes (seção 5.1.3).
+
+---
+
+#### Comparativo entre as duas tabelas associativas
+
+| Característica | `espetaculo_categoria` | `espetaculo_ator` |
+|---|---|---|
+| **Entidades relacionadas** | `espetaculo` ↔ `categoria` | `espetaculo` ↔ `ator` |
+| **Chave primária** | `(id_espetaculo, id_categoria)` | `(id_espetaculo, id_ator)` |
+| **Atributos próprios** | Nenhum | `papel`, `ordem_exibicao` |
+| **Tipo no diagrama de classes** | Associação simples | Classe associativa |
+| **ON DELETE FK esquerda** | CASCADE | CASCADE |
+| **ON DELETE FK direita** | CASCADE | CASCADE |
+| **Índice adicional** | Nenhum | `idx_espetaculo_ator_ator` |
+| **Relacionamento no conceitual** | Nº 8 — "Pertence a" | Nº 11 — "Atua em" |
+
+---
+
+## 4.4 Modelo Físico de Dados
+
+&emsp;O modelo físico de dados descreve como a estrutura lógica definida na seção 4.3 foi concretizada em tecnologias específicas de armazenamento, incluindo tipos de dados nativos do SGBD, mecanismos de segurança em nível de linha, índices de performance, triggers e a organização dos scripts de provisionamento. A documentação técnica completa do banco, incluindo instruções de instalação, rollback e dicionário detalhado, está disponível em [`src/database/README.md`](../src/database/README.md).
+
+---
+
+### 4.4.1 Tecnologias de Persistência
+
+O Spotlight adota uma estratégia de **persistência poliglota**, utilizando dois SGBDs com responsabilidades complementares:
+
+| SGBD | Versão | Provisionamento | Responsabilidade |
+|---|---|---|---|
+| **PostgreSQL** | 15+ | Supabase (cloud ou self-hosted via Docker) | Dados transacionais e estruturados: catálogo, perfis, avaliações e recomendações processadas |
+| **MongoDB** | 7+ | Container Docker independente | Eventos de telemetria comportamental em alta volumetria (cliques, tempo de tela) |
+
+A separação é justificada pela diferença de padrão de acesso: o PostgreSQL serve consultas relacionais complexas com JOINs e filtros compostos, enquanto o MongoDB absorve escritas massivas e contínuas sem impactar o banco principal.
+
+---
+
+### 4.4.2 Scripts SQL de Provisionamento
+
+Todos os scripts estão em `src/database/` e devem ser executados na ordem indicada:
+
+| Arquivo | Função | Ordem |
+|---|---|---|
+| [`01_create_database.sql`](../src/database/01_create_database.sql) | Cria os tipos ENUM, as 10 tabelas, as políticas de RLS, os 10 índices e o trigger de integração com o Supabase Auth | 1º |
+| [`02_initial_data.sql`](../src/database/02_initial_data.sql) | Insere dados de seed (categorias, teatros, atores, espetáculos e sessões iniciais) | 2º |
+| [`03_rollback.sql`](../src/database/03_rollback.sql) | Desfaz completamente o `01_create_database.sql` — destrutivo, uso exclusivo em desenvolvimento | — |
+
+**Execução via SQL Editor do Supabase:**
+1. Acesse o Supabase Dashboard → SQL Editor → New Query
+2. Cole e execute `01_create_database.sql`
+3. Cole e execute `02_initial_data.sql`
+
+**Execução via `psql`:**
+```bash
+export PGPASSWORD=<senha>
+psql -h <host> -p <porta> -U postgres -d postgres -f src/database/01_create_database.sql
+psql -h <host> -p <porta> -U postgres -d postgres -f src/database/02_initial_data.sql
+```
+
+---
+
+### 4.4.3 Implementação Física no PostgreSQL
+
+#### Tipos Enumerados (ENUMs)
+
+Dois tipos customizados são criados antes das tabelas e utilizados como domínio restrito de valores:
+
+| Tipo | Valores | Tabela que utiliza |
+|---|---|---|
+| `tipo_usuario_enum` | `'visitante'`, `'cadastrado'`, `'administrador'` | `usuario.tipo_usuario` |
+| `status_espetaculo_enum` | `'em_cartaz'`, `'em_breve'`, `'encerrado'` | `espetaculo.status` |
+
+O uso de ENUMs em vez de `VARCHAR` com CHECK garante que o banco rejeite valores inválidos sem a necessidade de manter a lógica de validação duplicada na aplicação.
+
+#### Integração com Supabase Auth via Trigger
+
+A tabela `usuario` não armazena senhas. A autenticação é delegada integralmente ao Supabase Auth, cujo estado reside na tabela `auth.users` (schema gerenciado). A sincronização entre o cadastro de um novo usuário no Supabase Auth e a criação do perfil no schema público é feita automaticamente por um trigger:
+
+```sql
+-- Função executada após INSERT em auth.users
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+    INSERT INTO public.usuario (id_usuario, nome, email)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
+        NEW.email
+    );
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+Isso garante que toda conta criada via Supabase Auth resulte automaticamente em um perfil na tabela `usuario`, sem necessidade de chamada explícita pela aplicação.
+
+#### Row Level Security (RLS)
+
+Todas as 10 tabelas têm RLS habilitado. As políticas implementadas seguem dois padrões:
+
+| Padrão | Tabelas | Regra |
+|---|---|---|
+| **Leitura pública** | `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao`, `avaliacao` | `USING (true)` — qualquer requisição pode ler |
+| **Acesso restrito ao próprio usuário** | `usuario`, `avaliacao` (INSERT/DELETE), `recomendacao` | `USING (auth.uid() = id_usuario)` — apenas o titular acessa |
+
+O RLS é a camada de segurança de dados mais próxima do banco. Mesmo que um token com permissões elevadas chegue ao banco, as políticas garantem que cada usuário só enxerga e modifica seus próprios registros onde aplicável.
+
+#### Índices de Performance
+
+10 índices explícitos foram criados para otimizar os padrões de consulta mais frequentes da aplicação:
+
+| Índice | Tabela | Colunas | Consulta otimizada |
+|---|---|---|---|
+| `idx_espetaculo_status` | `espetaculo` | `status` | Filtrar espetáculos em cartaz |
+| `idx_espetaculo_nota_media` | `espetaculo` | `nota_media DESC` | Ranking por avaliação |
+| `idx_espetaculo_popularidade` | `espetaculo` | `popularidade DESC` | Ranking por popularidade |
+| `idx_sessao_espetaculo` | `sessao` | `id_espetaculo` | Sessões de um espetáculo |
+| `idx_sessao_data` | `sessao` | `data` | Sessões por data |
+| `idx_sessao_teatro` | `sessao` | `id_teatro` | Sessões de um teatro |
+| `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | Recomendações de um usuário |
+| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | Top recomendações por usuário |
+| `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Avaliações de um espetáculo |
+| `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Espetáculos de um ator |
+
+Além desses, o PostgreSQL cria automaticamente índices para todas as chaves primárias e constraints UNIQUE.
+
+---
+
+### 4.4.4 Implementação Física no MongoDB
+
+O MongoDB armazena os eventos de telemetria comportamental gerados pelos usuários durante a navegação. A estrutura física é composta por uma única coleção principal:
+
+**Coleção: `interacoes`**
+
+Cada documento representa um evento de comportamento de um usuário em relação a um espetáculo:
+
+```json
+{
+  "_id": "ObjectId(...)",
+  "user_id": "uuid-do-usuario",
+  "espetaculo_id": 42,
+  "tipo_interacao": "visualizacao",
+  "timestamp": "2026-05-26T14:32:00.000Z",
+  "tempo_permanencia": 87,
+  "session_id": "sess_abc123",
+  "dispositivo": "mobile"
+}
+```
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `_id` | `ObjectId` | Sim (automático) | Identificador único gerado pelo MongoDB |
+| `user_id` | `String` (UUID) | Sim | ID do usuário — corresponde a `usuario.id_usuario` no PostgreSQL |
+| `espetaculo_id` | `Integer` | Sim | ID do espetáculo — corresponde a `espetaculo.id_espetaculo` |
+| `tipo_interacao` | `String` | Sim | Tipo do evento: `"visualizacao"`, `"clique"`, `"favorito"` |
+| `timestamp` | `Date` | Sim | Momento do evento em ISO 8601 |
+| `tempo_permanencia` | `Integer` | Não | Segundos de permanência na página do espetáculo |
+| `session_id` | `String` | Não | Identificador da sessão de navegação |
+| `dispositivo` | `String` | Não | Plataforma de origem: `"mobile"`, `"web"` |
+
+Os Workers do ML Engine consomem esta coleção em lote, calculam os scores de recomendação e escrevem os resultados processados de volta na tabela `recomendacao` do PostgreSQL, completando o ciclo de dados do sistema.
+
+---
+
+### 4.4.5 Implantação Local com Docker
+
+Para desenvolvimento local, o banco PostgreSQL é provisionado via Docker usando a imagem oficial do Supabase:
+
+```yaml
+services:
+  db:
+    image: supabase/postgres:15.1.0.147
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./src/database/01_create_database.sql:/docker-entrypoint-initdb.d/01_create.sql
+      - ./src/database/02_initial_data.sql:/docker-entrypoint-initdb.d/02_seed.sql
+```
+
+Os scripts mapeados em `docker-entrypoint-initdb.d/` são executados automaticamente na **primeira inicialização** do container, em ordem alfabética. Em reinicializações subsequentes, o volume já contém os dados e os scripts não são reexecutados.
+
+Para instruções completas de execução, variáveis de ambiente necessárias e procedimentos de rollback, consulte [`src/database/README.md`](../src/database/README.md).
 
 # 5. Solução Técnica (Design)
 _conteúdo_
@@ -1796,7 +2451,7 @@ _conteúdo_
 | `email` | `varchar` | E-mail utilizado para autenticação |
 | `senha` | `varchar` | Senha criptografada |
 | `data_nascimento` | `date` | Data de nascimento |
-| `localizacao` | `varchar` | Cidade ou região do usuário |
+| `localizacao` | `jsonb` | Localização consentida do usuário, com endereço normalizado, coordenadas e provedor |
 | `data_cadastro` | `timestamp` | Data de criação da conta |
 | `tipo_usuario` | `varchar` | Papel do usuário no sistema (ex: `comum`, `admin`) |
 | `nivel_acesso` | `jsonb` | Permissões granulares em formato JSON |
@@ -2096,7 +2751,7 @@ Contém o **Spotlight App**, responsável pela interface com o usuário final e 
 
 ### Serviços Externos
 
-Engloba a infraestrutura de identidade (**Supabase Auth**) e a API das Ticketeiras, provendo dados de inventário e emissão de ingressos.
+Engloba a infraestrutura de identidade (**Supabase Auth**), a API das Ticketeiras e a **OpenStreetMap/Nominatim API**, utilizada para apoio à geolocalização e ao cálculo de proximidade no MVP sem dependência de billing proprietário.
 
 ### API Gateway
 
@@ -2108,6 +2763,7 @@ Camada central de processamento contendo:
 - Serviço do Usuário
 - Serviço do Catálogo
 - Serviço de Recomendação
+- Serviço de Geolocalização
 
 Cada domínio gerencia sua própria regra de negócio isoladamente.
 
@@ -2137,9 +2793,11 @@ Infraestrutura de persistência segregada por perfil de carga, contendo:
 | **Serviço de Catálogo** | Gerenciamento de domínio de espetáculos, teatros, gêneros e precificação. | ASP.NET Core Web API |
 | **Serviço de Usuário** | Gestão de perfis, preferências explícitas e histórico de consumo. | ASP.NET Core Web API |
 | **Serviço de Recomendação** | Orquestração do fluxo de sugestões, consultando predições pré-processadas pelo Motor de ML. | ASP.NET Core Web API |
+| **Serviço de Geolocalização** | Normalização de localização, consulta de proximidade e integração com OpenStreetMap/Nominatim para apoiar recomendações contextuais. | ASP.NET Core Web API |
 | **Motor de ML** | Processamento de algoritmos de filtragem colaborativa (k-NN, SVD) para geração de recomendações. | C# + ML.NET |
 | **RabbitMQ** | Message Broker dedicado ao enfileiramento de eventos assíncronos de telemetria e interações. | RabbitMQ |
 | **Supabase Auth** | Provedor de Identidade, responsável por autenticação e emissão de tokens JWT. | Supabase Auth |
+| **OpenStreetMap/Nominatim API** | API externa para geocodificação e geocodificação reversa entre localização do usuário e endereços normalizados. | OpenStreetMap/Nominatim |
 | **Supabase DB (PostgreSQL)** | Banco de dados relacional primário para perfis, catálogo e metadados transacionais. | PostgreSQL via Supabase |
 | **MongoDB** | Repositório de alto volume para armazenamento de logs comportamentais e eventos de telemetria brutos. | MongoDB |
 
@@ -2182,12 +2840,14 @@ O diagrama estabelece portas e interfaces estritas (conectores e receptores) ent
 | **ISpotlightAPI** | Interface de consumo central exposta ao App (REST/GraphQL). |
 | **IAuth** | Interface de comunicação direta com o Supabase Auth para delegação de credenciais. |
 | **ITickets** | Integração de saída para APIs de terceiros (Ticketeiras). |
+| **IGeocoding** | Integração de saída do Serviço de Geolocalização com OpenStreetMap/Nominatim. |
 | **IUserPrefs** | Contrato interno roteado pelo Gateway para o Serviço do Usuário. |
 | **ICatalog** | Contrato interno roteado pelo Gateway para o Serviço de Catálogo. |
 | **IRecommendation** | Contrato interno roteado pelo Gateway para o Serviço de Recomendação. |
+| **IGeolocation** | Contrato interno roteado pelo Gateway para o Serviço de Geolocalização. |
 | **IEvents** | Contrato de publicação de mensagens (*Producer*) em tópicos/filas do RabbitMQ. |
 | **Worker** | Interface de consumo (*Consumer*) onde o ML Engine extrai lotes de eventos do RabbitMQ continuamente e de forma desacoplada. |
-| **SQL / NoSQL** | Abstrações de conexão de persistência (EF Core / MongoDB Driver). |
+| **SQL / NoSQL** | Abstrações de conexão de persistência (Npgsql/ADO.NET — SQL puro, sem ORM / MongoDB Driver). |
 
 ---
 
@@ -2301,6 +2961,8 @@ A API de negócio é organizada em três serviços independentes, seguindo a arq
 O **ASP.NET Core Web API** foi escolhido por ser o framework mais maduro do ecossistema .NET para APIs RESTful, com suporte robusto a middleware de autenticação JWT, injeção de dependência nativa e compatibilidade total com .NET 9. O .NET 10 foi descartado por ainda estar em preview no período de desenvolvimento.
 
 Um **API Gateway** centraliza o roteamento entre os três serviços, valida o JWT emitido pelo Supabase Auth e aplica rate limiting.
+
+> **Contratos de API:** a especificação completa das rotas — método, path, finalidade, schemas de request/response por status code e exemplos de payload em JSON — está em [`src/backend/contracts/api-contracts.md`](../src/backend/contracts/api-contracts.md). Esse documento é a **fonte da verdade** para a implementação das features do backend e para a documentação Swagger.
 
 ### 5.3.4 Frontend: React Native + TypeScript
 
@@ -2723,14 +3385,15 @@ Regras desta camada:
 
 ##### 2. Serviços Externos
 
-&emsp;Infraestrutura de identidade e de inventário de ingressos, consumidos pelo app e pelo Gateway.
+&emsp;Infraestrutura de identidade, inventário de ingressos e geolocalização, consumida pelo app, pelo Gateway e pelos serviços internos autorizados.
 
 | Componente | Tecnologia | Responsabilidade |
 |---|---|---|
 | Supabase Auth | Supabase Auth | Provedor de identidade: autenticação, emissão e validação de tokens JWT, OAuth |
 | API das Ticketeiras | API externa | Inventário de ingressos, emissão e validação |
+| OpenStreetMap/Nominatim API | OpenStreetMap/Nominatim | Geocodificação, geocodificação reversa e normalização de localização para recomendações contextuais |
 
-Interfaces: `IAuth` · `ITickets`
+Interfaces: `IAuth` · `ITickets` · `IGeocoding`
 
 ##### 3. API Gateway
 
@@ -2769,7 +3432,14 @@ Responsabilidades detalhadas:
 
 - Orquestra o fluxo de sugestões personalizadas para o usuário.
 - Consulta predições pré-processadas pelo ML Engine via interface `Worker`.
+- Consulta o Serviço de Geolocalização quando a recomendação utiliza contexto geográfico.
 - Persiste resultados no Supabase DB (PostgreSQL).
+
+**Serviço de Geolocalização (`IGeolocation`)**
+
+- Normaliza dados de localização consentidos pelo usuário.
+- Consulta OpenStreetMap/Nominatim via interface `IGeocoding`.
+- Retorna informações de proximidade para apoiar recomendações contextuais e geográficas.
 
 ##### 5. Infraestrutura de Processamento
 
@@ -2812,9 +3482,11 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 | `ISpotlightAPI` | App → API Gateway | Contrato REST do frontend com o backend |
 | `IAuth` | App → Supabase Auth | Autenticação e emissão de JWT |
 | `ITickets` | Gateway → API Ticketeiras | Consulta e emissão de ingressos |
+| `IGeocoding` | Serv. Geolocalização → OpenStreetMap/Nominatim | Consulta de geocodificação e geocodificação reversa |
 | `IUserPrefs` | Gateway → Serv. Usuário | Perfis e preferências |
 | `ICatalog` | Gateway → Serv. Catálogo | Espetáculos e metadados |
 | `IRecommendation` | Gateway → Serv. Recomendação | Sugestões personalizadas |
+| `IGeolocation` | Gateway / Serv. Recomendação → Serv. Geolocalização | Contexto geográfico e proximidade |
 | `Worker` | Serv. Recomendação → ML Engine | Predições e vetores de afinidade |
 | `IEvents` | Gateway → RabbitMQ | Publicação assíncrona de eventos de telemetria |
 | `SQL` | Serviços SOA + ML Engine → PostgreSQL | Leitura/escrita relacional |
@@ -2830,12 +3502,37 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 3. Gateway valida JWT com Supabase Auth
 4. Gateway → Serviço de Recomendação (IRecommendation)
 5. Serviço de Recomendação → ML Engine (Worker): solicita predições
-6. ML Engine consulta PostgreSQL (vetores de afinidade pré-calculados)
-7. ML Engine retorna lista ranqueada ao Serviço de Recomendação
-8. Serviço de Recomendação retorna ao Gateway → App
-9. App registra interação do usuário (clique, tempo de tela)
-10. Gateway publica evento no RabbitMQ (IEvents) — assíncrono
-11. Consumer do RabbitMQ persiste evento no MongoDB
+6. Quando há localização consentida, Serviço de Recomendação → Serviço de Geolocalização (IGeolocation)
+7. Serviço de Geolocalização → OpenStreetMap/Nominatim (IGeocoding): normaliza localização
+8. ML Engine consulta PostgreSQL (vetores de afinidade pré-calculados)
+9. Serviço de Recomendação combina afinidade e contexto geográfico
+10. Serviço de Recomendação retorna lista ranqueada ao Gateway → App
+11. App registra interação do usuário (clique, tempo de tela)
+12. Gateway publica evento no RabbitMQ (IEvents) — assíncrono
+13. Consumer do RabbitMQ persiste evento no MongoDB
+```
+
+**Consulta de Geolocalização**
+
+<div align="center">
+
+### Figura X – Fluxo de Geolocalização com OpenStreetMap/Nominatim
+
+![Fluxo de Geolocalização](./img/fluxo_geolocalizacao_openstreetmap.png)
+
+Fonte: Material produzido pelos autores (2026).
+
+</div>
+
+```
+1. Usuário autoriza compartilhamento de localização no Spotlight App
+2. App → API Gateway com requisição protegida por JWT
+3. Gateway → Serviço de Geolocalização (IGeolocation)
+4. Serviço de Geolocalização → OpenStreetMap/Nominatim (IGeocoding)
+5. OpenStreetMap/Nominatim retorna endereço normalizado e coordenadas
+6. Serviço de Geolocalização normaliza o retorno
+7. Serviço de Recomendação utiliza o contexto geográfico na ordenação das sugestões
+8. Gateway retorna recomendações contextuais ao App
 ```
 
 **Compra de Ingresso**
@@ -2858,6 +3555,7 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 |---|---|---|
 | Protocolo cliente–backend | REST (HTTPS) | Simplicidade, compatibilidade com React Native |
 | Autenticação | JWT + Supabase Auth | Stateless, escalável, OAuth integrado |
+| Geolocalização | OpenStreetMap/Nominatim | Apoia recomendações contextuais no MVP sem dependência de billing proprietário, sem alterar a lógica principal do ML |
 | Controle de acesso | RBAC (usuario, admin) | Separação clara entre perfis de uso |
 | Banco relacional | PostgreSQL via Supabase | Dados estruturados, integridade referencial |
 | Banco de telemetria | MongoDB | Alto volume, esquema flexível, sem onerar o relacional |
@@ -2964,6 +3662,516 @@ _conteúdo_
 ## 9.3.2 Resultados
 _conteúdo_
 
+## 9.4 Testes de Integração
+
+&emsp;Os testes de integração têm como objetivo validar as interações entre os componentes internos do Spotlight e os sistemas externos com os quais ele se comunica. Enquanto os testes unitários verificam o comportamento isolado de cada módulo, os testes de integração verificam que as fronteiras entre serviços, bancos de dados, filas de mensagens e APIs externas funcionam corretamente em conjunto.
+
+&emsp;A arquitetura SOA do Spotlight introduz múltiplos pontos de integração críticos: o API Gateway valida tokens com o Supabase Auth, os serviços de negócio persistem dados no PostgreSQL e no MongoDB, o RabbitMQ transporta eventos de telemetria até o ML Engine e o aplicativo mobile redireciona o usuário para a API da ticketeira parceira. Cada uma dessas fronteiras é um ponto potencial de falha e, portanto, deve ser coberta por cenários de teste positivos e negativos.
+
+### 9.4.1 Planejamento
+
+#### Módulo VHS — Mecanismo de Caching de Respostas de API Externa
+
+&emsp;Todos os testes de integração que envolvem chamadas a sistemas externos (Supabase Auth e API da Ticketeira) fazem uso obrigatório do módulo **VHS** (*Virtual HTTP Server*). O VHS é um mecanismo de caching que intercepta as chamadas HTTP realizadas pelo `HttpClient`, armazena a resposta real em memória (ou em arquivo `.json` no diretório `tests/cassettes/`), e a repete nas execuções seguintes até que o TTL expire ou o cassete seja invalidado manualmente.
+
+**Funcionamento do VHS:**
+
+```
+Primeira execução:                         Execuções subsequentes (TTL válido):
+┌────────────────┐   HTTP real    ┌──────────────────┐     ┌────────────────┐   cache hit    ┌──────────────────┐
+│  Serviço .NET  │ ─────────────► │  API Externa     │     │  Serviço .NET  │ ─────────────► │  VHS Cache Layer │
+│                │ ◄───────────── │  (Supabase Auth  │     │                │ ◄───────────── │  (resposta       │
+│                │  resposta real │   / Ticketeira)  │     │                │  cached JSON   │   armazenada)    │
+└────────────────┘                └──────────────────┘     └────────────────┘                └──────────────────┘
+         │                                                                                            │
+         └──────────────────── armazena em tests/cassettes/<nome_do_teste>.json ────────────────────►┘
+```
+
+**Implementação como `DelegatingHandler` no ASP.NET Core:**
+
+```csharp
+// src/backend/contracts/vhs/VhsCachingHandler.cs
+public class VhsCachingHandler : DelegatingHandler
+{
+    private readonly IMemoryCache _cache;
+    private readonly VhsOptions _options;
+
+    public VhsCachingHandler(IMemoryCache cache, VhsOptions options)
+    {
+        _cache = cache;
+        _options = options;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var cacheKey = $"vhs:{request.Method}:{request.RequestUri}";
+
+        if (_cache.TryGetValue(cacheKey, out string cachedBody))
+        {
+            var cachedResponse = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(cachedBody, Encoding.UTF8, "application/json")
+            };
+            return cachedResponse;
+        }
+
+        var response = await base.SendAsync(request, cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        _cache.Set(cacheKey, body, TimeSpan.FromSeconds(_options.TtlSeconds));
+
+        return response;
+    }
+}
+
+public class VhsOptions
+{
+    public int TtlSeconds { get; set; } = 300; // 5 minutos por padrão
+    public string CassettesDirectory { get; set; } = "tests/cassettes";
+}
+```
+
+**Registro no `Program.cs` dos serviços:**
+
+```csharp
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton(new VhsOptions { TtlSeconds = 300 });
+builder.Services.AddTransient<VhsCachingHandler>();
+
+builder.Services.AddHttpClient("supabase-auth")
+    .AddHttpMessageHandler<VhsCachingHandler>();
+
+builder.Services.AddHttpClient("ticketeira")
+    .AddHttpMessageHandler<VhsCachingHandler>();
+```
+
+**Configuração do TTL por ambiente:**
+
+| Ambiente | TTL padrão | Observação |
+|---|---|---|
+| `Development` | 300 s (5 min) | Permite iteração rápida sem chamar a API real |
+| `Testing` | 0 s (desabilitado) | Cassetes pré-gravados são usados via arquivo |
+| `Production` | Não usar | VHS não deve ser ativado em produção |
+
+---
+
+#### Escopo dos Testes de Integração
+
+Os testes cobrem seis fronteiras de integração definidas pela arquitetura do Spotlight:
+
+| ID | Fronteira | Tipo | Usa VHS |
+|---|---|---|---|
+| IT-01 | App Mobile → API Gateway (autenticação JWT) | Interno | Não |
+| IT-02 | API Gateway → Supabase Auth (validação de token) | Externo | **Sim** |
+| IT-03 | Serviços SOA → Supabase PostgreSQL | Interno | Não |
+| IT-04 | Serviços SOA → MongoDB (telemetria) | Interno | Não |
+| IT-05 | Serviços SOA → RabbitMQ → ML Engine | Interno | Não |
+| IT-06 | App Mobile → API Ticketeira (link de compra) | Externo | **Sim** |
+
+---
+
+#### IT-01 — API Gateway: Validação de JWT e Roteamento para Serviços SOA
+
+**Descrição:** Valida que o API Gateway aceita requisições com JWT válido, rejeita requisições inválidas e roteia corretamente para os três serviços internos (catálogo, usuário e recomendação).
+
+**Ferramentas utilizadas:**
+- `xUnit` — framework de testes do .NET
+- `Microsoft.AspNetCore.Mvc.Testing` — servidor de teste integrado (`WebApplicationFactory`)
+- `Bogus` — geração de dados fictícios para usuários e tokens
+
+**Instruções de execução:**
+```bash
+# a partir da raiz do repositório
+dotnet test src/backend/api-gateway --filter "Category=Integration" --logger "console;verbosity=detailed"
+```
+
+---
+
+**Pré-condições:**
+
+- Ambiente Docker em execução com todos os containers (`docker compose up -d`)
+- Variáveis de ambiente configuradas: `SUPABASE_JWT_SECRET`, `SUPABASE_URL`, `POSTGRES_CONNECTION_STRING`
+- Pelo menos um usuário registrado no Supabase Auth com `tipo_usuario=comum`
+- Pelo menos um usuário administrador com `tipo_usuario=admin`
+- Os três serviços internos (catálogo, usuário, recomendação) estão em execução e respondendo em suas portas configuradas
+- Nenhum rate-limit ativo que possa interferir nas chamadas sequenciais dos testes
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-01-P01 | Requisição autenticada roteia para Serviço de Catálogo | Enviar `GET /api/catalogo/espetaculos` com header `Authorization: Bearer <JWT_VALIDO>` | HTTP 200 com lista de espetáculos; header `X-Routed-To: catalogo` presente na resposta | Nenhuma alteração de estado; log de acesso registrado |
+| IT-01-P02 | Requisição autenticada roteia para Serviço de Usuário | Enviar `GET /api/usuario/perfil` com header `Authorization: Bearer <JWT_VALIDO>` | HTTP 200 com dados do perfil do usuário autenticado | Nenhuma alteração de estado |
+| IT-01-P03 | Requisição autenticada roteia para Serviço de Recomendação | Enviar `GET /api/recomendacao` com header `Authorization: Bearer <JWT_VALIDO>` | HTTP 200 com lista de recomendações | Nenhuma alteração de estado |
+| IT-01-P04 | Administrador acessa rota protegida por papel | Enviar `POST /api/admin/espetaculos` com JWT de usuário `tipo_usuario=admin` e body JSON válido | HTTP 201 com espetáculo criado; campo `id` presente no body de resposta | Espetáculo persiste no banco PostgreSQL |
+| IT-01-P05 | Token renovado (refresh) é aceito normalmente | Obter novo `access_token` via `POST /auth/token?grant_type=refresh_token`; usar o novo token em `GET /api/catalogo/espetaculos` | HTTP 200; novo token aceito sem erros | Sessão permanece ativa |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-01-N01 | Requisição sem header de autorização | Enviar `GET /api/catalogo/espetaculos` sem header `Authorization` | HTTP 401; body `{ "error": "token_missing" }` | Nenhuma alteração de estado; log de erro registrado |
+| IT-01-N02 | JWT com assinatura inválida | Enviar `GET /api/usuario/perfil` com token adulterado (último caractere alterado) | HTTP 401; body `{ "error": "invalid_token" }` | Nenhuma alteração de estado |
+| IT-01-N03 | JWT expirado | Gerar JWT com `exp` definido no passado (ex: `DateTimeOffset.UtcNow.AddHours(-1).ToUnixTimeSeconds()`) assinado com `SUPABASE_JWT_SECRET`; enviar em `GET /api/usuario/perfil` | HTTP 401; body `{ "error": "token_expired" }` | Nenhuma alteração de estado |
+| IT-01-N04 | Usuário comum acessa rota exclusiva de administrador | Enviar `POST /api/admin/espetaculos` com JWT de `tipo_usuario=comum` | HTTP 403; body `{ "error": "insufficient_permissions" }` | Nenhuma alteração de estado |
+| IT-01-N05 | Serviço interno indisponível | Derrubar o container do Serviço de Catálogo e enviar `GET /api/catalogo/espetaculos` com JWT válido | HTTP 503; body `{ "error": "service_unavailable", "service": "catalogo" }` | Gateway registra erro em log; outros serviços permanecem funcionais |
+
+**Pós-condições gerais:** Todos os acessos — bem-sucedidos e rejeitados — são registrados nos logs estruturados do API Gateway com os cinco campos obrigatórios definidos no RNF07 (timestamp, nível, serviço, sessão, dispositivo).
+
+**Método de validação dos resultados:**
+1. Verificar código HTTP retornado contra o esperado
+2. Validar estrutura do body de resposta via `JsonSchema`
+3. Inspecionar logs do container do API Gateway com `docker logs api-gateway | grep ERROR`
+4. Confirmar que nenhum token inválido passou para os serviços internos via análise dos logs dos serviços
+
+---
+
+#### IT-02 — API Gateway ↔ Supabase Auth: Validação de Token (com VHS)
+
+**Descrição:** Valida a integração entre o API Gateway e o Supabase Auth para os fluxos de cadastro, login e renovação de sessão. O módulo VHS é ativado para armazenar as respostas do Supabase Auth, evitando dependência de conectividade com o serviço remoto durante a bateria de testes.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Microsoft.AspNetCore.Mvc.Testing`
+- **Módulo VHS** com TTL de 300 segundos e cassetes pré-gravados em `tests/cassettes/supabase/`
+- `Supabase.Client` — SDK oficial para chamadas diretas quando necessário gravar novos cassetes
+- `FluentAssertions` — validação expressiva de respostas HTTP
+
+**Instruções de execução:**
+```bash
+# Gravar cassetes novos (requer conectividade com Supabase):
+VHS_MODE=record dotnet test src/backend/api-gateway --filter "Category=Integration&Tag=Supabase"
+
+# Executar com cassetes gravados (modo padrão, sem conectividade):
+dotnet test src/backend/api-gateway --filter "Category=Integration&Tag=Supabase"
+
+# Inspecionar cassetes gerados:
+ls tests/cassettes/supabase/
+```
+
+---
+
+**Pré-condições:**
+
+- Módulo VHS configurado no pipeline do `HttpClient` para o cliente nomeado `"supabase-auth"` (conforme código em `VhsCachingHandler.cs`)
+- Cassetes pré-gravados em `tests/cassettes/supabase/` para cada cenário (gerados com `VHS_MODE=record` em ambiente com conectividade)
+- Variável `SUPABASE_JWT_SECRET` definida no ambiente de teste para validação local de assinatura
+- Email `ana.test@spotlighttest.com` disponível no projeto Supabase (não cadastrado previamente)
+- Email `usuario.existente@spotlighttest.com` cadastrado previamente no projeto Supabase
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-02-P01 | Cadastro de novo usuário com dados válidos | Enviar `POST /auth/signup` com `{ "email": "ana.test@spotlighttest.com", "password": "Senh@Forte123", "data": { "nome": "Ana Teste" } }`; VHS retorna cassete `signup_success.json` | HTTP 200; body contém `user.id` (UUID), `session.access_token` e `session.refresh_token`; `access_token` é JWT válido com `sub` igual ao `user.id` | VHS registra resposta em cache com TTL de 300 s; usuário persiste no Supabase (ou cassete simula isso) |
+| IT-02-P02 | Login com credenciais válidas | Enviar `POST /auth/token?grant_type=password` com `{ "email": "usuario.existente@spotlighttest.com", "password": "Senh@Forte123" }`; VHS retorna cassete `login_success.json` | HTTP 200; `access_token` presente e assinado com `SUPABASE_JWT_SECRET`; `expires_in` = 3600 | Token em cache no VHS por 300 s; log de autenticação bem-sucedida registrado |
+| IT-02-P03 | Renovação de sessão com refresh_token válido | Enviar `POST /auth/token?grant_type=refresh_token` com `{ "refresh_token": "<TOKEN_VALIDO>" }`; VHS retorna cassete `refresh_success.json` | HTTP 200; novo `access_token` gerado; `refresh_token` atualizado; TTL do novo token = 3600 s | VHS invalida cache anterior e armazena nova resposta |
+| IT-02-P04 | Cache VHS é utilizado na segunda chamada idêntica | Realizar `POST /auth/token?grant_type=password` duas vezes com os mesmos dados dentro do TTL | Segunda chamada não gera tráfego real para o Supabase; resposta idêntica à primeira; latência < 5 ms na segunda chamada | Contador de cache hit incrementado; log VHS registra `cache_hit=true` |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-02-N01 | Login com senha incorreta | Enviar `POST /auth/token?grant_type=password` com senha errada; VHS retorna cassete `login_wrong_password.json` | HTTP 400; body `{ "error": "invalid_grant", "error_description": "Invalid login credentials" }` | VHS armazena resposta de erro em cache; nenhuma sessão criada |
+| IT-02-N02 | Cadastro com email já registrado | Enviar `POST /auth/signup` com email `usuario.existente@spotlighttest.com`; VHS retorna cassete `signup_duplicate.json` | HTTP 422; body `{ "error": "User already registered" }` | Nenhuma alteração de estado; erro registrado em log |
+| IT-02-N03 | Cadastro com senha fraca (menos de 8 caracteres) | Enviar `POST /auth/signup` com `"password": "abc"` | HTTP 422; body contém mensagem de validação de senha | Nenhum usuário criado |
+| IT-02-N04 | Renovação com refresh_token expirado | Enviar `POST /auth/token?grant_type=refresh_token` com token expirado; VHS retorna cassete `refresh_expired.json` | HTTP 400; body `{ "error": "invalid_grant" }` | Cache VHS invalidado; usuário deve fazer login novamente |
+| IT-02-N05 | Supabase Auth indisponível e VHS cache expirado | Definir `VhsOptions.TtlSeconds=0` e simular indisponibilidade do Supabase; enviar `POST /auth/token?grant_type=password` | HTTP 503; body `{ "error": "auth_service_unavailable" }`; fallback de retry não excede 3 tentativas com backoff exponencial | Erro crítico registrado em log estruturado; nenhum dado sensível exposto na resposta |
+
+**Pós-condições gerais:** O VHS persiste cassetes em `tests/cassettes/supabase/` somente quando `VHS_MODE=record`; em modo padrão, nenhuma chamada real é feita ao Supabase durante a execução dos testes.
+
+**Método de validação dos resultados:**
+1. Verificar se `VhsCachingHandler` foi invocado inspecionando logs com `[VHS]` no prefixo
+2. Confirmar que `cache_hit=true` aparece nos logs da segunda requisição idêntica (IT-02-P04)
+3. Validar assinatura do JWT retornado com `jose-jwt` ou `System.IdentityModel.Tokens.Jwt`
+4. Comparar body de resposta com o cassete JSON armazenado usando `DeepEqual`
+
+---
+
+#### IT-03 — Serviços SOA ↔ Supabase PostgreSQL: Persistência e Leitura
+
+**Descrição:** Valida que os três serviços de negócio (catálogo, usuário e recomendação) leem e escrevem corretamente no banco PostgreSQL provisionado via Supabase, respeitando as constraints definidas no modelo físico.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Testcontainers.PostgreSql` — instância isolada do PostgreSQL em container Docker para testes
+- `Entity Framework Core` — ORM utilizado pelos serviços
+- `Respawn` — reset do banco entre os testes para garantir isolamento
+- Scripts SQL de criação de schema: `src/database/01_create_database.sql` e `src/database/02_initial_data.sql`
+
+**Instruções de execução:**
+```bash
+# Requer Docker em execução
+dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" \
+  --logger "trx;LogFileName=integration-postgres.trx"
+```
+
+---
+
+**Pré-condições:**
+
+- Docker disponível no ambiente de execução para criação do container PostgreSQL via `Testcontainers`
+- Scripts SQL `01_create_database.sql` e `02_initial_data.sql` executados com sucesso no banco de teste
+- Variáveis de ambiente de teste isoladas (`POSTGRES_CONNECTION_STRING` apontando para o container efêmero do `Testcontainers`)
+- Dados de seed carregados: mínimo de 5 espetáculos, 3 usuários, 2 categorias e 1 teatro
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-03-P01 | Cadastro de espetáculo persiste no banco | Chamar `POST /api/catalogo/espetaculos` com payload completo e válido | Registro inserido na tabela `espetaculo` com `id` gerado; `status='em_cartaz'`; `popularidade=0.0`; `nota_media=0.0` | Linha verificada via `SELECT` direto no banco de teste |
+| IT-03-P02 | Atualização de preferências do usuário | Chamar `PUT /api/usuario/preferencias` com array de categorias e faixa de preço | Campo `perfil_preferencias` do usuário atualizado no PostgreSQL com as novas preferências em JSON | Campo verificado via query `SELECT perfil_preferencias FROM usuario WHERE id=$1` |
+| IT-03-P03 | Geração de recomendação persiste resultado | ML Engine publica resultado via RabbitMQ; Serviço de Recomendação consome e persiste | Registro na tabela `recomendacao` com `score_recomendacao > 0`, `tipo_algoritmo` preenchido e `referencia_origem_id` vinculando ao evento de telemetria | Linha verificada via `SELECT` com JOIN em `usuario` e `espetaculo` |
+| IT-03-P04 | Avaliação registrada atualiza nota_media do espetáculo | Inserir avaliação com nota 4.5; verificar `nota_media` do espetáculo antes e depois | `nota_media` do espetáculo atualizado para refletir a nova avaliação (média recalculada pelo Worker) | Campo `nota_media` verificado na tabela `espetaculo` após processamento |
+| IT-03-P05 | Consulta com filtros retorna subset correto | Chamar `GET /api/catalogo/espetaculos?categoria=musical&preco_max=100` | Apenas espetáculos da categoria "musical" com `preco_minimo ≤ 100` são retornados; nenhum espetáculo fora do filtro presente na lista | Nenhuma alteração de estado no banco |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-03-N01 | Violação de constraint NOT NULL | Tentar inserir espetáculo sem campo obrigatório `titulo` | HTTP 400; body `{ "error": "validation_failed", "field": "titulo" }`; nenhum registro inserido | Banco permanece consistente; rollback confirmado |
+| IT-03-N02 | Violação de chave estrangeira | Tentar inserir sessão com `espetaculo_id` inexistente | HTTP 400; body `{ "error": "foreign_key_violation" }`; nenhum registro inserido | Banco permanece consistente |
+| IT-03-N03 | Consulta com ID inexistente | Chamar `GET /api/catalogo/espetaculos/99999999` | HTTP 404; body `{ "error": "not_found", "resource": "espetaculo" }` | Nenhuma alteração de estado |
+| IT-03-N04 | Falha de conexão com banco | Forçar queda do container PostgreSQL e executar `GET /api/catalogo/espetaculos` | HTTP 503; mensagem de erro genérica (sem detalhes de infraestrutura); log interno com detalhe completo da exceção | Serviço tenta reconectar após 5 s; demais serviços permanecem operacionais |
+| IT-03-N05 | Inserção duplicada com email já cadastrado | Tentar registrar usuário com `email` já existente no banco | HTTP 409; body `{ "error": "conflict", "field": "email" }` | Nenhum registro duplicado inserido; constraint UNIQUE mantida |
+
+**Pós-condições gerais:** `Respawn` reseta todas as tabelas após cada teste; o container `Testcontainers` é destruído ao final da suite, sem resíduos em disco.
+
+**Método de validação dos resultados:**
+1. Verificar retorno HTTP e estrutura do body
+2. Executar `SELECT` direto no banco de teste via conexão de inspeção do `Testcontainers`
+3. Validar que constraints do banco (NOT NULL, FK, UNIQUE) foram aplicadas corretamente
+4. Conferir que nenhum dado de teste persiste após `Respawn`
+
+---
+
+#### IT-04 — Serviços SOA ↔ MongoDB: Registro de Telemetria Comportamental
+
+**Descrição:** Valida que os eventos de comportamento do usuário (cliques, visualizações, tempo de permanência) são registrados corretamente no MongoDB e que o ML Engine consegue lê-los para alimentar os algoritmos de recomendação.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Testcontainers.MongoDb` — instância isolada do MongoDB em container Docker
+- `MongoDB.Driver` — driver oficial C# para verificações diretas na coleção
+- `FluentAssertions` — validações expressivas em documentos BSON
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/services/usuario --filter "Category=Integration&Tag=MongoDB" \
+  --logger "console;verbosity=normal"
+```
+
+---
+
+**Pré-condições:**
+
+- Docker disponível para instanciar o container MongoDB via `Testcontainers`
+- Coleção `interacoes` vazia no banco de teste (garantido por `IAsyncLifetime.InitializeAsync`)
+- `user_id` de teste disponível (`"user_test_001"`)
+- `espetaculo_id` de teste disponível (`"espetaculo_test_001"`)
+- Pelo menos 3 tipos de interação definidos no enum: `visualizacao`, `clique`, `favorito`
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-04-P01 | Evento de visualização é persistido corretamente | O Serviço de Usuário recebe evento de visualização e chama repositório MongoDB | Documento inserido na coleção `interacoes` com campos: `user_id`, `espetaculo_id`, `tipo_interacao="visualizacao"`, `timestamp` (ISO 8601), `tempo_permanencia` | Documento verificado via `collection.FindAsync(filter)` |
+| IT-04-P02 | Múltiplos eventos do mesmo usuário são registrados independentemente | Enviar 10 eventos de clique para o mesmo espetáculo em sequência rápida | 10 documentos distintos inseridos na coleção `interacoes`; cada um com `timestamp` diferente | Count verificado via `collection.CountDocumentsAsync` |
+| IT-04-P03 | ML Engine lê últimas interações de um usuário | ML Engine consulta `interacoes` do `user_test_001` para gerar recomendação | Consulta retorna documentos ordenados por `timestamp DESC`; campos `espetaculo_id` e `tipo_interacao` presentes em todos | Nenhuma alteração de estado na coleção |
+| IT-04-P04 | Agregação de interações por espetáculo | Consultar total de visualizações do `espetaculo_test_001` | Pipeline de agregação MongoDB retorna contagem correta; resultado coerente com os documentos inseridos | Nenhuma alteração de estado |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-04-N01 | Evento com `espetaculo_id` nulo | Tentar inserir documento com `espetaculo_id: null` | Documento rejeitado pela validação do repositório antes de chegar ao MongoDB; HTTP 400 retornado ao chamador | Nenhum documento inserido; log de erro registrado |
+| IT-04-N02 | MongoDB indisponível durante escrita | Derrubar container MongoDB e enviar evento de interação | Evento enfileirado no RabbitMQ como fallback; HTTP 202 retornado ao frontend; evento será reprocessado quando MongoDB voltar | Evento persistido na fila RabbitMQ; log de aviso registrado |
+| IT-04-N03 | Consulta com `user_id` sem histórico | ML Engine solicita interações de usuário sem nenhum evento registrado | Array vazio retornado `[]`; serviço trata cold start ativando algoritmo k-NN baseado em popularidade | Nenhuma exceção lançada; fallback de cold start ativado |
+
+**Pós-condições gerais:** Container MongoDB destruído ao final da suite via `IAsyncLifetime.DisposeAsync`.
+
+**Método de validação dos resultados:**
+1. Verificar documentos inseridos via `FindAsync` com filtro exato
+2. Comparar `timestamp` dos documentos para garantir ordenação correta
+3. Confirmar que dados com campos inválidos não chegam à coleção MongoDB
+
+---
+
+#### IT-05 — Serviços SOA ↔ RabbitMQ ↔ ML Engine: Pipeline de Eventos Assíncronos
+
+**Descrição:** Valida o fluxo completo de publicação e consumo de eventos de telemetria via RabbitMQ, desde o Serviço de Usuário (publisher) até o ML Engine (consumer), incluindo o processamento do evento e a geração de recomendação resultante.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Testcontainers.RabbitMq` — instância isolada do RabbitMQ em container Docker
+- `RabbitMQ.Client` — SDK oficial para verificações diretas nas filas
+- `MassTransit.Testing` — utilitários de teste para publicação e consumo de mensagens
+- Pausa estratégica com `Task.Delay` para aguardar processamento assíncrono (máx. 5 s)
+
+**Instruções de execução:**
+```bash
+dotnet test src/backend/services --filter "Category=Integration&Tag=RabbitMQ" \
+  --timeout 30000
+```
+
+---
+
+**Pré-condições:**
+
+- Docker disponível para instanciar o container RabbitMQ via `Testcontainers`
+- Exchange `spotlight.telemetry` e filas `q.interacoes` e `q.recomendacoes` criadas no broker de teste
+- ML Engine configurado para consumir `q.interacoes` no ambiente de teste
+- Banco PostgreSQL de teste disponível para persistência do resultado da recomendação
+- Banco MongoDB de teste disponível para registro do evento de interação
+- Pelo menos 1 usuário e 5 espetáculos no banco de teste para que o algoritmo produza resultado
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-05-P01 | Evento de interação publicado chega ao ML Engine | Serviço de Usuário publica `InteracaoEvent { user_id, espetaculo_id, tipo="clique" }` na exchange `spotlight.telemetry`; aguardar até 5 s | ML Engine consome o evento da fila `q.interacoes`; evento registrado no MongoDB; recomendação gerada e publicada em `q.recomendacoes` | Coleção `interacoes` no MongoDB contém o documento; tabela `recomendacao` no PostgreSQL contém novo registro |
+| IT-05-P02 | Múltiplos eventos processados sem perda | Publicar 50 eventos em burst na exchange; aguardar 10 s | Todos os 50 eventos consumidos; 0 mensagens na fila após processamento; contagem no MongoDB = 50 | Todas as mensagens processadas e removidas da fila; verificado via Management API do RabbitMQ |
+| IT-05-P03 | Recomendação publicada pelo ML Engine é consumida pelo Serviço de Recomendação | ML Engine publica `RecomendacaoEvent` em `q.recomendacoes`; Serviço de Recomendação consome | Registro na tabela `recomendacao` com `score > 0` e `tipo_algoritmo` preenchido | Linha verificada no PostgreSQL de teste |
+| IT-05-P04 | Mensagem com dead-letter move para DLQ após 3 falhas | Configurar consumer para falhar intencionalmente; publicar 1 mensagem | Após 3 tentativas de reentrega, mensagem movida para `q.interacoes.dlq`; erro registrado em log | Mensagem disponível na DLQ para inspeção; sistema continua processando demais mensagens |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-05-N01 | RabbitMQ indisponível durante publicação | Derrubar container RabbitMQ e tentar publicar evento de interação | Serviço de Usuário retorna HTTP 202 ao frontend (aceita o evento); evento é salvo em buffer local (arquivo ou memória) para reenvio | Buffer de retry ativo; log de aviso `[RABBITMQ] broker_unavailable` registrado |
+| IT-05-N02 | Mensagem com schema inválido no payload | Publicar mensagem com `user_id` ausente na fila `q.interacoes` | ML Engine rejeita a mensagem; mensagem movida para DLQ; nenhuma recomendação gerada | DLQ contém a mensagem inválida; log de erro registrado com detalhes do schema |
+| IT-05-N03 | ML Engine indisponível | Parar o container do ML Engine e publicar 5 eventos | Mensagens acumuladas na fila `q.interacoes` (não processadas); ao reiniciar o ML Engine, mensagens são consumidas sem perda | Fila verificada via Management API durante a pausa; processamento retomado sem perda de dados |
+
+**Pós-condições gerais:** Containers RabbitMQ, PostgreSQL e MongoDB destruídos ao final da suite; nenhuma fila ou binding persiste entre execuções.
+
+**Método de validação dos resultados:**
+1. Verificar mensagens remanescentes na fila via RabbitMQ Management API (`GET /api/queues/%2F/q.interacoes`)
+2. Confirmar documentos no MongoDB via `CountDocumentsAsync`
+3. Confirmar registros no PostgreSQL via `SELECT count(*) FROM recomendacao WHERE data_geracao > now() - interval '1 minute'`
+4. Verificar DLQ após cenários negativos
+
+---
+
+#### IT-06 — App Mobile ↔ API Ticketeira: Redirecionamento para Compra de Ingressos (com VHS)
+
+**Descrição:** Valida que o link de compra de ingressos (`link_compra`) retornado pelo Serviço de Catálogo é válido, acessível e redireciona corretamente para a plataforma parceira de ticketing. O módulo VHS armazena as respostas da API da ticketeira para evitar chamadas reais durante os testes.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Microsoft.AspNetCore.Mvc.Testing`
+- **Módulo VHS** com cassetes em `tests/cassettes/ticketeira/`
+- `HttpClient` com seguimento de redirecionamentos desabilitado (`AllowAutoRedirect=false`) para verificar o `Location` header
+- `FluentAssertions` para validação de URLs e códigos HTTP
+
+**Instruções de execução:**
+```bash
+# Gravar cassetes (requer conectividade com a ticketeira):
+VHS_MODE=record dotnet test src/backend/services/catalogo \
+  --filter "Category=Integration&Tag=Ticketeira"
+
+# Executar com cassetes:
+dotnet test src/backend/services/catalogo \
+  --filter "Category=Integration&Tag=Ticketeira"
+```
+
+---
+
+**Pré-condições:**
+
+- Módulo VHS configurado no cliente HTTP nomeado `"ticketeira"` com TTL de 300 s
+- Cassete `ticketeira_sessao_disponivel.json` pré-gravado com resposta de disponibilidade válida
+- Cassete `ticketeira_sessao_indisponivel.json` pré-gravado com resposta de esgotamento
+- Espetáculo com sessão ativa e `link_compra` preenchido disponível no banco de teste
+- Espetáculo com sessão sem ingressos (`disponibilidade=0`) disponível no banco de teste
+
+---
+
+**Cenários Positivos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-06-P01 | Link de compra retornado é URL válida e acessível | Chamar `GET /api/catalogo/espetaculos/{id}/sessoes` e obter `link_compra`; fazer `HEAD` na URL com `AllowAutoRedirect=false`; VHS retorna cassete `ticketeira_sessao_disponivel.json` | HTTP 301 ou 302 no `HEAD`; header `Location` aponta para domínio da ticketeira parceira; URL bem formada (https, sem espaços) | VHS armazena resposta por 300 s; log `[VHS] cache_miss, storing response` registrado na primeira chamada |
+| IT-06-P02 | Campo `disponibilidade` reflete dados da ticketeira | Consultar disponibilidade via VHS cassete; verificar campo `disponibilidade` na resposta do catálogo | Campo `disponibilidade` > 0 quando cassete indica ingressos disponíveis; campo = 0 quando cassete indica esgotamento | Nenhuma alteração de estado no banco |
+| IT-06-P03 | VHS serve resposta em cache na segunda chamada idêntica | Chamar `GET /api/catalogo/espetaculos/{id}/sessoes` duas vezes com mesmo ID dentro do TTL | Segunda chamada usa cache VHS; log `[VHS] cache_hit=true` na segunda chamada; latência < 5 ms na segunda chamada | Cache válido por TTL restante |
+
+**Cenários Negativos:**
+
+| ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-06-N01 | API da Ticketeira retorna erro 500 | VHS retorna cassete `ticketeira_error_500.json` com resposta de falha interna | Serviço de Catálogo retorna HTTP 200 para o frontend com `disponibilidade=null` e `link_compra` preservado (não invalida o link pelo erro da ticketeira); log de warning registrado | Nenhuma alteração no catálogo; usuário pode tentar acessar o link diretamente |
+| IT-06-N02 | TTL do VHS expira e API da Ticketeira está indisponível | Configurar `VhsOptions.TtlSeconds=1`; aguardar expiração; ticketeira simulada como indisponível; nova chamada | HTTP 503; body `{ "error": "ticketeira_unavailable" }`; log de erro registrado | Nenhuma alteração no catálogo; erro exposto apenas no log interno, não ao usuário final |
+| IT-06-N03 | `link_compra` ausente no banco para uma sessão | Consultar sessão onde `link_compra IS NULL` no banco | HTTP 200 com campo `link_compra: null` na resposta; frontend deve exibir mensagem "venda não disponível online" | Nenhuma chamada à API da Ticketeira realizada; VHS não invocado |
+
+**Pós-condições gerais:** Cassetes VHS não são sobrescritos em modo padrão (apenas com `VHS_MODE=record`); nenhuma chamada real à API da ticketeira é feita durante a execução padrão.
+
+**Método de validação dos resultados:**
+1. Verificar se logs contêm `[VHS] cache_hit=true` na segunda chamada idêntica (IT-06-P03)
+2. Confirmar que URL no campo `link_compra` passa na validação de formato `Uri.IsWellFormedUriString`
+3. Verificar header `Location` no `HEAD` da URL com regex `^https://[a-zA-Z0-9.-]+\.(sympla|blueticket|ingresso)\.com\.br`
+4. Confirmar que nenhuma chamada HTTP real foi gerada para a ticketeira nos logs de rede (exceto quando `VHS_MODE=record`)
+
+---
+
+#### Abrangência dos Testes de Integração
+
+##### O que está coberto
+
+&emsp;O planejamento cobre as **seis fronteiras de integração críticas** da arquitetura do Spotlight, escolhidas com base na análise de risco e no mapeamento dos componentes definidos no Diagrama de Componentes UML (seção 5.2). A tabela abaixo correlaciona cada fronteira com os Requisitos Funcionais e Não Funcionais que ela valida diretamente:
+
+| Fronteira | RFs Cobertos | RNFs Cobertos | Justificativa |
+|---|---|---|---|
+| IT-01: API Gateway ↔ Serviços SOA | RF01, RF02, RF04, RF05, RF06, RF07, RF16 | RNF05 (segurança JWT), RNF08 (deploy independente) | Toda a comunicação do app passa pelo Gateway; falha aqui interrompe 100% das funcionalidades |
+| IT-02: API Gateway ↔ Supabase Auth | RF01, RF02 | RNF05 (JWT, HTTPS), RNF03 (disponibilidade) | Autenticação é pré-requisito para todas as funcionalidades personalizadas; VHS garante isolamento do teste |
+| IT-03: Serviços SOA ↔ PostgreSQL | RF03, RF04, RF07, RF08, RF09, RF10, RF12, RF16 | RNF01 (tempo de carregamento), RNF06 (200 usuários) | Banco relacional é a fonte de verdade para catálogo, usuários e recomendações |
+| IT-04: Serviços SOA ↔ MongoDB | RF11, RF12, RF13, RF14 | RNF09 (processamento assíncrono), RNF07 (logs) | Telemetria comportamental alimenta o motor de ML; perda de eventos degrada a qualidade das recomendações ao longo do tempo |
+| IT-05: RabbitMQ ↔ ML Engine | RF12, RF13, RF14, RF15 | RNF09 (100 eventos/s), RNF02 (recomendações em 2 s) | Desacoplamento assíncrono é o pilar de escalabilidade; falha aqui impede a geração de recomendações personalizadas |
+| IT-06: Serviço de Catálogo ↔ Ticketeira | RF07 | RNF01, RNF03 | Redirecionamento para compra é o ponto final da conversão; VHS isola a dependência externa |
+
+&emsp;Em termos de **cobertura de requisitos**, os testes de integração planejados cobrem diretamente 15 dos 16 Requisitos Funcionais (RF01–RF15 integralmente; RF16 parcialmente via IT-01-P04) e 8 dos 12 Requisitos Não Funcionais (RNF01, RNF02, RNF03, RNF05, RNF06, RNF07, RNF08, RNF09).
+
+&emsp;Em termos de **cobertura de cenários de falha**, cada fronteira possui pelo menos 3 cenários negativos, totalizando 22 cenários de falha planejados, endereçando as categorias: indisponibilidade de serviço externo, dados inválidos, violações de constraint, tokens expirados/adulterados e expiração de cache VHS.
+
+---
+
+##### O que não está coberto e por quê
+
+| Exclusão | Justificativa |
+|---|---|
+| Testes de integração ponta a ponta (E2E) com o app mobile | Cobertos pelos Testes Funcionais (seção 9.1), que já validam o fluxo completo da UI ao banco |
+| Performance sob carga das integrações (stress/soak) | Cobertos pelos Testes de RNFs (seção 9.2), especificamente RNF06 e RNF09, com ferramentas dedicadas (k6, JMeter) |
+| Integração com o Supabase Storage (imagens dos espetáculos) | Fora do escopo do MVP: leitura de assets estáticos não representa risco de falha sistêmica para as recomendações |
+| Integração com sistemas de analytics externos | Não implementado no MVP; planejado para fase posterior |
+| Validação da interface gráfica nas integrações | Responsabilidade dos Testes de Usabilidade (seção 9.3) |
+| Integração entre frontend React Native e API Gateway em dispositivos físicos | Validado pelos Testes Funcionais (seção 9.1) e Testes de Compatibilidade (RNF11) |
+
+---
+
+##### Justificativa do uso do módulo VHS
+
+&emsp;O VHS é obrigatório nas fronteiras IT-02 e IT-06 por três razões técnicas:
+
+1. **Determinismo:** Chamadas reais ao Supabase Auth ou à API da Ticketeira retornam dados não determinísticos (tokens com `exp` variável, disponibilidade de ingressos dinâmica). O VHS garante que o mesmo cassete produza o mesmo resultado em toda execução, tornando os testes reproduzíveis em CI/CD.
+
+2. **Isolamento:** A suite de integração não deve depender de conectividade externa ou de estado de serviços de terceiros. Um teste que falha por instabilidade da rede não é um teste de integração — é um teste de infraestrutura. O VHS elimina essa dependência.
+
+3. **Velocidade:** Chamadas reais ao Supabase Auth levam entre 200 ms e 800 ms por requisição. Com o VHS em cache-hit, a latência cai para menos de 5 ms, permitindo executar a suite completa em CI em menos de 60 segundos.
+
+&emsp;Para as fronteiras internas (IT-01, IT-03, IT-04, IT-05), o VHS não é utilizado porque os serviços são instanciados via `Testcontainers` no próprio ambiente de teste, garantindo isolamento e determinismo sem a necessidade de interceptar chamadas HTTP externas.
+
+---
+
+### 9.4.2 Resultados
+
+_Seção a ser preenchida após a execução dos testes planejados. Incluir: data de execução, versão do código testado, tabela de resultados por cenário (passou/falhou/bloqueado), evidências (logs e capturas de tela), defeitos encontrados e status de resolução._
+
+---
+
 # 10. Procedimentos de Implantação
 _conteúdo_
 
@@ -2975,4 +4183,3 @@ _conteúdo_
 
 # Referências
 _conteúdo_
-

@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   title: {
-    color: colors.text,
+    color: colors.textStrong,
     ...typography.title,
     fontSize: 24,
     lineHeight: 30,

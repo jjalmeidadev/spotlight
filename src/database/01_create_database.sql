@@ -1,20 +1,3 @@
-DROP TABLE IF EXISTS recomendacao         CASCADE;
-DROP TABLE IF EXISTS avaliacao            CASCADE;
-DROP TABLE IF EXISTS sessao               CASCADE;
-DROP TABLE IF EXISTS espetaculo_ator      CASCADE;
-DROP TABLE IF EXISTS espetaculo_categoria CASCADE;
-DROP TABLE IF EXISTS espetaculo           CASCADE;
-DROP TABLE IF EXISTS ator                 CASCADE;
-DROP TABLE IF EXISTS categoria            CASCADE;
-DROP TABLE IF EXISTS teatro               CASCADE;
-DROP TABLE IF EXISTS usuario              CASCADE;
-
-DROP TYPE IF EXISTS tipo_usuario_enum      CASCADE;
-DROP TYPE IF EXISTS status_espetaculo_enum CASCADE;
-
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP FUNCTION IF EXISTS public.handle_new_user();
-
 CREATE TYPE tipo_usuario_enum AS ENUM (
     'visitante',
     'cadastrado',
@@ -32,7 +15,7 @@ CREATE TABLE usuario (
     nome                VARCHAR(150)        NOT NULL,
     email               VARCHAR(255)        NOT NULL UNIQUE,
     data_nascimento     DATE,
-    localizacao         VARCHAR(150),
+    localizacao         JSONB,
     data_cadastro       TIMESTAMP           NOT NULL DEFAULT NOW(),
     tipo_usuario        tipo_usuario_enum   NOT NULL DEFAULT 'cadastrado',
     nivel_acesso        JSONB               NOT NULL DEFAULT '{}'::JSONB,
@@ -62,11 +45,17 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-    INSERT INTO public.usuario (id_usuario, nome, email)
+    INSERT INTO public.usuario (
+        id_usuario,
+        nome,
+        email,
+        data_nascimento
+    )
     VALUES (
         NEW.id,
         COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
-        NEW.email
+        NEW.email,
+        NULLIF(NEW.raw_user_meta_data->>'dataNascimento', '')::DATE
     );
     RETURN NEW;
 END;
