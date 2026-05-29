@@ -456,6 +456,229 @@ Para evitar reincidência dos problemas, a Sprint 4 deve iniciar com dois contro
 
 ---
 
+### 2.3.4 Planejamento da Sprint 4
+
+#### Objetivo da Sprint 4
+
+A Sprint 4 tem como objetivo consolidar a evolução técnica da solução a partir dos aprendizados da Sprint 3, avançando simultaneamente em quatro frentes principais: evolução do banco de dados, desenvolvimento incremental do produto, execução sistemática dos testes planejados e continuidade da gestão evolutiva do projeto. O ciclo deve demonstrar progresso significativo em relação à sprint anterior, com API de recomendação funcional, modelo de recomendação incrementado, ambiente dockerizado, evidências de desempenho do banco, testes executados e documentação atualizada.
+
+Esta sprint também incorpora diretamente as ações de melhoria identificadas na retrospectiva da Sprint 3. Por isso, o planejamento foi estruturado com maior granularidade nas tasks, dependências explícitas, checkpoints diários, início antecipado da apresentação e controle de capacidade para evitar centralização de trabalho em poucas pessoas.
+
+#### Capacidade Planejada
+
+Para esta sprint, a equipe adotou a métrica de t-shirt sizing definida pelo projeto:
+
+| Tamanho | Tempo estimado |
+|---------|----------------|
+| P       | Até 30 minutos |
+| M       | 30 a 60 minutos |
+| G       | 60 a 120 minutos |
+
+Considerando o limite superior de cada faixa para fins de planejamento, a Sprint 4 foi estruturada com 58 tasks e carga total mínima de 84 horas:
+
+| Tamanho | Quantidade de tasks | Carga considerada |
+|---------|---------------------|-------------------|
+| P       | 12                  | 6h                |
+| M       | 14                  | 14h               |
+| G       | 32                  | 64h               |
+| **Total** | **58**            | **84h**           |
+
+Como o grupo possui 7 integrantes, cada membro deve assumir ao menos 12 horas ao longo da sprint. A alocação nominal das tasks será feita durante a execução, respeitando o limite mínimo de capacidade por pessoa e evitando que entregas críticas fiquem concentradas em um único integrante.
+
+#### Estratégia de Priorização
+
+O backlog da Sprint 4 foi organizado para manter os quatro artefatos em andamento ao longo dos seis dias de desenvolvimento: 02/06, 03/06, 08/06, 09/06, 10/06 e 11/06. A estratégia adotada segue a lógica de ondas de execução:
+
+| Dia | Data | Foco principal | Objetivo operacional |
+|-----|------|----------------|----------------------|
+| 1 | 02/06 | Fundação da sprint | Definir contratos, revisar arquitetura, mapear melhorias do banco, estruturar testes e iniciar gestão da apresentação. |
+| 2 | 03/06 | Camada de apoio | Implementar bases técnicas que destravam desenvolvimento, documentação, padrões, índices e rastreabilidade. |
+| 3 | 08/06 | Núcleo do desenvolvimento | Implementar API de recomendação, modelo incrementado, testes de banco e testes automatizados iniciais. |
+| 4 | 09/06 | Integração, frontend e deploy | Integrar frontend e backend, dockerizar solução e iniciar validações em ambiente real. |
+| 5 | 10/06 | Evidências e revisão geral | Consolidar documentação, análise ética, diagramas, testes de usabilidade, logs e versão preliminar dos slides. |
+| 6 | 11/06 | Fechamento da sprint | Finalizar documentação, vídeo demonstrativo, retrospectiva da Sprint 4 e planejamento da Sprint 5. |
+
+Essa organização responde diretamente aos pontos fracos da Sprint 3. A apresentação passa a ter tasks desde o primeiro dia; as dependências ficam visíveis antes da execução; as tasks foram quebradas em unidades menores; e a capacidade mínima por integrante foi considerada desde o planejamento.
+
+#### Backlog Priorizado e Sequenciado
+
+##### Bloco 1 — Evolução do Banco de Dados
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T1 | Mapear melhorias necessárias no banco a partir dos feedbacks da Sprint 3 | M | Alta |
+| T2 | Revisar estrutura atual do `create_database.sql` | P | Alta |
+| T3 | Atualizar tabelas e restrições no `create_database.sql` | G | Alta |
+| T4 | Identificar consultas críticas para otimização | M | Alta |
+| T5 | Criar índices otimizados no banco | G | Alta |
+| T6 | Ajustar queries com base nos índices criados | G | Alta |
+| T7 | Executar `EXPLAIN ANALYZE` nas consultas principais | G | Alta |
+| T8 | Preparar massa de dados para teste de carga | M | Média |
+| T9 | Executar teste de carga no banco | G | Alta |
+| T10 | Atualizar `initial_data.sql` conforme mudanças estruturais | M | Alta |
+| T11 | Implementar rastreabilidade de transações no banco | G | Alta |
+| T12 | Atualizar dicionário de dados com índices, campos e rastreabilidade | G | Alta |
+| T13 | Atualizar README do banco com configuração, otimizações e evidências | G | Alta |
+| T14 | Revisar artefato de banco antes do Pull Request | P | Alta |
+
+##### Bloco 2 — Desenvolvimento do Projeto
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T15 | Revisar arquitetura de diretórios do projeto | M | Alta |
+| T16 | Atualizar documentação da arquitetura no `Projeto.md` | G | Alta |
+| T17 | Atualizar diagrama de arquitetura de codificação | M | Alta |
+| T18 | Revisar padrões de codificação adotados no projeto | M | Alta |
+| T19 | Atualizar `GuiaPadroesDesenvolvimento.md` | G | Alta |
+| T20 | Documentar padrão criacional aplicado | M | Média |
+| T21 | Documentar padrão comportamental aplicado | M | Média |
+| T22 | Definir contrato JSON da API de recomendação | G | Alta |
+| T23 | Implementar endpoint base da API de recomendação | G | Alta |
+| T24 | Implementar service de recomendação | G | Alta |
+| T25 | Incrementar modelo de classificação de recomendação | G | Alta |
+| T26 | Integrar modelo incrementado à API | G | Alta |
+| T27 | Atualizar Swagger com API de recomendação | M | Alta |
+| T28 | Implementar testes unitários do service de recomendação | G | Alta |
+| T29 | Documentar estratégia de TDD, cobertura e resultados | M | Alta |
+| T30 | Preparar frontend para consumir recomendação | G | Alta |
+| T31 | Implementar exibição de recomendações no frontend | G | Alta |
+| T32 | Validar fluxo frontend-backend da recomendação | G | Alta |
+| T33 | Documentar features implementadas na Sprint 4 e gravar vídeo demonstrativo | G | Alta |
+| T34 | Elaborar análise ética com base no framework IA4People | G | Média |
+| T35 | Criar diagrama de implantação da infraestrutura | G | Alta |
+| T36 | Dockerizar aplicação | G | Alta |
+| T37 | Publicar ambiente em algum servidor | G | Alta |
+| T38 | Validar Swagger no ambiente publicado | P | Alta |
+| T39 | Documentar instruções de execução e deploy | M | Alta |
+
+##### Bloco 3 — Execução de Testes
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T40 | Revisar planejamento de testes da Sprint 3 | M | Alta |
+| T41 | Definir ferramentas e bibliotecas de teste | M | Alta |
+| T42 | Detalhar casos de teste funcionais | G | Alta |
+| T43 | Executar testes de funcionalidade | G | Alta |
+| T44 | Implementar testes automatizados de integração | G | Alta |
+| T45 | Implementar testes automatizados de regras de negócio | G | Alta |
+| T46 | Executar testes de RNF de desempenho | G | Média |
+| T47 | Executar testes de RNF de segurança | G | Média |
+| T48 | Executar testes de usabilidade | G | Média |
+| T49 | Organizar logs de execução dos testes | P | Alta |
+| T50 | Documentar abrangência dos testes | M | Alta |
+| T51 | Consolidar seção de testes no `Projeto.md` | G | Alta |
+| T52 | Revisar scripts de teste conforme padrões de codificação | P | Média |
+
+##### Bloco 4 — Gestão de Projetos Evolutiva
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T53 | Criar task inicial da apresentação no Kanban | P | Alta |
+| T54 | Montar roteiro preliminar dos slides | P | Alta |
+| T55 | Criar versão preliminar dos slides | G | Alta |
+| T56 | Realizar ensaio e revisão da apresentação | G | Alta |
+| T57 | Atualizar retrospectiva da Sprint 4 no `GestaoProjeto.md` | P | Alta |
+| T58 | Planejar Sprint 5 no `GestaoProjeto.md` com t-shirt sizing | P | Alta |
+
+#### Matriz de Dependências Críticas
+
+| Task dependente | Depende de | Justificativa |
+|-----------------|------------|---------------|
+| T3, T4 | T1, T2 | A evolução do banco depende do mapeamento das melhorias e revisão do script atual. |
+| T5, T6, T7 | T3, T4 | Índices, queries e planos de execução dependem do banco atualizado e das consultas críticas definidas. |
+| T9 | T8 | O teste de carga depende de massa de dados preparada. |
+| T13 | T7, T9, T10, T12 | O README do banco deve consolidar scripts, evidências, dicionário e testes. |
+| T16, T17, T19 | T15, T18 | A documentação técnica depende da revisão da arquitetura e dos padrões. |
+| T23, T24, T25, T26 | T22 | Endpoint, service, modelo e integração dependem do contrato JSON da API de recomendação. |
+| T27, T28, T30, T31, T32 | T23, T24, T25, T26 | Swagger, testes unitários, frontend e validação integrada dependem da API funcional. |
+| T36, T37 | T13, T23, T31 | Deploy depende de banco documentado, backend funcional e frontend integrado. |
+| T43, T46, T47 | T32, T37 | Testes funcionais e RNFs dependem do fluxo integrado e do ambiente publicado. |
+| T48 | T31 | Testes de usabilidade dependem da interface com fluxo principal disponível. |
+| T51 | T43, T44, T45, T46, T47, T48, T49, T50 | Consolidação dos testes depende da execução, logs e análise de abrangência. |
+| T55, T56 | T33, T51 | Slides e ensaio dependem das evidências de desenvolvimento e testes. |
+| T57, T58 | T14, T33, T51, T56 | Retrospectiva e planejamento da Sprint 5 dependem do fechamento dos artefatos e da apresentação revisada. |
+
+#### Cronograma Priorizado por Dia
+
+##### Dia 1 — 02/06 — Fundação da Sprint
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T1, T2, T3, T4 |
+| Desenvolvimento do Projeto | T15, T18, T22 |
+| Execução de Testes | T40, T41 |
+| Gestão de Projetos | T53, T54 |
+
+Checkpoint do dia: T3, T15, T22, T40 e T41 devem estar concluídas, pois banco revisado, arquitetura validada, contrato JSON e estratégia de testes destravam as próximas ondas.
+
+##### Dia 2 — 03/06 — Camada de Apoio
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T5, T10, T11, T12 |
+| Desenvolvimento do Projeto | T16, T17, T19, T20, T21, T23 |
+| Execução de Testes | T42 |
+| Gestão de Projetos | Revisão entre Kanban, documentação e roteiro da apresentação |
+
+Checkpoint do dia: índices, rastreabilidade, contratos, padrões e endpoint base de recomendação devem estar disponíveis para permitir implementação funcional no Dia 3.
+
+##### Dia 3 — 08/06 — Núcleo do Desenvolvimento
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T6, T7, T8, T9 |
+| Desenvolvimento do Projeto | T24, T25, T26, T27, T28 |
+| Execução de Testes | T44, T45 |
+| Gestão de Projetos | Atualização das evidências parciais nos slides e checagem de centralização |
+
+Checkpoint do dia: API de recomendação funcional, modelo integrado, evidências de desempenho do banco em andamento ou finalizadas e testes automatizados iniciais implementados.
+
+##### Dia 4 — 09/06 — Integração, Frontend e Deploy
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T13 |
+| Desenvolvimento do Projeto | T29, T30, T31, T32, T36, T37 |
+| Execução de Testes | T43, T46, T47 |
+| Gestão de Projetos | Consolidação da primeira versão dos slides com evidências disponíveis |
+
+Checkpoint do dia: aplicação dockerizada e fluxo de recomendação validado entre frontend e backend. A partir desse ponto, novas features devem ser evitadas para preservar tempo de testes e documentação.
+
+##### Dia 5 — 10/06 — Evidências e Revisão Geral
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T14 |
+| Desenvolvimento do Projeto | T33, T34, T35, T38, T39 |
+| Execução de Testes | T48, T49, T50, T52 |
+| Gestão de Projetos | T55, T56 |
+
+Checkpoint do dia: código congelado, slides em versão apresentável, evidências organizadas, análise ética documentada e testes de usabilidade registrados.
+
+##### Dia 6 — 11/06 — Fechamento da Sprint
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | Revisão final de scripts, README e versionamento |
+| Desenvolvimento do Projeto | Revisão final do Projeto.md, Swagger, deploy e vídeo demonstrativo |
+| Execução de Testes | T51 e validação final de logs, ferramentas, casos e abrangência |
+| Gestão de Projetos | T57, T58 e revisão final dos slides |
+
+Checkpoint do dia: entrega fechada, documentação revisada, vídeo pronto, servidor validado, Swagger acessível, testes documentados, retrospectiva da Sprint 4 registrada e planejamento da Sprint 5 incluído no `GestaoProjeto.md`.
+
+#### Alinhamento com a Gestão de Configuração
+
+Todas as tasks da Sprint 4 devem ser registradas no quadro Kanban com descrição clara, DoR, DoD, tamanho, prioridade e dependências. Como melhoria em relação à Sprint 3, a documentação das tasks deve permitir entendimento do escopo mesmo fora do card, reduzindo a dependência exclusiva do Kanban para compreender o trabalho planejado.
+
+Para esta sprint, ficam estabelecidas as seguintes diretrizes adicionais:
+
+- Cada integrante deve assumir no mínimo 12 horas de trabalho ao longo da sprint, respeitando a capacidade mínima planejada.
+- A apresentação deve ser acompanhada desde o Dia 1, com roteiro, versão preliminar e ensaio registrados no fluxo.
+- Pull Requests devem ser abertos de forma incremental e revisados continuamente, mantendo o SLA interno de revisão adotado na Sprint 3.
+- O deploy deve ser tratado como entrega crítica e não deve ser postergado para o último dia.
+- O `Projeto.md`, o `GuiaPadroesDesenvolvimento.md`, o README do banco e o `GestaoProjeto.md` devem ser atualizados em paralelo ao desenvolvimento, evitando concentração documental no fechamento da sprint.
+- Evidências de testes, Swagger, vídeo demonstrativo, scripts SQL e logs de execução devem ser versionados ou referenciados antes da entrega final.
+
 ## 2.4 Sprint 4  
 Nota: Insira informações sobre mudanças realizadas.
 
