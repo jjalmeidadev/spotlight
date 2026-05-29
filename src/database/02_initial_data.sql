@@ -680,6 +680,49 @@ INSERT INTO recomendacao (
     ('00000000-0000-0000-0000-000000000025', 1, 'k-NN', 0.891, 'Elis, a Musical apontada por similaridade com perfil de shows musicais.', FALSE, NULL)
 ON CONFLICT DO NOTHING;
 
+INSERT INTO similaridade_item (
+    id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo, score_similaridade
+) VALUES
+    -- Similares de "Elis, a Musical" (1) — biografias musicais brasileiras.
+    (1, 6, 'k-NN', 0.8945),
+    (1, 9, 'k-NN', 0.8612),
+    (1, 3, 'k-NN', 0.7421),
+    -- Similares de "A Novica Rebelde" (2) — musicais clássicos.
+    (2, 3, 'k-NN', 0.8732),
+    (2, 8, 'k-NN', 0.8104),
+    (2, 15, 'k-NN', 0.7896),
+    -- Similares de "Mamma Mia!" (3) — musicais leves/populares.
+    (3, 8, 'k-NN', 0.8821),
+    (3, 15, 'k-NN', 0.8503),
+    (3, 2, 'k-NN', 0.8312),
+    -- Similares de "Pixar in Concert" (5) — concertos/famílias.
+    (5, 9, 'k-NN', 0.7615),
+    (5, 3, 'k-NN', 0.6932),
+    -- Similares de "Ayrton Senna - O Musical" (6) — biografias musicais.
+    (6, 1, 'k-NN', 0.8945),
+    (6, 9, 'k-NN', 0.8214),
+    -- Similares de "Romeu e Julieta" (7) — dramaturgia clássica.
+    (7, 12, 'k-NN', 0.8123),
+    (7, 11, 'k-NN', 0.7842),
+    -- Similares de "Hairspray" (8) — musicais populares.
+    (8, 3, 'k-NN', 0.8821),
+    (8, 15, 'k-NN', 0.8456),
+    (8, 2, 'k-NN', 0.7912),
+    -- Similares de "Clube da Esquina" (9) — música popular brasileira.
+    (9, 1, 'k-NN', 0.8612),
+    (9, 6, 'k-NN', 0.8214),
+    -- Similares de "Morte e Vida Severina" (11) — dramaturgia brasileira.
+    (11, 12, 'k-NN', 0.8421),
+    (11, 7, 'k-NN', 0.7842),
+    -- Similares de "A Cor Púrpura" (12) — dramas musicais.
+    (12, 11, 'k-NN', 0.8421),
+    (12, 7, 'k-NN', 0.8123),
+    (12, 8, 'k-NN', 0.7456),
+    -- Similares de "Hairspray" (15 — entrada extra) — entretenimento musical.
+    (15, 3, 'k-NN', 0.8503),
+    (15, 8, 'k-NN', 0.8456)
+ON CONFLICT (id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo) DO NOTHING;
+
 UPDATE espetaculo
 SET nota_media = sub.media
 FROM (

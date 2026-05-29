@@ -3608,15 +3608,146 @@ _conteúdo_
 **Nota:** Insira uma explicação de entregas em cada Sprint.
 
 ## 8.3.1 Sprint 3
-&emsp;A Sprint 3 concentrou a primeira entrega funcional da experiência de catálogo no frontend, consolidando a base visual da solução e validando a distribuição dos componentes que o usuário vê na tela principal.
 
-### Entrega incremental da tela de catálogo
+A Sprint 3 entregou o **esqueleto da arquitetura SOA** e as primeiras features
+ponta-a-ponta do produto: o usuário consegue se cadastrar, escolher
+preferências, navegar pelo catálogo, abrir os detalhes de um espetáculo,
+consultar recomendações e, no painel administrativo, gerir o catálogo. O
+backend foi estruturado em quatro microsserviços por trás de um API Gateway,
+com contratos JSON consolidados em OpenAPI 3.0.3.
+
+### Arquitetura entregue
+
+- **API Gateway** (YARP, porta 5000): ponto único de entrada, configurado para
+  encaminhar `/catalogo/*`, `/usuario/*`, `/recomendacao/*` e
+  `/geolocalizacao/*` para os serviços de negócio.
+- **Quatro serviços .NET 9 / ASP.NET Core** (portas 5001–5004), organizados em
+  camadas `presentation` / `application` / `domain` / `infrastructure`.
+- **PostgreSQL via Supabase**, acessado com **Npgsql (SQL puro)** — sem ORM,
+  por decisão de transparência sobre o SQL executado e por aproveitar Row
+  Level Security do Supabase Auth.
+- **Autenticação JWT do Supabase** com três níveis (`visitante`, `cadastrado`,
+  `administrador`) e checagem de permissão por rota.
+- **Swagger UI** ativo em todos os serviços durante o ambiente de
+  desenvolvimento; especificação consolidada em
+  [`src/backend/contracts/openapi.json`](../src/backend/contracts/openapi.json)
+  e descrita em
+  [`src/backend/contracts/api-contracts.md`](../src/backend/contracts/api-contracts.md).
+- **Health checks** em todos os serviços: `/health` (liveness) e
+  `/health/ready` (readiness que testa a conexão com o Postgres).
+
+### Features de backend
+
+#### Serviço de Catálogo (11 rotas)
+
+Espinha dorsal de leitura/escrita do catálogo. Implementa as operações
+públicas de descoberta (espetáculos, categorias, teatros, sessões e
+avaliações) e as operações de gestão restritas ao administrador.
+
+| Método | Rota | Acesso |
+|---|---|---|
+| GET    | `/catalogo/espetaculos`                       | Público |
+| GET    | `/catalogo/espetaculos/{id}`                  | Público |
+| POST   | `/catalogo/espetaculos`                       | Administrador |
+| PUT    | `/catalogo/espetaculos/{id}`                  | Administrador |
+| DELETE | `/catalogo/espetaculos/{id}`                  | Administrador |
+| GET    | `/catalogo/espetaculos/{id}/sessoes`          | Público |
+| GET    | `/catalogo/espetaculos/{id}/avaliacoes`       | Público |
+| POST   | `/catalogo/espetaculos/{id}/avaliacoes`       | Cadastrado |
+| GET    | `/catalogo/categorias`                        | Público |
+| GET    | `/catalogo/teatros`  · `GET /catalogo/teatros/{id}` | Público |
+
+#### Serviço de Usuário (6 rotas)
+
+Gestão do perfil próprio do usuário autenticado: dados básicos, preferências
+declaradas (alimentadas pelo onboarding) e histórico de avaliações. Inclui a
+rota de atualização de localização consentida, integrada à geolocalização.
+
+| Método | Rota | Acesso |
+|---|---|---|
+| GET    | `/usuario/me`                | Cadastrado |
+| PUT    | `/usuario/me`                | Cadastrado |
+| PUT    | `/usuario/me/localizacao`    | Cadastrado |
+| GET    | `/usuario/me/preferencias`   | Cadastrado |
+| PUT    | `/usuario/me/preferencias`   | Cadastrado |
+| GET    | `/usuario/me/avaliacoes`     | Cadastrado |
+
+#### Serviço de Geolocalização (2 rotas)
+
+Consome o **OpenStreetMap/Nominatim** para geocodificação direta e reversa.
+Suporta o consentimento de localização do usuário (rota `PUT /usuario/me/localizacao`)
+e habilita filtros geográficos sem dependência de billing proprietário.
+
+| Método | Rota | Acesso |
+|---|---|---|
+| GET | `/geolocalizacao/geocoding`         | Público |
+| GET | `/geolocalizacao/geocoding/reverse` | Público |
+
+#### Serviço de Recomendação (2 rotas)
+
+Lê predições pré-processadas pelo Motor de ML. A rota `/me` retorna
+sugestões personalizadas do usuário autenticado (tabela `recomendacao`,
+protegida por RLS), e a rota `/similares` retorna similaridade item-item
+global a partir da tabela `similaridade_item` (leitura pública, populada em
+batch pelo k-NN).
+
+| Método | Rota | Acesso |
+|---|---|---|
+| GET | `/recomendacao/me`                                | Cadastrado |
+| GET | `/recomendacao/espetaculos/{id}/similares`        | Público |
+
+### Features de frontend (React Native)
+
+O aplicativo foi estruturado seguindo **MVVM** (Model · View · ViewModel),
+com os ViewModels expostos como hooks (`useXxxViewModel`).
+
+| Tela | Arquivo | Estado |
+|---|---|---|
+| Login                          | `LoginView.tsx`                   | Integrada com `/usuario` |
+| Cadastro                       | `CadastroView.tsx`                | Integrada com `/usuario` |
+| Carregamento (splash)          | `CarregamentoView.tsx`            | Standalone |
+| Seleção de preferências        | `PreferenceSelectionScreen.tsx`   | Integrada com `/usuario/me/preferencias` |
+| Catálogo                       | `CatalogView.tsx`                 | Implementada (dados mockados) |
+| Detalhes do espetáculo         | `DetalhesView.tsx`                | Integrada com `/catalogo/espetaculos/{id}` |
+| Dashboard do administrador     | `AdminDashboardScreen.tsx`        | Integrada com `/catalogo` (admin) |
+
+#### Entrega incremental da tela de catálogo
 
 &emsp;A tela de catálogo foi implementada como uma composição de componentes reutilizáveis em React Native, organizada para manter o alinhamento com o padrão MVVM. O componente `CatalogView` atua como orquestrador da tela e consome os dados produzidos por `useCatalogViewModel`, que centraliza os assets mockados, as opções de filtro, os blocos de seções e o nome do usuário exibido no cabeçalho.
 
 &emsp;O topo da tela é composto por `CatalogHero`, que exibe a imagem principal do espetáculo, a saudação com o perfil e o CTA de compra. Sobre ele, `HeroFloatingArtwork` mantém o elemento visual flutuante do banner. A área principal de conteúdo é encapsulada em `CatalogContentShell`, que organiza o fundo branco, a curva superior, o logotipo da marca e o restante da hierarquia da página.
 
 &emsp;Abaixo do shell, a interface expõe `SearchBar` e `FilterDropdown` como controles de refinamento. As trilhas de conteúdo são apresentadas por `CatalogRail`, que reutiliza `SectionTitle` e `CatalogPosterCard` para cada conjunto de espetáculos. Esse arranjo reduz duplicação e facilita a expansão da tela para novas seções sem alterar a estrutura principal.
+
+### Banco de dados
+
+Schema relacional com **12 tabelas** (`usuario`, `espetaculo`, `categoria`,
+`ator`, `teatro`, `sessao`, `avaliacao`, `recomendacao`,
+`similaridade_item`, `espetaculo_categoria`, `espetaculo_ator` e
+`auth.users` do Supabase). RLS habilitada em todas as tabelas com políticas
+de leitura pública (catálogo) ou por dono (`auth.uid() = id_usuario`, para
+`usuario` e `recomendacao`). Dataset semeado em `02_initial_data.sql` cobre
+o catálogo completo do MVP, avaliações simuladas, recomendações e
+similaridade item-item suficientes para validar as rotas de leitura.
+
+### Desvios do plano (escopo migrado para a Sprint 4)
+
+- **Integração da tela de catálogo com o backend:** o `CatalogView` já está
+  roteado no `App.js` e renderiza os componentes finais, mas ainda consome
+  dados do `useCatalogViewModel` em formato mockado. O consumo real das
+  rotas `/catalogo/espetaculos` (com filtros e paginação) entra na Sprint 4.
+- **Testes unitários por UseCase/Service:** a Sprint 3 entregou apenas
+  testes de **integração do esqueleto** (`HealthEndpointsTests` em cada
+  serviço, validando que sobem, respondem `/health` e tratam ausência de
+  banco). A cobertura unitária dos UseCases — necessária para regressões
+  finas — entra na Sprint 4.
+- **Pipeline real de ML para popular `similaridade_item`:** a tabela e a
+  rota `/similares` já estão funcionais lendo de seed estático; o batch
+  k-NN do **Motor de ML** que repopulará a tabela em produção é entrega da
+  Sprint 4.
+- **Rate limiting e validação completa de JWT no Gateway:** o YARP está
+  encaminhando, mas as políticas de limite por usuário e o cache de chaves
+  públicas do Supabase ficam para a Sprint 4.
 
 ## 8.3.2 Sprint 4
 _conteúdo_
