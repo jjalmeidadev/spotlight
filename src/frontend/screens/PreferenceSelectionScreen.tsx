@@ -10,8 +10,6 @@ import {
   View,
 } from 'react-native';
 
-import { Chip } from '@/frontend/components/Chip';
-import { colors, spacing, typography } from '@/frontend/theme';
 import { usePreferenceSelectionViewModel } from '@/frontend/viewmodels/usePreferenceSelectionViewModel';
 
 const preferenceIcon = require('../../../documentos/img/preferential_icon.png');
@@ -36,7 +34,7 @@ export default function PreferenceSelectionScreen({ onComplete }: PreferenceSele
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.surface} />
+      <StatusBar barStyle="light-content" backgroundColor="#0A0A0A" />
 
       <View style={styles.container}>
         <ScrollView
@@ -61,10 +59,9 @@ export default function PreferenceSelectionScreen({ onComplete }: PreferenceSele
 
               <View style={styles.genreGroup}>
                 {viewModel.genres.map((genre) => (
-                  <Chip
+                  <PreferenceOption
                     key={genre.id}
                     label={genre.label}
-                    tone="dark"
                     active={viewModel.selectedGenreIds.includes(genre.id)}
                     onPress={() => viewModel.toggleGenre(genre.id)}
                   />
@@ -86,10 +83,9 @@ export default function PreferenceSelectionScreen({ onComplete }: PreferenceSele
 
               <View style={styles.priceGroup}>
                 {viewModel.priceRanges.map((priceRange) => (
-                  <Chip
+                  <PreferenceOption
                     key={priceRange.id}
                     label={priceRange.label}
-                    tone="dark"
                     active={viewModel.selectedPriceRangeId === priceRange.id}
                     onPress={() => viewModel.selectPriceRange(priceRange.id)}
                   />
@@ -132,110 +128,160 @@ export default function PreferenceSelectionScreen({ onComplete }: PreferenceSele
   );
 }
 
+type PreferenceOptionProps = {
+  active: boolean;
+  label: string;
+  onPress: () => void;
+};
+
+function PreferenceOption({ active, label, onPress }: PreferenceOptionProps) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.option, active && styles.optionActive, pressed && styles.pressed]}
+    >
+      <Text style={[styles.optionLabel, active && styles.optionLabelActive]}>{label}</Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: '#0A0A0A',
   },
   container: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: '#0A0A0A',
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.xxl,
+    paddingHorizontal: 16,
+    paddingTop: 42,
     paddingBottom: 104,
   },
   title: {
-    color: colors.textStrong,
-    ...typography.title,
-    fontSize: 36,
-    lineHeight: 42,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
+    color: '#FFFFFF',
+    fontFamily: 'Gotham-Bold',
+    fontSize: 30,
+    fontWeight: '700',
+    letterSpacing: 1.8,
+    lineHeight: 36,
+    marginBottom: 18,
+    textTransform: 'uppercase',
   },
   stepContent: {
     alignItems: 'center',
     width: '100%',
   },
   stepDescription: {
-    color: colors.textStrong,
-    ...typography.subtitle,
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-    maxWidth: 304,
+    alignSelf: 'flex-start',
+    color: 'rgba(255,255,255,0.68)',
+    fontFamily: 'Gotham-Book',
+    fontSize: 14,
+    fontWeight: '300',
+    lineHeight: 20,
+    marginBottom: 18,
+    maxWidth: 324,
   },
   stepIcon: {
-    width: 92,
-    height: 92,
-    marginBottom: spacing.xl,
+    height: 84,
+    marginBottom: 24,
+    tintColor: '#E8420A',
+    width: 84,
   },
   priceGroup: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
-    columnGap: spacing.md,
-    rowGap: spacing.lg,
+    gap: 10,
+    justifyContent: 'flex-start',
+    width: '100%',
   },
   genreGroup: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 10,
+    justifyContent: 'flex-start',
+    width: '100%',
+  },
+  option: {
+    alignItems: 'center',
+    borderColor: 'rgba(255,255,255,0.16)',
+    borderRadius: 6,
+    borderWidth: 1,
+    flexBasis: '48%',
+    flexGrow: 1,
     justifyContent: 'center',
-    columnGap: spacing.lg,
-    rowGap: spacing.xxxl,
-    paddingHorizontal: spacing.sm,
+    minHeight: 42,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+  },
+  optionActive: {
+    backgroundColor: '#E8420A',
+    borderColor: '#E8420A',
+  },
+  optionLabel: {
+    color: 'rgba(255,255,255,0.72)',
+    fontFamily: 'Gotham-Book',
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 16,
+  },
+  optionLabelActive: {
+    color: '#FFFFFF',
   },
   footer: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: spacing.xl,
+    bottom: 20,
     alignItems: 'center',
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: 16,
   },
   onboardingIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    columnGap: spacing.xs,
-    marginBottom: spacing.md,
+    columnGap: 7,
+    marginBottom: 14,
   },
   onboardingBar: {
     width: 56,
     height: 5,
-    borderRadius: 999,
+    borderRadius: 2,
   },
   onboardingBarActive: {
-    backgroundColor: colors.textStrong,
+    backgroundColor: '#E8420A',
   },
   onboardingBarInactive: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: colors.textStrong,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   continueButton: {
-    minHeight: 28,
-    minWidth: 148,
-    borderRadius: 999,
     alignItems: 'center',
+    backgroundColor: '#E8420A',
+    borderRadius: 6,
+    height: 52,
     justifyContent: 'center',
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.lg,
+    width: '100%',
   },
   continueButtonDisabled: {
     opacity: 0.45,
   },
   continueButtonPressed: {
     opacity: 0.82,
-    transform: [{ scale: 0.99 }],
   },
   continueLabel: {
-    color: colors.text,
-    ...typography.caption,
-    fontFamily: typography.fontFamily.bold,
-    fontSize: 11,
+    color: '#FFFFFF',
+    fontFamily: 'Gotham-Bold',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 1.56,
+    textTransform: 'uppercase',
+  },
+  pressed: {
+    opacity: 0.84,
   },
 });

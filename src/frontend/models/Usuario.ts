@@ -121,7 +121,7 @@ async function requestSupabaseAuth(path: string, body: unknown): Promise<Usuario
     body: JSON.stringify(body),
   });
 
-  const payload = await response.json();
+  const payload = await parseJsonResponse(response);
 
   if (!response.ok) {
     throw new Error(getSupabaseErrorMessage(payload));
@@ -154,6 +154,16 @@ function getSupabaseErrorMessage(payload: any) {
   return /email not confirmed/i.test(message)
     ? 'Confirme seu e-mail antes de entrar.'
     : message;
+}
+
+async function parseJsonResponse(response: Response) {
+  const text = await response.text();
+
+  if (!text.trim()) {
+    return {};
+  }
+
+  return JSON.parse(text);
 }
 
 function toIsoDate(value: string) {

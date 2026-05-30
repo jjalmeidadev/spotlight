@@ -22,10 +22,6 @@ export function useLoginViewModel(onSuccess?: (usuario: Usuario) => void) {
           return;
         } catch (locationError) {
           console.warn(locationError);
-          setError(locationError instanceof Error
-            ? locationError.message
-            : 'Nao foi possivel salvar sua localizacao.');
-          return;
         }
       }
 

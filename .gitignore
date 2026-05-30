@@ -10,6 +10,7 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+**/.data-protection-keys/
 
 # .NET test and coverage artifacts
 TestResults/

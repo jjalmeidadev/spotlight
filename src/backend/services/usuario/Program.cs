@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Npgsql;
@@ -12,6 +13,11 @@ using Spotlight.Usuario.Presentation.Middleware;
 Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(
+        Path.Combine(builder.Environment.ContentRootPath, ".data-protection-keys")));
 
 builder.Host.UseSerilog((context, configuration) =>
     configuration

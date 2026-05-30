@@ -184,6 +184,8 @@
 - [10. Procedimentos de Implantação](#10-procedimentos-de-implantação)
   - [10.1 Implantação e Configuração do Banco de Dados](#101-implantação-e-configuração-do-banco-de-dados)
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
+    - [10.2.1 Modo de desenvolvimento para demonstração](#1021-modo-de-desenvolvimento-para-demonstração)
+    - [10.2.2 Problemas comuns em execução local](#1022-problemas-comuns-em-execução-local)
 - [Referências](#referências)
 
 # 1. Introdução
@@ -4411,13 +4413,100 @@ _Seção a ser preenchida após a execução dos testes planejados. Incluir: dat
 ---
 
 # 10. Procedimentos de Implantação
-_conteúdo_
+
+&emsp;Esta seção descreve o procedimento utilizado para executar a solução em ambiente local de desenvolvimento e demonstração. Na Sprint 3, o backend foi validado localmente por meio do API Gateway e dos serviços independentes, enquanto o aplicativo mobile foi executado via Expo Go em dispositivo físico. O ambiente Docker existente no projeto ainda é utilizado principalmente para apoio ao banco local; a containerização completa dos serviços backend permanece como evolução planejada para implantação.
 
 ## 10.1 Implantação e Configuração do Banco de Dados
-_conteúdo_
+
+&emsp;O banco principal da solução utiliza PostgreSQL/Supabase. Para execução local integrada ao ambiente remoto do Supabase, as variáveis sensíveis devem ser configuradas no arquivo `.env` da raiz do projeto. Esse arquivo não deve ser versionado.
+
+Variáveis utilizadas no ambiente local:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://SEU_PROJETO.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=SUA_CHAVE_PUBLICA
+EXPO_PUBLIC_API_BASE_URL=http://IP_DO_COMPUTADOR:5000
+EXPO_PUBLIC_AUTH_REDIRECT_URL=exp://IP_DO_COMPUTADOR:8081/--/email-confirmado
+DATABASE_CONNECTION_STRING="Host=HOST;Port=5432;Database=postgres;Username=USUARIO;Password=SENHA;SSL Mode=Require;Trust Server Certificate=true"
+SUPABASE_JWT_SECRET=SEU_LEGACY_JWT_SECRET
+NOMINATIM_BASE_URL=https://nominatim.openstreetmap.org
+NOMINATIM_USER_AGENT=spotlight-inteli-g04/1.0
+```
+
+&emsp;O campo `EXPO_PUBLIC_API_BASE_URL` deve apontar para o IP local da máquina que executa o backend, pois o aplicativo mobile roda em outro dispositivo. No Windows, o IP pode ser localizado com:
+
+```powershell
+ipconfig
+```
+
+&emsp;Deve-se utilizar o valor de `Endereço IPv4` da rede em que o celular e o computador estejam conectados. Sempre que o IP mudar, o `.env` deve ser atualizado e o Expo reiniciado.
+
+&emsp;Os scripts de schema e seed do banco permanecem documentados na seção 4.4.2, com execução via SQL Editor do Supabase ou `psql`. Para a Sprint 3, a coluna `localizacao` foi padronizada como `JSONB`, permitindo armazenar endereço formatado, latitude, longitude, identificador do local e provedor de geocodificação.
 
 ## 10.2 Implantação do Protótipo para uso por equipe de desenvolvimento
-_conteúdo_
+
+&emsp;Para executar o backend localmente, deve-se abrir um terminal na pasta `src/backend` e executar:
+
+```powershell
+cd C:\Users\MarianaReis\OneDrive\Documentos\GitLab\g04\src\backend
+.\run-all.ps1
+```
+
+&emsp;O script inicializa os serviços em janelas separadas do PowerShell:
+
+| Serviço | Porta | Finalidade |
+|---|---:|---|
+| API Gateway | 5000 | Entrada única do frontend para os serviços backend |
+| Catálogo | 5001 | Consulta de espetáculos e dados de catálogo |
+| Usuário | 5002 | Perfil, preferências, autenticação autorizada e localização do usuário |
+| Recomendação | 5003 | Serviços relacionados ao motor de recomendação |
+| Geolocalização | 5004 | Geocodificação e geocodificação reversa via OpenStreetMap/Nominatim |
+
+&emsp;A verificação básica do backend é feita pelo gateway:
+
+```txt
+http://localhost:5000/usuario/health
+http://localhost:5000/geolocalizacao/health
+```
+
+&emsp;O retorno esperado para serviços saudáveis é:
+
+```txt
+Healthy
+```
+
+&emsp;Com o backend ativo, o aplicativo mobile deve ser executado em outro terminal, na raiz do projeto:
+
+```powershell
+cd C:\Users\MarianaReis\OneDrive\Documentos\GitLab\g04
+npx expo start --lan --clear
+```
+
+&emsp;O QR Code gerado pelo Expo deve ser aberto no Expo Go, com o celular conectado à mesma rede do computador. O fluxo esperado para validação é:
+
+1. Abrir o aplicativo.
+2. Realizar login ou acessar cadastro.
+3. Concluir cadastro ou autenticação.
+4. Selecionar preferências.
+5. Acessar o catálogo.
+6. Tocar em um card para abrir detalhes do espetáculo.
+
+### 10.2.1 Modo de desenvolvimento para demonstração
+
+&emsp;A tela de Login possui um botão discreto de **Modo dev**. Esse acesso foi incluído apenas como apoio de demonstração, permitindo que professores e avaliadores naveguem pelo protótipo caso alguma dependência local esteja indisponível no momento da apresentação, como backend, Supabase, rede do celular ou serviço de geolocalização.
+
+&emsp;O modo de desenvolvimento não substitui o fluxo oficial de autenticação e não deve ser usado para validar integração com banco, login real ou persistência de dados. Sua função é reduzir risco operacional durante demonstrações presenciais, mantendo o protótipo navegável mesmo diante de instabilidade de ambiente.
+
+### 10.2.2 Problemas comuns em execução local
+
+| Erro | Causa provável | Ação recomendada |
+|---|---|---|
+| `Network request failed` | IP incorreto no `.env`, celular em outra rede ou gateway desligado | Conferir `EXPO_PUBLIC_API_BASE_URL`, executar `ipconfig` e reiniciar o Expo |
+| `HTTP ERROR 502` | Gateway ativo, mas serviço interno fora do ar | Conferir se as portas 5001, 5002, 5003 e 5004 estão abertas |
+| `JSON Parse error: Unexpected end of input` | Resposta vazia ou erro intermediário em rota local | Verificar `/usuario/health` e `/geolocalizacao/health` pelo gateway |
+| Falha ao resolver localização | Serviço de geolocalização indisponível ou bloqueio de rede externa | Prosseguir com o fluxo; a localização é tratada como recurso opcional na demonstração |
+
+&emsp;Na Sprint 3, a geolocalização foi implementada como integração adicional via OpenStreetMap/Nominatim. Para evitar que instabilidades externas ou bloqueios locais interrompam o fluxo principal de autenticação, a aplicação mobile trata a localização como recurso opcional: quando ela falha, o erro é registrado em console, mas login e cadastro continuam funcionando.
 
 # Referências
 _conteúdo_
