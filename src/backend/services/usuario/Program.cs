@@ -89,20 +89,12 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer"
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+    // Aplica o requirement apenas em operações com [Authorize] — coerente
+    // com Catálogo e Recomendação e pronto pra eventuais rotas públicas.
+    options.OperationFilter<Spotlight.Usuario.Infrastructure.Auth.AuthorizeOperationFilter>();
+
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
@@ -111,11 +103,9 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseSerilogRequestLogging();
 app.UseCors(CorsPolicy);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger sempre habilitado: o gateway agrega as specs dos serviços em /swagger.
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Auth: precisa vir antes do MapControllers para que [Authorize] funcione.
 app.UseAuthentication();

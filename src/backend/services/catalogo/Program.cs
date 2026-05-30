@@ -1,6 +1,7 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
 using Spotlight.Catalogo.Application.UseCases;
@@ -105,12 +106,30 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
+{
     options.SwaggerDoc("v1", new()
     {
         Title = "Spotlight — Serviço de Catálogo",
         Version = "v1",
         Description = "Gerenciamento de espetáculos, teatros, gêneros e precificação."
-    }));
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT do Supabase Auth. Informe: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    // Aplica o requirement apenas em operações com [Authorize] — rotas públicas
+    // ficam sem cadeado na UI.
+    options.OperationFilter<Spotlight.Catalogo.Infrastructure.Auth.AuthorizeOperationFilter>();
+
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
@@ -121,11 +140,9 @@ app.UseMiddleware<ErrorHandlingMiddleware>(); // error handler global (primeiro)
 app.UseSerilogRequestLogging();
 app.UseCors(CorsPolicy);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger sempre habilitado: o gateway agrega as specs dos serviços em /swagger.
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Auth: precisa vir antes do MapControllers para que [Authorize] funcione.
 app.UseAuthentication();

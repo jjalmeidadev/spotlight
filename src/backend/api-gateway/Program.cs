@@ -40,12 +40,17 @@ builder.Services.AddReverseProxy()
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
+{
     options.SwaggerDoc("v1", new()
     {
         Title = "Spotlight — API Gateway",
         Version = "v1",
         Description = "Ponto único de entrada: roteamento para os serviços e validação de JWT."
-    }));
+    });
+
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
@@ -56,11 +61,19 @@ app.UseMiddleware<ErrorHandlingMiddleware>(); // error handler global (primeiro)
 app.UseSerilogRequestLogging();
 app.UseCors(CorsPolicy);
 
-if (app.Environment.IsDevelopment())
+// Swagger unificado: a UI do gateway agrega as specs dos quatro serviços
+// (cada SwaggerEndpoint usa um caminho relativo, que o YARP reencaminha pro
+// serviço correspondente — não há cross-origin no navegador).
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    options.DocumentTitle = "Spotlight — Documentação das APIs";
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway");
+    options.SwaggerEndpoint("/catalogo/swagger/v1/swagger.json", "Catálogo");
+    options.SwaggerEndpoint("/usuario/swagger/v1/swagger.json", "Usuário");
+    options.SwaggerEndpoint("/recomendacao/swagger/v1/swagger.json", "Recomendação");
+    options.SwaggerEndpoint("/geolocalizacao/swagger/v1/swagger.json", "Geolocalização");
+});
 
 app.MapControllers();
 

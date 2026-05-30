@@ -7,12 +7,21 @@ using Spotlight.Usuario.Infrastructure.Auth;
 
 namespace Spotlight.Usuario.Presentation.Controllers;
 
+/// <summary>
+/// Endpoints do próprio usuário que dependem de serviços externos (ex.: geolocalização).
+/// </summary>
 [ApiController]
 [Authorize(Policy = AuthSetup.PolicyCadastrado)]
 [Route("me")]
 public sealed class MeController(IUsuarioLocalizacaoService localizacaoService) : ControllerBase
 {
+    /// <summary>Atualiza a localização consentida do usuário autenticado.</summary>
     [HttpPut("localizacao")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErroDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErroDto), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErroDto), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> AtualizarLocalizacao(
         AtualizarLocalizacaoRequest request,
         CancellationToken cancellationToken)
