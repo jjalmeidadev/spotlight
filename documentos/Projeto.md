@@ -3633,7 +3633,86 @@ _conteúdo_
 Obs.: Insira informações sobre quais frameworks foram usados e como acessar.
 
 # 9. Planejamento e Execução de Testes
-_conteúdo_
+
+&emsp;O Spotlight é um sistema de recomendação de espetáculos para o Portal Aventura Teatros, construído sobre arquitetura SOA (API Gateway, serviços de catálogo, usuário, recomendação e geolocalização, fila RabbitMQ e motor de ML) e aplicativo mobile first em React Native/Expo. Diante desse desenho distribuído e de um público heterogêneo, incluindo personas com baixa familiaridade tecnológica, como **Carlos Nóbrega** (seção 2.4), a validação sistemática deixa de ser etapa opcional e passa a condicionar a confiança na solução: recomendações relevantes, autenticação segura, integrações externas estáveis e interface utilizável em smartphones devem ser verificadas de forma planejada, rastreável e complementar entre si.
+
+&emsp;Esta seção consolida a estratégia geral de testes do ciclo de desenvolvimento. Ela orienta e justifica os esforços detalhados nas subseções 9.1 a 9.4, sem substituir seus planejamentos específicos. Os resultados de cada frente serão registrados nas respectivas subseções de resultados ao longo da execução.
+
+### Tipos de teste adotados
+
+&emsp;A estratégia organiza-se em cinco frentes complementares, cada uma respondendo a uma dimensão distinta de validação:
+
+| Tipo | Papel no projeto | Seção de detalhamento |
+|------|------------------|------------------------|
+| **Testes funcionais (RFs)** | Verificam se o sistema realiza o comportamento especificado nos dezesseis requisitos funcionais (seção 3.1): cadastro, login, preferências, catálogo, busca, filtros, detalhes, avaliações e fluxos administrativos. | [9.1](#91-testes-funcionais) |
+| **Testes de RNFs** | Avaliam características de qualidade — desempenho, disponibilidade, segurança, escalabilidade, usabilidade mobile e manutenibilidade — conforme os doze RNFs da seção 3.2. | [9.2](#92-testes-de-rnfs) |
+| **Testes de usabilidade** | Validam a experiência com usuários reais no aplicativo mobile, mensurando conclusão de tarefas, número de toques e percepção global via **System Usability Scale (SUS)**. | [9.3](#93-testes-de-usabilidade) |
+| **Testes de APIs externas** | Exercitam contratos e respostas dos serviços terceiros integrados ao Spotlight — **Supabase Auth**, **API da Ticketeira** e, no escopo de geolocalização, **OpenStreetMap/Nominatim** (seções 5.3 e 8.1) — com cenários positivos e negativos de indisponibilidade, autenticação e formato de payload. | Integrados ao planejamento da seção [9.4](#94-testes-de-integração) (IT-02, IT-06 e fluxos de geocodificação) |
+| **Testes de integração** | Validam interações entre componentes internos (Gateway, serviços SOA, PostgreSQL, MongoDB, RabbitMQ, ML Engine) e fronteiras externas. Chamadas a Supabase Auth e Ticketeira utilizam obrigatoriamente o módulo **VHS** (*Virtual HTTP Server*) para cache determinístico de respostas HTTP em `tests/cassettes/`. | [9.4](#94-testes-de-integração) |
+
+### Ferramentas por tipo de teste
+
+&emsp;As ferramentas abaixo foram escolhidas com base na stack documentada (seções 5.3 e 8.1) e nos planejamentos já elaborados nas seções 9.2, 9.3 e 9.4:
+
+| Tipo de teste | Ferramentas / artefatos | Observação |
+|---------------|-------------------------|------------|
+| Testes funcionais | `xUnit`, `Microsoft.AspNetCore.Mvc.Testing`, `Bogus` | Validação de comportamento via API e cenários derivados da tabela de RFs (seção 3.1); complementada por execução manual no app Expo |
+| Testes de RNFs | Lighthouse (mobile), k6, UptimeRobot, OWASP ZAP, Postman, dispositivos físicos Android/iOS, inspeção manual de logs, scripts shell, pipeline CI/CD | Detalhamento por RNF na seção 9.2.1 |
+| Testes de usabilidade | Roteiro estruturado (T01–T09), planilha de campo, questionário **SUS** | Detalhamento na seção 9.3.1; resultados subsidiam RNF10 |
+| Testes de APIs externas | Módulo **VHS** (`VhsCachingHandler`), cassetes JSON em `tests/cassettes/supabase/` e `tests/cassettes/ticketeira/`, `xUnit` | Respostas gravadas garantem determinismo; modo `VHS_MODE=record` para geração inicial de cassetes |
+| Testes de integração | `xUnit`, `Testcontainers` (PostgreSQL, MongoDB, RabbitMQ), `Microsoft.AspNetCore.Mvc.Testing`, `Respawn`, **VHS**, `docker compose` | Seis fronteiras IT-01 a IT-06 documentadas na seção 9.4.1 |
+
+### Organização dos arquivos de teste
+
+&emsp;A estrutura de testes automatizados segue a organização do repositório descrita na seção 8.1, concentrando a automação backend em projetos `xUnit` espelhando os serviços SOA:
+
+```text
+g04/
+└─ src/
+   └─ backend/
+      ├─ api-gateway/
+      ├─ contracts/
+      │  └─ vhs/                          # VhsCachingHandler e configuração VHS
+      ├─ services/
+      │  ├─ catalogo/
+      │  ├─ recomendacao/
+      │  ├─ usuario/
+      │  └─ geolocalizacao/
+      ├─ ml-engine/
+      └─ tests/
+         ├─ Spotlight.Gateway.Tests/      # Testes unitários e de integração do Gateway
+         ├─ Spotlight.Catalogo.Tests/
+         ├─ Spotlight.Usuario.Tests/
+         └─ Spotlight.Recomendacao.Tests/
+tests/
+└─ cassettes/
+   ├─ supabase/                          # Respostas gravadas do Supabase Auth (VHS)
+   └─ ticketeira/                        # Respostas gravadas da API da Ticketeira (VHS)
+```
+
+&emsp;Cada projeto em `src/backend/tests/` referencia o serviço correspondente e utiliza `Microsoft.AspNetCore.Mvc.Testing` para hospedar a API em memória durante a execução. Os cassetes VHS permanecem na raiz `tests/cassettes/`, separados da lógica de produção. Testes de usabilidade e registros SUS permanecem em planilha externa (seção 9.3.1.10). O frontend React Native/Expo ainda não possui suíte automatizada configurada no `package.json`; a validação de interface concentra-se nos testes de usabilidade e nos critérios mobile dos RNFs RNF04, RNF10 e RNF11.
+
+### Abordagem TDD
+
+&emsp;O desenvolvimento incremental por sprints (seção 8.3) prevê a adoção de **Test-Driven Development (TDD)** nos componentes de maior criticidade e risco de regressão: casos de uso do serviço de recomendação, pipeline assíncrono RabbitMQ → ML Engine, validação JWT no API Gateway e fluxos de geolocalização via `IGeocoding`. A prática consiste em definir cenários de teste a partir dos RFs e RNFs associados, implementar o teste automatizado com `xUnit` antes ou em paralelo à implementação, e refatorar mantendo a suíte verde. A seção 8.4 reserva o detalhamento da estratégia unitária; o capítulo 9 operacionaliza essa visão no planejamento e na execução formal das rodadas.
+
+### Critérios de cobertura
+
+&emsp;Os critérios mínimos de cobertura combinam rastreabilidade a requisitos e priorização de módulos críticos:
+
+| Dimensão | Critério mínimo | Módulos prioritários |
+|----------|-----------------|----------------------|
+| Cobertura de RFs | Todos os dezesseis RFs devem possuir ao menos um cenário de teste funcional ou de integração documentado | Recomendação (RF04, RF12–RF15), autenticação (RF01–RF02), geolocalização e preferências (RF03) |
+| Cobertura de RNFs | Os doze RNFs devem possuir planejamento formal com critério objetivo de aceitação (seção 9.2.1) | Desempenho (RNF01, RNF02), segurança (RNF05), usabilidade mobile (RNF04, RNF10) |
+| Cobertura de integração | Mínimo de três cenários negativos por fronteira IT-01 a IT-06; meta documentada de **15/16 RFs** e **8/12 RNFs** cobertos diretamente pelos testes de integração (seção 9.4) | Gateway ↔ serviços SOA, Supabase Auth, RabbitMQ ↔ ML Engine |
+| Cobertura de usabilidade | **≥ 85%** de conclusão por tarefa e **≤ 3 toques** nas execuções bem-sucedidas (RNF10); média SUS **≥ 68** (seção 9.3.1.8) | Fluxos de catálogo, busca, filtro e detalhes (RF04–RF07) |
+| Cenários de falha | Mínimo de **22 cenários negativos** planejados nas fronteiras de integração, abrangendo indisponibilidade externa, tokens inválidos e violações de constraint (seção 9.4) | Autenticação, persistência PostgreSQL, fila de telemetria |
+
+&emsp;Entre os módulos classificados como críticos, o motor de recomendação (`ml-engine` e serviço de recomendação), a autenticação (Gateway + Supabase Auth) e a geolocalização (serviço dedicado + Nominatim) concentram a expansão prioritária da suíte automatizada antes das demais camadas.
+
+### Relação com os requisitos
+
+&emsp;A estratégia de testes articula-se diretamente aos **dezesseis RFs** e **doze RNFs** definidos na seção 3 e correlacionados na seção 3.3. Os testes funcionais verificam *o que* o sistema faz; os testes de RNFs verificam *como* ele se comporta sob carga, em produção e em dispositivos mobile; os testes de usabilidade validam a experiência percebida por usuários reais, incluindo público idoso e com baixa familiaridade digital; os testes de APIs externas e de integração garantem que as fronteiras SOA, especialmente autenticação, ticketeira e persistência, operem de forma coerente e resiliente. Nenhuma frente isolada substitui as demais: a conformidade do Spotlight depende da convergência dos resultados registrados nas subseções 9.1 a 9.4 em relação aos critérios de aceitação da seção 3.
 
 ## 9.1 Testes Funcionais
 _conteúdo_
