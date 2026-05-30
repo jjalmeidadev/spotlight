@@ -3894,7 +3894,7 @@ detox test --testNamePattern "RF07"
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| TF-RF07-P01 | Detalhes completos | Tocar card "Hamlet" na Home | Tela exibe título, sinopse, categoria, próxima sessão, faixa de preço, teatro, mapa, elenco e CTA "Comprar" (RF06 do IT) | Evento `detail_view` registrado para o espetáculo |
+| TF-RF07-P01 | Detalhes completos | Tocar card "Hamlet" na Home | Tela exibe título, sinopse, categoria, próxima sessão, faixa de preço, teatro, mapa, elenco e CTA "Comprar" (coberto em IT-06 — testes de integração) | Evento `detail_view` registrado para o espetáculo |
 | TF-RF07-P02 | Múltiplas sessões | Espetáculo com 3 sessões agendadas | Carrossel de sessões exibe todas com data/horário/disponibilidade | — |
 | TF-RF07-P03 | Compartilhamento | Tocar ícone de compartilhar | Sheet nativa do SO abre com link `spotlight://espetaculo/<id>` | — |
 
@@ -4153,7 +4153,7 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
 | TF-RF14-P01 | Recomendação vinda de vizinhos | Solicitar recomendação para usuário-alvo | Lista contém ≥ 2 itens consumidos por vizinhos (similaridade ≥ 0,6) e não pelo usuário-alvo | Trace do ML Engine confirma origem CF |
-| TF-RF14-P02 | Diversidade entre vizinhos | Lista | Itens vêm de ≥ 2 vizinhos distintos | Evita over-fit a um vizinho único |
+| TF-RF14-P02 | Diversidade entre vizinhos | Solicitar recomendação para o usuário-alvo e inspecionar o trace do ML Engine para identificar os vizinhos de origem de cada item retornado | Itens vêm de ≥ 2 vizinhos distintos | Evita over-fit a um vizinho único |
 
 **Cenários Negativos:**
 
