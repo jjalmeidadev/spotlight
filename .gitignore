@@ -11,6 +11,9 @@ npm-debug.log*
 .env.*
 !.env.example
 
+# .NET test and coverage artifacts
+TestResults/
+
 # Artefatos gerados por notebooks e análises locais
 src/aad/*.png
 src/aad/*.jpg
