@@ -1,0 +1,28 @@
+# Normaliza fim de linha: o repositório guarda LF; cada SO faz a conversão local.
+# Evita o ruído de CRLF<->LF típico de Windows/WSL/OneDrive.
+* text=auto eol=lf
+
+# Código e configs (LF)
+*.cs      text eol=lf
+*.csproj  text eol=lf
+*.json    text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.js      text eol=lf
+*.md      text eol=lf
+*.sql     text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+
+# Arquivos que o ecossistema Windows espera com CRLF
+*.sln     text eol=crlf
+
+# Tratados como binário (sem conversão de EOL) — evita diffs gigantes
+*.csv     -text
+*.ipynb   -text
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.pdf     binary

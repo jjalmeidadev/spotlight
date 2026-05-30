@@ -106,11 +106,9 @@
   <img src="./img/bottom.png" alt="bottom">
 </p>
 
-# Spotlight <nome do projeto>
+# Spotlight
 
-## GESTÃO DE PROJETO <nome do arquivo>
-
-
+## Gestão de Projeto
 
 # Sumário
 - [1. Introdução](#1-introdução)
@@ -397,9 +395,289 @@ Todas as tasks acima devem ser registradas no quadro Kanban com os campos obriga
 ---
 
 ## 2.3 Sprint 3  
-Nota: Insira informações sobre mudanças realizadas.
+
+### 2.3.1 Retrospectiva da Sprint 3
+
+Ao final da Sprint 3, a equipe realizou a retrospectiva do ciclo com foco em avaliar a evolução do processo após as ações pactuadas na Sprint 2. A sprint marcou uma transição importante do projeto, pois concentrou atividades de maior densidade técnica, como implementação de banco de dados, backend, frontend, testes, documentação e preparação das evidências de entrega.
+
+De forma geral, a Sprint 3 apresentou avanço relevante na organização do fluxo de desenvolvimento. Problemas identificados no ciclo anterior, como acúmulo de revisões, ausência de priorização clara e falta de mapeamento de dependências, foram tratados com maior disciplina. Por outro lado, a execução ainda revelou fragilidades na distribuição de carga entre os integrantes, na clareza das descrições das tasks e no planejamento antecipado dos materiais de apresentação.
 
 ---
+
+### 2.3.2 Análise dos Pontos Identificados
+
+#### Pontos Fortes
+
+| Ponto forte | Evidência observada na Sprint 3 | Impacto no processo |
+|-------------|----------------------------------|---------------------|
+| Revisões contínuas nos Pull Requests | As revisões deixaram de se concentrar apenas no fim da sprint e passaram a ocorrer ao longo do ciclo, em resposta ao SLA interno definido na Sprint 2. | Reduziu gargalos próximos à entrega, aumentou a qualidade das validações e diminuiu o risco de retrabalho tardio. |
+| Priorização das tasks | O backlog da Sprint 3 foi estruturado em 8 blocos e 32 tasks, separando banco de dados, arquitetura, APIs externas, backend, frontend, testes, evidências e gestão. | A equipe conseguiu direcionar esforço primeiro para entregas estruturantes, evitando que tarefas menos críticas bloqueassem o avanço do produto. |
+| Mapeamento das dependências entre tasks | A matriz de dependências críticas planejada para a Sprint 3 explicitou relações como banco antes de backend, rotas antes de frontend e services antes de testes unitários. | Ajudou a reduzir incertezas sobre ordem de execução e tornou mais claro quais entregas precisavam estar prontas antes de outras avançarem. |
+| Dailys mais concretas | As dailys passaram a tratar andamento, impedimentos e próximos passos de forma mais objetiva, com maior conexão com o estado real das tasks no Kanban. | Melhorou a visibilidade do progresso e permitiu intervenções mais rápidas quando alguma tarefa apresentava risco de atraso. |
+| Ritual de fechamento mais esclarecido | A equipe chegou ao encerramento da sprint com maior entendimento sobre o que precisava ser validado, revisado e consolidado antes da entrega. | Aumentou a previsibilidade do fechamento e reduziu dúvidas sobre responsabilidades finais de revisão e documentação. |
+
+A principal evolução da Sprint 3 foi a correção de problemas diretamente herdados da Sprint 2. A equipe demonstrou maior maturidade ao transformar ações de melhoria em práticas observáveis, especialmente nas revisões contínuas de Pull Requests e na organização das dependências. Isso indica que a retrospectiva anterior não ficou apenas como registro documental, mas influenciou efetivamente a forma de trabalho do ciclo seguinte.
+
+Além disso, a priorização das tasks trouxe mais clareza para uma sprint tecnicamente mais complexa. Como havia dependências fortes entre banco de dados, backend, frontend e testes, a organização por ordem de execução foi essencial para evitar bloqueios previsíveis. As dailys também passaram a ter papel mais prático, funcionando como pontos de checagem para alinhar andamento, destravar dúvidas e reforçar o foco nas entregas prioritárias.
+
+#### Pontos Fracos
+
+| Ponto fraco | Evidência observada na Sprint 3 | Consequência |
+|-------------|----------------------------------|--------------|
+| Centralização de tarefas em poucas pessoas | Parte relevante das entregas técnicas e de fechamento ficou concentrada em um número reduzido de integrantes. | Aumentou a sobrecarga individual, reduziu a previsibilidade do ritmo coletivo e criou dependência excessiva de pessoas específicas. |
+| Distribuição desbalanceada de trabalho | A complexidade e o volume das tasks não ficaram igualmente distribuídos entre os membros da equipe. | Alguns integrantes ficaram com maior responsabilidade operacional, enquanto outros tiveram menor participação em entregas críticas. |
+| Dificuldade de visualizar o que deveria ser feito em cada task | O documento de gestão apresentava as tasks de forma resumida, enquanto a descrição detalhada estava concentrada apenas nos cards do Kanban. | A rastreabilidade documental ficou limitada e a consulta fora do quadro tornou-se insuficiente para entender escopo, DoR, DoD e critérios de conclusão. |
+| Apresentação de slides montada um dia antes da entrega | A montagem final dos slides ocorreu próxima ao prazo de entrega, repetindo parcialmente um risco já identificado em ciclos anteriores. | Reduziu o tempo disponível para revisão narrativa, padronização visual, ensaio e correção de inconsistências entre produto, documentação e apresentação. |
+
+O ponto mais crítico da Sprint 3 foi a centralização do trabalho. Embora a equipe tenha melhorado o controle do fluxo, a execução ainda dependeu demais de poucos integrantes em atividades de maior impacto. Esse comportamento é arriscado porque reduz a sustentabilidade do processo: quando uma entrega depende de poucas pessoas, qualquer indisponibilidade, dúvida técnica ou acúmulo de revisão pode comprometer o andamento da sprint inteira.
+
+A distribuição desbalanceada também indica que o planejamento precisa considerar não apenas a prioridade das tasks, mas também a capacidade real de execução de cada membro. O uso de t-shirt sizing ajudou a estimar esforço, mas ainda não foi suficiente para garantir divisão proporcional da carga. Para a Sprint 4, será necessário combinar tamanho, complexidade técnica e disponibilidade individual antes da alocação final.
+
+Outro ponto relevante foi a diferença entre o nível de detalhe presente nos cards do Kanban e o nível de detalhe registrado no documento de gestão. Como o documento continha descrições mais sintéticas, a equipe tinha dificuldade de compreender rapidamente o escopo completo de cada task sem acessar o card correspondente. Isso enfraquece a rastreabilidade e dificulta a consulta histórica, principalmente para revisores, professores e integrantes que não participaram diretamente da execução de determinada tarefa.
+
+Por fim, a apresentação de slides voltou a ser um ponto de atenção. Apesar de o ritual de fechamento estar mais claro, a montagem final ter ocorrido apenas um dia antes da entrega limitou a qualidade da revisão. Esse problema precisa ser tratado como parte do fluxo oficial da sprint, e não como uma atividade separada no final do ciclo.
+
+---
+
+### 2.3.3 Ações de Melhoria Propostas para a Sprint 4
+
+| Problema endereçado | Ação de melhoria | Responsável | Prazo de aplicação | Critério de sucesso |
+|---------------------|------------------|-------------|--------------------|---------------------|
+| Centralização de tarefas em poucas pessoas | Definir, no planejamento da Sprint 4, um limite de carga por integrante considerando quantidade de tasks, tamanho estimado e criticidade técnica. | Scrum Master | Planejamento da Sprint 4 | Nenhum integrante deve concentrar sozinho mais de uma entrega crítica sem dupla de apoio definida. |
+| Distribuição desbalanceada de trabalho | Criar uma tabela de alocação por pessoa, relacionando responsável, apoio, tamanho da task e dependências. | Scrum Master | Início da Sprint 4 | Todas as tasks priorizadas devem ter responsável principal e, quando forem M ou G, ao menos um apoio indicado. |
+| Baixa clareza das tasks no documento | Expandir a descrição das tasks em algum documento, incluindo objetivo, entrega esperada, DoR e DoD resumidos para cada item planejado. | Scrum Master | Durante o planejamento da Sprint 4 | Cada task deve ser compreensível pelo documento, sem depender exclusivamente da leitura do card no Kanban. |
+| Diferença entre documento e Kanban | Padronizar uma checagem entre Kanban e documentação ao final de cada daily, garantindo que mudanças relevantes de escopo estejam refletidas nos dois locais. | Equipe | Ao longo da Sprint 4 | Cards e documento devem permanecer consistentes quanto a descrição, responsável, prioridade e status. |
+| Slides montados próximos à entrega | Criar uma task específica para a apresentação já no início da sprint, com checkpoints obrigatórios de roteiro, versão preliminar e revisão final. | Responsável pelos slides e Scrum Master | Início e meio da Sprint 4 | A primeira versão dos slides deve estar pronta pelo menos dois dias antes da entrega. |
+| Pouco tempo para revisão da apresentação | Realizar ensaio interno antes da entrega, validando narrativa, tempo de fala, evidências do produto e coerência com a documentação. | Equipe | Até um dia antes da entrega | Apresentação validada com ajustes registrados antes do dia final de entrega. |
+
+Além das ações específicas, a equipe deve manter as práticas que funcionaram bem na Sprint 3. As revisões contínuas de Pull Requests, a matriz de dependências, as dailys objetivas e o ritual de fechamento devem permanecer como parte do processo padrão da Sprint 4, pois demonstraram impacto direto na organização do trabalho e na redução de riscos operacionais.
+
+Para evitar reincidência dos problemas, a Sprint 4 deve iniciar com dois controles adicionais: uma visão de capacidade por integrante e uma visão de qualidade da documentação das tasks. A primeira garante que a equipe distribua melhor o esforço; a segunda garante que o planejamento seja rastreável e compreensível mesmo fora do Kanban.
+
+---
+
+### 2.3.4 Planejamento da Sprint 4
+
+#### Objetivo da Sprint 4
+
+A Sprint 4 tem como objetivo consolidar a evolução técnica da solução a partir dos aprendizados da Sprint 3, avançando simultaneamente em quatro frentes principais: evolução do banco de dados, desenvolvimento incremental do produto, execução sistemática dos testes planejados e continuidade da gestão evolutiva do projeto. O ciclo deve demonstrar progresso significativo em relação à sprint anterior, com API de recomendação funcional, modelo de recomendação incrementado, ambiente dockerizado, evidências de desempenho do banco, testes executados e documentação atualizada.
+
+Esta sprint também incorpora diretamente as ações de melhoria identificadas na retrospectiva da Sprint 3. Por isso, o planejamento foi estruturado com maior granularidade nas tasks, dependências explícitas, checkpoints diários, início antecipado da apresentação e controle de capacidade para evitar centralização de trabalho em poucas pessoas.
+
+#### Capacidade Planejada
+
+Para esta sprint, a equipe adotou a métrica de t-shirt sizing definida pelo projeto:
+
+| Tamanho | Tempo estimado |
+|---------|----------------|
+| P       | Até 30 minutos |
+| M       | 30 a 60 minutos |
+| G       | 60 a 120 minutos |
+
+Considerando o limite superior de cada faixa para fins de planejamento, a Sprint 4 foi estruturada com 58 tasks e carga total mínima de 84 horas:
+
+| Tamanho | Quantidade de tasks | Carga considerada |
+|---------|---------------------|-------------------|
+| P       | 12                  | 6h                |
+| M       | 14                  | 14h               |
+| G       | 32                  | 64h               |
+| **Total** | **58**            | **84h**           |
+
+Como o grupo possui 7 integrantes, cada membro deve assumir ao menos 12 horas ao longo da sprint. A alocação nominal das tasks será feita durante a execução, respeitando o limite mínimo de capacidade por pessoa e evitando que entregas críticas fiquem concentradas em um único integrante.
+
+#### Estratégia de Priorização
+
+O backlog da Sprint 4 foi organizado para manter os quatro artefatos em andamento ao longo dos seis dias de desenvolvimento: 02/06, 03/06, 08/06, 09/06, 10/06 e 11/06. A estratégia adotada segue a lógica de ondas de execução:
+
+| Dia | Data | Foco principal | Objetivo operacional |
+|-----|------|----------------|----------------------|
+| 1 | 02/06 | Fundação da sprint | Definir contratos, revisar arquitetura, mapear melhorias do banco, estruturar testes e iniciar gestão da apresentação. |
+| 2 | 03/06 | Camada de apoio | Implementar bases técnicas que destravam desenvolvimento, documentação, padrões, índices e rastreabilidade. |
+| 3 | 08/06 | Núcleo do desenvolvimento | Implementar API de recomendação, modelo incrementado, testes de banco e testes automatizados iniciais. |
+| 4 | 09/06 | Integração, frontend e deploy | Integrar frontend e backend, dockerizar solução e iniciar validações em ambiente real. |
+| 5 | 10/06 | Evidências e revisão geral | Consolidar documentação, análise ética, diagramas, testes de usabilidade, logs e versão preliminar dos slides. |
+| 6 | 11/06 | Fechamento da sprint | Finalizar documentação, vídeo demonstrativo, retrospectiva da Sprint 4 e planejamento da Sprint 5. |
+
+Essa organização responde diretamente aos pontos fracos da Sprint 3. A apresentação passa a ter tasks desde o primeiro dia; as dependências ficam visíveis antes da execução; as tasks foram quebradas em unidades menores; e a capacidade mínima por integrante foi considerada desde o planejamento.
+
+#### Backlog Priorizado e Sequenciado
+
+##### Bloco 1 — Evolução do Banco de Dados
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T1 | Mapear melhorias necessárias no banco a partir dos feedbacks da Sprint 3 | M | Alta |
+| T2 | Revisar estrutura atual do `create_database.sql` | P | Alta |
+| T3 | Atualizar tabelas e restrições no `create_database.sql` | G | Alta |
+| T4 | Identificar consultas críticas para otimização | M | Alta |
+| T5 | Criar índices otimizados no banco | G | Alta |
+| T6 | Ajustar queries com base nos índices criados | G | Alta |
+| T7 | Executar `EXPLAIN ANALYZE` nas consultas principais | G | Alta |
+| T8 | Preparar massa de dados para teste de carga | M | Média |
+| T9 | Executar teste de carga no banco | G | Alta |
+| T10 | Atualizar `initial_data.sql` conforme mudanças estruturais | M | Alta |
+| T11 | Implementar rastreabilidade de transações no banco | G | Alta |
+| T12 | Atualizar dicionário de dados com índices, campos e rastreabilidade | G | Alta |
+| T13 | Atualizar README do banco com configuração, otimizações e evidências | G | Alta |
+| T14 | Revisar artefato de banco antes do Pull Request | P | Alta |
+
+##### Bloco 2 — Desenvolvimento do Projeto
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T15 | Revisar arquitetura de diretórios do projeto | M | Alta |
+| T16 | Atualizar documentação da arquitetura no `Projeto.md` | G | Alta |
+| T17 | Atualizar diagrama de arquitetura de codificação | M | Alta |
+| T18 | Revisar padrões de codificação adotados no projeto | M | Alta |
+| T19 | Atualizar `GuiaPadroesDesenvolvimento.md` | G | Alta |
+| T20 | Documentar padrão criacional aplicado | M | Média |
+| T21 | Documentar padrão comportamental aplicado | M | Média |
+| T22 | Definir contrato JSON da API de recomendação | G | Alta |
+| T23 | Implementar endpoint base da API de recomendação | G | Alta |
+| T24 | Implementar service de recomendação | G | Alta |
+| T25 | Incrementar modelo de classificação de recomendação | G | Alta |
+| T26 | Integrar modelo incrementado à API | G | Alta |
+| T27 | Atualizar Swagger com API de recomendação | M | Alta |
+| T28 | Implementar testes unitários do service de recomendação | G | Alta |
+| T29 | Documentar estratégia de TDD, cobertura e resultados | M | Alta |
+| T30 | Preparar frontend para consumir recomendação | G | Alta |
+| T31 | Implementar exibição de recomendações no frontend | G | Alta |
+| T32 | Validar fluxo frontend-backend da recomendação | G | Alta |
+| T33 | Documentar features implementadas na Sprint 4 e gravar vídeo demonstrativo | G | Alta |
+| T34 | Elaborar análise ética com base no framework IA4People | G | Média |
+| T35 | Criar diagrama de implantação da infraestrutura | G | Alta |
+| T36 | Dockerizar aplicação | G | Alta |
+| T37 | Publicar ambiente em algum servidor | G | Alta |
+| T38 | Validar Swagger no ambiente publicado | P | Alta |
+| T39 | Documentar instruções de execução e deploy | M | Alta |
+
+##### Bloco 3 — Execução de Testes
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T40 | Revisar planejamento de testes da Sprint 3 | M | Alta |
+| T41 | Definir ferramentas e bibliotecas de teste | M | Alta |
+| T42 | Detalhar casos de teste funcionais | G | Alta |
+| T43 | Executar testes de funcionalidade | G | Alta |
+| T44 | Implementar testes automatizados de integração | G | Alta |
+| T45 | Implementar testes automatizados de regras de negócio | G | Alta |
+| T46 | Executar testes de RNF de desempenho | G | Média |
+| T47 | Executar testes de RNF de segurança | G | Média |
+| T48 | Executar testes de usabilidade | G | Média |
+| T49 | Organizar logs de execução dos testes | P | Alta |
+| T50 | Documentar abrangência dos testes | M | Alta |
+| T51 | Consolidar seção de testes no `Projeto.md` | G | Alta |
+| T52 | Revisar scripts de teste conforme padrões de codificação | P | Média |
+
+##### Bloco 4 — Gestão de Projetos Evolutiva
+
+| Task | Descrição | Tamanho | Prioridade |
+|------|-----------|---------|------------|
+| T53 | Criar task inicial da apresentação no Kanban | P | Alta |
+| T54 | Montar roteiro preliminar dos slides | P | Alta |
+| T55 | Criar versão preliminar dos slides | G | Alta |
+| T56 | Realizar ensaio e revisão da apresentação | G | Alta |
+| T57 | Atualizar retrospectiva da Sprint 4 no `GestaoProjeto.md` | P | Alta |
+| T58 | Planejar Sprint 5 no `GestaoProjeto.md` com t-shirt sizing | P | Alta |
+
+#### Matriz de Dependências Críticas
+
+| Task dependente | Depende de | Justificativa |
+|-----------------|------------|---------------|
+| T3, T4 | T1, T2 | A evolução do banco depende do mapeamento das melhorias e revisão do script atual. |
+| T5, T6, T7 | T3, T4 | Índices, queries e planos de execução dependem do banco atualizado e das consultas críticas definidas. |
+| T9 | T8 | O teste de carga depende de massa de dados preparada. |
+| T13 | T7, T9, T10, T12 | O README do banco deve consolidar scripts, evidências, dicionário e testes. |
+| T16, T17, T19 | T15, T18 | A documentação técnica depende da revisão da arquitetura e dos padrões. |
+| T23, T24, T25, T26 | T22 | Endpoint, service, modelo e integração dependem do contrato JSON da API de recomendação. |
+| T27, T28, T30, T31, T32 | T23, T24, T25, T26 | Swagger, testes unitários, frontend e validação integrada dependem da API funcional. |
+| T36, T37 | T13, T23, T31 | Deploy depende de banco documentado, backend funcional e frontend integrado. |
+| T43, T46, T47 | T32, T37 | Testes funcionais e RNFs dependem do fluxo integrado e do ambiente publicado. |
+| T48 | T31 | Testes de usabilidade dependem da interface com fluxo principal disponível. |
+| T51 | T43, T44, T45, T46, T47, T48, T49, T50 | Consolidação dos testes depende da execução, logs e análise de abrangência. |
+| T55, T56 | T33, T51 | Slides e ensaio dependem das evidências de desenvolvimento e testes. |
+| T57, T58 | T14, T33, T51, T56 | Retrospectiva e planejamento da Sprint 5 dependem do fechamento dos artefatos e da apresentação revisada. |
+
+#### Cronograma Priorizado por Dia
+
+##### Dia 1 — 02/06 — Fundação da Sprint
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T1, T2, T3, T4 |
+| Desenvolvimento do Projeto | T15, T18, T22 |
+| Execução de Testes | T40, T41 |
+| Gestão de Projetos | T53, T54 |
+
+Checkpoint do dia: T3, T15, T22, T40 e T41 devem estar concluídas, pois banco revisado, arquitetura validada, contrato JSON e estratégia de testes destravam as próximas ondas.
+
+##### Dia 2 — 03/06 — Camada de Apoio
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T5, T10, T11, T12 |
+| Desenvolvimento do Projeto | T16, T17, T19, T20, T21, T23 |
+| Execução de Testes | T42 |
+| Gestão de Projetos | Revisão entre Kanban, documentação e roteiro da apresentação |
+
+Checkpoint do dia: índices, rastreabilidade, contratos, padrões e endpoint base de recomendação devem estar disponíveis para permitir implementação funcional no Dia 3.
+
+##### Dia 3 — 08/06 — Núcleo do Desenvolvimento
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T6, T7, T8, T9 |
+| Desenvolvimento do Projeto | T24, T25, T26, T27, T28 |
+| Execução de Testes | T44, T45 |
+| Gestão de Projetos | Atualização das evidências parciais nos slides e checagem de centralização |
+
+Checkpoint do dia: API de recomendação funcional, modelo integrado, evidências de desempenho do banco em andamento ou finalizadas e testes automatizados iniciais implementados.
+
+##### Dia 4 — 09/06 — Integração, Frontend e Deploy
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T13 |
+| Desenvolvimento do Projeto | T29, T30, T31, T32, T36, T37 |
+| Execução de Testes | T43, T46, T47 |
+| Gestão de Projetos | Consolidação da primeira versão dos slides com evidências disponíveis |
+
+Checkpoint do dia: aplicação dockerizada e fluxo de recomendação validado entre frontend e backend. A partir desse ponto, novas features devem ser evitadas para preservar tempo de testes e documentação.
+
+##### Dia 5 — 10/06 — Evidências e Revisão Geral
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | T14 |
+| Desenvolvimento do Projeto | T33, T34, T35, T38, T39 |
+| Execução de Testes | T48, T49, T50, T52 |
+| Gestão de Projetos | T55, T56 |
+
+Checkpoint do dia: código congelado, slides em versão apresentável, evidências organizadas, análise ética documentada e testes de usabilidade registrados.
+
+##### Dia 6 — 11/06 — Fechamento da Sprint
+
+| Artefato | Tasks planejadas |
+|----------|------------------|
+| Banco de Dados | Revisão final de scripts, README e versionamento |
+| Desenvolvimento do Projeto | Revisão final do Projeto.md, Swagger, deploy e vídeo demonstrativo |
+| Execução de Testes | T51 e validação final de logs, ferramentas, casos e abrangência |
+| Gestão de Projetos | T57, T58 e revisão final dos slides |
+
+Checkpoint do dia: entrega fechada, documentação revisada, vídeo pronto, servidor validado, Swagger acessível, testes documentados, retrospectiva da Sprint 4 registrada e planejamento da Sprint 5 incluído no `GestaoProjeto.md`.
+
+#### Alinhamento com a Gestão de Configuração
+
+Todas as tasks da Sprint 4 devem ser registradas no quadro Kanban com descrição clara, DoR, DoD, tamanho, prioridade e dependências. Como melhoria em relação à Sprint 3, a documentação das tasks deve permitir entendimento do escopo mesmo fora do card, reduzindo a dependência exclusiva do Kanban para compreender o trabalho planejado.
+
+Para esta sprint, ficam estabelecidas as seguintes diretrizes adicionais:
+
+- Cada integrante deve assumir no mínimo 12 horas de trabalho ao longo da sprint, respeitando a capacidade mínima planejada.
+- A apresentação deve ser acompanhada desde o Dia 1, com roteiro, versão preliminar e ensaio registrados no fluxo.
+- Pull Requests devem ser abertos de forma incremental e revisados continuamente, mantendo o SLA interno de revisão adotado na Sprint 3.
+- O deploy deve ser tratado como entrega crítica e não deve ser postergado para o último dia.
+- O `Projeto.md`, o `GuiaPadroesDesenvolvimento.md`, o README do banco e o `GestaoProjeto.md` devem ser atualizados em paralelo ao desenvolvimento, evitando concentração documental no fechamento da sprint.
+- Evidências de testes, Swagger, vídeo demonstrativo, scripts SQL e logs de execução devem ser versionados ou referenciados antes da entrega final.
 
 ## 2.4 Sprint 4  
 Nota: Insira informações sobre mudanças realizadas.
@@ -421,7 +699,7 @@ O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a 
 |----|------|--------------|---------|-------------|
 | R1 | Atraso na entrega de apresentações | Média | Alto | Scrum Master |
 | R2 | Falta de revisão de materiais | Alta | Médio | Equipe |
-| R3 | Desorganização no Kanban | Média | Médio | Product Owner |
+| R3 | Desorganização no Kanban | Média | Médio | Scrum Master |
 
 
 ## 3.2 Mitigação de Riscos

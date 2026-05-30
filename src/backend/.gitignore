@@ -1,0 +1,13 @@
+# Build .NET
+bin/
+obj/
+*.user
+
+# Variáveis de ambiente (segredos)
+.env
+
+# Logs
+*.log
+
+# .NET test and coverage artifacts
+TestResults/

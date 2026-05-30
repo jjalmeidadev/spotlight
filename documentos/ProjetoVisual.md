@@ -124,6 +124,7 @@
   - [4.7 Tela 6 - Catálogo - Visão por Afinidade](#47-tela-6---catálogo---visão-por-afinidade)
   - [4.8 Tela 7 - Descrição do Espetáculo](#48-tela-7---descrição-do-espetáculo)
   - [4.9 Tela 8 - Dashboard Administrativo](#49-tela-8---dashboard-administrativo)
+  - [4.10 Ajustes Aplicados no Frontend](#410-ajustes-aplicados-no-frontend)
 
 ---
 
@@ -698,3 +699,17 @@ Fonte: Material produzido pelos autores (2026).
 &emsp;O donut chart de "Tipos de exibições" usa laranja/vermelho para o segmento "Externa" e azul para "Aventura", introduzindo cor funcional na única tela onde a distinção cromática entre categorias é necessária para leitura imediata do dado. O centro do donut exibe o total numérico de exibições, tornando o espaço funcional além de decorativo.
 
 &emsp;O gráfico de barras de "Vendas por período" usa barras azuis sobre fundo claro. Os eixos e labels usam Cinza Texto (`#8A8A8A`). As tabs "SEMANA", "MÊS", "ANO" seguem o mesmo padrão de chip das preferências: ativo (fundo destacado, Gotham Bold) e inativo (sem fundo, texto Cinza Texto, Gotham Book). 
+
+---
+
+## 4.10 Ajustes Aplicados no Frontend
+
+&emsp;Durante a implementação mobile, algumas decisões visuais foram ajustadas em relação aos mockups originais para manter consistência entre as telas conectadas ao backend e melhorar a legibilidade no dispositivo real. Esses ajustes não substituem os mockups documentados anteriormente; registram apenas a adaptação aplicada no frontend.
+
+&emsp;No Login, a imagem `login-bg.png` passou a ocupar o fundo da tela com `resizeMode="cover"` e alinhamento ao topo. Para preservar a arte sem comprometer leitura, foi aplicado um gradiente vertical transparente no terço superior, escurecendo até preto quase opaco no rodapé. Os campos permanecem em padrão underline, sem caixas preenchidas, e o botão "Entrar" mantém 52px de altura como área de toque principal.
+
+&emsp;No Cadastro, o fundo foi padronizado em Preto Aventura (`#0A0A0A`) e o cabeçalho passou a usar a cor de acento `#E8420A`. O espaçamento superior foi ampliado para respeitar a safe area em celulares, evitando que o título fique próximo demais dos elementos do sistema operacional. Os campos funcionais integrados ao backend foram preservados: Nome completo, E-mail, Data de nascimento, Senha, Gênero e Compartilhar localização.
+
+&emsp;Na Seleção de Preferências, a tela foi alinhada ao mesmo sistema visual do Cadastro. As opções deixaram de usar chips arredondados e passaram a ser botões retangulares com raio de 6px, borda discreta e estado ativo em `#E8420A`. A distribuição em grade de duas colunas evita elementos isolados desalinhados e melhora a leitura do conjunto em telas estreitas.
+
+&emsp;Também foi adicionado um acesso discreto de modo desenvolvimento na tela de Login. Esse acesso não altera o fluxo oficial de autenticação, mas permite que professores e avaliadores naveguem pelo protótipo caso o backend local, Supabase ou serviço de geolocalização estejam indisponíveis durante uma demonstração.

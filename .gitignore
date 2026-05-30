@@ -4,6 +4,16 @@
 !src/dataset/*.csv
 *.xls
 *.xlsx
+node_modules/
+/.expo/
+npm-debug.log*
+.env
+.env.*
+!.env.example
+**/.data-protection-keys/
+
+# .NET test and coverage artifacts
+TestResults/
 
 # Artefatos gerados por notebooks e análises locais
 src/aad/*.png
