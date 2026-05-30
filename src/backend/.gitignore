@@ -8,3 +8,6 @@ obj/
 
 # Logs
 *.log
+
+# .NET test and coverage artifacts
+TestResults/
