@@ -25,7 +25,7 @@ foreach ($s in $services) {
     Start-Process powershell -ArgumentList @(
         "-NoExit",
         "-Command",
-        "`$host.UI.RawUI.WindowTitle = '$title'; Write-Host '$title' -ForegroundColor Cyan; dotnet run --project '$proj'"
+        "`$host.UI.RawUI.WindowTitle = '$title'; Write-Host '$title' -ForegroundColor Cyan; dotnet run --no-launch-profile --project '$proj' --urls http://0.0.0.0:$($s.Port)"
     )
     Start-Sleep -Milliseconds 700
 }

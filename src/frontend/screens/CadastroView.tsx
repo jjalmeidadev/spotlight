@@ -26,44 +26,47 @@ export default function CadastroView({ onCadastro, onBackPress }: CadastroViewPr
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
+      <View style={styles.header}>
+        <Text style={styles.title}>Cadastro</Text>
+        <Text style={styles.subtitle}>Preencha seus dados para continuar</Text>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerShape}>
-          <Pressable
-            accessibilityLabel="Voltar para o login"
-            accessibilityRole="button"
-            onPress={onBackPress}
-            style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-          >
-            <Text style={styles.backIcon}>‹</Text>
-          </Pressable>
-          <Text style={styles.title}>Cadastro</Text>
-          <Text style={styles.subtitle}>Nos conte sobre você!</Text>
-        </View>
-
         <View style={styles.form}>
-          <Field label="Nome" onChangeText={vm.setNome} value={vm.nome} />
+          <Field
+            label="Nome completo"
+            onChangeText={vm.setNome}
+            placeholder="seu nome"
+            value={vm.nome}
+          />
           <Field
             autoCapitalize="none"
             keyboardType="email-address"
-            label="Seu melhor e-mail"
+            label="E-mail"
             onChangeText={vm.setEmail}
+            placeholder="seu@email.com"
             value={vm.email}
           />
-          <Field label="Senha" onChangeText={vm.setSenha} secureTextEntry value={vm.senha} />
           <Field
             keyboardType="number-pad"
             label="Data de nascimento"
             onChangeText={vm.setDataNascimento}
             placeholder="DD/MM/AAAA"
-            placeholderTextColor="#a7afa9"
             value={vm.dataNascimento}
           />
+          <Field
+            label="Senha"
+            onChangeText={vm.setSenha}
+            placeholder="sua senha"
+            secureTextEntry
+            value={vm.senha}
+          />
 
-          <Text style={styles.label}>Gênero</Text>
+          <Text style={styles.groupLabel}>Gênero</Text>
           <View style={styles.optionGrid}>
             {vm.generos.map((genero) => (
               <Option
@@ -75,7 +78,7 @@ export default function CadastroView({ onCadastro, onBackPress }: CadastroViewPr
             ))}
           </View>
 
-          <Text style={styles.label}>Compartilhar Localização?</Text>
+          <Text style={styles.groupLabel}>Compartilhar localização?</Text>
           <View style={styles.segmented}>
             <Option
               active={vm.compartilharLocalizacao}
@@ -102,7 +105,13 @@ export default function CadastroView({ onCadastro, onBackPress }: CadastroViewPr
               vm.loading && styles.disabled,
             ]}
           >
-            {vm.loading ? <ActivityIndicator color="#eef7f2" /> : <Text style={styles.primaryText}>Criar Conta</Text>}
+            {vm.loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.primaryText}>Criar conta</Text>}
+          </Pressable>
+
+          <Pressable accessibilityRole="button" onPress={onBackPress} style={styles.loginLinkButton}>
+            <Text style={styles.footerText}>
+              Já tem conta? <Text style={styles.footerLink}>Entrar</Text>
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -118,7 +127,11 @@ function Field({ label, ...props }: FieldProps) {
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput style={styles.input} {...props} />
+      <TextInput
+        placeholderTextColor="rgba(255,255,255,0.18)"
+        style={styles.input}
+        {...props}
+      />
     </View>
   );
 }
@@ -146,129 +159,154 @@ function Option({ active, label, onPress }: OptionProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eef7f2',
+    backgroundColor: '#0A0A0A',
+  },
+  header: {
+    backgroundColor: '#E8420A',
+    justifyContent: 'flex-end',
+    minHeight: 112,
+    paddingBottom: 18,
+    paddingHorizontal: 16,
+    paddingTop: 34,
+  },
+  title: {
+    color: '#FFFFFF',
+    fontFamily: 'Gotham-Bold',
+    fontSize: 26,
+    fontWeight: '700',
+    letterSpacing: 1.32,
+    lineHeight: 32,
+    textTransform: 'uppercase',
+  },
+  subtitle: {
+    color: 'rgba(255,255,255,0.6)',
+    fontFamily: 'Gotham-Book',
+    fontSize: 11,
+    fontWeight: '300',
+    lineHeight: 16,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 40,
-  },
-  headerShape: {
-    minHeight: 156,
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingTop: 24,
-    backgroundColor: '#050505',
-    borderBottomRightRadius: 220,
-  },
-  backButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    left: 24,
-    minHeight: 44,
-    minWidth: 44,
-    position: 'absolute',
-    top: 18,
-  },
-  backIcon: {
-    color: '#eef7f2',
-    fontSize: 42,
-    fontWeight: '500',
-    lineHeight: 44,
-  },
-  title: {
-    color: '#eef7f2',
-    fontSize: 50,
-    fontWeight: '800',
-    letterSpacing: 0,
-    lineHeight: 58,
-  },
-  subtitle: {
-    color: '#eef7f2',
-    fontSize: 16,
-    lineHeight: 22,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   form: {
-    alignSelf: 'center',
-    width: '70%',
-    maxWidth: 360,
-    paddingTop: 26,
-    gap: 16,
+    flexGrow: 1,
+    gap: 14,
+    justifyContent: 'flex-end',
   },
   field: {
-    gap: 8,
+    gap: 3,
   },
   label: {
-    color: '#202421',
-    fontSize: 15,
-    lineHeight: 18,
-    textAlign: 'center',
+    color: 'rgba(255,255,255,0.35)',
+    fontFamily: 'Gotham-Book',
+    fontSize: 10,
+    fontWeight: '500',
+    letterSpacing: 0.64,
+    lineHeight: 13,
+    textTransform: 'uppercase',
   },
   input: {
-    height: 22,
-    borderRadius: 999,
-    backgroundColor: '#303030',
-    color: '#eef7f2',
-    paddingHorizontal: 12,
-    textAlign: 'center',
+    borderBottomColor: 'rgba(255,255,255,0.12)',
+    borderBottomWidth: 1,
+    color: '#FFFFFF',
+    fontFamily: 'Gotham-Book',
+    fontSize: 14,
+    fontStyle: 'italic',
+    fontWeight: '300',
+    minHeight: 36,
+    paddingHorizontal: 0,
+    paddingVertical: 6,
+  },
+  groupLabel: {
+    color: 'rgba(255,255,255,0.35)',
+    fontFamily: 'Gotham-Book',
+    fontSize: 10,
+    fontWeight: '500',
+    letterSpacing: 0.64,
+    lineHeight: 13,
+    marginTop: 2,
+    textTransform: 'uppercase',
   },
   optionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   segmented: {
     flexDirection: 'row',
-    gap: 28,
-    justifyContent: 'center',
+    gap: 8,
   },
   option: {
     alignItems: 'center',
+    borderColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 6,
+    borderWidth: 1,
     justifyContent: 'center',
-    minHeight: 22,
-    minWidth: 110,
-    borderRadius: 999,
-    backgroundColor: '#a3a3a3',
+    minHeight: 32,
     paddingHorizontal: 12,
   },
   optionActive: {
-    backgroundColor: '#303030',
+    backgroundColor: '#E8420A',
+    borderColor: '#E8420A',
   },
   optionText: {
-    color: '#111412',
-    fontSize: 11,
-    fontWeight: '700',
+    color: 'rgba(255,255,255,0.55)',
+    fontFamily: 'Gotham-Book',
+    fontSize: 12,
+    fontWeight: '500',
   },
   optionTextActive: {
-    color: '#eef7f2',
+    color: '#FFFFFF',
   },
   error: {
-    color: '#c94f3a',
+    color: '#FFFFFF',
+    fontFamily: 'Gotham-Book',
     fontSize: 12,
     lineHeight: 16,
-    textAlign: 'center',
   },
   success: {
-    color: '#2f6d45',
+    color: '#FFFFFF',
+    fontFamily: 'Gotham-Book',
     fontSize: 12,
     lineHeight: 16,
-    textAlign: 'center',
   },
   primaryButton: {
     alignItems: 'center',
-    alignSelf: 'center',
+    backgroundColor: '#E8420A',
+    borderRadius: 6,
+    height: 52,
     justifyContent: 'center',
-    minHeight: 24,
-    minWidth: 156,
-    borderRadius: 999,
-    backgroundColor: '#303030',
-    marginTop: 10,
-    paddingHorizontal: 18,
+    marginTop: 'auto',
+    width: '100%',
   },
   primaryText: {
-    color: '#eef7f2',
-    fontSize: 11,
+    color: '#FFFFFF',
+    fontFamily: 'Gotham-Bold',
+    fontSize: 13,
     fontWeight: '700',
+    letterSpacing: 1.56,
+    textTransform: 'uppercase',
+  },
+  loginLinkButton: {
+    alignItems: 'center',
+    minHeight: 22,
+  },
+  footerText: {
+    color: 'rgba(255,255,255,0.45)',
+    fontFamily: 'Gotham-Book',
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: 'center',
+  },
+  footerLink: {
+    color: 'rgba(255,255,255,0.7)',
+    textDecorationLine: 'underline',
   },
   disabled: {
-    opacity: 0.65,
+    opacity: 0.72,
   },
   pressed: {
     opacity: 0.84,

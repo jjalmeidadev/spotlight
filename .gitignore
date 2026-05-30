@@ -10,6 +10,7 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+**/.data-protection-keys/
 
 # Artefatos gerados por notebooks e análises locais
 src/aad/*.png

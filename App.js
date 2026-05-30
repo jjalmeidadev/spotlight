@@ -131,6 +131,10 @@ export default function App() {
 	return (
 		<LoginView
 			onCadastroPress={() => setScreen('cadastro')}
+			onDevModePress={() => {
+				setUserName('Professor');
+				setScreen('catalogo');
+			}}
 			onLogin={handleLogin}
 		/>
 	);

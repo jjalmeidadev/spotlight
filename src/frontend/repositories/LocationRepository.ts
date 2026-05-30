@@ -26,7 +26,7 @@ export async function obterLocalizacaoAtual(): Promise<LocalizacaoUsuario> {
     `${API_BASE_URL}/geolocalizacao/geocoding/reverse?latitude=${latitude}&longitude=${longitude}`,
   );
 
-  const payload = await response.json();
+  const payload = await parseJsonResponse(response);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(payload, 'Nao foi possivel resolver sua localizacao.'));
@@ -52,7 +52,7 @@ export async function salvarLocalizacaoUsuario(
     body: JSON.stringify(localizacao),
   });
 
-  const payload = await response.json();
+  const payload = await parseJsonResponse(response);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(payload, 'Nao foi possivel salvar sua localizacao.'));
@@ -65,4 +65,14 @@ function getApiErrorMessage(payload: any, fallback: string) {
     : '';
 
   return `${payload?.error ?? fallback}${details}`;
+}
+
+async function parseJsonResponse(response: Response) {
+  const text = await response.text();
+
+  if (!text.trim()) {
+    return {};
+  }
+
+  return JSON.parse(text);
 }

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Net.Sockets;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -133,8 +134,20 @@ public static class AuthSetup
 
         if (!string.IsNullOrWhiteSpace(jwksUrl))
         {
-            var jwks = new HttpClient().GetStringAsync(jwksUrl).GetAwaiter().GetResult();
-            keys.AddRange(new JsonWebKeySet(jwks).Keys);
+            try
+            {
+                var jwks = new HttpClient().GetStringAsync(jwksUrl).GetAwaiter().GetResult();
+                keys.AddRange(new JsonWebKeySet(jwks).Keys);
+            }
+            catch (HttpRequestException)
+            {
+                // O ambiente local pode bloquear chamadas externas na inicializacao.
+                // Mantem o servico de pe usando as chaves locais ja configuradas.
+            }
+            catch (SocketException)
+            {
+                // Mesmo motivo acima, mas alguns bloqueios chegam como erro de socket.
+            }
         }
 
         return keys;
