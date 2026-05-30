@@ -4592,10 +4592,221 @@ _conteúdo_
 _conteúdo_
 
 ## 9.3 Testes de Usabilidade
-_conteúdo_
+
+&emsp;Os testes de usabilidade do Spotlight constituem etapa de validação sistemática da experiência do usuário no aplicativo mobile do Portal Aventura. A rodada avalia, com participantes externos em smartphones, a capacidade de descobrir espetáculos, empregar busca e filtros, visualizar detalhes e concluir ações principais com poucos toques e linguagem acessível. Os resultados subsidiam refinamentos de interface antes da integração definitiva com o backend e complementam os testes funcionais e de RNF previstos no capítulo 9.
+
+&emsp;Esta seção apresenta o planejamento da rodada. A consolidação quantitativa e qualitativa dos achados será documentada em [9.3.2 Resultados](#932-resultados).
 
 ## 9.3.1 Planejamento
-_conteúdo_
+
+### 9.3.1.1 Objetivo dos testes no contexto do projeto
+
+&emsp;O Spotlight é um sistema de recomendação para o Portal Aventura Teatros, orientado à descoberta cultural e ao estímulo ao interesse em ingressos. No escopo desta rodada, o artefato avaliado concentra o fluxo do usuário final em dispositivo móvel: autenticação, definição de preferências, catálogo com recomendações, busca, filtros e página de detalhes do espetáculo.
+
+&emsp;Os objetivos do planejamento são:
+
+- Verificar se usuários externos conseguem executar, em smartphone, as tarefas centrais de navegação, busca, visualização de espetáculo e interação por toque, sem dependência de conhecimento técnico prévio.
+- Mensurar a percepção global de facilidade de uso por meio do **System Usability Scale (SUS)**.
+- Relacionar os achados aos requisitos funcionais de exploração e conteúdo (RF04 a RF07) e aos requisitos não funcionais de usabilidade mobile (RNF04, RNF10, RNF11), com atenção à persona **Carlos Nóbrega** e a participantes com 60 anos ou mais e baixa familiaridade tecnológica.
+- Produzir evidências para priorização de ajustes de interface no protótipo mockado, antes da evolução para integração com serviços de backend.
+
+&emsp;A rodada não substitui testes de performance (RNF01, RNF02), segurança (RNF05) nem validação do motor de recomendação (RF12 a RF15). O foco restringe-se à experiência de uso da interface no mobile.
+
+### 9.3.1.2 Pré-condições
+
+&emsp;Para a realização da rodada, estabelecem-se as seguintes pré-condições:
+
+| Categoria | Pré-condição |
+|-----------|----------------|
+| Artefato | Protótipo instalável do aplicativo Spotlight (build de demonstração ou equivalente), com fluxos de splash, login, preferências, catálogo, busca, filtro e detalhes disponíveis para execução |
+| Dados de teste | Credenciais de acesso de teste definidas; espetáculo e categoria utilizados nos cenários T05 e T06 identificados no catálogo mockado |
+| Participantes | Mínimo de cinco pessoas externas ao grupo de desenvolvimento, conforme perfil descrito na seção 9.3.1.4 |
+| Dispositivo | Smartphone com Android 10+ ou iOS 15+ (RNF11), preferencialmente o aparelho habitual do participante |
+| Ambiente | Local silencioso, iluminação adequada à leitura da tela, conexão estável quando o protótipo depender de rede |
+| Equipe | Condução por membro do grupo treinado no roteiro; registro em planilha padronizada; consentimento do participante para observação e, se aplicável, gravação |
+| Exclusões | Membros do grupo que implementaram a interface não atuam como usuários avaliados na mesma rodada |
+
+&emsp;Antes de cada sessão, o estado inicial do aplicativo será padronizado (reinstalação ou limpeza de sessão, conforme script definido pelo grupo), de modo a garantir comparabilidade entre participantes.
+
+### 9.3.1.3 Cenários de teste
+
+&emsp;Os cenários contemplam o percurso principal do usuário no mobile e combinam situações de uso esperadas (cenários positivos) com situações de dificuldade ou insucesso registrável (cenários negativos), quando aplicável ao protótipo disponível.
+
+**Cenários positivos (fluxo esperado)**
+
+| Cenário | Descrição | Tarefas relacionadas |
+|---------|-----------|----------------------|
+| CP01 | Acesso inicial e autenticação | T01, T02 |
+| CP02 | Configuração de preferências no onboarding | T03 |
+| CP03 | Descoberta de espetáculos por recomendações e carrosséis horizontais | T04, T08 |
+| CP04 | Localização de espetáculo por busca textual | T05 |
+| CP05 | Refinamento da lista por filtro de categoria | T06 |
+| CP06 | Consulta de informações na página de detalhes e intenção de compra | T07, T09 |
+
+**Cenários negativos ou de contingência (quando observados)**
+
+| Cenário | Descrição | Registro esperado |
+|---------|-----------|-------------------|
+| CN01 | Termo de busca sem resultado correspondente no protótipo | Desfecho “não encontrou” em T05, sem classificação como falha de usabilidade se a interface comunicar ausência de resultados |
+| CN02 | Filtro que não altera a lista percebida pelo participante | Desfecho registrado em T06; classificação posterior como limitação de protótipo ou problema de interface |
+| CN03 | Credenciais de teste recusadas ou fluxo interrompido por erro | Falha em T02; evidência documentada para correção técnica |
+| CN04 | Participante necessita de auxílio para concluir tarefa | `Precisou_Ajuda` = Sim; impacto na taxa de sucesso do RNF10 |
+| CN05 | Elementos com área de toque reduzida ou texto de difícil leitura (perfil 60+) | Observações de acessibilidade na planilha de campo |
+
+&emsp;Os enunciados das tarefas (seção 9.3.1.5) materializam os cenários em linguagem simples, apta à leitura em sessão moderada.
+
+### 9.3.1.4 Perfil dos participantes
+
+&emsp;A amostra mínima compreende **cinco participantes externos** ao grupo de desenvolvimento, sem vínculo com a implementação da interface. A composição exata pode variar conforme disponibilidade de recrutamento, desde que o critério obrigatório abaixo seja atendido.
+
+| Critério | Especificação |
+|----------|----------------|
+| Quantidade mínima | 5 participantes externos |
+| Vínculo com o projeto | Externo ao grupo; não desenvolvedor da solução avaliada |
+| Vaga obrigatória (60+ e baixa familiaridade) | **1 participante** com **60 anos ou mais**, que também representa **baixa familiaridade tecnológica** (uso cotidiano limitado a funções básicas do telefone, como mensagens e ligações). Este participante atende, em uma única pessoa, aos dois critérios de acessibilidade prioritários |
+| Demais vagas (4 participantes) | Preenchimento **preferencial** por perfis mais jovens, com **variação de familiaridade tecnológica** entre baixa, média e alta, de modo a observar diferentes padrões de interação mobile |
+| Dispositivo | Smartphone Android 10+ ou iOS 15+ (RNF11) |
+| Familiaridade com teatro | Diversidade desejável; não constitui critério de exclusão |
+| Personas de referência | Ana Clara Amaral, Mariana Lacerda Souza, Ronaldo Benito Soares, Pedro Henrique Lima, **Carlos Nóbrega** |
+
+&emsp;A reserva de uma vaga para participante com 60 anos ou mais e baixa familiaridade tecnológica alinha a rodada ao requisito de acessibilidade mobile (RNF04) e à validação do público idoso previsto nas personas do projeto. Os demais participantes complementam a amostra com perfis predominantemente jovens, sem exigir duplicação artificial dos critérios de idade avançada e baixa alfabetização digital em pessoas distintas.
+
+&emsp;Os dados de recrutamento serão registrados na planilha de anotações (seção 9.3.1.10), respeitando restrições de privacidade acordadas com cada pessoa.
+
+### 9.3.1.5 Metodologia SUS
+
+&emsp;Após a execução das tarefas estruturadas, cada participante responderá ao questionário **SUS** em português, com escala Likert de 1 (discordo totalmente) a 5 (concordo totalmente). A pontuação individual será convertida para a escala padrão de 0 a 100; a média do grupo será confrontada com o limiar definido na seção 9.3.1.8.
+
+&emsp;As dez perguntas fixas do SUS, sem alteração de redação, são:
+
+| # | Pergunta |
+|---|----------|
+| 1 | Eu acho que gostaria de usar este sistema com frequência. |
+| 2 | Eu achei o sistema desnecessariamente complexo. |
+| 3 | Eu achei o sistema fácil de usar. |
+| 4 | Eu acho que precisaria de ajuda de uma pessoa com conhecimentos técnicos para usar o sistema. |
+| 5 | Eu achei que as funções do sistema estão bem integradas. |
+| 6 | Eu achei que houve inconsistência no sistema. |
+| 7 | Eu imagino que a maioria das pessoas aprenderia a usar este sistema rapidamente. |
+| 8 | Eu achei o sistema muito complicado de usar. |
+| 9 | Eu me senti confiante usando o sistema. |
+| 10 | Eu precisei aprender muitas coisas antes de conseguir usar o sistema. |
+
+&emsp;As respostas brutas (1 a 5) serão registradas na planilha de campo; o cálculo da nota SUS será realizado na etapa de análise, de forma a reduzir viés durante a sessão.
+
+### 9.3.1.6 Lista de tarefas estruturadas
+
+&emsp;As tarefas abaixo constituem o roteiro verbal da sessão. Cada enunciado será apresentado ao participante em linguagem simples. A estrutura da tabela permite replicação direta na planilha de anotações de campo, com colunas sugeridas: `ID_Tarefa`, `Participante`, `Concluiu (S/N)`, `Toques`, `Tempo (s)`, `Precisou_Ajuda (S/N)`, `Observações`.
+
+| ID | Descrição da tarefa (enunciado ao participante) | Critério de conclusão | RFs cobertos | RNFs cobertos |
+|----|--------------------------------------------------|------------------------|--------------|---------------|
+| T01 | Abra o aplicativo e espere a tela inicial terminar de carregar. Quando aparecer a tela para entrar com e-mail e senha, diga que está pronto. | Tela de login visível e compreensível, sem explicação prévia sobre a natureza da tela. | RF02 | RNF01, RNF04, RNF11 |
+| T02 | Entre no aplicativo usando o e-mail e a senha que serão informados. Avise quando estiver logado. | Credenciais de teste aceitas; participante alcança tela posterior ao login (preferências ou catálogo). | RF02 | RNF10, RNF11 |
+| T03 | Escolha pelo menos um tipo de espetáculo que você gosta e uma faixa de preço que faz sentido para você. Avance até concluir essa configuração. | Preferências selecionadas e fluxo de onboarding concluído sem erro bloqueante. | RF03 | RNF04, RNF10, RNF11 |
+| T04 | Na tela principal, role a tela para baixo e diga quais espetáculos aparecem nas listas que deslizam para o lado. Toque em um cartaz que chame sua atenção. | Identificação de ao menos uma seção de recomendações e abertura ou indicação clara do cartaz selecionado. | RF04 | RNF04, RNF10, RNF11 |
+| T05 | Use a barra de busca para encontrar um espetáculo disponível na plataforma. Avise quando achar o resultado. | Termo de busca aplicado; resultado esperado visível ou desfecho “não encontrou” registrado. | RF05 | RNF10, RNF11 |
+| T06 | Limpe ou ignore a busca anterior. Use o filtro para mostrar apenas espetáculos de uma categoria disponível. Diga quando a lista estiver do jeito que pediu. | Filtro aplicado; lista percebida como refinada ou desfecho de não conclusão registrado. | RF06 | RNF10, RNF11 |
+| T07 | Abra a página com informações completas de um espetáculo qualquer. Role até o final e diga o que entendeu sobre a peça (data, local ou resumo). | Tela de detalhes exibida; citação de ao menos um dado do espetáculo (título, descrição, data, preço ou local). | RF07 | RNF01, RNF04, RNF10, RNF11 |
+| T08 | Volte para a tela principal. Deslize o dedo horizontalmente em uma das listas de espetáculos e abra outro espetáculo diferente do anterior. | Gesto horizontal executado; segundo espetáculo acessado ou tentativa registrada. | RF04, RF07 | RNF04, RNF10, RNF11 |
+| T09 | Na página do espetáculo, encontre onde comprar ingresso ou seguir para compra. Toque nessa opção e diga o que aconteceu. | Botão ou link de compra localizado; ação executada (incluindo redirecionamento mockado, se houver). | RF07 | RNF10, RNF11 |
+
+&emsp;Credenciais de teste, versão do build e enunciados permanecem idênticos para todos os participantes de uma mesma rodada, a fim de assegurar comparabilidade dos resultados.
+
+### 9.3.1.7 Registro de condução da sessão
+
+&emsp;Cada sessão individual terá duração estimada entre **25 e 40 minutos**, em ambiente controlado, com o participante utilizando o smartphone na postura habitual (uso com uma mão ou apoiado).
+
+**Momento preparatório**
+
+&emsp;Nesta fase, obtém-se o consentimento do participante, configura-se o dispositivo com o build de teste, define-se brilho e conectividade adequados, estabelecem-se o espetáculo e a categoria de referência para as tarefas T05 e T06 e restabelece-se o estado inicial do aplicativo.
+
+**Momento de execução das tarefas (T01 a T09)**
+
+&emsp;Durante cada tarefa, serão registrados os comportamentos observados, incluindo dificuldades, número de toques, tempo até o critério de conclusão, caminho percorrido entre telas, hesitações, comentários espontâneos e necessidade de auxílio. O registro de auxílio distingue orientação genérica do sistema operacional de indicação do caminho na interface; apenas a segunda situação impacta a métrica de sucesso do RNF10.
+
+| Dimensão observada | Registro na planilha |
+|--------------------|----------------------|
+| Compreensão do enunciado | Reformulação solicitada, repetição do enunciado |
+| Caminho de navegação | Sequência de telas visitadas |
+| Eficiência de interação | Número de toques, tempo em segundos |
+| Erros e hesitações | Toques incorretos, scroll inadequado, leitura prolongada |
+| Auxílio | Necessidade de ajuda (Sim/Não) e descrição resumida |
+| Acessibilidade | Legibilidade, contraste, área de toque, insegurança na interação (ênfase no participante 60+) |
+| Comentários espontâneos | Transcrição literal de falas relevantes |
+
+**Momento de encerramento**
+
+&emsp;Após as tarefas, aplica-se o questionário SUS (seção 9.3.1.5). Podem ser registradas, em campo livre, respostas a perguntas de encerramento sobre principais dificuldades e aspectos positivos percebidos.
+
+&emsp;Quando houver observador adicional, este concentrar-se-á no registro quantitativo em planilha, enquanto o condutor conduz o diálogo com o participante.
+
+### 9.3.1.8 Critérios de avaliação
+
+| Métrica | Critério de aceitação | Fonte no projeto |
+|---------|----------------------|------------------|
+| Pontuação SUS média | **≥ 68** (escala 0–100) | Benchmark de usabilidade aceitável |
+| Taxa de conclusão por tarefa | **≥ 85%** dos participantes concluem cada tarefa T01–T09 sem auxílio que revele o caminho na interface | RNF10 |
+| Toques por tarefa | **≤ 3 toques** na conclusão bem-sucedida, em **≥ 85%** das execuções que atingiram o critério de conclusão | RNF10 |
+| Elementos de toque | Área mínima de **44×44 px** nos elementos interativos críticos, quando mensurável no protótipo | RNF04 |
+| Compatibilidade | Execução em dispositivos Android 10+ e/ou iOS 15+ | RNF11 |
+
+&emsp;Considera-se **conclusão bem-sucedida** o atendimento ao critério da tarefa (seção 9.3.1.6) sem auxílio verbal que indique o elemento correto da interface. Desvios serão classificados na análise (seção 9.3.2) como problema de usabilidade, defeito do protótipo ou limitação do escopo mockado.
+
+### 9.3.1.9 Pós-condições
+
+&emsp;Ao término da rodada, espera-se dispor dos seguintes resultados:
+
+| Resultado esperado | Descrição |
+|--------------------|-----------|
+| Planilha de campo completa | Registros por participante e por tarefa (T01–T09), com métricas de toques, tempo e auxílio |
+| Respostas SUS | Dez respostas por participante e pontuação calculada na análise |
+| Síntese por tarefa | Taxa de conclusão e percentual de execuções com até três toques, por tarefa |
+| Veredito frente ao RNF10 | Indicação se a rodada atingiu ≥ 85% de sucesso e ≤ 3 toques nas tarefas avaliadas |
+| Veredito SUS | Indicação se a média do grupo atingiu pontuação ≥ 68 |
+| Lista priorizada de problemas | Problemas de usabilidade, bugs de protótipo e limitações de escopo, com rastreabilidade aos RFs/RNFs |
+| Insumos para refinamento | Recomendações documentadas para ajustes de interface antes da integração com API e para eventual replicação da rodada |
+
+&emsp;Os resultados consolidados alimentarão a seção 9.3.2 e poderão subsidiar o backlog de melhorias da interface mobile do Spotlight.
+
+### 9.3.1.10 Planilha de anotações
+
+> Planilha de anotações e respostas SUS: [inserir link aqui]
+
+### 9.3.1.11 Tabela de rastreabilidade
+
+| Tarefa | RFs cobertos | RNFs cobertos | Critério de aceitação validado |
+|--------|--------------|---------------|--------------------------------|
+| T01 | RF02 | RNF01, RNF04, RNF11 | Splash/login compreensível; carregamento percebido como aceitável |
+| T02 | RF02 | RNF10, RNF11 | Login concluído em ≤ 3 toques (85% dos participantes) |
+| T03 | RF03 | RNF04, RNF10, RNF11 | Preferências salvas; conclusão em ≤ 3 toques (85%) |
+| T04 | RF04 | RNF04, RNF10, RNF11 | Recomendações vistas; interação com cartaz; scroll horizontal |
+| T05 | RF05 | RNF10, RNF11 | Busca por nome; resultado encontrado ou falha registrada |
+| T06 | RF06 | RNF10, RNF11 | Filtro aplicado; lista refinada percebida |
+| T07 | RF07 | RNF01, RNF04, RNF10, RNF11 | Detalhes completos compreendidos; ≤ 3 toques (85%) |
+| T08 | RF04, RF07 | RNF04, RNF10, RNF11 | Segundo espetáculo via gesto horizontal |
+| T09 | RF07 | RNF10, RNF11 | Ação de compra localizada e executada |
+| SUS (pós-tarefas) | RF04, RF05, RF06, RF07 (transversal) | RNF04, RNF10 | Média SUS ≥ 68 |
+
+### 9.3.1.12 Discussão de abrangência e limitações
+
+**Abrangência**
+
+- Validação sistemática do fluxo principal do usuário final no mobile: entrada no aplicativo, login, preferências, catálogo com recomendações, busca, filtro, detalhes e intenção de compra.
+- Explicitação de pré-condições, cenários positivos e negativos, tarefas mensuráveis e pós-condições esperadas.
+- Rastreabilidade aos requisitos RF04 a RF07 e aos RNFs RNF04, RNF10 e RNF11.
+- Inclusão obrigatória de um participante com 60 anos ou mais e baixa familiaridade tecnológica, alinhada à acessibilidade para idosos prevista no projeto.
+- Estrutura apta à replicação em planilha de campo, sem retrabalho de formulação dos enunciados.
+
+**Limitações**
+
+- Protótipo com dados mockados: busca, filtro e recomendações podem não refletir o comportamento final integrado ao backend (RF12 a RF15 permanecem fora do escopo).
+- Amostra mínima de cinco participantes: resultados indicativos, sem pretensão de generalização estatística à população de frequentadores de teatro.
+- O SUS mensura percepção global e não substitui auditoria formal de acessibilidade (WCAG) nem testes de carga (RNF06).
+- Funcionalidades não avaliadas nesta rodada: cadastro completo (RF01), avaliações e comentários (RF08 a RF10), painel administrativo (RF16), cold start algorítmico (RF15).
+- O ambiente controlado de teste difere de uso em mobilidade urbana, sob luminosidade variável ou com interrupções; recomenda-se registrar condições de teste na planilha.
+- Incompletudes do protótipo (ex.: busca sem efeito na lista) serão registradas como limitação de artefato na análise, distinguindo-se de falhas definitivas de desenho.
+
+&emsp;Prevê-se a repetição da rodada após integração com API e incorporação dos ajustes prioritários identificados, preservando as mesmas tarefas quando possível para permitir comparação longitudinal.
 
 ## 9.3.2 Resultados
 _conteúdo_
