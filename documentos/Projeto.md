@@ -3751,6 +3751,16 @@ similaridade item-item suficientes para validar as rotas de leitura.
   encaminhando, mas as políticas de limite por usuário e o cache de chaves
   públicas do Supabase ficam para a Sprint 4.
 
+### Evidência de execução da aplicação
+
+Como evidência do progresso incremental da Sprint 3, foi gravado um vídeo demonstrativo da aplicação em execução local, exibindo simultaneamente a interface mobile e o console do VSCode/PowerShell com os serviços do backend ativos.
+
+O vídeo demonstra o fluxo principal implementado na sprint, incluindo autenticação, cadastro, seleção de preferências, navegação pelo catálogo e acesso à tela de detalhes, além da integração entre frontend, API Gateway e serviços backend.
+
+Durante a gravação, o backend foi executado localmente por meio do script `src/backend/run-all.ps1`, que sobe o API Gateway e os microsserviços nas portas configuradas para desenvolvimento.
+
+**Link do vídeo demonstrativo:** [https://drive.google.com/file/d/1M51U2qHbm24WcHvc9Xm5Hm_YnLadphNw/view?usp=sharing]
+
 ## 8.3.2 Sprint 4
 _conteúdo_
 
