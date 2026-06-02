@@ -26,7 +26,7 @@ Cada serviço tem um projeto de teste correspondente em `tests/`.
 | Item | Onde |
 |---|---|
 | Inicialização ASP.NET Core (.NET 9) | `Program.cs` |
-| Variáveis de ambiente (`.env`) | `.env.example` + `DotNetEnv` |
+| Variáveis de ambiente (`.env`) | `.env.example` na raiz do repositório + `DotNetEnv` |
 | Conexão com o banco (Npgsql / ADO.NET, sem ORM) | `Program.cs` (`NpgsqlDataSource`) |
 | Logger (Serilog) | `Program.cs` (`UseSerilog`) |
 | Middlewares: CORS, error handler, request logging | `Program.cs` + `presentation/middleware/ErrorHandlingMiddleware.cs` |
@@ -78,21 +78,21 @@ src/backend/
 
 ## Como rodar
 
-A partir desta pasta (`src/backend`):
+A partir da raiz do repositório:
 
 ```bash
-# 1. Configurar variáveis de ambiente do serviço que vai rodar
-cp services/catalogo/.env.example services/catalogo/.env
-# edite o .env e preencha DATABASE_CONNECTION_STRING
+# 1. Configurar variáveis de ambiente em um único arquivo
+cp .env.example .env
+# edite o .env e preencha DATABASE_CONNECTION_STRING, Supabase e demais conexões
 
 # 2. Restaurar dependências (a solution Spotlight.sln já vem versionada)
-dotnet restore
+dotnet restore src/backend/Spotlight.sln
 
 # 3. Subir um serviço (cada um numa porta — ver tabela de Projetos)
-dotnet run --project services/catalogo     # http://localhost:5001/swagger
-dotnet run --project services/usuario       # http://localhost:5002/swagger
-dotnet run --project services/recomendacao   # http://localhost:5003/swagger
-dotnet run --project api-gateway             # http://localhost:5000  (roteia p/ os serviços)
+dotnet run --project src/backend/services/catalogo        # http://localhost:5001/swagger
+dotnet run --project src/backend/services/usuario         # http://localhost:5002/swagger
+dotnet run --project src/backend/services/recomendacao    # http://localhost:5003/swagger
+dotnet run --project src/backend/api-gateway              # http://localhost:5000  (roteia p/ os serviços)
 ```
 
 > Para abrir no Visual Studio/Rider, abra o `Spotlight.sln` (já referencia os 8 projetos).
@@ -100,8 +100,8 @@ dotnet run --project api-gateway             # http://localhost:5000  (roteia p/
 ## Verificando os critérios de aceite
 
 ```bash
-# Sobe sem erros (ex.: catálogo)
-dotnet run --project services/catalogo
+# Sobe sem erros (ex.: catálogo, a partir da raiz)
+dotnet run --project src/backend/services/catalogo
 
 # GET /health retorna 200 (em outro terminal)
 curl -i http://localhost:5001/health
@@ -110,7 +110,7 @@ curl -i http://localhost:5001/health
 curl -i http://localhost:5001/health/ready
 
 # Testes rodam (todos os serviços)
-dotnet test
+dotnet test src/backend/Spotlight.sln
 ```
 
 | Critério de aceite | Como validar |
