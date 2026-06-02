@@ -145,6 +145,7 @@
     - [4.3.4 Normalização do Modelo Relacional](#434-normalização-do-modelo-relacional)
     - [4.3.5 Tabelas Associativas dos Relacionamentos N:N](#435-tabelas-associativas-dos-relacionamentos-nn)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
+    - [4.4.6 Dockerização dos Serviços Backend (atualização)](#446-dockerização-dos-serviços-backend-atualização)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
   - [5.2 Diagrama de Componentes da UML](#52-diagrama-de-componentes-da-uml)
@@ -2386,6 +2387,83 @@ services:
 Os scripts mapeados em `docker-entrypoint-initdb.d/` são executados automaticamente na **primeira inicialização** do container, em ordem alfabética. Em reinicializações subsequentes, o volume já contém os dados e os scripts não são reexecutados.
 
 Para instruções completas de execução, variáveis de ambiente necessárias e procedimentos de rollback, consulte [`src/database/README.md`](../src/database/README.md).
+
+# 4.4.6 Dockerização dos Serviços Backend
+
+A equipe introduziu uma dockerização focalizada nos microsserviços backend (`catalogo`, `usuario`, `recomendacao`, `geolocalizacao`) com o objetivo de padronizar execução, isolar dependências e preparar a solução para integração contínua. Esta seção documenta as alterações, padrões aplicados e instruções de uso.
+
+Objetivo
+- Padronizar a execução dos serviços backend em containers Docker.
+- Manter o banco de dados transacional (PostgreSQL/Supabase) como serviço remoto (Supabase cloud) conforme arquivo de configuração `.env` do ambiente, evitando duplicação de dados locais.
+
+O que foi adicionado / modificado
+- Dockerfiles multi-stage para cada serviço (compilação + runtime) — localizados em:
+  - `src/backend/services/catalogo/Dockerfile`
+  - `src/backend/services/usuario/Dockerfile`
+  - `src/backend/services/recomendacao/Dockerfile`
+  - `src/backend/services/geolocalizacao/Dockerfile`
+
+- `.dockerignore` para cada serviço para reduzir contexto de build e excluir artefatos:
+  - `src/backend/services/*/.dockerignore`
+
+- `docker-compose.yml` na raiz foi atualizado para orquestrar os quatro serviços backend como containers independentes e mapear portas locais: 5001 (`catalogo`), 5002 (`usuario`), 5003 (`recomendacao`) e 5004 (`geolocalizacao`). Neste fluxo o PostgreSQL não é mais levantado pelo compose (a aplicação usa a connection string do Supabase remoto definida em `.env`).
+
+- Healthchecks: cada serviço ganhou `healthcheck` no `docker-compose.yml`, apontando para os endpoints `/health` ou `/health/ready` expostos pela aplicação ASP.NET Core, para permitir verificação de readiness a partir do orquestrador local.
+
+- Segurança e qualidade nas imagens:
+  - Labels de imagem (`org.opencontainers.image.*`) adicionadas aos Dockerfiles.
+  - Criação de usuário não-root (`appuser`) no runtime image e mudança do `USER` para reduzir riscos de execução como root.
+
+Padrões aplicados
+- Dockerfiles multi-stage (SDK -> publish -> ASP.NET runtime) para minimizar tamanho da imagem e velocidade de start.
+- Isolamento do contexto de build via `.dockerignore` para evitar inclusão de bin/obj, .git e arquivos sensíveis.
+- Uso de variáveis de ambiente para `DATABASE_CONNECTION_STRING` e `SUPABASE_JWT_SECRET` (lidas pelo `DotNetEnv` no startup dos serviços).
+- Healthchecks no compose para automação de dependência e monitoramento local.
+
+Variáveis e segurança
+- O compose espera que exista um `.env` na raiz com, no mínimo, as variáveis de conexão e segredos (ex.: `DATABASE_CONNECTION_STRING`, `SUPABASE_JWT_SECRET`, `NOMINATIM_*`).
+- IMPORTANT: Não versionar arquivos `.env` com credenciais. Remover do histórico do Git e usar GitLab/GitHub CI variables, Docker secrets ou um vault para ambientes compartilhados.
+
+Como executar localmente (resumo)
+1. Colocar o `.env` (com as variáveis finais do ambiente) na raiz do repositório.
+2. Abrir Docker Desktop (Windows) e garantir que o daemon esteja ativo.
+3. Na raiz do projeto executar:
+
+```bash
+docker compose up -d --build
+```
+
+4. Conferir que os containers estão `running`:
+
+```bash
+docker compose ps
+docker compose logs -f catalogo usuario recomendacao geolocalizacao
+```
+
+5. Validar endpoints (exemplos):
+
+```bash
+curl -i http://localhost:5001/health
+curl -i http://localhost:5001/health/ready
+curl -i http://localhost:5002/health
+curl -i http://localhost:5003/health
+curl -i http://localhost:5004/health
+```
+
+Observações operacionais
+- Os serviços fazem leitura do `DATABASE_CONNECTION_STRING` no ambiente; quando apontados para o Supabase remoto, as checagens de readiness dependem da disponibilidade do Supabase.
+
+Boa prática
+- Remover/arquivar o `.env` sensível do repositório e documentar no README onde armazenar/como fornecer as variáveis em CI.
+
+
+Referências e arquivos afetados
+- `docker-compose.yml` (raiz) — orquestração dos serviços backend.
+- `src/backend/services/*/Dockerfile` — build e runtime das aplicações.
+- `src/backend/services/*/.dockerignore` — exclusões de contexto de build.
+- `src/backend/README.md` — instruções atualizadas de execução e validação.
+
+Esta documentação descreve a configuração aplicada em 2026-06-02 e deve ser revisada caso o fluxo de deploy (local vs. cloud) mude ou se a equipe optar por containerizar também o API Gateway ou o banco localmente.
 
 # 5. Solução Técnica (Design)
 _conteúdo_

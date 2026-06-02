@@ -97,6 +97,52 @@ dotnet run --project api-gateway             # http://localhost:5000  (roteia p/
 
 > Para abrir no Visual Studio/Rider, abra o `Spotlight.sln` (já referencia os 8 projetos).
 
+## Dockerização dos serviços
+
+A base Docker do backend está organizada na raiz do repositório, em `docker-compose.yml`, com os quatro serviços backend em containers. O banco não é containerizado nesta configuração; ele fica no Supabase remoto, conforme o `.env` final.
+
+Os serviços expostos ficam assim:
+
+- `catalogo` em `http://localhost:5001`
+- `usuario` em `http://localhost:5002`
+- `recomendacao` em `http://localhost:5003`
+- `geolocalizacao` em `http://localhost:5004`
+
+Para subir tudo:
+
+```bash
+# na raiz do repositório
+docker compose up -d --build
+```
+
+Se preferir, crie um arquivo `.env` na raiz com pelo menos:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://nyaxqgujyyvkjnqzbklf.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=REDACTED_FOR_PUBLIC_RELEASE
+EXPO_PUBLIC_SITE_URL=http://localhost:3000
+EXPO_PUBLIC_API_BASE_URL=http://192.168.1.118:5000
+EXPO_PUBLIC_AUTH_REDIRECT_URL=exp://192.168.1.118:8081/--/email-confirmado
+ASPNETCORE_ENVIRONMENT=Development
+NOMINATIM_BASE_URL=https://nominatim.openstreetmap.org
+NOMINATIM_USER_AGENT=spotlight-inteli-g04/1.0
+DATABASE_CONNECTION_STRING=Host=db.nyaxqgujyyvkjnqzbklf.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=spotlight2026@#S;SSL Mode=Require;Trust Server Certificate=true
+SUPABASE_JWT_SECRET=REDACTED_FOR_PUBLIC_RELEASE
+```
+
+Se o Docker estiver no Windows, mantenha o Docker Desktop aberto antes de subir os containers.
+
+Para acompanhar a execução:
+
+```bash
+docker compose ps
+docker compose logs -f catalogo usuario recomendacao geolocalizacao
+```
+
+No Docker Desktop ou na extensão Docker do VS Code, confirme que os quatro containers estão com status `running` e que as portas `5001`, `5002`, `5003` e `5004` estão publicadas no host.
+
+Se você for validar o app mobile junto com esses containers, mantenha o API Gateway rodando fora do compose apontando para esses serviços, porque a aplicação ainda usa `EXPO_PUBLIC_API_BASE_URL=http://192.168.1.118:5000`.
+
 ## Verificando os critérios de aceite
 
 ```bash
@@ -106,18 +152,35 @@ dotnet run --project services/catalogo
 # GET /health retorna 200 (em outro terminal)
 curl -i http://localhost:5001/health
 
-# Conecta no banco com sucesso (200 quando a connection string está correta)
+# Conecta no banco remoto com sucesso (200 quando a connection string está correta)
 curl -i http://localhost:5001/health/ready
 
 # Testes rodam (todos os serviços)
 dotnet test
 ```
 
+Validação rápida no navegador ou no app HTTP do VS Code:
+
+- abrir `http://localhost:5001/swagger`
+- abrir `http://localhost:5002/swagger`
+- abrir `http://localhost:5003/swagger`
+- abrir `http://localhost:5004/swagger`
+- testar `http://localhost:5001/health` e `http://localhost:5004/health`
+
+Se quiser validar por terminal:
+
+```bash
+curl http://localhost:5001/health
+curl http://localhost:5002/health
+curl http://localhost:5003/health
+curl http://localhost:5004/health
+```
+
 | Critério de aceite | Como validar |
 |---|---|
 | `dotnet run` sobe o backend sem erros | passo 3 acima |
 | `GET /health` retorna 200 | `curl /health` → `200 OK` |
-| Conecta no banco com sucesso | `curl /health/ready` → `200` (`503` se a connection string estiver errada) |
+| Conecta no banco remoto com sucesso | `curl /health/ready` → `200` (`503` se a connection string estiver errada) |
 | Testes rodam | `dotnet test` → 8 testes passando |
 
 ## Acesso a dados — padrão de repositório (sem ORM)

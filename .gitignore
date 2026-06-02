@@ -1,4 +1,3 @@
-
 *.csv
 !src/dataset/
 !src/dataset/*.csv
@@ -23,3 +22,32 @@ src/aad/*.svg
 src/aad/*.pdf
 src/aad/.ipynb_checkpoints/
 src/database/*.csv
+
+# Environment & Secrets (AIOX)
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# Dependencies (AIOX)
+node_modules
+
+# Build & Logs (AIOX)
+dist/
+build/
+*.log
+logs/
+
+# IDE & OS (AIOX)
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+
+# AIOX Local (AIOX)
+.aiox-core/local/
+.claude/settings.local.json
+.aiox/install-log.txt
+.github
+.aiox-core
+.AGENTS.md
