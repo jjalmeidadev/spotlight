@@ -154,6 +154,43 @@ CREATE TABLE usuarios (
 | Cobertura | 69.8% |
 ```
 
+### 2.5 Padrões de Mensagens de Commit (Git Hooks)
+
+Este projeto adota o padrão de **Conventional Commits** e utiliza um Git Hook para validar se todas as mensagens de commit seguem essa estrutura, garantindo a associação com a issue correspondente.
+
+#### 2.5.1 Estrutura de Commit
+
+A mensagem de commit deve seguir o seguinte formato:
+```text
+<type>: <descrição> #<issue>
+```
+
+* **Exemplos Válidos:**
+  - `docs: atualiza documentação #12`
+  - `feat: cria endpoint de login #34`
+  - `fix(api): corrige validação #105`
+
+* **Regras de Validação:**
+  - O **type** deve ser um dos seguintes: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `revert`.
+  - A **descrição** não pode ser vazia.
+  - A **issue** deve ser identificada por `#` seguida de pelo menos 2 dígitos (ex: `#12`).
+
+#### 2.5.2 Ativação do Hook de Validação
+
+Para ativar a validação local automática antes de cada commit, execute o seguinte comando no terminal na raiz do repositório:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+#### 2.5.3 Desativação do Hook de Validação
+
+Caso seja necessário desativar a validação automática (restaurando o comportamento padrão de hooks do Git no diretório `.git/hooks`), execute:
+
+```bash
+git config --unset core.hooksPath
+```
+
 ## 3. Padrões de Projeto
 
 ### 3.1 Padrão Criacional: Builder Pattern
