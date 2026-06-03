@@ -31,11 +31,7 @@ test:unit:
       dotnet test src/backend/Spotlight.sln
       --configuration Release
       --filter "Category!=Integration"
-      --logger "junit;LogFilePath=$CI_PROJECT_DIR/test-results/results.xml"
-      --collect:"XPlat Code Coverage"
-  coverage: '/Total[^|]*\|[^|]*\|\s*([\d\.]+)/'
+      --logger "trx;LogFileName=results.trx"
   artifacts:
     when: always
-    reports:
-      junit: test-results/results.xml
     expire_in: 1 week
