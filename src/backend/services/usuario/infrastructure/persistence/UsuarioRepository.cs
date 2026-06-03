@@ -64,7 +64,6 @@ public class UsuarioRepository(NpgsqlDataSource dataSource) : IUsuarioRepository
 
         Add("nome = @nome", "nome", dados.Nome);
         Add("data_nascimento = @nasc", "nasc", dados.DataNascimento);
-        Add("localizacao = @loc", "loc", dados.Localizacao);
 
         if (sets.Count == 0) return true; // nada a atualizar — semântica no-op
 
