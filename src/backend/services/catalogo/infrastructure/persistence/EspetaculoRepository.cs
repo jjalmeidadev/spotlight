@@ -385,7 +385,6 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
 
         if (sets.Count > 0)
         {
-            sets.Add("updated_at = NOW()");
             await using var cmd = conexao.CreateCommand();
             cmd.Transaction = tx;
             cmd.CommandText = $"UPDATE espetaculo SET {string.Join(", ", sets)} WHERE id_espetaculo = @id;";
