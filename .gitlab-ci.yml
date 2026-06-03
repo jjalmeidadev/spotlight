@@ -1,0 +1,44 @@
+image: mcr.microsoft.com/dotnet/sdk:9.0
+
+stages:
+  - build
+  - test
+
+variables:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget/packages"
+
+cache:
+  key: "nuget-$CI_COMMIT_REF_SLUG"
+  paths:
+    - .nuget/packages/
+
+build:
+  stage: build
+  script:
+    - dotnet restore src/backend/Spotlight.sln
+    - >-
+      dotnet build src/backend/Spotlight.sln
+      --no-restore
+      --configuration Release
+
+test:unit:
+  stage: test
+  needs: [build]
+  script:
+    - >-
+      dotnet test src/backend/Spotlight.sln
+      --configuration Release
+      --filter "Category!=Integration"
+      --logger "junit;LogFilePath=$CI_PROJECT_DIR/test-results/results.xml"
+      --collect:"XPlat Code Coverage"
+  coverage: '/Total[^|]*\|[^|]*\|\s*([\d\.]+)/'
+  artifacts:
+    when: always
+    reports:
+      junit: test-results/results.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: "src/backend/tests/**/TestResults/**/coverage.cobertura.xml"
+    expire_in: 1 week
