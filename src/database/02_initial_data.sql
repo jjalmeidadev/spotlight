@@ -231,6 +231,22 @@ INSERT INTO auth.users (
     )
 ON CONFLICT (id) DO NOTHING;
 
+-- ---------------------------------------------------------------------------
+-- Atualizações dos perfis em public.usuario (criados via trigger on_auth_user_created).
+--
+-- O campo `localizacao` segue a estrutura JSONB real do contrato — mesmas 5
+-- chaves em camelCase produzidas pelo NominatimGeocodingService:
+--   { formattedAddress, latitude, longitude, placeId, provider }
+--
+-- Convenções deste seed:
+--   - `provider = "seed"` distingue dados de bootstrap dos dados geocodificados
+--     pelo serviço em runtime (que usam `"openstreetmap_nominatim"`).
+--   - `placeId = ""` porque não há documento Nominatim associado neste estágio.
+--   - `latitude`/`longitude` são aproximações centradas no município (precisão
+--     suficiente para testes de filtros e recomendações geográficas).
+-- Especificação completa em src/database/README.md.
+-- ---------------------------------------------------------------------------
+
 UPDATE usuario SET
     data_nascimento     = '1985-06-10',
     localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,

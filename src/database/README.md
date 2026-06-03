@@ -424,7 +424,7 @@ Entidade principal.
 | `nome` | `VARCHAR(150)` | Não | - | - | - | Nome exibido do usuário. |
 | `email` | `VARCHAR(255)` | Não | - | - | `UNIQUE`, `chk_email_formato` | E-mail do usuário. Deve ser único e seguir formato válido. |
 | `data_nascimento` | `DATE` | Sim | - | - | - | Data de nascimento do usuário. |
-| `localizacao` | `JSONB` | Sim | - | - | - | Localização consentida do usuário, com endereço normalizado, coordenadas e provedor. |
+| `localizacao` | `JSONB` | Sim | - | - | - | Localização consentida do usuário, gerada pelo `NominatimGeocodingService` via `PUT /usuario/me/localizacao`. Estrutura serializada em camelCase (`JsonSerializerDefaults.Web`) — ver detalhes abaixo. |
 | `data_cadastro` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de criação do perfil. |
 | `tipo_usuario` | `tipo_usuario_enum` | Não | `'cadastrado'` | - | Valores do ENUM | Tipo do usuário no sistema. |
 | `nivel_acesso` | `JSONB` | Não | `'{}'::JSONB` | - | - | Estrutura flexível para permissões, papéis ou escopos adicionais. |
@@ -463,6 +463,34 @@ O campo `perfil_preferencias` pode armazenar preferências de recomendação, po
   }
 }
 ```
+
+##### Estrutura do JSONB `localizacao`
+
+O campo é populado pelo `UsuarioLocalizacaoService` (via `PUT /usuario/me/localizacao`), que serializa o DTO `AtualizarLocalizacaoRequest` com `JsonSerializerDefaults.Web` — chaves em camelCase. Em produção, os valores vêm do `NominatimGeocodingService` (proxy do OpenStreetMap/Nominatim). No seed de bootstrap (`02_initial_data.sql`), o campo `provider` recebe `"seed"` para distinguir dados de carga inicial dos dados geocodificados.
+
+Exemplo de objeto válido:
+
+```json
+{
+  "formattedAddress": "Av. Paulista, 1578 - Bela Vista, São Paulo - SP",
+  "latitude": -23.55052,
+  "longitude": -46.633308,
+  "placeId": "123456789",
+  "provider": "openstreetmap_nominatim"
+}
+```
+
+Validações aplicadas pelo `UsuarioLocalizacaoService` antes da gravação:
+
+| Chave | Tipo | Obrigatória | Regra |
+|---|---|---|---|
+| `formattedAddress` | `string` | sim | não-vazia |
+| `latitude` | `number` | sim | `-90 ≤ lat ≤ 90` |
+| `longitude` | `number` | sim | `-180 ≤ lon ≤ 180` |
+| `placeId` | `string` | sim | — (sem validação extra) |
+| `provider` | `string` | sim | em produção: `"openstreetmap_nominatim"`; em seed: `"seed"` |
+
+> **Contrato de escrita:** o campo `localizacao` **não é aceito** no body de `PUT /usuario/me`. Qualquer payload com essa chave é silenciosamente ignorado pelo deserializador (a propriedade não existe em `UsuarioUpdateDto`). Para atualizar a localização use exclusivamente `PUT /usuario/me/localizacao`, que valida o payload completo antes de gravar.
 
 #### Relacionamentos
 
