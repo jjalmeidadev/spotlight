@@ -38,7 +38,4 @@ test:unit:
     when: always
     reports:
       junit: test-results/results.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: "src/backend/tests/**/TestResults/**/coverage.cobertura.xml"
     expire_in: 1 week
