@@ -1763,7 +1763,7 @@ Armazena os dados dos usuários cadastrados na plataforma, integrada ao sistema 
 | `email` | `VARCHAR(255)` | NN, UQ, CK (`email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'`) | E-mail do usuário. Deve ter formato válido. Único na tabela. |
 | `data_nascimento` | `DATE` | — | Data de nascimento. Opcional; utilizada para filtros de faixa etária em recomendações. |
 | `localizacao` | `JSONB` | — | Localização consentida do usuário, incluindo endereço normalizado, coordenadas, identificador do provedor e origem da geocodificação. Utilizada como sinal de contexto para recomendações baseadas em localização. |
-| `data_cadastro` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
+| `data_cadastro` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
 | `tipo_usuario` | `tipo_usuario_enum` | NN, DF `'cadastrado'` | Papel do usuário: `'visitante'`, `'cadastrado'` ou `'administrador'`. Controla o acesso a funcionalidades administrativas. |
 | `nivel_acesso` | `JSONB` | NN, DF `'{}'` | Permissões granulares em formato JSON. Permite definir capacidades específicas dentro do papel sem criar tabelas de controle adicionais. |
 | `perfil_preferencias` | `JSONB` | NN, DF `'{}'` | Preferências declaradas pelo usuário (gêneros, faixa de preço, etc.). Alimenta o motor de recomendação no cold start. |
@@ -1791,7 +1791,7 @@ Representa os artistas do elenco dos espetáculos. Substituiu o campo textual `e
 | `id_ator` | `SERIAL` | PK, NN | Identificador único do ator, gerado automaticamente. |
 | `nome` | `VARCHAR(150)` | NN | Nome artístico ou completo do ator. |
 | `biografia` | `TEXT` | — | Texto descritivo com a trajetória profissional do ator. Opcional. |
-| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente. |
+| `created_at` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente. |
 
 ---
 
@@ -1813,8 +1813,8 @@ Tabela central do catálogo, armazena os metadados de cada peça teatral dispon�
 | `popularidade` | `NUMERIC(10,4)` | NN, DF `0` | Indicador de popularidade calculado a partir das interações no MongoDB. Cache de leitura atualizado por Workers. |
 | `nota_media` | `NUMERIC(4,2)` | NN, DF `0`, CK `BETWEEN 0 AND 5` | Média das avaliações recebidas. Valor entre 0 e 5. Cache atualizado ao registrar novas avaliações. |
 | `id_admin` | `UUID` | FK → `usuario(id_usuario)` ON DELETE SET NULL | Administrador responsável pelo cadastro e gestão do espetáculo. Nulo quando o administrador é removido. |
-| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
-| `updated_at` | `TIMESTAMP` | NN, DF `NOW()` | Data da última atualização. Deve ser mantida pelo aplicativo ou por trigger ao editar. |
+| `created_at` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data de inserção do registro. |
+| `updated_at` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data da última atualização. Atualizada automaticamente pela trigger `trg_espetaculo_updated_at` (definida em `migrations/04_trigger_updated_at_espetaculo.sql`) em todo `UPDATE`, independente da aplicação setar o campo. |
 
 **Índices:** `idx_espetaculo_status`, `idx_espetaculo_nota_media` (DESC), `idx_espetaculo_popularidade` (DESC).
 
@@ -1862,7 +1862,7 @@ Armazena os dados dos espaços físicos onde os espetáculos são realizados.
 | `capacidade` | `INTEGER` | CK `(capacidade > 0)` | Número máximo de espectadores. Deve ser positivo quando informado. |
 | `acessibilidade` | `BOOLEAN` | NN, DF `FALSE` | Indica se o teatro possui recursos de acessibilidade (rampa, elevador, etc.). |
 | `parceiro_naming_rights` | `VARCHAR(200)` | — | Nome da empresa parceira vinculada ao naming rights do teatro. |
-| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+| `created_at` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data de inserção do registro. |
 
 ---
 
@@ -1881,7 +1881,7 @@ Representa uma apresentação específica de um espetáculo em um teatro, em dat
 | `preco_maximo` | `NUMERIC(10,2)` | CK `(preco_maximo >= 0)`, CK `(preco_maximo >= preco_minimo)` | Maior valor de ingresso disponível. Deve ser maior ou igual ao preço mínimo quando ambos informados. |
 | `disponibilidade` | `INTEGER` | NN, DF `0`, CK `(disponibilidade >= 0)` | Quantidade de ingressos disponíveis. Cache atualizado por integração com a ticketeira. |
 | `link_compra` | `TEXT` | — | URL externa para compra de ingressos na plataforma parceira (Sympla, Blueticket, etc.). |
-| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data de inserção do registro. |
+| `created_at` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data de inserção do registro. |
 
 **Índices:** `idx_sessao_espetaculo`, `idx_sessao_data`, `idx_sessao_teatro`.
 
@@ -1898,7 +1898,7 @@ Registra as notas e comentários explícitos de usuários sobre espetáculos. Ca
 | `id_espetaculo` | `INTEGER` | FK → `espetaculo(id_espetaculo)` ON DELETE CASCADE, NN | Espetáculo avaliado. Removida em cascata se o espetáculo for excluído. |
 | `nota` | `NUMERIC(4,2)` | NN, CK `BETWEEN 0 AND 5` | Nota atribuída pelo usuário, entre 0 e 5. |
 | `comentario` | `TEXT` | — | Comentário textual opcional do usuário sobre o espetáculo. |
-| `created_at` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de registro da avaliação. |
+| `created_at` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data e hora de registro da avaliação. |
 
 **Chave Única:** `(id_usuario, id_espetaculo)` — impede avaliações duplicadas do mesmo usuário para o mesmo espetáculo. **Índice:** `idx_avaliacao_espetaculo`.
 
@@ -1916,7 +1916,7 @@ Armazena os resultados gerados pelos algoritmos de Machine Learning para cada us
 | `tipo_algoritmo` | `VARCHAR(50)` | NN, CK `IN ('k-NN', 'SVD', 'k-means')` | Algoritmo utilizado para gerar a recomendação. Valores aceitos: `'k-NN'`, `'SVD'` ou `'k-means'`. |
 | `score_recomendacao` | `NUMERIC(8,6)` | NN, CK `(score_recomendacao >= 0)` | Pontuação de relevância calculada pelo algoritmo. Valor não-negativo; quanto maior, mais relevante. |
 | `motivo_recomendacao` | `TEXT` | — | Justificativa textual da recomendação exibida ao usuário (ex: "Porque você gostou de musicais"). |
-| `data_geracao` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora em que a recomendação foi gerada. |
+| `data_geracao` | `TIMESTAMPTZ` | NN, DF `NOW()` | Data e hora em que a recomendação foi gerada. |
 | `prioridade_manual` | `BOOLEAN` | NN, DF `FALSE` | Indica se um administrador sobrescreveu a prioridade gerada pelo algoritmo para fins de campanha. |
 | `referencia_origem_id` | `VARCHAR(50)` | — | ID do documento no MongoDB (`interacoes`) que serviu de gatilho para esta recomendação. Permite rastrear qual evento comportamental originou a sugestão. |
 
@@ -2240,20 +2240,34 @@ Todos os scripts estão em `src/database/` e devem ser executados na ordem indic
 
 | Arquivo | Função | Ordem |
 |---|---|---|
-| [`01_create_database.sql`](../src/database/01_create_database.sql) | Cria os tipos ENUM, as 10 tabelas, as políticas de RLS, os 10 índices e o trigger de integração com o Supabase Auth | 1º |
+| [`01_create_database.sql`](../src/database/01_create_database.sql) | Cria os tipos ENUM, as 11 tabelas, as políticas de RLS, os 11 índices iniciais e o trigger de integração com o Supabase Auth | 1º |
 | [`02_initial_data.sql`](../src/database/02_initial_data.sql) | Insere dados de seed (categorias, teatros, atores, espetáculos e sessões iniciais) | 2º |
 | [`03_rollback.sql`](../src/database/03_rollback.sql) | Desfaz completamente o `01_create_database.sql` — destrutivo, uso exclusivo em desenvolvimento | — |
+| [`migrations/04_trigger_updated_at_espetaculo.sql`](../src/database/migrations/04_trigger_updated_at_espetaculo.sql) | Trigger `BEFORE UPDATE` em `espetaculo.updated_at` + função genérica `public.set_updated_at()` | 3º (manual) |
+| [`migrations/05_timestamptz.sql`](../src/database/migrations/05_timestamptz.sql) | Converte todas as colunas temporais de `TIMESTAMP` para `TIMESTAMPTZ` (interpretando os valores como UTC) | 4º (manual) |
+| [`migrations/06_indexes.sql`](../src/database/migrations/06_indexes.sql) | Habilita extensão `pg_trgm` e cria 4 índices novos para queries reais do catálogo (busca por título, filtro por gênero, status+popularidade, sessões por espetáculo) | 5º (manual) |
+| [`migrations/07_constraints_sessao_usuario.sql`](../src/database/migrations/07_constraints_sessao_usuario.sql) | `UNIQUE` em `sessao(id_espetaculo, id_teatro, data, horario)` e `CHECK` em `usuario.data_nascimento` | 6º (manual) |
+| [`migrations/08_tipo_algoritmo_e_unique_recomendacao.sql`](../src/database/migrations/08_tipo_algoritmo_e_unique_recomendacao.sql) | Função central `public.is_tipo_algoritmo_valido()` reusada por `recomendacao` e `similaridade_item`, e `UNIQUE INDEX` em `recomendacao(id_usuario, id_espetaculo, tipo_algoritmo)` viabilizando UPSERT pelo Worker | 7º (manual) |
+
+Cada migration em `src/database/migrations/` tem um arquivo `_rollback.sql` correspondente. As migrations são aplicadas **manualmente** via SQL Editor do Supabase ou `psql` após o setup inicial (`01` + `02`) — o Docker só executa automaticamente os scripts de bootstrap (`00`, `01`, `02`). Detalhes do contrato operacional estão na seção "Estratégia de Migrations Incrementais" do [README do banco](../src/database/README.md#estratégia-de-migrations-incrementais).
 
 **Execução via SQL Editor do Supabase:**
 1. Acesse o Supabase Dashboard → SQL Editor → New Query
 2. Cole e execute `01_create_database.sql`
 3. Cole e execute `02_initial_data.sql`
+4. (Opcional) Aplique as migrations em `src/database/migrations/` na ordem numérica.
 
 **Execução via `psql`:**
 ```bash
 export PGPASSWORD=<senha>
 psql -h <host> -p <porta> -U postgres -d postgres -f src/database/01_create_database.sql
 psql -h <host> -p <porta> -U postgres -d postgres -f src/database/02_initial_data.sql
+
+# Migrations incrementais (aplicar na ordem numérica):
+for migration in src/database/migrations/0*_*.sql; do
+    case "$migration" in *_rollback.sql) continue ;; esac
+    psql -h <host> -p <porta> -U postgres -d postgres -f "$migration"
+done
 ```
 
 ---
@@ -2299,7 +2313,7 @@ Isso garante que toda conta criada via Supabase Auth resulte automaticamente em 
 
 #### Row Level Security (RLS)
 
-Todas as 10 tabelas têm RLS habilitado. As políticas implementadas seguem dois padrões:
+Todas as 11 tabelas têm RLS habilitado. As políticas implementadas seguem dois padrões:
 
 | Padrão | Tabelas | Regra |
 |---|---|---|
@@ -2310,22 +2324,28 @@ O RLS é a camada de segurança de dados mais próxima do banco. Mesmo que um to
 
 #### Índices de Performance
 
-10 índices explícitos foram criados para otimizar os padrões de consulta mais frequentes da aplicação:
+16 índices explícitos foram criados para otimizar os padrões de consulta mais frequentes da aplicação. Os 11 primeiros existem desde o bootstrap (`01_create_database.sql`); os 5 últimos foram acrescentados pelas migrations incrementais em `src/database/migrations/`.
 
-| Índice | Tabela | Colunas | Consulta otimizada |
-|---|---|---|---|
-| `idx_espetaculo_status` | `espetaculo` | `status` | Filtrar espetáculos em cartaz |
-| `idx_espetaculo_nota_media` | `espetaculo` | `nota_media DESC` | Ranking por avaliação |
-| `idx_espetaculo_popularidade` | `espetaculo` | `popularidade DESC` | Ranking por popularidade |
-| `idx_sessao_espetaculo` | `sessao` | `id_espetaculo` | Sessões de um espetáculo |
-| `idx_sessao_data` | `sessao` | `data` | Sessões por data |
-| `idx_sessao_teatro` | `sessao` | `id_teatro` | Sessões de um teatro |
-| `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | Recomendações de um usuário |
-| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | Top recomendações por usuário |
-| `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Avaliações de um espetáculo |
-| `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Espetáculos de um ator |
+| Índice | Tabela | Colunas | Consulta otimizada | Origem |
+|---|---|---|---|---|
+| `idx_espetaculo_status` | `espetaculo` | `status` | Filtrar espetáculos em cartaz | `01_create_database.sql` |
+| `idx_espetaculo_nota_media` | `espetaculo` | `nota_media DESC` | Ranking por avaliação | `01_create_database.sql` |
+| `idx_espetaculo_popularidade` | `espetaculo` | `popularidade DESC` | Ranking por popularidade | `01_create_database.sql` |
+| `idx_sessao_espetaculo` | `sessao` | `id_espetaculo` | Sessões de um espetáculo | `01_create_database.sql` |
+| `idx_sessao_data` | `sessao` | `data` | Sessões por data | `01_create_database.sql` |
+| `idx_sessao_teatro` | `sessao` | `id_teatro` | Sessões de um teatro | `01_create_database.sql` |
+| `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | Recomendações de um usuário | `01_create_database.sql` |
+| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | Top recomendações por usuário | `01_create_database.sql` |
+| `idx_similaridade_item_origem` | `similaridade_item` | `id_espetaculo_origem, score_similaridade DESC` | Similares de um espetáculo | `01_create_database.sql` |
+| `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Avaliações de um espetáculo | `01_create_database.sql` |
+| `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Espetáculos de um ator | `01_create_database.sql` |
+| `idx_espetaculo_titulo_trgm` | `espetaculo` | `titulo` (GIN trigram) | Busca textual `ILIKE '%termo%'` | `06_indexes.sql` |
+| `idx_espetaculo_genero` | `espetaculo` | `genero` | Filtro `WHERE genero = X` | `06_indexes.sql` |
+| `idx_espetaculo_status_popularidade` | `espetaculo` | `status, popularidade DESC` | Catálogo com filtro de status + ordenação por popularidade (sem sort separado) | `06_indexes.sql` |
+| `idx_sessao_espetaculo_data_horario` | `sessao` | `id_espetaculo, data, horario` | Sessões de um espetáculo já ordenadas por data/horário | `06_indexes.sql` |
+| `uq_recomendacao_usuario_espetaculo_algo` | `recomendacao` | `id_usuario, id_espetaculo, tipo_algoritmo` | `UNIQUE` — viabiliza `ON CONFLICT ... DO UPDATE` (UPSERT) do Worker | `08_tipo_algoritmo_e_unique_recomendacao.sql` |
 
-Além desses, o PostgreSQL cria automaticamente índices para todas as chaves primárias e constraints UNIQUE.
+Além desses, o PostgreSQL cria automaticamente índices para todas as chaves primárias e constraints `UNIQUE` (incluindo `uq_sessao_espetaculo_teatro_data_horario` adicionada em `07_constraints_sessao_usuario.sql` e `uq_similaridade_item` definida desde o bootstrap).
 
 ---
 
