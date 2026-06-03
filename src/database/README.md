@@ -1035,3 +1035,37 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-28 | O score de recomendação não pode ser negativo. | Constraint `CHECK`. | `recomendacao.score_recomendacao CHECK (score_recomendacao >= 0)` |
 | RN-BD-29 | Recomendações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `recomendacao.id_usuario`, `recomendacao.id_espetaculo` |
 | RN-BD-30 | Dados de catálogo e agenda devem ser públicos para consulta. | Políticas de Row Level Security com `USING (true)`. | Políticas de `SELECT` em `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao` e `avaliacao` |
+
+## Planos de Execução — Queries Críticas
+
+Esta seção documenta o comportamento esperado dos quatro índices criados em `src/database/migrations/06_indexes.sql` para as queries reais executadas por `EspetaculoRepository.cs` no serviço de catálogo. Cada entrada lista a query SQL equivalente, o índice associado, o plano de execução esperado em produção e uma observação sobre o comportamento em ambiente de desenvolvimento com seed pequeno.
+
+### 1. Busca por título
+
+- **Query:** `SELECT * FROM espetaculo WHERE titulo ILIKE '%musical%'`
+- **Índice:** `idx_espetaculo_titulo_trgm` (GIN trigram, requer extensão `pg_trgm`)
+- **Plano esperado em produção:** `Bitmap Index Scan on idx_espetaculo_titulo_trgm`
+- **Observação:** com poucos registros (seed) o PostgreSQL escolhe `Seq Scan` por ser mais eficiente — comportamento correto, não indica problema no índice.
+
+### 2. Filtro por gênero
+
+- **Query:** `SELECT * FROM espetaculo WHERE genero = 'Drama'`
+- **Índice:** `idx_espetaculo_genero` (B-tree)
+- **Plano esperado em produção:** `Index Scan using idx_espetaculo_genero`
+- **Observação:** mesma situação do título — `Seq Scan` é esperado com volume baixo.
+
+### 3. Filtro de status + ordenação por popularidade
+
+- **Query:** `SELECT * FROM espetaculo WHERE status = 'em_cartaz' ORDER BY popularidade DESC LIMIT 20`
+- **Índice:** `idx_espetaculo_status_popularidade` (B-tree composto)
+- **Plano esperado em produção:** `Index Scan using idx_espetaculo_status_popularidade` — o índice composto evita um sort separado porque já entrega as linhas na ordem correta.
+- **Observação:** este é o índice de maior impacto — é a query padrão da tela de catálogo.
+
+### 4. Sessões de um espetáculo ordenadas
+
+- **Query:** `SELECT * FROM sessao WHERE id_espetaculo = 1 ORDER BY data, horario`
+- **Índice:** `idx_sessao_espetaculo_data_horario` (B-tree composto)
+- **Plano esperado em produção:** `Index Scan using idx_sessao_espetaculo_data_horario` — o índice composto cobre o filtro e a ordenação sem sort adicional.
+- **Observação:** elimina o custo de sort em espetáculos com muitas sessões.
+
+> Os planos acima foram validados com `EXPLAIN` no ambiente Supabase com dados de seed. Com volume reduzido o PostgreSQL opta por `Seq Scan`, que é o comportamento correto — o otimizador escolhe automaticamente o índice quando o volume justificar.
