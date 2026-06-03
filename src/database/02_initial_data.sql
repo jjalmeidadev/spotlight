@@ -233,7 +233,7 @@ ON CONFLICT (id) DO NOTHING;
 
 UPDATE usuario SET
     data_nascimento     = '1985-06-10',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'administrador',
     nivel_acesso        = '{"can_manage_shows": true, "can_manage_users": true}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Ballet Classico"]}'::jsonb
@@ -241,7 +241,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000001';
 
 UPDATE usuario SET
     data_nascimento     = '2007-11-22',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Dramaturgia"]}'::jsonb
@@ -249,7 +249,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000002';
 
 UPDATE usuario SET
     data_nascimento     = '1958-04-30',
-    localizacao         = 'Rio de Janeiro, RJ',
+    localizacao         = '{"formattedAddress": "Rio de Janeiro, RJ", "latitude": -22.9068, "longitude": -43.1729, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Infantil", "Concerto e Show"]}'::jsonb
@@ -257,7 +257,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000003';
 
 UPDATE usuario SET
     data_nascimento     = '1990-07-08',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Infantil"]}'::jsonb
@@ -265,7 +265,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000004';
 
 UPDATE usuario SET
     data_nascimento     = '2002-05-14',
-    localizacao         = 'Belo Horizonte, MG',
+    localizacao         = '{"formattedAddress": "Belo Horizonte, MG", "latitude": -19.9167, "longitude": -43.9345, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Concerto e Show"]}'::jsonb
@@ -273,7 +273,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000005';
 
 UPDATE usuario SET
     data_nascimento     = '1995-03-22',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Show Musical"]}'::jsonb
@@ -281,7 +281,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000006';
 
 UPDATE usuario SET
     data_nascimento     = '1988-09-15',
-    localizacao         = 'Rio de Janeiro, RJ',
+    localizacao         = '{"formattedAddress": "Rio de Janeiro, RJ", "latitude": -22.9068, "longitude": -43.1729, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Dramaturgia"]}'::jsonb
@@ -289,7 +289,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000007';
 
 UPDATE usuario SET
     data_nascimento     = '1999-12-01',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical"]}'::jsonb
@@ -297,7 +297,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000008';
 
 UPDATE usuario SET
     data_nascimento     = '1975-07-19',
-    localizacao         = 'Porto Alegre, RS',
+    localizacao         = '{"formattedAddress": "Porto Alegre, RS", "latitude": -30.0346, "longitude": -51.2177, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Concerto e Show", "Teatro Musical"]}'::jsonb
@@ -305,7 +305,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000009';
 
 UPDATE usuario SET
     data_nascimento     = '2001-02-28',
-    localizacao         = 'Curitiba, PR',
+    localizacao         = '{"formattedAddress": "Curitiba, PR", "latitude": -25.4284, "longitude": -49.2733, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Ballet Classico", "Teatro Musical"]}'::jsonb
@@ -313,7 +313,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000010';
 
 UPDATE usuario SET
     data_nascimento     = '1992-08-04',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Infantil", "Teatro Musical"]}'::jsonb
@@ -321,7 +321,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000011';
 
 UPDATE usuario SET
     data_nascimento     = '1985-11-17',
-    localizacao         = 'Rio de Janeiro, RJ',
+    localizacao         = '{"formattedAddress": "Rio de Janeiro, RJ", "latitude": -22.9068, "longitude": -43.1729, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Infantil", "Concerto e Show"]}'::jsonb
@@ -329,7 +329,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000012';
 
 UPDATE usuario SET
     data_nascimento     = '1970-01-30',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Dramaturgia", "Teatro Musical"]}'::jsonb
@@ -337,7 +337,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000013';
 
 UPDATE usuario SET
     data_nascimento     = '2003-06-25',
-    localizacao         = 'Salvador, BA',
+    localizacao         = '{"formattedAddress": "Salvador, BA", "latitude": -12.9714, "longitude": -38.5014, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Show Musical", "Teatro Musical"]}'::jsonb
@@ -345,7 +345,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000014';
 
 UPDATE usuario SET
     data_nascimento     = '1980-04-12',
-    localizacao         = 'Belo Horizonte, MG',
+    localizacao         = '{"formattedAddress": "Belo Horizonte, MG", "latitude": -19.9167, "longitude": -43.9345, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Dramaturgia"]}'::jsonb
@@ -353,7 +353,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000015';
 
 UPDATE usuario SET
     data_nascimento     = '1993-10-08',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Concerto e Show", "Show Musical"]}'::jsonb
@@ -361,7 +361,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000016';
 
 UPDATE usuario SET
     data_nascimento     = '1967-03-21',
-    localizacao         = 'Rio de Janeiro, RJ',
+    localizacao         = '{"formattedAddress": "Rio de Janeiro, RJ", "latitude": -22.9068, "longitude": -43.1729, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Concerto e Show"]}'::jsonb
@@ -369,7 +369,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000017';
 
 UPDATE usuario SET
     data_nascimento     = '1998-07-14',
-    localizacao         = 'Florianopolis, SC',
+    localizacao         = '{"formattedAddress": "Florianópolis, SC", "latitude": -27.5954, "longitude": -48.5480, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Show Musical"]}'::jsonb
@@ -377,7 +377,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000018';
 
 UPDATE usuario SET
     data_nascimento     = '2000-09-03',
-    localizacao         = 'Recife, PE',
+    localizacao         = '{"formattedAddress": "Recife, PE", "latitude": -8.0539, "longitude": -34.8811, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Concerto e Show"]}'::jsonb
@@ -385,7 +385,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000019';
 
 UPDATE usuario SET
     data_nascimento     = '1987-12-19',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Dramaturgia", "Concerto e Show"]}'::jsonb
@@ -393,7 +393,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000020';
 
 UPDATE usuario SET
     data_nascimento     = '1994-05-07',
-    localizacao         = 'Brasilia, DF',
+    localizacao         = '{"formattedAddress": "Brasília, DF", "latitude": -15.7801, "longitude": -47.9292, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Teatro Infantil"]}'::jsonb
@@ -401,7 +401,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000021';
 
 UPDATE usuario SET
     data_nascimento     = '1979-08-23',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Show Musical", "Concerto e Show"]}'::jsonb
@@ -409,7 +409,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000022';
 
 UPDATE usuario SET
     data_nascimento     = '2004-01-16',
-    localizacao         = 'Rio de Janeiro, RJ',
+    localizacao         = '{"formattedAddress": "Rio de Janeiro, RJ", "latitude": -22.9068, "longitude": -43.1729, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Dramaturgia"]}'::jsonb
@@ -417,7 +417,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000023';
 
 UPDATE usuario SET
     data_nascimento     = '1991-04-09',
-    localizacao         = 'Campinas, SP',
+    localizacao         = '{"formattedAddress": "Campinas, SP", "latitude": -22.9099, "longitude": -47.0626, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Teatro Musical", "Ballet Classico"]}'::jsonb
@@ -425,7 +425,7 @@ WHERE id_usuario = '00000000-0000-0000-0000-000000000024';
 
 UPDATE usuario SET
     data_nascimento     = '1983-11-02',
-    localizacao         = 'Sao Paulo, SP',
+    localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
     tipo_usuario        = 'cadastrado',
     nivel_acesso        = '{}'::jsonb,
     perfil_preferencias = '{"generos": ["Concerto e Show", "Show Musical"]}'::jsonb
