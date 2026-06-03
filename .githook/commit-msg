@@ -1,0 +1,28 @@
+#!/bin/sh
+
+commit_msg_file="$1"
+commit_msg=$(head -n 1 "$commit_msg_file")
+
+pattern='^(feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert)(\([a-zA-Z0-9._-]+\))?!?: .+ #[0-9]{2,}$'
+
+if echo "$commit_msg" | grep -Eq "$pattern"; then
+  exit 0
+else
+  echo ""
+  echo "Commit inválido!"
+  echo ""
+  echo "Use o padrão:"
+  echo "  <type>: <descrição> #<issue>"
+  echo ""
+  echo "Exemplos válidos:"
+  echo "  docs: atualiza documentação #12"
+  echo "  feat: cria endpoint de login #34"
+  echo "  fix(api): corrige validação #105"
+  echo ""
+  echo "Regras:"
+  echo "  - O type deve ser: feat, fix, docs, style, refactor, test, chore, build, ci, perf ou revert"
+  echo "  - A descrição não pode estar vazia"
+  echo "  - A issue deve ter pelo menos 2 dígitos, exemplo: #12"
+  echo ""
+  exit 1
+fi
