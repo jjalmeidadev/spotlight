@@ -19,3 +19,6 @@ src/aad/*.svg
 src/aad/*.pdf
 src/aad/.ipynb_checkpoints/
 src/database/*.csv
+.codex
+.aiox-core
+.github
