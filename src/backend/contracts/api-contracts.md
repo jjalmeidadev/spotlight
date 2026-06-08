@@ -386,7 +386,13 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
   "nome": "Maria Souza",
   "email": "maria@exemplo.com",
   "dataNascimento": "1995-04-12",
-  "localizacao": "Campinas, SP",
+  "localizacao": {
+    "formattedAddress": "Av. Paulista, 1578 - Bela Vista, São Paulo - SP",
+    "latitude": -23.55052,
+    "longitude": -46.633308,
+    "placeId": "123456789",
+    "provider": "openstreetmap_nominatim"
+  },
   "tipoUsuario": "cadastrado",
   "dataCadastro": "2026-03-01T10:00:00Z"
 }
@@ -394,6 +400,8 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 - `401` — token ausente ou inválido. `Erro`.
 - `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `500` — `Erro`.
+
+> `localizacao` é `null` quando o usuário ainda não consentiu a coleta. Quando presente, o objeto sempre tem as 5 chaves documentadas — gravadas exclusivamente por `PUT /usuario/me/localizacao` (4.3).
 
 ---
 
@@ -404,8 +412,10 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 - Headers: `Authorization`, `Content-Type`.
 - Body (campos opcionais):
 ```json
-{ "nome": "string (máx 150)", "dataNascimento": "1995-04-12", "localizacao": { "formattedAddress": "Campinas, SP", "latitude": -22.90556, "longitude": -47.06083, "placeId": "123", "provider": "openstreetmap_nominatim" } }
+{ "nome": "string (máx 150)", "dataNascimento": "1995-04-12" }
 ```
+
+> O campo `localizacao` **não** faz parte deste contrato. Mesmo que enviado no body, é silenciosamente ignorado pelo deserializador (a propriedade não existe no `UsuarioUpdateDto`) — a coluna JSONB no banco nunca é tocada por esta rota. Para atualizar a localização, use `PUT /usuario/me/localizacao` (4.3), que valida o payload estruturado antes de gravar.
 
 **Responses**
 - `200 OK` — perfil atualizado (mesmo schema de 4.1).
@@ -418,10 +428,11 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 
 ### 4.3 `PUT /usuario/me/localizacao`
 **Finalidade:** atualizar a localização consentida do usuário autenticado. **Requer `cadastrado`.**
+Esta é a **única** rota que escreve na coluna JSONB `usuario.localizacao` — `PUT /usuario/me` (4.2) não a aceita.
 
 **Request**
 - Headers: `Authorization`, `Content-Type`.
-- Body:
+- Body (todas as 5 chaves obrigatórias, em camelCase):
 ```json
 {
   "formattedAddress": "Rua Caetanopolis, Sao Paulo, SP",
@@ -431,6 +442,18 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
   "provider": "openstreetmap_nominatim"
 }
 ```
+
+Validações aplicadas antes da gravação:
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `formattedAddress` | `string` | não-vazia |
+| `latitude` | `number` | `-90 ≤ lat ≤ 90` |
+| `longitude` | `number` | `-180 ≤ lon ≤ 180` |
+| `placeId` | `string` | obrigatório, sem validação extra |
+| `provider` | `string` | obrigatório |
+
+> **Fluxo recomendado para o cliente:** obtenha o objeto chamando `GET /geolocalizacao/geocoding` ou `GET /geolocalizacao/geocoding/reverse` (5.1 e 5.2) e repasse a resposta inteira como body desta rota. Os valores de `placeId` e `provider` vêm preenchidos pelo serviço de geocoding (`provider = "openstreetmap_nominatim"`) — o cliente não deve fabricar esses campos manualmente.
 
 **Responses**
 - `200 OK`:

@@ -1,8 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(docker rm *)",
-      "Bash(DOTNET_ROLL_FORWARD=Major dotnet test src/backend/tests/Spotlight.Recomendacao.Tests/Spotlight.Recomendacao.Tests.csproj --filter \"Category=Integration\" -l \"trx;LogFileName=integration.trx\")"
+      "Bash(python3 -c \"import json,sys; import subprocess; r=subprocess.run\\(['python3','-c','import yaml,json,sys; print\\(json.dumps\\(yaml.safe_load\\(sys.stdin.read\\(\\)\\)\\)\\)'], input=open\\('/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/.gitlab-ci.yml'\\).read\\(\\), text=True, capture_output=True\\); print\\(r.stderr or r.stdout[:300]\\)\")",
+      "Bash(pip3 list *)",
+      "Bash(ruby -ryaml -e \"YAML.load_file\\('/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/.gitlab-ci.yml'\\); puts 'YAML OK'\")",
+      "Bash(awk 'NR==1 || /^## / || /^### / || /^#### [0-9]/ { printf \"%4d  %s\\\\n\", NR, $0 }' /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/database/README.md)",
+      "Bash(export TMPDIR=/tmp)",
+      "Bash(cd \"/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04\")",
+      "Bash(git add *)",
+      "Bash(git status *)"
     ]
   }
 }

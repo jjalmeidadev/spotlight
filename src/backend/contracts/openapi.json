@@ -1779,7 +1779,7 @@
       },
       "UsuarioUpdate": {
         "type": "object",
-        "description": "Campos opcionais do próprio perfil.",
+        "description": "Campos opcionais do próprio perfil. Localização é gerenciada por PUT /usuario/me/localizacao e não é aceita neste schema — ver schema Localizacao usado por aquela rota.",
         "properties": {
           "nome": {
             "type": "string",
@@ -1788,9 +1788,6 @@
           "dataNascimento": {
             "type": "string",
             "format": "date"
-          },
-          "localizacao": {
-            "$ref": "#/components/schemas/Localizacao"
           }
         }
       },
