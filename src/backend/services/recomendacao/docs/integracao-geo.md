@@ -38,7 +38,7 @@ disponível.
 
 | Dependência | Tipo | Controle do grupo | No teste |
 |---|---|---|---|
-| PostgreSQL (`recomendacao`, `espetaculo`, `usuario`) | **Possuída** | Schema, migrations e deploy são do grupo | `Testcontainers` (`supabase/postgres:15.1.0.147`) |
+| PostgreSQL (`recomendacao`, `espetaculo`, `usuario`) | **Possuída** | Schema, migrations e deploy são do grupo | `Testcontainers` (`postgres:15-alpine` — PG 15.x, compatível com o Postgres do Supabase de produção; ver `IntegrationFixture`) |
 | API de geocodificação (OpenStreetMap/Nominatim) | **Consumida** | Terceiro externo, sem controle de uptime/contrato | `WireMock.Net` (stub HTTP) |
 
 ## 4. Configuração

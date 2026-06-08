@@ -15,9 +15,11 @@ namespace Spotlight.Recomendacao.Tests.Integration;
 ///
 /// <list type="bullet">
 ///   <item><description><b>Dependência possuída</b>: PostgreSQL real em container
-///   (<c>Testcontainers</c>, imagem <c>postgres:15-alpine</c> — a MESMA usada pelo
-///   <c>docker-compose.yml</c> da raiz do repositório, conforme documentado em
-///   <c>src/database/README.md</c>). O schema é montado executando, em ordem, os
+///   (<c>Testcontainers</c>, imagem <c>postgres:15-alpine</c> — PG 15.x, compatível
+///   com o Postgres do Supabase de produção e com a referência documentada em
+///   <c>src/database/README.md</c> §6.1; o ambiente atual não roda um serviço de
+///   banco no <c>docker-compose.yml</c> da raiz — o Postgres é o Supabase externo).
+///   O schema é montado executando, em ordem, os
 ///   scripts oficiais <c>00_supabase_compat.sql → 01_create_database.sql</c>
 ///   (o <c>02_initial_data.sql</c> é deliberadamente OMITIDO — ver nota abaixo)
 ///   e, por fim, um seed mínimo e determinístico próprio do teste.</description></item>
