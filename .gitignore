@@ -11,6 +11,9 @@ npm-debug.log*
 !.env.example
 **/.data-protection-keys/
 
+# Configurações locais do Claude Code
+.claude/
+
 # .NET test and coverage artifacts
 TestResults/
 

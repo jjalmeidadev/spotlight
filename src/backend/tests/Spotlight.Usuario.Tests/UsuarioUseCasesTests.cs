@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Npgsql;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Application.UseCases;
@@ -53,8 +54,7 @@ public class UsuarioUseCasesTests
             new UsuarioUpdateDto
             {
                 Nome = "Ana Atualizada",
-                DataNascimento = new DateOnly(1995, 5, 10),
-                Localizacao = "Sao Paulo"
+                DataNascimento = new DateOnly(1995, 5, 10)
             },
             Ct);
 
@@ -81,17 +81,16 @@ public class UsuarioUseCasesTests
     }
 
     [Fact]
-    public async Task AtualizarUsuarioMe_ComCamposLongos_AcumulaErros()
+    public async Task AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation()
     {
         var useCase = new AtualizarUsuarioMeUseCase(new FakeUsuarioRepository());
 
         var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => useCase.ExecutarAsync(
             Guid.NewGuid(),
-            new UsuarioUpdateDto { Nome = new string('A', 151), Localizacao = new string('B', 151) },
+            new UsuarioUpdateDto { Nome = new string('A', 151) },
             Ct));
 
         Assert.Contains("nome", ex.Details.Keys);
-        Assert.Contains("localizacao", ex.Details.Keys);
     }
 
     [Fact]
@@ -103,6 +102,25 @@ public class UsuarioUseCasesTests
             Guid.NewGuid(),
             new UsuarioUpdateDto { Nome = "Ana" },
             Ct));
+    }
+
+    [Fact]
+    public void UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo()
+    {
+        // PUT /me com {"localizacao":"São Paulo"} desserializa sem erro
+        // (System.Text.Json ignora propriedades desconhecidas por padrão), mas
+        // o campo não existe no DTO — então o UPDATE no banco nunca toca a
+        // coluna localizacao por esta rota. Atualização de localização vai por
+        // PUT /me/localizacao (payload JSONB validado).
+        const string payload = """{"nome":"Ana","localizacao":"São Paulo"}""";
+
+        var dto = JsonSerializer.Deserialize<UsuarioUpdateDto>(
+            payload,
+            new JsonSerializerOptions(JsonSerializerDefaults.Web));
+
+        Assert.NotNull(dto);
+        Assert.Equal("Ana", dto!.Nome);
+        Assert.Null(typeof(UsuarioUpdateDto).GetProperty("Localizacao"));
     }
 
     [Fact]

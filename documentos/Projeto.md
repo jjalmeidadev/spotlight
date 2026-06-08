@@ -1416,7 +1416,7 @@ Essa entidade permite identificar os usuários da plataforma, registrar preferê
 | email | E-mail utilizado para acesso à plataforma. |
 | senha | Senha de autenticação do usuário. |
 | data_nascimento | Data de nascimento do usuário. |
-| localizacao | Localização do usuário. |
+| localizacao | Localização consentida do usuário, armazenada como JSONB estruturado (`formattedAddress`, `latitude`, `longitude`, `placeId`, `provider`). Populada pela rota dedicada `PUT /usuario/me/localizacao` via integração com OpenStreetMap/Nominatim. |
 | perfil_preferencias | Preferências de categorias e conteúdos. |
 | data_cadastro | Data de criação da conta. |
 | tipo_usuario | Define o tipo do usuário (visitante, cadastrado ou administrador). |
@@ -1762,7 +1762,7 @@ Armazena os dados dos usuários cadastrados na plataforma, integrada ao sistema 
 | `nome` | `VARCHAR(150)` | NN | Nome completo ou nome de exibição do usuário. Preenchido automaticamente pelo trigger a partir dos metadados do cadastro. |
 | `email` | `VARCHAR(255)` | NN, UQ, CK (`email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'`) | E-mail do usuário. Deve ter formato válido. Único na tabela. |
 | `data_nascimento` | `DATE` | — | Data de nascimento. Opcional; utilizada para filtros de faixa etária em recomendações. |
-| `localizacao` | `JSONB` | — | Localização consentida do usuário, incluindo endereço normalizado, coordenadas, identificador do provedor e origem da geocodificação. Utilizada como sinal de contexto para recomendações baseadas em localização. |
+| `localizacao` | `JSONB` | — | Localização consentida do usuário, com objeto estruturado de 5 chaves em camelCase (`formattedAddress`, `latitude`, `longitude`, `placeId`, `provider`). Populado pelo `UsuarioLocalizacaoService` via `PUT /usuario/me/localizacao` — **não** é aceito no body de `PUT /usuario/me`. Em seed, `provider = "seed"`; em produção, `"openstreetmap_nominatim"`. Especificação completa e regras de validação em [`src/database/README.md`](../src/database/README.md#estrutura-do-jsonb-localizacao). |
 | `data_cadastro` | `TIMESTAMP` | NN, DF `NOW()` | Data e hora de criação do registro. Preenchida automaticamente pelo banco. |
 | `tipo_usuario` | `tipo_usuario_enum` | NN, DF `'cadastrado'` | Papel do usuário: `'visitante'`, `'cadastrado'` ou `'administrador'`. Controla o acesso a funcionalidades administrativas. |
 | `nivel_acesso` | `JSONB` | NN, DF `'{}'` | Permissões granulares em formato JSON. Permite definir capacidades específicas dentro do papel sem criar tabelas de controle adicionais. |
@@ -2531,7 +2531,7 @@ _conteúdo_
 | `email` | `varchar` | E-mail utilizado para autenticação |
 | `senha` | `varchar` | Senha criptografada |
 | `data_nascimento` | `date` | Data de nascimento |
-| `localizacao` | `jsonb` | Localização consentida do usuário, com endereço normalizado, coordenadas e provedor |
+| `localizacao` | `jsonb` | Localização consentida — objeto estruturado (`formattedAddress`, `latitude`, `longitude`, `placeId`, `provider`) populado por `PUT /usuario/me/localizacao`. Detalhes em [`src/database/README.md`](../src/database/README.md#estrutura-do-jsonb-localizacao) |
 | `data_cadastro` | `timestamp` | Data de criação da conta |
 | `tipo_usuario` | `varchar` | Papel do usuário no sistema (ex: `comum`, `admin`) |
 | `nivel_acesso` | `jsonb` | Permissões granulares em formato JSON |
