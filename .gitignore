@@ -49,7 +49,7 @@ Thumbs.db
 
 # AIOX Local (AIOX)
 .aiox-core/local/
-.claude/settings.local.json
+.claude/
 .aiox/install-log.txt
 .github
 .aiox-core
