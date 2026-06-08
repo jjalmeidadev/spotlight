@@ -50,6 +50,12 @@ public sealed class IntegrationFixture : IAsyncLifetime
     /// <summary>UUID fixo do usuário semeado para os testes.</summary>
     public static readonly Guid TestUserId = Guid.Parse("00000000-0000-0000-0000-0000000000aa");
 
+    /// <summary>Usuário sem localização consentida (localizacao IS NULL).</summary>
+    public static readonly Guid TestUserIdSemLocalizacao = Guid.Parse("00000000-0000-0000-0000-0000000000bb");
+
+    /// <summary>Usuário com coordenadas armazenadas como strings JSON (não números).</summary>
+    public static readonly Guid TestUserIdCoordsComoString = Guid.Parse("00000000-0000-0000-0000-0000000000cc");
+
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:15-alpine")
         .WithDatabase("postgres")
         .WithUsername("postgres")
@@ -83,10 +89,15 @@ public sealed class IntegrationFixture : IAsyncLifetime
     public System.Net.Http.HttpClient CreateClient() => Factory.CreateClient();
 
     /// <summary>
-    /// Gera um JWT HS256 válido (assinado com o segredo de teste) para o usuário
-    /// semeado, com o claim <c>tipo_usuario = cadastrado</c> exigido pela policy.
+    /// Gera um JWT HS256 válido para o <see cref="TestUserId"/> principal dos testes.
     /// </summary>
-    public string GerarTokenUsuario()
+    public string GerarTokenUsuario() => GerarTokenUsuario(TestUserId);
+
+    /// <summary>
+    /// Gera um JWT HS256 válido (assinado com o segredo de teste) para qualquer
+    /// usuário semeado, com o claim <c>tipo_usuario = cadastrado</c> exigido pela policy.
+    /// </summary>
+    public string GerarTokenUsuario(Guid userId)
     {
         var credenciais = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSecret)),
@@ -96,7 +107,7 @@ public sealed class IntegrationFixture : IAsyncLifetime
         {
             Subject = new ClaimsIdentity(
             [
-                new Claim("sub", TestUserId.ToString()),
+                new Claim("sub", userId.ToString()),
                 new Claim("tipo_usuario", "cadastrado")
             ]),
             Expires = DateTime.UtcNow.AddHours(1),
@@ -175,6 +186,57 @@ public sealed class IntegrationFixture : IAsyncLifetime
             ('{{TestUserId}}', 3, 'k-NN',    0.880000, 'Vizinhos com perfil analogo.', FALSE),
             ('{{TestUserId}}', 4, 'k-means', 0.800000, 'Cluster de preferencia familiar.', FALSE),
             ('{{TestUserId}}', 5, 'SVD',     0.750000, 'Afinidade latente identificada.', FALSE)
+        ON CONFLICT DO NOTHING;
+
+        -- Usuário sem localização consentida: localizacao permanece NULL (não há UPDATE).
+        -- Exercita o branch "resultado is null or DBNull" em ObterCoordenadasAsync,
+        -- provando degradação graciosa quando o usuário não partilhou coordenadas (RNF03).
+        INSERT INTO auth.users (
+            id, aud, role, email, encrypted_password,
+            email_confirmed_at, raw_user_meta_data, created_at, updated_at
+        ) VALUES (
+            '{{TestUserIdSemLocalizacao}}', 'authenticated', 'authenticated',
+            'sem.localizacao@spotlight.test',
+            crypt('Spotlight@2025!', gen_salt('bf', 10)),
+            NOW(), '{"nome": "Sem Localizacao"}'::jsonb, NOW(), NOW()
+        ) ON CONFLICT (id) DO NOTHING;
+
+        INSERT INTO recomendacao (
+            id_usuario, id_espetaculo, tipo_algoritmo,
+            score_recomendacao, motivo_recomendacao, prioridade_manual
+        ) VALUES
+            ('{{TestUserIdSemLocalizacao}}', 1, 'k-NN',    0.900000, 'Afinidade alta.', FALSE),
+            ('{{TestUserIdSemLocalizacao}}', 2, 'SVD',     0.850000, 'Predicao SVD.', FALSE),
+            ('{{TestUserIdSemLocalizacao}}', 3, 'k-NN',    0.800000, 'Vizinhos proximos.', FALSE),
+            ('{{TestUserIdSemLocalizacao}}', 4, 'k-means', 0.750000, 'Cluster de preferencia.', FALSE),
+            ('{{TestUserIdSemLocalizacao}}', 5, 'SVD',     0.700000, 'Afinidade latente.', FALSE)
+        ON CONFLICT DO NOTHING;
+
+        -- Usuário com coordenadas armazenadas como strings JSON em vez de números:
+        -- exercita JsonValueKind.String em LerNumero (branch não coberto pelos demais testes).
+        INSERT INTO auth.users (
+            id, aud, role, email, encrypted_password,
+            email_confirmed_at, raw_user_meta_data, created_at, updated_at
+        ) VALUES (
+            '{{TestUserIdCoordsComoString}}', 'authenticated', 'authenticated',
+            'coords.string@spotlight.test',
+            crypt('Spotlight@2025!', gen_salt('bf', 10)),
+            NOW(), '{"nome": "Coords Como String"}'::jsonb, NOW(), NOW()
+        ) ON CONFLICT (id) DO NOTHING;
+
+        UPDATE usuario SET
+            localizacao = '{"latitude": "-23.561", "longitude": "-46.656"}'::jsonb
+        WHERE id_usuario = '{{TestUserIdCoordsComoString}}';
+
+        INSERT INTO recomendacao (
+            id_usuario, id_espetaculo, tipo_algoritmo,
+            score_recomendacao, motivo_recomendacao, prioridade_manual
+        ) VALUES
+            ('{{TestUserIdCoordsComoString}}', 1, 'k-NN',    0.920000, 'Afinidade alta.', FALSE),
+            ('{{TestUserIdCoordsComoString}}', 2, 'SVD',     0.870000, 'Predicao SVD.', FALSE),
+            ('{{TestUserIdCoordsComoString}}', 3, 'k-NN',    0.820000, 'Vizinhos proximos.', FALSE),
+            ('{{TestUserIdCoordsComoString}}', 4, 'k-means', 0.770000, 'Cluster de preferencia.', FALSE),
+            ('{{TestUserIdCoordsComoString}}', 5, 'SVD',     0.720000, 'Afinidade latente.', FALSE)
         ON CONFLICT DO NOTHING;
         """;
 

@@ -1,0 +1,48 @@
+Summary
+  Generated on: 08/06/2026 - 19:54:53
+  Coverage date: 08/06/2026 - 19:51:09 - 08/06/2026 - 19:54:47
+  Parser: MultiReport (4x Cobertura)
+  Assemblies: 1
+  Classes: 26
+  Files: 21
+  Line coverage: 90%
+  Covered lines: 443
+  Uncovered lines: 49
+  Coverable lines: 492
+  Total lines: 1008
+  Branch coverage: 70% (103 of 147)
+  Covered branches: 103
+  Total branches: 147
+  Method coverage: 90.5% (67 of 74)
+  Full method coverage: 81% (60 of 74)
+  Covered methods: 67
+  Fully covered methods: 60
+  Total methods: 74
+
+Spotlight.Recomendacao                                                               90%
+  Program                                                                          94.5%
+  Spotlight.Recomendacao.Application.Dtos.ErroDto                                     0%
+  Spotlight.Recomendacao.Application.Dtos.EspetaculoRecomendadoDto                  100%
+  Spotlight.Recomendacao.Application.Dtos.ListaDto<T>                               100%
+  Spotlight.Recomendacao.Application.Dtos.RecomendacaoDto                           100%
+  Spotlight.Recomendacao.Application.Dtos.SimilarDto                                100%
+  Spotlight.Recomendacao.Application.UseCases.ListarRecomendacoesMeUseCase           96%
+  Spotlight.Recomendacao.Application.UseCases.ListarSimilaresUseCase                100%
+  Spotlight.Recomendacao.Domain.Entities.ConflictException                          100%
+  Spotlight.Recomendacao.Domain.Entities.EspetaculoRecomendado                      100%
+  Spotlight.Recomendacao.Domain.Entities.NotFoundException                          100%
+  Spotlight.Recomendacao.Domain.Entities.Recomendacao                               100%
+  Spotlight.Recomendacao.Domain.Entities.Similar                                    100%
+  Spotlight.Recomendacao.Domain.Entities.ValidationException                        100%
+  Spotlight.Recomendacao.Domain.ValueObjects.Coordenadas                            100%
+  Spotlight.Recomendacao.Infrastructure.Auth.AuthorizeOperationFilter               100%
+  Spotlight.Recomendacao.Infrastructure.Auth.AuthSetup                               66%
+  Spotlight.Recomendacao.Infrastructure.Auth.UsuarioContextoHttp                    100%
+  Spotlight.Recomendacao.Infrastructure.Geocoding.NominatimGeocodingClient         84.3%
+  Spotlight.Recomendacao.Infrastructure.Persistence.LocalizacaoUsuarioRepository   66.6%
+  Spotlight.Recomendacao.Infrastructure.Persistence.RecomendacaoRepository          100%
+  Spotlight.Recomendacao.Infrastructure.Persistence.SimilaridadeRepository          100%
+  Spotlight.Recomendacao.Presentation.Controllers.EspetaculosSimilaresController    100%
+  Spotlight.Recomendacao.Presentation.Controllers.PingController                    100%
+  Spotlight.Recomendacao.Presentation.Controllers.RecomendacaoMeController          100%
+  Spotlight.Recomendacao.Presentation.Middleware.ErrorHandlingMiddleware            100%
