@@ -14,6 +14,7 @@ export default function App() {
 	const [screen, setScreen] = React.useState('loading');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
 	const [userName, setUserName] = React.useState('Leonardo');
+	const [accessToken, setAccessToken] = React.useState(null);
 
 	const [fontsLoaded] = useFonts({
 		'Gotham-Bold': require('./assets/fonts/Gotham Bold.otf'),
@@ -40,6 +41,7 @@ export default function App() {
 
 	function handleLogin(usuario) {
 		setUserName(usuario.nome);
+		setAccessToken(usuario.accessToken ?? null);
 		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
 	}
 
@@ -75,6 +77,8 @@ export default function App() {
 						return;
 					}
 
+					setUserName(usuario.nome);
+					setAccessToken(usuario.accessToken ?? null);
 					setScreen('preferencias');
 				}}
 			/>
@@ -82,7 +86,7 @@ export default function App() {
 	}
 
 	if (screen === 'preferencias') {
-		return <PreferenceSelectionScreen onComplete={() => setScreen('catalogo')} />;
+		return <PreferenceSelectionScreen accessToken={accessToken} onComplete={() => setScreen('catalogo')} />;
 	}
 
 	if (screen === 'catalogo') {
