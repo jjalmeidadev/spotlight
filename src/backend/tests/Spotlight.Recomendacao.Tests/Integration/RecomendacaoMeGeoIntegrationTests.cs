@@ -106,6 +106,74 @@ public class RecomendacaoMeGeoIntegrationTests(IntegrationFixture fixture)
         Assert.All(corpo.Data, item => Assert.Null(item.ContextoGeografico));
     }
 
+    [Fact]
+    public async Task DeveRetornarSemContextoGeoQuandoUsuarioNaoTemLocalizacao()
+    {
+        // Arrange: usuário sem localização consentida (localizacao IS NULL no banco).
+        // Mesmo com o geocoder disponível (200), o serviço deve degradar graciosamente:
+        // ObterCoordenadasAsync retorna null → geocoder nunca é chamado → contextoGeografico
+        // permanece null. Testa o cenário RNF03 pelo lado do usuário (sem localização),
+        // distinto do cenário "geocoder indisponível".
+        fixture.GeocodingMock.Reset();
+
+        var client = fixture.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", fixture.GerarTokenUsuario(IntegrationFixture.TestUserIdSemLocalizacao));
+
+        // Act
+        var resposta = await client.GetAsync(RotaRecomendacoesMe);
+
+        // Assert: 200 com recomendações, sem enriquecimento — o fluxo não propaga a
+        // ausência de localização como erro.
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+
+        var corpo = await resposta.Content.ReadFromJsonAsync<ListaRecomendacoesResponse>();
+
+        Assert.NotNull(corpo);
+        Assert.True(corpo!.Data.Count >= 5);
+        Assert.All(corpo.Data, item => Assert.Null(item.ContextoGeografico));
+    }
+
+    [Fact]
+    public async Task DeveRetornarContextoGeoQuandoCoordenadaEstiverComoString()
+    {
+        // Arrange: usuário com coordenadas armazenadas como strings JSON em vez de números
+        // (ex.: {"latitude": "-23.561", "longitude": "-46.656"}). Testa a tolerância de
+        // formato do LerNumero (JsonValueKind.String). O geocoder responde 200 → prova
+        // que as coordenadas foram parseadas corretamente e a chamada externa aconteceu.
+        fixture.GeocodingMock.Reset();
+        fixture.GeocodingMock
+            .Given(Request.Create()
+                .WithPath(RotaReverseGeocoding)
+                .UsingGet())
+            .RespondWith(Response.Create()
+                .WithStatusCode(HttpStatusCode.OK)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(new
+                {
+                    place_id = 202,
+                    display_name = "Avenida Paulista, Sao Paulo, SP",
+                    address = new { city = "Sao Paulo (coords-string)", state = "SP" }
+                }));
+
+        var client = fixture.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", fixture.GerarTokenUsuario(IntegrationFixture.TestUserIdCoordsComoString));
+
+        // Act
+        var resposta = await client.GetAsync(RotaRecomendacoesMe);
+
+        // Assert: contextoGeografico preenchido → coordenadas em formato string foram
+        // parseadas com sucesso e o geocoder foi acionado ponta a ponta.
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+
+        var corpo = await resposta.Content.ReadFromJsonAsync<ListaRecomendacoesResponse>();
+
+        Assert.NotNull(corpo);
+        Assert.True(corpo!.Data.Count >= 5);
+        Assert.All(corpo.Data, item => Assert.Equal("Sao Paulo (coords-string)", item.ContextoGeografico));
+    }
+
     // -----------------------------------------------------------------------
     // Modelos de desserialização do contrato observável (caixa-preta): só os
     // campos que os testes precisam afirmar — não reaproveita os DTOs internos

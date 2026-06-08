@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.5121" branch-rate="0.2585" version="1.9" timestamp="1780959270" lines-covered="252" lines-valid="492" branches-covered="38" branches-valid="147">
+<coverage line-rate="0.5121" branch-rate="0.2585" version="1.9" timestamp="1780960308" lines-covered="252" lines-valid="492" branches-covered="38" branches-valid="147">
   <sources>
     <source>/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/recomendacao/</source>
   </sources>
