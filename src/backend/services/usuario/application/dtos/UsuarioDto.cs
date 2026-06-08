@@ -12,10 +12,13 @@ public class UsuarioDto
     public DateTime DataCadastro { get; init; }
 }
 
-/// <summary>Body de PUT /usuario/me — todos os campos opcionais (partial update).</summary>
+/// <summary>
+/// Body de PUT /usuario/me — todos os campos opcionais (partial update).
+/// Localização é gerenciada exclusivamente por PUT /usuario/me/localizacao
+/// (coluna <c>localizacao</c> é JSONB e exige estrutura validada).
+/// </summary>
 public class UsuarioUpdateDto
 {
     public string? Nome { get; set; }
     public DateOnly? DataNascimento { get; set; }
-    public string? Localizacao { get; set; }
 }

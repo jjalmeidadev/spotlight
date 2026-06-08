@@ -4,13 +4,13 @@ using Spotlight.Usuario.Domain.Entities;
 namespace Spotlight.Usuario.Application.UseCases;
 
 /// <summary>
-/// Atualiza parcialmente o perfil do usuário autenticado (nome, dataNascimento,
-/// localizacao). Valida os limites de tamanho do contrato.
+/// Atualiza parcialmente o perfil do usuário autenticado (nome, dataNascimento).
+/// Valida os limites de tamanho do contrato. Localização tem rota própria
+/// (<c>PUT /me/localizacao</c>) por exigir payload JSONB estruturado.
 /// </summary>
 public class AtualizarUsuarioMeUseCase(IUsuarioRepository repositorio)
 {
     private const int TamanhoMaximoNome = 150;
-    private const int TamanhoMaximoLocalizacao = 150;
 
     public async Task<UsuarioDto> ExecutarAsync(
         Guid usuarioId, UsuarioUpdateDto dados, CancellationToken cancellationToken)
@@ -37,10 +37,6 @@ public class AtualizarUsuarioMeUseCase(IUsuarioRepository repositorio)
         if (dados.Nome is not null && string.IsNullOrWhiteSpace(dados.Nome))
         {
             erros["nome"] = ["O nome não pode ser vazio."];
-        }
-        if (dados.Localizacao is { Length: > TamanhoMaximoLocalizacao })
-        {
-            erros["localizacao"] = [$"A localização deve ter no máximo {TamanhoMaximoLocalizacao} caracteres."];
         }
 
         if (erros.Count > 0) throw new ValidationException(erros);
