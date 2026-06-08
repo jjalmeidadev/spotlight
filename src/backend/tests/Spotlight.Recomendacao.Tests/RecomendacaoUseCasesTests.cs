@@ -65,11 +65,14 @@ public class RecomendacaoUseCasesTests
                 }
             ]
         };
-        var useCase = new ListarSimilaresUseCase(repositorio);
+        var motor = new FakeMotorSimilaridadeClient();
+        var useCase = new ListarSimilaresUseCase(repositorio, motor);
 
         var resultado = await useCase.ExecutarAsync(7, limite, Ct);
 
         Assert.Equal(7, repositorio.LastExisteId);
+        Assert.Equal(7, motor.LastEspetaculoOrigemId);
+        Assert.Equal(limiteEsperado, motor.LastLimite);
         Assert.Equal(7, repositorio.LastOrigemId);
         Assert.Equal(limiteEsperado, repositorio.LastLimite);
         var item = Assert.Single(resultado.Data);
@@ -81,10 +84,12 @@ public class RecomendacaoUseCasesTests
     public async Task ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista()
     {
         var repositorio = new FakeSimilaridadeRepository { Existe = false };
-        var useCase = new ListarSimilaresUseCase(repositorio);
+        var motor = new FakeMotorSimilaridadeClient();
+        var useCase = new ListarSimilaresUseCase(repositorio, motor);
 
         await Assert.ThrowsAsync<RecomendacaoNotFoundException>(() => useCase.ExecutarAsync(404, 10, Ct));
 
+        Assert.Equal(0, motor.Calls);
         Assert.Equal(0, repositorio.ListarCalls);
     }
 
@@ -138,6 +143,24 @@ public class RecomendacaoUseCasesTests
             LastOrigemId = espetaculoOrigemId;
             LastLimite = limite;
             return Task.FromResult(Similares);
+        }
+    }
+
+    private sealed class FakeMotorSimilaridadeClient : IMotorSimilaridadeClient
+    {
+        public int Calls { get; private set; }
+        public int LastEspetaculoOrigemId { get; private set; }
+        public int LastLimite { get; private set; }
+
+        public Task ValidarConsultaAsync(
+            int espetaculoOrigemId,
+            int limite,
+            CancellationToken cancellationToken)
+        {
+            Calls++;
+            LastEspetaculoOrigemId = espetaculoOrigemId;
+            LastLimite = limite;
+            return Task.CompletedTask;
         }
     }
 }

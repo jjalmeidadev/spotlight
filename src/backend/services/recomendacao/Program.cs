@@ -6,6 +6,7 @@ using Npgsql;
 using Serilog;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Infrastructure.Auth;
+using Spotlight.Recomendacao.Infrastructure.Http;
 using Spotlight.Recomendacao.Infrastructure.Persistence;
 using Spotlight.Recomendacao.Presentation.Middleware;
 
@@ -31,6 +32,11 @@ var connectionString =
     ?? builder.Configuration.GetConnectionString("Default")
     ?? string.Empty;
 
+var motorSimilaridadeBaseUrl =
+    Environment.GetEnvironmentVariable("MOTOR_SIMILARIDADE_BASE_URL")
+    ?? builder.Configuration["SimilarityEngine:BaseUrl"]
+    ?? string.Empty;
+
 // ---------------------------------------------------------------------------
 // Banco de dados (Npgsql / ADO.NET — sem ORM — PostgreSQL/Supabase)
 // ---------------------------------------------------------------------------
@@ -42,6 +48,18 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
     builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
     builder.Services.AddScoped<ListarSimilaresUseCase>();
+}
+
+if (!string.IsNullOrWhiteSpace(motorSimilaridadeBaseUrl))
+{
+    builder.Services.AddHttpClient<IMotorSimilaridadeClient, MotorSimilaridadeHttpClient>(client =>
+    {
+        client.BaseAddress = new Uri(motorSimilaridadeBaseUrl);
+    });
+}
+else
+{
+    builder.Services.AddSingleton<IMotorSimilaridadeClient, MotorSimilaridadeNoOpClient>();
 }
 
 // ---------------------------------------------------------------------------

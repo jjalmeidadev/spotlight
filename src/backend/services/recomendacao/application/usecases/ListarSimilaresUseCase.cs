@@ -9,7 +9,9 @@ namespace Spotlight.Recomendacao.Application.UseCases;
 /// Normaliza o <c>limite</c> dentro de 1..50 (default 10).
 /// Lança <see cref="NotFoundException"/> se o espetáculo de origem não existir.
 /// </summary>
-public class ListarSimilaresUseCase(ISimilaridadeRepository repositorio)
+public class ListarSimilaresUseCase(
+    ISimilaridadeRepository repositorio,
+    IMotorSimilaridadeClient motorSimilaridade)
 {
     private const int LimitePadrao = 10;
     private const int LimiteMaximo = 50;
@@ -28,6 +30,9 @@ public class ListarSimilaresUseCase(ISimilaridadeRepository repositorio)
             > LimiteMaximo => LimiteMaximo,
             _ => limite.Value
         };
+
+        await motorSimilaridade.ValidarConsultaAsync(
+            espetaculoOrigemId, limiteNorm, cancellationToken);
 
         var itens = await repositorio.ListarPorOrigemAsync(
             espetaculoOrigemId, limiteNorm, cancellationToken);
