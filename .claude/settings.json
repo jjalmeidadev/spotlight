@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker rm *)",
+      "Bash(DOTNET_ROLL_FORWARD=Major dotnet test src/backend/tests/Spotlight.Recomendacao.Tests/Spotlight.Recomendacao.Tests.csproj --filter \"Category=Integration\" -l \"trx;LogFileName=integration.trx\")"
+    ]
+  }
+}

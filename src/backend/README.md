@@ -183,6 +183,20 @@ curl http://localhost:5004/health
 | Conecta no banco remoto com sucesso | `curl /health/ready` → `200` (`503` se a connection string estiver errada) |
 | Testes rodam | `dotnet test` → 8 testes passando |
 
+## 🧪 Tracker · Testes de Integração (Aula 8)
+
+> Coordenação entre os integrantes para evitar fluxos duplicados. Cada pessoa
+> registra **um** fluxo (serviço + endpoint) e o MR correspondente.
+
+| Aluno | Fluxo testado | Dependências (possuída · consumida) | MR |
+|---|---|---|---|
+| Rafael Campos | `GET /recomendacao/me` (recomendações + contexto geográfico) | PostgreSQL (Testcontainers) · API de geocodificação (WireMock.Net) | _(preencher após abrir o MR)_ |
+
+> Os testes de integração são marcados com `[Trait("Category","Integration")]`.
+> Eles exigem Docker (Testcontainers) e ficam **fora** do filtro do pipeline
+> (`Category!=Integration`); por isso são validados localmente. Veja
+> `services/recomendacao/docs/integracao-geo.md`.
+
 ## Acesso a dados — padrão de repositório (sem ORM)
 
 O acesso ao PostgreSQL é feito com **SQL puro via Npgsql**. O `NpgsqlDataSource`

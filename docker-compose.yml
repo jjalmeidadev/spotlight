@@ -30,6 +30,8 @@ services:
       ASPNETCORE_URLS: http://+:8080
       DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING}
       SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      GEOCODING_BASE_URL: ${GEOCODING_BASE_URL:-https://nominatim.openstreetmap.org}
+      GEOCODING_USER_AGENT: ${GEOCODING_USER_AGENT:-spotlight-inteli-g04/1.0}
     ports:
       - "5003:8080"
     healthcheck:

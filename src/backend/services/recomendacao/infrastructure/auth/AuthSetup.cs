@@ -25,7 +25,10 @@ public static class AuthSetup
 
     public static void AdicionarAutenticacaoESupabase(this WebApplicationBuilder builder)
     {
-        var jwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET");
+        // Lido via IConfiguration (que agrega variáveis de ambiente). Em produção
+        // o comportamento é idêntico a ler a env var diretamente; nos testes de
+        // integração permite injeção determinística do segredo via configuração.
+        var jwtSecret = builder.Configuration["SUPABASE_JWT_SECRET"];
         if (string.IsNullOrWhiteSpace(jwtSecret)) return;
 
         builder.Services.AddHttpContextAccessor();

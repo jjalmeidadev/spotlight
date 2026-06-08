@@ -8,6 +8,15 @@ public class RecomendacaoDto
     public string TipoAlgoritmo { get; init; } = string.Empty;
     public string? Motivo { get; init; }
     public DateTime DataGeracao { get; init; }
+
+    /// <summary>
+    /// Rótulo de cidade/região derivado da localização consentida do usuário via
+    /// reverse geocoding (OpenStreetMap/Nominatim). É <c>null</c> quando o usuário
+    /// não tem localização OU quando o serviço externo de geocodificação está
+    /// indisponível — neste último caso o endpoint degrada graciosamente e ainda
+    /// retorna as recomendações (RNF03 — Confiabilidade).
+    /// </summary>
+    public string? ContextoGeografico { get; init; }
 }
 
 /// <summary>Subconjunto de campos do espetáculo expostos junto da recomendação.</summary>
