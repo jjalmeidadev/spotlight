@@ -6,12 +6,13 @@ import { CatalogPosterCard } from './CatalogPosterCard';
 import { SectionTitle } from './SectionTitle';
 
 type CatalogRailProps = {
+	id?: string;
 	title: string;
 	items: CatalogItem[];
-	onItemPress?: (item: CatalogItem) => void;
+	onItemPress?: (item: CatalogItem, context: { railId?: string; railTitle: string; position: number }) => void;
 };
 
-export function CatalogRail({ title, items, onItemPress }: CatalogRailProps) {
+export function CatalogRail({ id, title, items, onItemPress }: CatalogRailProps) {
 	return (
 		<View style={styles.section}>
 			<SectionTitle title={title} />
@@ -22,12 +23,12 @@ export function CatalogRail({ title, items, onItemPress }: CatalogRailProps) {
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={styles.listContent}
 				ItemSeparatorComponent={() => <View style={styles.separator} />}
-				renderItem={({ item }) => (
+				renderItem={({ item, index }) => (
 					<CatalogPosterCard
 						title={item.title}
 						subtitle={item.subtitle}
 						imageSource={item.image}
-						onPress={() => onItemPress?.(item)}
+						onPress={() => onItemPress?.(item, { railId: id, railTitle: title, position: index })}
 					/>
 				)}
 			/>
