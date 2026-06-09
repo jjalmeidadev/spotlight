@@ -6,6 +6,18 @@
 **Fluxo escolhido:** `POST /catalogo/espetaculos/{id}/avaliacoes`  
 **Branch:** `test/integration-avaliacao-espetaculo`
 
+## Coordenação do grupo - Testes de integração
+
+| Aluno | Fluxo escolhido | Dependência possuída (Testcontainers) | Dependência consumida (WireMock.Net) | RF | RNF / ISO 25010 | Link do MR | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Mariana Reis | `PUT /usuario/me/preferencias` | PostgreSQL - tabela `usuario`, campo `perfil_preferencias` | Motor de recomendação/notificação de preferências | RF03 | RNF03 - Confiabilidade | A preencher | Em desenvolvimento |
+| Vitor | `PUT /usuario/me/localizacao` | PostgreSQL - tabela `usuario`, campo `localizacao` | OpenStreetMap/Nominatim | RF03 | RNF03 - Confiabilidade | A preencher | A confirmar |
+| Rafael | `GET /recomendacao/me` | PostgreSQL - tabelas `recomendacao`, `usuario` e `espetaculo` | OpenStreetMap/Nominatim para contexto geográfico, se usado no fluxo | RF04 | RNF02 - Desempenho ou RNF03 - Confiabilidade | A preencher | Em desenvolvimento |
+| Celso | `GET /recomendacao/espetaculos/{id}/similares` | PostgreSQL - tabelas `similaridade_item` e `espetaculo` | Motor externo de similaridade/k-NN simulado | RF14 | RNF02 - Desempenho | A preencher | A confirmar |
+| Leonardo | `POST /catalogo/espetaculos/{id}/avaliacoes` | PostgreSQL - tabelas `usuario`, `espetaculo` e `avaliacao` | Serviço de recomendação recebendo evento de avaliação | RF09, RF10, RF11 e RF13 | RNF05 - Segurança; RNF02/RNF09 como impacto indireto | A preencher após abertura do MR | Implementado |
+| Mariana Pereira | `POST /catalogo/espetaculos` | PostgreSQL - tabelas `espetaculo`, `categoria` e relacionamentos | API externa simulada de armazenamento/validação de imagem ou ticketeira | RF16 | RNF05 - Segurança | A preencher | A confirmar |
+| Jaime | `GET /geolocalizacao/geocoding/reverse` | Cache ou PostgreSQL, caso o fluxo persista/cacheie o resultado | OpenStreetMap/Nominatim | RF03 ou RF12 | RNF03 - Confiabilidade | A preencher | Mais arriscado se não tocar dependência possuída |
+
 ## 1. Contexto do fluxo
 
 Este Merge Request implementa testes de integração para o fluxo de criação de avaliação de espetáculo no serviço `Spotlight.Catalogo`.
