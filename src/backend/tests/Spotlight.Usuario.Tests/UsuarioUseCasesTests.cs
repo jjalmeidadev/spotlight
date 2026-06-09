@@ -147,7 +147,7 @@ public class UsuarioUseCasesTests
     public async Task AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias()
     {
         var repositorio = new FakeUsuarioRepository { AtualizarPreferenciasResult = true };
-        var useCase = new AtualizarPreferenciasUseCase(repositorio);
+        var useCase = new AtualizarPreferenciasUseCase(repositorio, new FakePreferenciasRecomendacaoNotifier());
 
         var resultado = await useCase.ExecutarAsync(
             Guid.NewGuid(),
@@ -169,7 +169,7 @@ public class UsuarioUseCasesTests
     public async Task AtualizarPreferencias_ComPrecoNegativo_LancaValidation()
     {
         var repositorio = new FakeUsuarioRepository();
-        var useCase = new AtualizarPreferenciasUseCase(repositorio);
+        var useCase = new AtualizarPreferenciasUseCase(repositorio, new FakePreferenciasRecomendacaoNotifier());
 
         var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => useCase.ExecutarAsync(
             Guid.NewGuid(),
@@ -183,7 +183,9 @@ public class UsuarioUseCasesTests
     [Fact]
     public async Task AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound()
     {
-        var useCase = new AtualizarPreferenciasUseCase(new FakeUsuarioRepository { AtualizarPreferenciasResult = false });
+        var useCase = new AtualizarPreferenciasUseCase(
+            new FakeUsuarioRepository { AtualizarPreferenciasResult = false },
+            new FakePreferenciasRecomendacaoNotifier());
 
         await Assert.ThrowsAsync<UsuarioNotFoundException>(() => useCase.ExecutarAsync(
             Guid.NewGuid(),
@@ -376,6 +378,14 @@ public class UsuarioUseCasesTests
         }
     }
 
+    private sealed class FakePreferenciasRecomendacaoNotifier : IPreferenciasRecomendacaoNotifier
+    {
+        public Task NotificarPreferenciasAtualizadasAsync(
+            Guid usuarioId,
+            Preferencias preferencias,
+            CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
     private sealed class FakeTelemetriaRepository : ITelemetriaRepository
     {
         public TelemetriaEvento? LastEvento { get; private set; }
@@ -385,5 +395,6 @@ public class UsuarioUseCasesTests
             LastEvento = evento;
             return Task.CompletedTask;
         }
+    }
     }
 }

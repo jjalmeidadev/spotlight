@@ -25,7 +25,17 @@ public class ObterPreferenciasUseCase(IUsuarioRepository repositorio)
 /// Substitui as preferências do usuário (semântica de PUT — replace, não merge).
 /// Valida que <c>faixaPrecoMax</c> não seja negativa.
 /// </summary>
-public class AtualizarPreferenciasUseCase(IUsuarioRepository repositorio)
+public interface IPreferenciasRecomendacaoNotifier
+{
+    Task NotificarPreferenciasAtualizadasAsync(
+        Guid usuarioId,
+        Preferencias preferencias,
+        CancellationToken cancellationToken);
+}
+
+public class AtualizarPreferenciasUseCase(
+    IUsuarioRepository repositorio,
+    IPreferenciasRecomendacaoNotifier recomendacaoNotifier)
 {
     public async Task<PreferenciasDto> ExecutarAsync(
         Guid usuarioId, PreferenciasDto dados, CancellationToken cancellationToken)
@@ -41,6 +51,9 @@ public class AtualizarPreferenciasUseCase(IUsuarioRepository repositorio)
 
         var atualizado = await repositorio.AtualizarPreferenciasAsync(usuarioId, entidade, cancellationToken);
         if (!atualizado) throw new NotFoundException("Perfil do usuário autenticado não encontrado.");
+
+        await recomendacaoNotifier.NotificarPreferenciasAtualizadasAsync(
+            usuarioId, entidade, cancellationToken);
 
         return ObterPreferenciasUseCase.Mapear(entidade);
     }

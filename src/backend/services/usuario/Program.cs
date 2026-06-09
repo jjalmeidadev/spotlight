@@ -9,9 +9,13 @@ using Serilog;
 using Spotlight.Usuario.Application.UseCases;
 using Spotlight.Usuario.Infrastructure.Auth;
 using Spotlight.Usuario.Infrastructure.Persistence;
+using Spotlight.Usuario.Infrastructure.Recommendation;
 using Spotlight.Usuario.Presentation.Middleware;
 
-Env.TraversePath().Load();
+if (!AppContext.BaseDirectory.Contains("Spotlight.Usuario.Tests", StringComparison.OrdinalIgnoreCase))
+{
+    Env.TraversePath().Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +50,11 @@ var mongoTelemetryCollectionName =
     ?? builder.Configuration["MongoDB:TelemetryCollection"]
     ?? string.Empty;
 
+var recommendationEngineBaseUrl =
+    Environment.GetEnvironmentVariable("RECOMMENDATION_ENGINE_BASE_URL")
+    ?? builder.Configuration["RecommendationEngine:BaseUrl"]
+    ?? string.Empty;
+
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
     builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
@@ -78,6 +87,16 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString)
         sp.GetRequiredService<IMongoClient>().GetDatabase(mongoOptions.DatabaseName));
     builder.Services.AddScoped<ITelemetriaRepository, MongoTelemetriaRepository>();
     builder.Services.AddScoped<ITelemetriaService, TelemetriaService>();
+}
+
+if (string.IsNullOrWhiteSpace(recommendationEngineBaseUrl))
+{
+    builder.Services.AddScoped<IPreferenciasRecomendacaoNotifier, NoOpPreferenciasRecomendacaoNotifier>();
+}
+else
+{
+    builder.Services.AddHttpClient<IPreferenciasRecomendacaoNotifier, HttpPreferenciasRecomendacaoNotifier>(
+        client => client.BaseAddress = new Uri(recommendationEngineBaseUrl));
 }
 
 builder.Services.AddScoped<IUsuarioLocalizacaoService, UsuarioLocalizacaoService>();
