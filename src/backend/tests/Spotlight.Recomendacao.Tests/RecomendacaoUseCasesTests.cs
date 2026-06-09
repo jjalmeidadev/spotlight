@@ -1,3 +1,4 @@
+using Spotlight.Recomendacao.Application.Services;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Domain.Entities;
 using Xunit;
@@ -33,7 +34,8 @@ public class RecomendacaoUseCasesTests
             ]
         };
         var usuarioId = Guid.NewGuid();
-        var useCase = new ListarRecomendacoesMeUseCase(repositorio);
+        var service = new RecomendacaoService(repositorio);
+        var useCase = new ListarRecomendacoesMeUseCase(service);
 
         var resultado = await useCase.ExecutarAsync(usuarioId, limite, Ct);
 

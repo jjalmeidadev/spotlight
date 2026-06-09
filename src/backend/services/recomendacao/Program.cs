@@ -4,6 +4,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
+using Spotlight.Recomendacao.Application.Services;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Infrastructure.Auth;
 using Spotlight.Recomendacao.Infrastructure.Persistence;
@@ -40,6 +41,7 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 
     builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
     builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
+    builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
     builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
     builder.Services.AddScoped<ListarSimilaresUseCase>();
 }
