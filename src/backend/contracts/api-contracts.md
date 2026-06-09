@@ -345,6 +345,10 @@ Em erros de validação (400), inclui `details` por campo:
 ### 3.10 `POST /catalogo/espetaculos/{id}/avaliacoes`
 **Finalidade:** avaliar um espetáculo. **Requer `cadastrado`.** Um usuário só pode
 avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)`).
+As avaliações são dados transacionais e permanecem na base relacional
+PostgreSQL/Supabase, na tabela `avaliacao`. Elas também podem alimentar o modelo
+de recomendação como feedback explícito, mas não devem ser duplicadas como nota
+canônica na collection MongoDB de telemetria.
 
 **Request**
 - Path param: `id`. Headers: `Authorization`, `Content-Type`.
@@ -517,8 +521,12 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 ### 4.7 `POST /usuario/telemetria`
 **Finalidade:** registrar eventos de telemetria comportamental gerados pelo aplicativo
-mobile, como visualização de tela, clique em card, busca, avaliação e abertura de
+mobile, como visualização de tela, clique em card, busca e abertura de
 compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
+
+> O catálogo completo de eventos, a justificativa de coleta, as propriedades por
+> evento e o schema lógico da collection estão detalhados em
+> [`telemetria.md`](./telemetria.md).
 
 **Autenticação**
 - Header `Authorization: Bearer <jwt>` opcional.
@@ -558,7 +566,7 @@ compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
 | Campo | Tipo | Obrigatório | Regra |
 |---|---|---|---|
 | `eventId` | `string` | Não | Idempotência no cliente. Se omitido, o backend gera um identificador. |
-| `eventType` | `string` | Sim | Enum inicial: `session_started`, `screen_viewed`, `show_card_clicked`, `show_viewed`, `search_performed`, `favorite_toggled`, `rating_submitted`, `purchase_clicked`, `session_ended`. |
+| `eventType` | `string` | Sim | Enum inicial: `session_started`, `screen_viewed`, `show_card_clicked`, `show_viewed`, `search_performed`, `favorite_toggled`, `purchase_clicked`, `session_ended`. |
 | `source` | `string` | Sim | Origem do evento. Enum inicial: `mobile`. |
 | `sessionId` | `string` | Sim | Identificador da sessão de uso do app. |
 | `occurredAt` | `date-time` | Não | Momento em que o evento ocorreu no cliente. Se omitido, o backend usa o horário de recebimento. |
