@@ -281,10 +281,15 @@ ou `anonymous_id`.
 
 ---
 
-## Indices Candidatos para T23
+## Indices MongoDB
 
-Estes indices ficam documentados como base para a task T23, sem exigir criacao
-imediata nesta etapa.
+O servico de usuario tenta criar os indices abaixo de forma idempotente no
+startup, quando `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` e
+`MONGODB_TELEMETRY_COLLECTION` estiverem configurados. A implementacao fica em
+`MongoTelemetryIndexInitializer` e usa os mesmos nomes de campos gravados na
+collection `interacoes`. Se o MongoDB/Atlas estiver indisponivel no startup, o
+servico registra warning e continua subindo; o readiness continua responsavel
+por expor a indisponibilidade operacional.
 
 | Indice | Campos | Objetivo |
 |---|---|---|
@@ -294,6 +299,23 @@ imediata nesta etapa.
 | `ix_entity_time` | `{ "entity.type": 1, "entity.id": 1, occurred_at: -1 }` | Agregar eventos por espetaculo, sessao, teatro ou busca. |
 | `ix_event_type_time` | `{ event_type: 1, occurred_at: -1 }` | Medir volume por tipo de evento. |
 | `ix_session_time` | `{ session_id: 1, occurred_at: 1 }` | Reconstruir jornada dentro de uma sessao. |
+
+### Validacao operacional
+
+Para validar os indices no Atlas ou em um MongoDB acessivel via `mongosh`:
+
+```bash
+mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE').getCollection('$MONGODB_TELEMETRY_COLLECTION').getIndexes()"
+```
+
+Resultado esperado: alem do indice `_id_` criado pelo MongoDB, a collection deve
+listar `ux_event_id`, `ix_user_time`, `ix_anonymous_time`, `ix_entity_time`,
+`ix_event_type_time` e `ix_session_time`.
+
+Se a criacao de `ux_event_id` falhar por documentos legados duplicados em
+`event_id`, a collection deve ser saneada antes de reexecutar o servico. Em
+ambientes novos, o endpoint sempre normaliza um `event_id`, gerado pelo backend
+quando o cliente nao informa.
 
 ---
 
