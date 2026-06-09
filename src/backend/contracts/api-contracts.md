@@ -362,7 +362,7 @@ canônica na collection MongoDB de telemetria.
 ```json
 { "id": 41, "nota": 4.5, "comentario": "...", "createdAt": "2026-05-26T19:00:00Z" }
 ```
-- `400` — nota fora de 0–5 (`Erro` com `details`).
+- `400` — nota fora de 1–5 (`Erro` com `details`).
 - `401` — token ausente ou inválido. `Erro`.
 - `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `404` — espetáculo inexistente.
@@ -370,6 +370,7 @@ canônica na collection MongoDB de telemetria.
 ```json
 { "error": "Você já avaliou este espetáculo.", "traceId": "00-...-00" }
 ```
+- `502` — falha ao notificar a dependência consumida de recomendação.
 - `500` — `Erro`.
 
 ---

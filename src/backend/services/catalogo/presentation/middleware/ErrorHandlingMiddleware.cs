@@ -31,6 +31,10 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
         {
             await EscreverAsync(context, HttpStatusCode.Conflict, ex.Message);
         }
+        catch (ExternalDependencyException ex)
+        {
+            await EscreverAsync(context, HttpStatusCode.BadGateway, ex.Message);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Erro não tratado ao processar {Method} {Path}",

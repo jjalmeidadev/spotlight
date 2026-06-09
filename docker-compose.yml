@@ -9,6 +9,7 @@ services:
       ASPNETCORE_URLS: http://+:8080
       DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING}
       SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      RECOMENDACAO_BASE_URL: http://recomendacao:8080
     ports:
       - "5001:8080"
     healthcheck:

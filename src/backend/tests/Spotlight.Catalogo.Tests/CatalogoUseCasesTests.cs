@@ -154,7 +154,10 @@ public class CatalogoUseCasesTests
             }
         };
         var espetaculoRepositorio = new FakeEspetaculoRepository { ExisteResult = true };
-        var useCase = new CriarAvaliacaoUseCase(avaliacaoRepositorio, espetaculoRepositorio);
+        var useCase = new CriarAvaliacaoUseCase(
+            avaliacaoRepositorio,
+            espetaculoRepositorio,
+            new FakeAvaliacaoRecomendacaoClient());
         var usuarioId = Guid.NewGuid();
 
         var resultado = await useCase.ExecutarAsync(
@@ -171,6 +174,7 @@ public class CatalogoUseCasesTests
     public static TheoryData<decimal?> NotasInvalidas => new()
     {
         null,
+        0,
         -0.1m,
         5.1m
     };
@@ -179,7 +183,10 @@ public class CatalogoUseCasesTests
     [MemberData(nameof(NotasInvalidas))]
     public async Task CriarAvaliacao_ComNotaInvalida_LancaValidation(decimal? nota)
     {
-        var useCase = new CriarAvaliacaoUseCase(new FakeAvaliacaoRepository(), new FakeEspetaculoRepository());
+        var useCase = new CriarAvaliacaoUseCase(
+            new FakeAvaliacaoRepository(),
+            new FakeEspetaculoRepository(),
+            new FakeAvaliacaoRecomendacaoClient());
 
         var ex = await Assert.ThrowsAsync<CatalogoValidationException>(() => useCase.ExecutarAsync(
             1,
@@ -365,6 +372,13 @@ public class CatalogoUseCasesTests
             LastUsuarioId = usuarioId;
             return Task.FromResult(CriarResult);
         }
+    }
+
+    private sealed class FakeAvaliacaoRecomendacaoClient : IAvaliacaoRecomendacaoClient
+    {
+        public Task NotificarAvaliacaoCriadaAsync(
+            AvaliacaoCriadaEvento evento,
+            CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
     private sealed class FakeCategoriaRepository : ICategoriaRepository

@@ -3,7 +3,7 @@ namespace Spotlight.Catalogo.Application.Dtos;
 /// <summary>Body de <c>POST /catalogo/espetaculos/{id}/avaliacoes</c>.</summary>
 public class AvaliacaoCreateDto
 {
-    /// <summary>Obrigatório. Deve estar entre 0 e 5 (validação no use case).</summary>
+    /// <summary>Obrigatório. Deve estar entre 1 e 5 (validação no use case).</summary>
     public decimal? Nota { get; set; }
 
     public string? Comentario { get; set; }

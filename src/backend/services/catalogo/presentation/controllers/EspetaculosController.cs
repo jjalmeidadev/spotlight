@@ -14,6 +14,7 @@ namespace Spotlight.Catalogo.Presentation.Controllers;
 /// </summary>
 [ApiController]
 [Route("espetaculos")]
+[Route("catalogo/espetaculos")]
 public class EspetaculosController : ControllerBase
 {
     /// <summary>Lista espetáculos do catálogo, com filtros e paginação. Rota pública.</summary>

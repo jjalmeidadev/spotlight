@@ -7,11 +7,13 @@ using Serilog;
 using Spotlight.Catalogo.Application.UseCases;
 using Spotlight.Catalogo.Infrastructure.Auth;
 using Spotlight.Catalogo.Infrastructure.Persistence;
+using Spotlight.Catalogo.Infrastructure.Recomendacao;
 using Spotlight.Catalogo.Presentation.Middleware;
 
-// Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
+// Carrega variáveis do arquivo .env (se existir) sem sobrescrever variáveis já
+// definidas pelo ambiente, pelo Docker Compose ou pelos testes de integração.
 // TraversePath() procura o .env subindo a árvore de diretórios.
-Env.TraversePath().Load();
+Env.NoClobber().TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +36,11 @@ builder.Host.UseSerilog((context, configuration) =>
 var connectionString =
     Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
     ?? builder.Configuration.GetConnectionString("Default")
+    ?? string.Empty;
+
+var recomendacaoBaseUrl =
+    Environment.GetEnvironmentVariable("RECOMENDACAO_BASE_URL")
+    ?? builder.Configuration["Recomendacao:BaseUrl"]
     ?? string.Empty;
 
 // ---------------------------------------------------------------------------
@@ -67,6 +74,19 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     builder.Services.AddScoped<CriarEspetaculoUseCase>();
     builder.Services.AddScoped<AtualizarEspetaculoUseCase>();
     builder.Services.AddScoped<ExcluirEspetaculoUseCase>();
+}
+
+if (!string.IsNullOrWhiteSpace(recomendacaoBaseUrl))
+{
+    builder.Services.AddHttpClient<IAvaliacaoRecomendacaoClient, RecomendacaoAvaliacaoHttpClient>(client =>
+    {
+        client.BaseAddress = new Uri(recomendacaoBaseUrl);
+        client.Timeout = TimeSpan.FromSeconds(2);
+    });
+}
+else
+{
+    builder.Services.AddSingleton<IAvaliacaoRecomendacaoClient, NoOpAvaliacaoRecomendacaoClient>();
 }
 
 // ---------------------------------------------------------------------------

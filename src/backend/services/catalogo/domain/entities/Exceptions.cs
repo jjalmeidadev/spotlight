@@ -15,3 +15,7 @@ public class ValidationException(IReadOnlyDictionary<string, string[]> details, 
 
 /// <summary>Lançada em violação de invariantes/uniqueness → middleware traduz para 409.</summary>
 public class ConflictException(string mensagem) : Exception(mensagem);
+
+/// <summary>Lancada quando uma dependencia HTTP consumida falha -> middleware traduz para 502.</summary>
+public class ExternalDependencyException(string mensagem, Exception? innerException = null)
+    : Exception(mensagem, innerException);
