@@ -16,14 +16,15 @@ const preferenceIcon = require('../../../documentos/img/preferential_icon.png');
 const priceIcon = require('../../../documentos/img/preco_icon.png');
 
 type PreferenceSelectionScreenProps = {
+  accessToken?: string | null;
   onComplete?: () => void;
 };
 
-export default function PreferenceSelectionScreen({ onComplete }: PreferenceSelectionScreenProps) {
-  const viewModel = usePreferenceSelectionViewModel();
+export default function PreferenceSelectionScreen({ accessToken, onComplete }: PreferenceSelectionScreenProps) {
+  const viewModel = usePreferenceSelectionViewModel(accessToken);
 
-  function handleContinue() {
-    const selection = viewModel.goToNextStep();
+  async function handleContinue() {
+    const selection = await viewModel.goToNextStep();
 
     if (!selection) {
       return;
@@ -112,16 +113,18 @@ export default function PreferenceSelectionScreen({ onComplete }: PreferenceSele
 
           <Pressable
             accessibilityRole="button"
-            disabled={!viewModel.canContinue}
+            disabled={!viewModel.canContinue || viewModel.loading}
             onPress={handleContinue}
             style={({ pressed }) => [
               styles.continueButton,
-              !viewModel.canContinue && styles.continueButtonDisabled,
+              (!viewModel.canContinue || viewModel.loading) && styles.continueButtonDisabled,
               pressed && viewModel.canContinue && styles.continueButtonPressed,
             ]}
           >
-            <Text style={styles.continueLabel}>Continuar</Text>
+            <Text style={styles.continueLabel}>{viewModel.loading ? 'Salvando...' : 'Continuar'}</Text>
           </Pressable>
+
+          {viewModel.error ? <Text style={styles.errorText}>{viewModel.error}</Text> : null}
         </View>
       </View>
     </SafeAreaView>
@@ -280,6 +283,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.56,
     textTransform: 'uppercase',
+  },
+  errorText: {
+    color: '#FCA5A5',
+    fontFamily: 'Gotham-Book',
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 10,
+    textAlign: 'center',
   },
   pressed: {
     opacity: 0.84,
