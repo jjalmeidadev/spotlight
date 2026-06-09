@@ -253,6 +253,65 @@ public class UsuarioUseCasesTests
             Ct));
     }
 
+    [Fact]
+    public async Task TelemetriaService_ComEventoValido_ChamaRepositorio()
+    {
+        var usuarioId = Guid.NewGuid();
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+        var properties = JsonDocument.Parse("""{"duration_ms":23000}""").RootElement.Clone();
+
+        var eventId = await service.RegistrarAsync(
+            usuarioId,
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: new DateTimeOffset(2026, 6, 8, 12, 0, 0, TimeSpan.Zero),
+                Screen: "detalhes",
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: properties,
+                Device: null,
+                AnonymousId: null),
+            Ct);
+
+        Assert.False(string.IsNullOrWhiteSpace(eventId));
+        Assert.NotNull(repositorio.LastEvento);
+        Assert.Equal(usuarioId, repositorio.LastEvento.UserId);
+        Assert.Equal("show_viewed", repositorio.LastEvento.EventType);
+        Assert.Equal("detalhes", repositorio.LastEvento.Screen);
+        Assert.Equal("show-1", repositorio.LastEvento.Entity?.Id);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: null,
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "",
+                Source: "",
+                SessionId: "",
+                OccurredAt: null,
+                Screen: null,
+                Entity: null,
+                Properties: null,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+
+        Assert.Contains("eventType", ex.Details.Keys);
+        Assert.Contains("source", ex.Details.Keys);
+        Assert.Contains("sessionId", ex.Details.Keys);
+        Assert.Contains("usuario", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
+    }
+
     private static Domain.Entities.Usuario Usuario(Guid usuarioId) => new()
     {
         Id = usuarioId,
@@ -314,6 +373,17 @@ public class UsuarioUseCasesTests
             LastPage = page;
             LastPageSize = pageSize;
             return Task.FromResult(Result);
+        }
+    }
+
+    private sealed class FakeTelemetriaRepository : ITelemetriaRepository
+    {
+        public TelemetriaEvento? LastEvento { get; private set; }
+
+        public Task InserirAsync(TelemetriaEvento evento, CancellationToken cancellationToken)
+        {
+            LastEvento = evento;
+            return Task.CompletedTask;
         }
     }
 }

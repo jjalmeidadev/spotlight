@@ -8,9 +8,20 @@ namespace Spotlight.Usuario.Tests;
 /// Testes de integração do esqueleto do serviço de usuário: garantem que o
 /// serviço sobe e que os endpoints respondem sem depender de um banco real.
 /// </summary>
-public class HealthEndpointsTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>
+public class HealthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 {
+    private readonly WebApplicationFactory<Program> factory;
+
+    public HealthEndpointsTests(WebApplicationFactory<Program> factory)
+    {
+        Environment.SetEnvironmentVariable("DATABASE_CONNECTION_STRING", string.Empty);
+        Environment.SetEnvironmentVariable("MONGODB_CONNECTION_STRING", string.Empty);
+        Environment.SetEnvironmentVariable("MONGODB_DATABASE", string.Empty);
+        Environment.SetEnvironmentVariable("MONGODB_TELEMETRY_COLLECTION", string.Empty);
+
+        this.factory = factory;
+    }
+
     [Fact]
     public async Task Get_Health_Returns_200()
     {
