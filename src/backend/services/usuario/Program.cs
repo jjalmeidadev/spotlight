@@ -76,6 +76,7 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString)
     builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoOptions.ConnectionString));
     builder.Services.AddSingleton(sp =>
         sp.GetRequiredService<IMongoClient>().GetDatabase(mongoOptions.DatabaseName));
+    builder.Services.AddHostedService<MongoTelemetryIndexInitializer>();
     builder.Services.AddScoped<ITelemetriaRepository, MongoTelemetriaRepository>();
     builder.Services.AddScoped<ITelemetriaService, TelemetriaService>();
 }

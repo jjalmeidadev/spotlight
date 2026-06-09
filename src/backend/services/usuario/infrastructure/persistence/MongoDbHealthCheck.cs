@@ -5,7 +5,6 @@ using MongoDB.Driver;
 namespace Spotlight.Usuario.Infrastructure.Persistence;
 
 public sealed class MongoDbHealthCheck(
-    IMongoClient mongoClient,
     MongoTelemetryOptions options) : IHealthCheck
 {
     public async Task<HealthCheckResult> CheckHealthAsync(
@@ -14,6 +13,7 @@ public sealed class MongoDbHealthCheck(
     {
         try
         {
+            var mongoClient = new MongoClient(options.ConnectionString);
             var database = mongoClient.GetDatabase(options.DatabaseName);
             await database.RunCommandAsync<BsonDocument>(
                 new BsonDocument("ping", 1),
