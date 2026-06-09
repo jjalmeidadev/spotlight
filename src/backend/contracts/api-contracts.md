@@ -655,69 +655,233 @@ O backend normaliza o payload para a coleção `interacoes` com campos em
 
 ---
 
-## 6. Serviço de Recomendação
+## 6. Servico de Recomendacao
 
-### 6.1 `GET /recomendacao/me`
-**Finalidade:** recomendações personalizadas para o usuário autenticado, ordenadas
-por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `recomendacao`).
+### 6.1 Schemas do servico de recomendacao
+
+#### EspetaculoRecomendado
+
+Objeto usado dentro das respostas de recomendacao. Representa o subconjunto do espetaculo necessario para exibicao em listas e carroseis.
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|---|---|---|---|
+| `id` | integer | Sim | Identificador do espetaculo. |
+| `titulo` | string | Sim | Titulo do espetaculo. |
+| `genero` | string ou null | Nao | Genero textual do espetaculo, quando cadastrado. |
+| `status` | string | Sim | Status do espetaculo. Ex.: `em_cartaz`, `em_breve`, `encerrado`. |
+| `notaMedia` | number | Sim | Media de avaliacoes do espetaculo. |
+
+Exemplo:
+
+```json
+{
+  "id": 12,
+  "titulo": "O Auto da Compadecida",
+  "genero": "Comedia",
+  "status": "em_cartaz",
+  "notaMedia": 4.7
+}
+```
+
+#### RecomendacaoItem
+
+Item retornado em `GET /recomendacao/me`.
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|---|---|---|---|
+| `espetaculo` | EspetaculoRecomendado | Sim | Espetaculo recomendado. |
+| `score` | number | Sim | Pontuacao calculada pelo algoritmo de recomendacao. Deve ser maior ou igual a zero. |
+| `tipoAlgoritmo` | string | Sim | Algoritmo responsavel pela recomendacao. Ex.: `SVD`, `k-NN`, `content_based`. |
+| `motivo` | string ou null | Nao | Explicacao textual da recomendacao. |
+| `dataGeracao` | string date-time | Sim | Momento em que a recomendacao foi gerada. |
+
+Exemplo:
+
+```json
+{
+  "espetaculo": {
+    "id": 12,
+    "titulo": "O Auto da Compadecida",
+    "genero": "Comedia",
+    "status": "em_cartaz",
+    "notaMedia": 4.7
+  },
+  "score": 0.934512,
+  "tipoAlgoritmo": "SVD",
+  "motivo": "Por que voce gostou de outras comedias populares.",
+  "dataGeracao": "2026-05-25T03:00:00Z"
+}
+```
+
+#### SimilarItem
+
+Item retornado em `GET /recomendacao/espetaculos/{id}/similares`.
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|---|---|---|---|
+| `espetaculo` | EspetaculoRecomendado | Sim | Espetaculo similar ao espetaculo de origem. |
+| `score` | number | Sim | Grau de similaridade no intervalo esperado de 0 a 1. |
+| `tipoAlgoritmo` | string | Sim | Algoritmo usado para calcular similaridade. Ex.: `k-NN`, `SVD`. |
+
+Exemplo:
+
+```json
+{
+  "espetaculo": {
+    "id": 18,
+    "titulo": "Morte e Vida Severina",
+    "genero": "Drama",
+    "status": "em_cartaz",
+    "notaMedia": 4.5
+  },
+  "score": 0.81234,
+  "tipoAlgoritmo": "k-NN"
+}
+```
+
+#### Lista de recomendacao
+
+Envelope usado pelas rotas de recomendacao.
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|---|---|---|---|
+| `data` | array | Sim | Lista de itens retornados. Pode ser vazia quando nao houver recomendacoes disponiveis. |
+
+Exemplo:
+
+```json
+{
+  "data": []
+}
+```
+
+---
+
+### 6.2 `GET /recomendacao/me`
+
+**Finalidade:** recomendacoes personalizadas para o usuario autenticado, ordenadas por `score`. **Requer `cadastrado`.** Le predicoes pre-processadas da tabela `recomendacao`.
+
+**Regra basica:** o backend retorna recomendacoes ja calculadas pelo pipeline/modelo de recomendacao. A rota nao treina o modelo nem recalcula scores em tempo real; ela consulta os resultados persistidos para o usuario autenticado.
 
 **Request**
-- Header: `Authorization`.
+
+- Headers:
+
+| Header | Obrigatorio | Descricao |
+|---|---|---|
+| `Authorization: Bearer <token-jwt>` | Sim | JWT valido de usuario `cadastrado`. |
+
 - Query params:
-```json
-{ "limite": "integer (default 10, máx 50)" }
+
+| Campo | Tipo | Obrigatorio | Regra |
+|---|---|---|---|
+| `limite` | integer | Nao | Default 10. Valores menores que 1 usam 10. Valor maximo 50. |
+
+Exemplo de request:
+
+```http
+GET /recomendacao/me?limite=5
+Authorization: Bearer <token-jwt>
 ```
 
 **Responses**
-- `200 OK`:
+
+- `200 OK` - lista de `RecomendacaoItem`:
+
 ```json
 {
   "data": [
     {
-      "espetaculo": { "id": 12, "titulo": "O Auto da Compadecida", "genero": "Comédia",
-                      "status": "em_cartaz", "notaMedia": 4.7 },
+      "espetaculo": {
+        "id": 12,
+        "titulo": "O Auto da Compadecida",
+        "genero": "Comedia",
+        "status": "em_cartaz",
+        "notaMedia": 4.7
+      },
       "score": 0.934512,
       "tipoAlgoritmo": "SVD",
-      "motivo": "Por que você gostou de outras comédias populares.",
+      "motivo": "Por que voce gostou de outras comedias populares.",
       "dataGeracao": "2026-05-25T03:00:00Z"
     }
   ]
 }
 ```
-- `401` — token ausente ou inválido. `Erro`.
-- `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
-- `500` — `Erro`.
+
+- `200 OK` - sem recomendacoes disponiveis:
+
+```json
+{
+  "data": []
+}
+```
+
+- `401 Unauthorized` - token ausente ou invalido. Schema `Erro`.
+- `403 Forbidden` - token valido, mas usuario sem permissao. Schema `Erro`.
+- `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
 
-### 6.2 `GET /recomendacao/espetaculos/{id}/similares`
-**Finalidade:** espetáculos similares a um dado espetáculo (item-item). **Público.**
+### 6.3 `GET /recomendacao/espetaculos/{id}/similares`
 
-> **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os
-> usuários), então **não** sai da tabela `recomendacao` — essa é por-usuário e
-> protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm da tabela
-> dedicada `similaridade_item` (definida em `01_create_database.sql`), populada
-> em batch pelos algoritmos de recomendação (k-NN, SVD, k-means) com leitura
-> pública via política RLS `similaridade_item: leitura pública`.
+**Finalidade:** espetaculos similares a um dado espetaculo (item-item). **Publico.**
+
+> **Fonte dos dados:** a similaridade item-item e **global** (igual para todos os usuarios), entao **nao** sai da tabela `recomendacao` - essa e por usuario e protegida por RLS (`auth.uid() = id_usuario`). Estes similares vem da tabela dedicada `similaridade_item` (definida em `01_create_database.sql`), populada em batch pelos algoritmos de recomendacao (k-NN, SVD, k-means) com leitura publica via politica RLS `similaridade_item: leitura publica`.
 
 **Request**
-- Path param: `id`. Query: `limite` (default 10, máx 50).
+
+- Path params:
+
+| Campo | Tipo | Obrigatorio | Regra |
+|---|---|---|---|
+| `id` | integer | Sim | Identificador do espetaculo de origem. |
+
+- Query params:
+
+| Campo | Tipo | Obrigatorio | Regra |
+|---|---|---|---|
+| `limite` | integer | Nao | Default 10. Valores menores que 1 usam 10. Valor maximo 50. |
+
+Exemplo de request:
+
+```http
+GET /recomendacao/espetaculos/12/similares?limite=5
+```
 
 **Responses**
-- `200 OK`:
+
+- `200 OK` - lista de `SimilarItem`:
+
 ```json
 {
   "data": [
-    { "espetaculo": { "id": 18, "titulo": "Morte e Vida Severina", "genero": "Drama",
-                      "status": "em_cartaz", "notaMedia": 4.5 },
-      "score": 0.812340, "tipoAlgoritmo": "k-NN" }
+    {
+      "espetaculo": {
+        "id": 18,
+        "titulo": "Morte e Vida Severina",
+        "genero": "Drama",
+        "status": "em_cartaz",
+        "notaMedia": 4.5
+      },
+      "score": 0.81234,
+      "tipoAlgoritmo": "k-NN"
+    }
   ]
 }
 ```
-- `404` (espetáculo inexistente) / `500` — `Erro`.
+
+- `200 OK` - sem similares disponiveis:
+
+```json
+{
+  "data": []
+}
+```
+
+- `404 Not Found` - espetaculo de origem inexistente. Schema `Erro`.
+- `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
-
 ## 7. Rastreabilidade (rota → entidade do banco)
 
 | Rota | Tabela(s) principal(is) |
