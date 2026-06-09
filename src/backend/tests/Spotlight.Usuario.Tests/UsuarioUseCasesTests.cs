@@ -1,8 +1,13 @@
 using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Application.UseCases;
 using Spotlight.Usuario.Domain.Entities;
+using Spotlight.Usuario.Presentation.Controllers;
 using Xunit;
 using UsuarioConflictException = Spotlight.Usuario.Domain.Entities.ConflictException;
 using UsuarioNotFoundException = Spotlight.Usuario.Domain.Entities.NotFoundException;
@@ -312,6 +317,83 @@ public class UsuarioUseCasesTests
         Assert.Null(repositorio.LastEvento);
     }
 
+    [Fact]
+    public async Task TelemetriaController_ComEventoAnonimo_RetornaAccepted()
+    {
+        var service = new FakeTelemetriaService("evt-test");
+        var controller = CriarTelemetriaController(service);
+
+        var result = await controller.Registrar(
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: "detalhes",
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: null,
+                Device: null,
+                AnonymousId: "anon-123"),
+            Ct);
+
+        var response = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(StatusCodes.Status202Accepted, response.StatusCode);
+        var body = Assert.IsType<RegistrarTelemetriaResponse>(response.Value);
+        Assert.Equal("evt-test", body.EventId);
+        Assert.Equal("accepted", body.Status);
+        Assert.Null(service.LastUsuarioId);
+    }
+
+    [Fact]
+    public async Task TelemetriaController_ComUsuarioAutenticado_AssociaUsuario()
+    {
+        var usuarioId = Guid.NewGuid();
+        var service = new FakeTelemetriaService("evt-auth");
+        var controller = CriarTelemetriaController(service, usuarioId);
+
+        await controller.Registrar(
+            new RegistrarTelemetriaRequest(
+                EventId: "evt-auth",
+                EventType: "screen_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: "Catalogo",
+                Entity: null,
+                Properties: null,
+                Device: null,
+                AnonymousId: null),
+            Ct);
+
+        Assert.Equal(usuarioId, service.LastUsuarioId);
+    }
+
+    [Fact]
+    public async Task TelemetriaController_SemServicoConfigurado_Retorna503()
+    {
+        var controller = CriarTelemetriaController(service: null);
+
+        var result = await controller.Registrar(
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: null,
+                Entity: null,
+                Properties: null,
+                Device: null,
+                AnonymousId: "anon-123"),
+            Ct);
+
+        var response = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(StatusCodes.Status503ServiceUnavailable, response.StatusCode);
+        var body = Assert.IsType<ErroDto>(response.Value);
+        Assert.Equal("Telemetria nao configurada.", body.Error);
+    }
+
     private static Domain.Entities.Usuario Usuario(Guid usuarioId) => new()
     {
         Id = usuarioId,
@@ -385,5 +467,49 @@ public class UsuarioUseCasesTests
             LastEvento = evento;
             return Task.CompletedTask;
         }
+    }
+
+    private sealed class FakeTelemetriaService(string eventId) : ITelemetriaService
+    {
+        public Guid? LastUsuarioId { get; private set; }
+        public RegistrarTelemetriaRequest? LastRequest { get; private set; }
+
+        public Task<string> RegistrarAsync(
+            Guid? usuarioId,
+            RegistrarTelemetriaRequest request,
+            CancellationToken cancellationToken)
+        {
+            LastUsuarioId = usuarioId;
+            LastRequest = request;
+            return Task.FromResult(eventId);
+        }
+    }
+
+    private static TelemetriaController CriarTelemetriaController(
+        ITelemetriaService? service,
+        Guid? usuarioId = null)
+    {
+        var services = new ServiceCollection();
+        if (service is not null) services.AddSingleton(service);
+
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = services.BuildServiceProvider()
+        };
+
+        if (usuarioId is not null)
+        {
+            httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(
+                [new Claim(ClaimTypes.NameIdentifier, usuarioId.Value.ToString())],
+                authenticationType: "Test"));
+        }
+
+        return new TelemetriaController
+        {
+            ControllerContext = new ControllerContext
+            {
+                HttpContext = httpContext
+            }
+        };
     }
 }

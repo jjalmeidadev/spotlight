@@ -863,8 +863,8 @@
           "401": {
             "$ref": "#/components/responses/Erro401"
           },
-          "403": {
-            "$ref": "#/components/responses/Erro403"
+          "503": {
+            "$ref": "#/components/responses/Erro503"
           },
           "500": {
             "$ref": "#/components/responses/Erro500"
@@ -1182,6 +1182,20 @@
             },
             "example": {
               "error": "Você já avaliou este espetáculo.",
+              "traceId": "00-abc123-def456-00"
+            }
+          }
+        }
+      },
+      "Erro503": {
+        "description": "Servico temporariamente indisponivel.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            },
+            "example": {
+              "error": "Telemetria nao configurada.",
               "traceId": "00-abc123-def456-00"
             }
           }

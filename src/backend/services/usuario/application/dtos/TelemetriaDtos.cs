@@ -15,3 +15,5 @@ public sealed record RegistrarTelemetriaRequest(
     JsonElement? Properties,
     JsonElement? Device,
     string? AnonymousId);
+
+public sealed record RegistrarTelemetriaResponse(string EventId, string Status);

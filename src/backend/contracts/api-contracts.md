@@ -588,7 +588,7 @@ compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
 ```
 - `400 Bad Request` — validação (`Erro` com `details`).
 - `401 Unauthorized` — token enviado, mas ausente/inválido para associação autenticada. `Erro`.
-- `403 Forbidden` — token válido, mas usuário sem permissão quando a política exigir usuário cadastrado. `Erro`.
+- `503 Service Unavailable` — telemetria/MongoDB não configurados no ambiente. `Erro`.
 - `500` — falha inesperada. `Erro`.
 
 **Documento persistido no MongoDB**
