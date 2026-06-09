@@ -318,6 +318,137 @@ public class UsuarioUseCasesTests
     }
 
     [Fact]
+    public async Task TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "evento_desconhecido",
+                Source: "web",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: null,
+                Entity: new TelemetriaEntityDto("obra", "show-1"),
+                Properties: null,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+
+        Assert.Contains("eventType", ex.Details.Keys);
+        Assert.Contains("source", ex.Details.Keys);
+        Assert.Contains("entity.type", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+        var properties = JsonDocument.Parse("""{}""").RootElement.Clone();
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "search_performed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: null,
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: properties,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+
+        Assert.Contains("entity.type", ex.Details.Keys);
+        Assert.Contains("properties.query", ex.Details.Keys);
+        Assert.Contains("properties.resultsCount", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+        var properties = JsonDocument.Parse($$"""{"value":"{{new string('A', 17_000)}}"}""").RootElement.Clone();
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: null,
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: properties,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+
+        Assert.Contains("metadata", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComDataForaDaJanela_LancaValidation()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: DateTimeOffset.UtcNow.AddDays(-181),
+                Screen: null,
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: null,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+
+        Assert.Contains("occurredAt", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComDataFutura_LancaValidation()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: DateTimeOffset.UtcNow.AddMinutes(6),
+                Screen: null,
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: null,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+
+        Assert.Contains("occurredAt", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
+    }
+
+    [Fact]
     public async Task TelemetriaController_ComEventoAnonimo_RetornaAccepted()
     {
         var service = new FakeTelemetriaService("evt-test");
