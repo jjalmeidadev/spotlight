@@ -41,6 +41,13 @@ public class PreferenciasIntegrationTests(PreferenciasIntegrationFixture fixture
         });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var leitura = await client.GetAsync("/me/preferencias");
+        Assert.Equal(HttpStatusCode.OK, leitura.StatusCode);
+        var preferenciasApi = await leitura.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("Teatro Musical", preferenciasApi.GetProperty("generosFavoritos")[0].GetString());
+        Assert.Equal(150, preferenciasApi.GetProperty("faixaPrecoMax").GetDecimal());
+
         var preferencias = await fixture.ObterPreferenciasPersistidasAsync();
         Assert.Equal("Teatro Musical", preferencias.GetProperty("generosFavoritos")[0].GetString());
         Assert.Equal(150, preferencias.GetProperty("faixaPrecoMax").GetDecimal());

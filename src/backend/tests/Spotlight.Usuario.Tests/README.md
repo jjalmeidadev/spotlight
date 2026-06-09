@@ -6,7 +6,7 @@ Endpoint publico via gateway: `PUT /usuario/me/preferencias`
 
 Endpoint interno do servico testado: `PUT /me/preferencias`
 
-Objetivo: validar o fluxo real de atualizacao de preferencias do usuario autenticado, cobrindo a persistencia no PostgreSQL e a chamada HTTP para notificacao de recomendacao.
+Objetivo: validar o fluxo real de atualizacao de preferencias do usuario autenticado, cobrindo a persistencia no PostgreSQL, a leitura posterior por `GET /me/preferencias` e a chamada HTTP para notificacao de recomendacao.
 
 O fluxo permite que um usuario atualize preferencias declaradas, como generos favoritos, categorias favoritas e faixa maxima de preco. Essas informacoes sao persistidas no campo `perfil_preferencias` da tabela `usuario` e notificadas a um endpoint HTTP de recomendacao para recalculo futuro das sugestoes.
 
@@ -29,7 +29,7 @@ O fluxo permite que um usuario atualize preferencias declaradas, como generos fa
 
 ## Cenarios
 
-1. Sucesso: WireMock responde `200 OK`, o endpoint responde com sucesso, as preferencias sao persistidas no PostgreSQL e a chamada HTTP de notificacao e registrada.
+1. Sucesso: WireMock responde `200 OK`, o endpoint `PUT /me/preferencias` responde com sucesso, a rota alternativa `GET /me/preferencias` retorna as preferencias atualizadas, os dados sao persistidos no PostgreSQL e a chamada HTTP de notificacao e registrada.
 2. Erro: WireMock responde `503 Service Unavailable`, o backend converte a falha externa em `409 Conflict` e retorna erro controlado ao consumidor.
 
 ## RF validado
