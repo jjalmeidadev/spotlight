@@ -62,7 +62,10 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
         var condicoes = new List<string>();
         var parametros = new List<(string, object)>();
 
-        if (!string.IsNullOrWhiteSpace(filtro.Q))
+        // Termos com 1-2 caracteres não acionam o índice GIN trigram
+        // (idx_espetaculo_titulo_trgm) — descartar o filtro evita Seq Scan
+        // disfarçado de busca semântica.
+        if (!string.IsNullOrWhiteSpace(filtro.Q) && filtro.Q.Trim().Length >= 3)
         {
             condicoes.Add("e.titulo ILIKE @q");
             parametros.Add(("q", $"%{filtro.Q.Trim()}%"));
@@ -70,7 +73,9 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
 
         if (!string.IsNullOrWhiteSpace(filtro.Status))
         {
-            condicoes.Add("e.status::text = @status");
+            // Cast no parâmetro (não na coluna) preserva o uso do índice
+            // idx_espetaculo_status_popularidade — e.status::text desabilitaria.
+            condicoes.Add("e.status = @status::status_espetaculo_enum");
             parametros.Add(("status", filtro.Status));
         }
 
@@ -108,6 +113,9 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
     {
         "nota_media" => "e.nota_media DESC",
         "titulo" => "e.titulo ASC",
+        // popularidade DESC aproveita idx_espetaculo_status_popularidade
+        // quando combinado com filtro de status; sem o filtro o plano cai
+        // em Seq Scan + sort, comportamento aceitável.
         _ => "e.popularidade DESC"
     };
 
@@ -385,7 +393,6 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
 
         if (sets.Count > 0)
         {
-            sets.Add("updated_at = NOW()");
             await using var cmd = conexao.CreateCommand();
             cmd.Transaction = tx;
             cmd.CommandText = $"UPDATE espetaculo SET {string.Join(", ", sets)} WHERE id_espetaculo = @id;";

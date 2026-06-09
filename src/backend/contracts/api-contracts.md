@@ -596,10 +596,10 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 
 > **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os
 > usuários), então **não** sai da tabela `recomendacao` — essa é por-usuário e
-> protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm de uma
-> **estrutura dedicada de similaridade global**, populada em batch pelo k-NN, com
-> leitura pública. (Tabela proposta: `similaridade_item` — ver seção 6; ainda
-> **precisa ser criada** no schema do banco.)
+> protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm da tabela
+> dedicada `similaridade_item` (definida em `01_create_database.sql`), populada
+> em batch pelos algoritmos de recomendação (k-NN, SVD, k-means) com leitura
+> pública via política RLS `similaridade_item: leitura pública`.
 
 **Request**
 - Path param: `id`. Query: `limite` (default 10, máx 50).
@@ -631,13 +631,16 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 | `/usuario/me*` | `usuario` (inclui `perfil_preferencias` JSONB) |
 | `/geolocalizacao/geocoding*` | API externa OpenStreetMap/Nominatim; sem persistência direta |
 | `/recomendacao/me` | `recomendacao` (por-usuário, RLS), `espetaculo` |
-| `/recomendacao/espetaculos/{id}/similares` | `similaridade_item` (global, leitura pública — **a criar**), `espetaculo` |
+| `/recomendacao/espetaculos/{id}/similares` | `similaridade_item` (global, leitura pública), `espetaculo` |
 
-> **`similaridade_item` (proposta — ainda não existe no schema):** estrutura para
-> similaridade global item-item, populada em batch pelo k-NN. Campos sugeridos:
-> `id_espetaculo_origem` (FK), `id_espetaculo_similar` (FK), `score` (NUMERIC),
-> `tipo_algoritmo` (VARCHAR), com RLS de **leitura pública** (espelhando
-> `espetaculo`/`avaliacao`). A criação dessa tabela deve ser combinada com a equipe
-> de banco/ML antes de implementar a rota.
+> **`similaridade_item`:** estrutura para similaridade global item-item, populada
+> em batch pelos algoritmos de recomendação. Definida em `01_create_database.sql`
+> com os campos `id_espetaculo_origem` (FK), `id_espetaculo_similar` (FK),
+> `score_similaridade NUMERIC(8,6)` em `[0, 1]`, `tipo_algoritmo VARCHAR(50)` e
+> `data_geracao TIMESTAMPTZ`. A validação de `tipo_algoritmo` é delegada à função
+> central `public.is_tipo_algoritmo_valido()` (migration
+> `08_tipo_algoritmo_e_unique_recomendacao.sql`) que reaproveita a mesma lista de
+> algoritmos usada em `recomendacao`. RLS de **leitura pública** habilitada
+> (`similaridade_item: leitura pública` com `USING (true)`).
 
 ---

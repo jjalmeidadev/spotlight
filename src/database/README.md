@@ -14,6 +14,9 @@
 - [6. Implantação](#6-implantação)
 - [7. Dicionário de Dados](#dicionário-de-dados)
 - [8. Regras de Negócio](#regras-de-negócio-implementadas-no-banco-de-dados)
+- [9. Planos de Execução — Queries Críticas](#planos-de-execução--queries-críticas)
+- [10. Timezone e Tipos Temporais](#timezone-e-tipos-temporais)
+- [11. Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais)
 
 ---
 
@@ -41,8 +44,21 @@ src/database/
 ├── 01_create_database.sql   — criação de tabelas, tipos ENUM, índices, RLS e trigger do Auth
 ├── 02_initial_data.sql      — seed com dados iniciais (categorias, teatros, atores, espetáculos e sessões)
 ├── 03_rollback.sql          — desfaz completamente a execução do 01_create_database.sql
+├── migrations/              — alterações incrementais ao schema após o setup inicial
+│   ├── 04_trigger_updated_at_espetaculo.sql           — trigger BEFORE UPDATE em espetaculo.updated_at
+│   ├── 04_trigger_updated_at_espetaculo_rollback.sql
+│   ├── 05_timestamptz.sql                             — TIMESTAMP → TIMESTAMPTZ em todas as colunas temporais
+│   ├── 05_timestamptz_rollback.sql
+│   ├── 06_indexes.sql                                 — pg_trgm + 4 índices para queries reais do catálogo
+│   ├── 06_indexes_rollback.sql
+│   ├── 07_constraints_sessao_usuario.sql              — UNIQUE em sessao e CHECK em usuario.data_nascimento
+│   ├── 07_constraints_sessao_usuario_rollback.sql
+│   ├── 08_tipo_algoritmo_e_unique_recomendacao.sql    — função is_tipo_algoritmo_valido + UNIQUE em recomendacao
+│   └── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
 └── README.md                — este arquivo
 ```
+
+> Cada migration tem um arquivo `_rollback.sql` correspondente. As migrations são aplicadas **manualmente** via SQL Editor do Supabase ou `psql` após o setup inicial (`01_create_database.sql` + `02_initial_data.sql`) e respeitam a ordem numérica. Veja a seção [Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais) para detalhes.
 
 ---
 
@@ -359,11 +375,13 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 
 | Item | Quantidade |
 |---|---:|
-| Tabelas | 10 |
+| Tabelas | 11 |
 | Tipos enumerados | 2 |
-| Funções | 1 |
-| Triggers | 1 |
-| Índices explícitos | 10 |
+| Funções | 3 |
+| Triggers | 2 |
+| Índices explícitos | 16 |
+
+> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/`. As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04) e `public.is_tipo_algoritmo_valido()` (08); os triggers são `on_auth_user_created` (01) e `trg_espetaculo_updated_at` (04).
 
 #### Tabelas do Modelo
 
@@ -379,6 +397,7 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 | 8 | `sessao` | Agenda de apresentações dos espetáculos nos teatros. |
 | 9 | `avaliacao` | Avaliações de usuários sobre espetáculos. |
 | 10 | `recomendacao` | Recomendações personalizadas geradas para usuários. |
+| 11 | `similaridade_item` | Similaridade item-item entre espetáculos (global, leitura pública), populada em batch pelos algoritmos de recomendação. |
 
 #### Tipos Enumerados
 
@@ -992,12 +1011,69 @@ Entidade transacional / saída de algoritmo de recomendação.
 |---|---|---|
 | `idx_recomendacao_usuario` | `id_usuario` | Otimiza consultas de recomendações por usuário. |
 | `idx_recomendacao_score` | `id_usuario, score_recomendacao DESC` | Otimiza listagem das melhores recomendações por usuário. |
+| `uq_recomendacao_usuario_espetaculo_algo` | `id_usuario, id_espetaculo, tipo_algoritmo` | UNIQUE — garante uma única recomendação ativa por par usuário/espetáculo/algoritmo e habilita o `ON CONFLICT ... DO UPDATE` (UPSERT) do Worker. Criado na migration `08_tipo_algoritmo_e_unique_recomendacao.sql`. |
 
 #### Triggers e Functions
 
-Não há triggers ou functions associadas diretamente.
+A constraint `chk_tipo_algoritmo` delega a validação à função reutilizável `public.is_tipo_algoritmo_valido(TEXT)` (definida em `08_tipo_algoritmo_e_unique_recomendacao.sql`). Adicionar um novo algoritmo passa a exigir apenas `CREATE OR REPLACE FUNCTION`, sem necessidade de `ALTER TYPE`.
 
-### 12. Relacionamentos Gerais do Modelo
+### 12. Tabela `similaridade_item`
+
+#### Descrição
+
+Armazena pares de espetáculos similares (cálculo item-item) e o score associado por algoritmo de recomendação. Diferente de `recomendacao`, esta tabela é **global** (não associada a um usuário específico) e tem leitura pública. É populada em batch pelos Workers de ML que processam os eventos de telemetria do MongoDB.
+
+#### Tipo de Tabela
+
+Entidade transacional / saída global de algoritmo de recomendação item-item.
+
+#### Políticas de Row Level Security
+
+| Política | Operação | Regra |
+|---|---|---|
+| `similaridade_item: leitura pública` | `SELECT` | Permite leitura pública: `USING (true)`. |
+
+#### Colunas
+
+| Coluna | Tipo | Nulo? | Default | PK / FK | Restrições | Descrição |
+|---|---|---|---|---|---|---|
+| `id_similaridade` | `SERIAL` | Não | Sequência automática | PK | - | Identificador único da linha de similaridade. |
+| `id_espetaculo_origem` | `INTEGER` | Não | - | FK | Referencia `espetaculo(id_espetaculo) ON DELETE CASCADE` | Espetáculo de referência. |
+| `id_espetaculo_similar` | `INTEGER` | Não | - | FK | Referencia `espetaculo(id_espetaculo) ON DELETE CASCADE` | Espetáculo similar ao de origem. |
+| `tipo_algoritmo` | `VARCHAR(50)` | Não | - | - | `chk_tipo_algoritmo_similaridade` | Algoritmo que produziu a similaridade. |
+| `score_similaridade` | `NUMERIC(8,6)` | Não | - | - | `CHECK (score_similaridade BETWEEN 0 AND 1)` | Score normalizado em [0, 1]. |
+| `data_geracao` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de geração do par de similaridade. |
+
+#### Constraints
+
+| Nome | Tipo | Definição |
+|---|---|---|
+| `similaridade_item_pkey` | Primary Key | `id_similaridade` |
+| Check implícito | Check | `score_similaridade BETWEEN 0 AND 1` |
+| `chk_tipo_algoritmo_similaridade` | Check | `public.is_tipo_algoritmo_valido(tipo_algoritmo)` (após migration `08_...`; nome anterior era `chk_tipo_algoritmo_similar` com lista literal) |
+| `chk_espetaculos_distintos` | Check | `id_espetaculo_origem <> id_espetaculo_similar` |
+| `uq_similaridade_item` | Unique | `(id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo)` |
+| FK implícita | Foreign Key | `id_espetaculo_origem -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
+| FK implícita | Foreign Key | `id_espetaculo_similar -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
+
+#### Relacionamentos
+
+| Tipo | Tabela / Coluna | Cardinalidade |
+|---|---|---|
+| FK | `espetaculo(id_espetaculo)` <- `similaridade_item(id_espetaculo_origem)` | Um espetáculo pode ter vários similares. |
+| FK | `espetaculo(id_espetaculo)` <- `similaridade_item(id_espetaculo_similar)` | Um espetáculo pode aparecer como similar de vários outros. |
+
+#### Índices
+
+| Índice | Colunas | Objetivo |
+|---|---|---|
+| `idx_similaridade_item_origem` | `id_espetaculo_origem, score_similaridade DESC` | Otimiza listagem dos espetáculos mais similares a um dado espetáculo. |
+
+#### Triggers e Functions
+
+A constraint `chk_tipo_algoritmo_similaridade` delega a validação à função `public.is_tipo_algoritmo_valido(TEXT)` — mesma função usada por `recomendacao`. Centralizar a lista de algoritmos aceitos em um único lugar evita divergência entre as duas tabelas.
+
+### 13. Relacionamentos Gerais do Modelo
 
 | Relacionamento | Cardinalidade | Implementação |
 |---|---|---|
@@ -1012,20 +1088,32 @@ Não há triggers ou functions associadas diretamente.
 | `usuario` -> `recomendacao` | 1:N | `recomendacao.id_usuario`. |
 | `espetaculo` -> `recomendacao` | 1:N | `recomendacao.id_espetaculo`. |
 
-### 13. Índices Criados
+### 14. Índices Criados
 
-| Índice | Tabela | Colunas | Finalidade |
-|---|---|---|---|
-| `idx_espetaculo_status` | `espetaculo` | `status` | Otimiza filtros por status. |
-| `idx_espetaculo_nota_media` | `espetaculo` | `nota_media DESC` | Otimiza rankings por nota média. |
-| `idx_espetaculo_popularidade` | `espetaculo` | `popularidade DESC` | Otimiza rankings por popularidade. |
-| `idx_sessao_espetaculo` | `sessao` | `id_espetaculo` | Otimiza busca de sessões por espetáculo. |
-| `idx_sessao_data` | `sessao` | `data` | Otimiza busca de sessões por data. |
-| `idx_sessao_teatro` | `sessao` | `id_teatro` | Otimiza busca de sessões por teatro. |
-| `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | Otimiza busca de recomendações por usuário. |
-| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | Otimiza ranking de recomendações por usuário. |
-| `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | Otimiza busca de avaliações por espetáculo. |
-| `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | Otimiza busca de espetáculos por ator. |
+A tabela abaixo consolida todos os índices explícitos do schema. Os marcados com `*` foram adicionados pelas migrations incrementais (`src/database/migrations/`).
+
+| Índice | Tabela | Colunas | Origem | Finalidade |
+|---|---|---|---|---|
+| `idx_espetaculo_status` | `espetaculo` | `status` | `01_create_database.sql` | Otimiza filtros por status. |
+| `idx_espetaculo_nota_media` | `espetaculo` | `nota_media DESC` | `01_create_database.sql` | Otimiza rankings por nota média. |
+| `idx_espetaculo_popularidade` | `espetaculo` | `popularidade DESC` | `01_create_database.sql` | Otimiza rankings por popularidade. |
+| `idx_sessao_espetaculo` | `sessao` | `id_espetaculo` | `01_create_database.sql` | Otimiza busca de sessões por espetáculo. |
+| `idx_sessao_data` | `sessao` | `data` | `01_create_database.sql` | Otimiza busca de sessões por data. |
+| `idx_sessao_teatro` | `sessao` | `id_teatro` | `01_create_database.sql` | Otimiza busca de sessões por teatro. |
+| `idx_recomendacao_usuario` | `recomendacao` | `id_usuario` | `01_create_database.sql` | Otimiza busca de recomendações por usuário. |
+| `idx_recomendacao_score` | `recomendacao` | `id_usuario, score_recomendacao DESC` | `01_create_database.sql` | Otimiza ranking de recomendações por usuário. |
+| `idx_similaridade_item_origem` | `similaridade_item` | `id_espetaculo_origem, score_similaridade DESC` | `01_create_database.sql` | Otimiza listagem dos similares de um espetáculo. |
+| `idx_avaliacao_espetaculo` | `avaliacao` | `id_espetaculo` | `01_create_database.sql` | Otimiza busca de avaliações por espetáculo. |
+| `idx_espetaculo_ator_ator` | `espetaculo_ator` | `id_ator` | `01_create_database.sql` | Otimiza busca de espetáculos por ator. |
+| `idx_espetaculo_titulo_trgm` * | `espetaculo` | `titulo` (GIN trigram) | `06_indexes.sql` | Acelera buscas `ILIKE '%termo%'` (requer extensão `pg_trgm`). |
+| `idx_espetaculo_genero` * | `espetaculo` | `genero` | `06_indexes.sql` | Otimiza filtro `WHERE genero = @genero`. |
+| `idx_espetaculo_status_popularidade` * | `espetaculo` | `status, popularidade DESC` | `06_indexes.sql` | Composto — cobre filtro de status combinado com ordenação por popularidade sem sort extra. |
+| `idx_sessao_espetaculo_data_horario` * | `sessao` | `id_espetaculo, data, horario` | `06_indexes.sql` | Composto — cobre sessões de um espetáculo já ordenadas por data/horário. |
+| `uq_recomendacao_usuario_espetaculo_algo` * | `recomendacao` | `id_usuario, id_espetaculo, tipo_algoritmo` | `08_tipo_algoritmo_e_unique_recomendacao.sql` | UNIQUE — viabiliza `ON CONFLICT ... DO UPDATE` (UPSERT) do Worker. |
+
+Além desses 16 índices nomeados, o PostgreSQL cria automaticamente índices para:
+- Toda chave primária declarada.
+- Toda constraint `UNIQUE`, incluindo a `uq_sessao_espetaculo_teatro_data_horario` (`id_espetaculo, id_teatro, data, horario`) adicionada em `07_constraints_sessao_usuario.sql` e a `uq_similaridade_item` (`id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo`) presente desde o schema inicial.
 
 ## Regras de Negócio Implementadas no Banco de Dados
 
@@ -1063,3 +1151,114 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-28 | O score de recomendação não pode ser negativo. | Constraint `CHECK`. | `recomendacao.score_recomendacao CHECK (score_recomendacao >= 0)` |
 | RN-BD-29 | Recomendações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `recomendacao.id_usuario`, `recomendacao.id_espetaculo` |
 | RN-BD-30 | Dados de catálogo e agenda devem ser públicos para consulta. | Políticas de Row Level Security com `USING (true)`. | Políticas de `SELECT` em `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao` e `avaliacao` |
+| RN-BD-31 | Toda atualização em `espetaculo` deve registrar automaticamente a hora da modificação em `updated_at`, independente da aplicação setar o campo. | Função genérica reutilizável `public.set_updated_at()` + trigger `BEFORE UPDATE`. A função pode ser ligada a outras tabelas no futuro. | `04_trigger_updated_at_espetaculo.sql` — `public.set_updated_at()`, `trg_espetaculo_updated_at` |
+| RN-BD-32 | Não pode haver mais de uma sessão para o mesmo espetáculo, no mesmo teatro, na mesma data e horário. | Constraint `UNIQUE` composta. | `07_constraints_sessao_usuario.sql` — `uq_sessao_espetaculo_teatro_data_horario` |
+| RN-BD-33 | A data de nascimento, quando informada, deve estar entre 1900-01-01 e a data atual; `NULL` continua aceito para perfis sem cadastro de data. | Constraint `CHECK` (semântica three-valued logic do SQL ignora `NULL`). | `07_constraints_sessao_usuario.sql` — `ck_usuario_data_nascimento` |
+| RN-BD-34 | Cada par `(usuario, espetaculo, tipo_algoritmo)` tem no máximo uma recomendação ativa. O Worker grava com `ON CONFLICT ... DO UPDATE` (UPSERT) e o campo `prioridade_manual` **não** é sobrescrito pelo UPSERT automático — priorização editorial é via rota administrativa. | `UNIQUE INDEX`. | `08_tipo_algoritmo_e_unique_recomendacao.sql` — `uq_recomendacao_usuario_espetaculo_algo` |
+| RN-BD-35 | A lista de algoritmos de recomendação aceitos é definida em um único ponto reutilizado pelas duas tabelas (`recomendacao` e `similaridade_item`). Adicionar um algoritmo novo é uma única alteração, sem `ALTER TYPE` que bloquearia a tabela em produção. | Função SQL `IMMUTABLE` chamada pelos CHECKs `chk_tipo_algoritmo` (em `recomendacao`) e `chk_tipo_algoritmo_similaridade` (em `similaridade_item`). | `08_tipo_algoritmo_e_unique_recomendacao.sql` — `public.is_tipo_algoritmo_valido(TEXT)` |
+
+> **Sobre a decisão `VARCHAR + CHECK + função` no lugar de `ENUM` para `tipo_algoritmo`:** ENUMs nativos do PostgreSQL exigem `ALTER TYPE ... ADD VALUE` para incluir novos valores, operação que adquire lock na tabela. O time optou por `VARCHAR(50)` + constraint `CHECK` que chama a função `public.is_tipo_algoritmo_valido()`. Adicionar um algoritmo passa a ser um `CREATE OR REPLACE FUNCTION`, sem reescrita de constraint em duas tabelas e sem impacto operacional.
+
+## Planos de Execução — Queries Críticas
+
+Esta seção documenta o comportamento esperado dos quatro índices criados em `src/database/migrations/06_indexes.sql` para as queries reais executadas por `EspetaculoRepository.cs` no serviço de catálogo. Cada entrada lista a query SQL equivalente, o índice associado, o plano de execução esperado em produção e uma observação sobre o comportamento em ambiente de desenvolvimento com seed pequeno.
+
+### 1. Busca por título
+
+- **Query:** `SELECT * FROM espetaculo WHERE titulo ILIKE '%musical%'`
+- **Índice:** `idx_espetaculo_titulo_trgm` (GIN trigram, requer extensão `pg_trgm`)
+- **Plano esperado em produção:** `Bitmap Index Scan on idx_espetaculo_titulo_trgm`
+- **Observação:** com poucos registros (seed) o PostgreSQL escolhe `Seq Scan` por ser mais eficiente — comportamento correto, não indica problema no índice.
+
+### 2. Filtro por gênero
+
+- **Query:** `SELECT * FROM espetaculo WHERE genero = 'Drama'`
+- **Índice:** `idx_espetaculo_genero` (B-tree)
+- **Plano esperado em produção:** `Index Scan using idx_espetaculo_genero`
+- **Observação:** mesma situação do título — `Seq Scan` é esperado com volume baixo.
+
+### 3. Filtro de status + ordenação por popularidade
+
+- **Query:** `SELECT * FROM espetaculo WHERE status = 'em_cartaz' ORDER BY popularidade DESC LIMIT 20`
+- **Índice:** `idx_espetaculo_status_popularidade` (B-tree composto)
+- **Plano esperado em produção:** `Index Scan using idx_espetaculo_status_popularidade` — o índice composto evita um sort separado porque já entrega as linhas na ordem correta.
+- **Observação:** este é o índice de maior impacto — é a query padrão da tela de catálogo.
+
+### 4. Sessões de um espetáculo ordenadas
+
+- **Query:** `SELECT * FROM sessao WHERE id_espetaculo = 1 ORDER BY data, horario`
+- **Índice:** `idx_sessao_espetaculo_data_horario` (B-tree composto)
+- **Plano esperado em produção:** `Index Scan using idx_sessao_espetaculo_data_horario` — o índice composto cobre o filtro e a ordenação sem sort adicional.
+- **Observação:** elimina o custo de sort em espetáculos com muitas sessões.
+
+> Os planos acima foram validados com `EXPLAIN` no ambiente Supabase com dados de seed. Com volume reduzido o PostgreSQL opta por `Seq Scan`, que é o comportamento correto — o otimizador escolhe automaticamente o índice quando o volume justificar.
+
+## Timezone e Tipos Temporais
+
+Todas as colunas temporais do schema são `TIMESTAMPTZ` (timestamp com fuso horário) a partir da migration [`05_timestamptz.sql`](migrations/05_timestamptz.sql). A versão original do schema (`01_create_database.sql`) declarou essas colunas como `TIMESTAMP` (sem fuso); a migration converteu todas elas interpretando o valor existente como UTC.
+
+### Premissa da migração
+
+Os valores gravados antes da migration foram **assumidos como UTC** — premissa válida porque:
+
+- O container Docker do banco (`postgres:15-alpine` em `docker-compose.yml`) não configura a variável `TZ`, então o servidor opera em UTC por padrão.
+- O Supabase cloud também opera em UTC sem configuração explícita.
+
+A conversão usa `ALTER COLUMN ... TYPE TIMESTAMPTZ USING <coluna> AT TIME ZONE 'UTC'` para cada coluna afetada. O conjunto convertido cobre as 9 colunas temporais existentes (em 8 tabelas), listadas no comentário-cabeçalho da migration.
+
+### Defaults
+
+Nenhum `DEFAULT` precisou mudar: `NOW()` no PostgreSQL já é timezone-aware e retorna `TIMESTAMPTZ`. As triggers e funções definidas em SQL (`public.handle_new_user()`, `public.set_updated_at()`) também continuam funcionando sem alteração.
+
+### Rollback
+
+O arquivo [`05_timestamptz_rollback.sql`](migrations/05_timestamptz_rollback.sql) reverte cada coluna para `TIMESTAMP` (sem fuso). A reversão é destrutiva no sentido **semântico**: a informação de fuso é perdida e qualquer cliente que ler as colunas precisa assumir UTC explicitamente — caso contrário interpretará o valor como horário local e produzirá leituras incorretas em fusos diferentes de UTC.
+
+## Estratégia de Migrations Incrementais
+
+A pasta [`src/database/migrations/`](migrations/) contém alterações incrementais ao schema aplicadas **após** o setup inicial (`01_create_database.sql` + `02_initial_data.sql`). Esta seção descreve o contrato operacional dessas migrations.
+
+### Princípios
+
+1. **`01_create_database.sql` é imutável para alterações incrementais.** Qualquer mudança de schema posterior ao bootstrap deve ser feita via migration nova em `migrations/`. O arquivo original só é editado em cenários de reset completo (ambiente de desenvolvimento).
+2. **Cada migration tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação).
+3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`).
+4. **Aplicação manual.** As migrations **não** são executadas automaticamente pelo Docker — apenas `01` e `02` rodam na inicialização do volume. Migrations em `migrations/` precisam ser aplicadas explicitamente via SQL Editor do Supabase ou via `psql`.
+
+### Como aplicar uma migration
+
+**Via SQL Editor do Supabase:**
+
+1. Abra o Supabase Dashboard → SQL Editor → New Query.
+2. Cole o conteúdo do arquivo `migrations/NN_*.sql` (onde `NN` é o próximo número não aplicado).
+3. Execute. Cada migration está envolvida em `BEGIN/COMMIT`, então uma falha aborta tudo sem deixar estado parcial.
+4. Confira a validação documentada no comentário-cabeçalho da migration (em geral uma query `information_schema` ou `pg_indexes`).
+
+**Via `psql`:**
+
+```bash
+psql -h <host> -p <porta> -U postgres -d postgres \
+  -f src/database/migrations/NN_*.sql
+```
+
+### Como reverter
+
+Aplique o arquivo `_rollback.sql` correspondente:
+
+```bash
+psql -h <host> -p <porta> -U postgres -d postgres \
+  -f src/database/migrations/NN_*_rollback.sql
+```
+
+> Antes de rodar um rollback, leia o aviso operacional no cabeçalho do arquivo — algumas reversões implicam mudança de contrato para a aplicação (ex: a aplicação volta a precisar setar `updated_at` manualmente após o rollback de `04_`).
+
+### Convenções de nomenclatura
+
+| Padrão | Exemplo |
+|---|---|
+| `NN_<descricao_curta>.sql` | `06_indexes.sql` |
+| `NN_<descricao_curta>_rollback.sql` | `06_indexes_rollback.sql` |
+| Funções genéricas reutilizáveis em `public.<nome>` | `public.set_updated_at`, `public.is_tipo_algoritmo_valido` |
+| Triggers prefixadas por `trg_<tabela>_<evento>` | `trg_espetaculo_updated_at` |
+| Constraints `UNIQUE` prefixadas por `uq_` | `uq_recomendacao_usuario_espetaculo_algo` |
+| Constraints `CHECK` prefixadas por `ck_` ou `chk_` (mantém estilo da tabela alvo) | `ck_usuario_data_nascimento`, `chk_tipo_algoritmo` |
