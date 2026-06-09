@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
+using Spotlight.Geolocalizacao.Application.UseCases;
+using Spotlight.Geolocalizacao.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -50,12 +52,12 @@ public class GeolocationReverseIntegrationTests : IAsyncLifetime
         }
 
         _wireMock = WireMockServer.Start();
-        _wireMock.Given(Request.Create().WithPath("/maps/api/geocode/json").UsingGet())
+        _wireMock.Given(Request.Create().WithPath("/reverse").UsingGet())
             .RespondWith(
                 Response.Create()
                     .WithStatusCode(200)
                     .WithHeader("Content-Type", "application/json")
-                    .WithBody(@"{ ""results"": [ { ""formatted_address"": ""Rua Falsa, 123, Cidade Exemplo"", ""geometry"": { ""location"": { ""lat"": -22.9, ""lng"": -47.1 } } } ], ""status"": ""OK"" }")
+                    .WithBody(@"{ ""place_id"": 123, ""display_name"": ""Rua Falsa, 123, Cidade Exemplo"", ""lat"": ""-22.9"", ""lon"": ""-47.1"" }")
             );
 
         _factory = new CustomWebApplicationFactory(_postgresContainer.GetConnectionString(), _wireMock.Urls[0]);
@@ -72,16 +74,16 @@ public class GeolocationReverseIntegrationTests : IAsyncLifetime
     public async Task ReverseEndpoint_ShouldReturnAddress_AndPersistCache_AndCallExternal()
     {
         using var client = _factory!.CreateClient();
-        var lat = -22.9m;
-        var lng = -47.1m;
+        var lat = -22.9d;
+        var lng = -47.1d;
         var latText = lat.ToString(CultureInfo.InvariantCulture);
         var lngText = lng.ToString(CultureInfo.InvariantCulture);
-        var res = await client.GetAsync($"/geolocalizacao/geocoding/reverse?lat={latText}&lng={lngText}");
+        var res = await client.GetAsync($"/geocoding/reverse?latitude={latText}&longitude={lngText}");
         var json = await res.Content.ReadAsStringAsync();
         Assert.True(res.StatusCode == HttpStatusCode.OK, $"Expected 200 OK but got {(int)res.StatusCode}. Body: {json}");
 
         var doc = JsonDocument.Parse(json);
-        var addr = doc.RootElement.GetProperty("address").GetString();
+        var addr = doc.RootElement.GetProperty("formattedAddress").GetString();
         Assert.Equal("Rua Falsa, 123, Cidade Exemplo", addr);
 
         // verify WireMock received call
@@ -91,7 +93,13 @@ public class GeolocationReverseIntegrationTests : IAsyncLifetime
         await using var conn = new NpgsqlConnection(_postgresContainer.GetConnectionString());
         await conn.OpenAsync();
         await using var cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT COUNT(*) FROM geocode_cache WHERE lat = @lat AND lng = @lng AND address = @addr";
+        cmd.CommandText = """
+            SELECT COUNT(*)
+            FROM geocode_cache
+            WHERE ABS(lat::double precision - @lat) < 0.00001
+              AND ABS(lng::double precision - @lng) < 0.00001
+              AND address = @addr
+            """;
         cmd.Parameters.AddWithValue("lat", lat);
         cmd.Parameters.AddWithValue("lng", lng);
         cmd.Parameters.AddWithValue("addr", addr ?? string.Empty);
@@ -103,28 +111,33 @@ public class GeolocationReverseIntegrationTests : IAsyncLifetime
     public async Task ReverseEndpoint_ShouldReturnExternalError_AndNotPersistCache_WhenGeocodingFails()
     {
         _wireMock.ResetMappings();
-        _wireMock.Given(Request.Create().WithPath("/maps/api/geocode/json").UsingGet())
+        _wireMock.Given(Request.Create().WithPath("/reverse").UsingGet())
             .RespondWith(
                 Response.Create()
                     .WithStatusCode(503)
                     .WithHeader("Content-Type", "application/json")
-                    .WithBody(@"{ ""status"": ""UNAVAILABLE"", ""error_message"": ""Geocoding provider unavailable"" }")
+                    .WithBody(@"{ ""error"": ""Geocoding provider unavailable"" }")
             );
 
         using var client = _factory!.CreateClient();
-        var lat = -23.5m;
-        var lng = -46.6m;
+        var lat = -23.5d;
+        var lng = -46.6d;
         var latText = lat.ToString(CultureInfo.InvariantCulture);
         var lngText = lng.ToString(CultureInfo.InvariantCulture);
-        var res = await client.GetAsync($"/geolocalizacao/geocoding/reverse?lat={latText}&lng={lngText}");
+        var res = await client.GetAsync($"/geocoding/reverse?latitude={latText}&longitude={lngText}");
 
-        Assert.Equal(HttpStatusCode.ServiceUnavailable, res.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, res.StatusCode);
         Assert.True(_wireMock.LogEntries.Any(), "WireMock did not receive the failing geocoding request");
 
         await using var conn = new NpgsqlConnection(_postgresContainer.GetConnectionString());
         await conn.OpenAsync();
         await using var cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT COUNT(*) FROM geocode_cache WHERE lat = @lat AND lng = @lng";
+        cmd.CommandText = """
+            SELECT COUNT(*)
+            FROM geocode_cache
+            WHERE ABS(lat::double precision - @lat) < 0.00001
+              AND ABS(lng::double precision - @lng) < 0.00001
+            """;
         cmd.Parameters.AddWithValue("lat", lat);
         cmd.Parameters.AddWithValue("lng", lng);
         var count = (long)(await cmd.ExecuteScalarAsync() ?? 0L);
@@ -149,7 +162,8 @@ public class GeolocationReverseIntegrationTests : IAsyncLifetime
                 var settings = new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:Default"] = _connStr,
-                    ["Geocoding:BaseUrl"] = _geoBaseUrl
+                    ["Nominatim:BaseUrl"] = _geoBaseUrl,
+                    ["Nominatim:UserAgent"] = "spotlight-geolocalizacao-tests/1.0"
                 };
                 conf.AddInMemoryCollection(settings!);
             });
@@ -157,7 +171,15 @@ public class GeolocationReverseIntegrationTests : IAsyncLifetime
             builder.ConfigureServices(services =>
             {
                 services.RemoveAll<NpgsqlDataSource>();
+                services.RemoveAll<IGeocodingService>();
+                services.RemoveAll<IGeocodeCacheRepository>();
                 services.AddSingleton(NpgsqlDataSource.Create(_connStr));
+                services.AddScoped<IGeocodeCacheRepository, GeocodeCacheRepository>();
+                services.AddHttpClient<IGeocodingService, NominatimGeocodingService>(client =>
+                {
+                    client.BaseAddress = new Uri(_geoBaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("spotlight-geolocalizacao-tests/1.0");
+                });
             });
         }
     }

@@ -2,9 +2,11 @@
 
 ## Fluxo testado
 
-Endpoint: `GET /geolocalizacao/geocoding/reverse?lat={lat}&lng={lng}`
+Endpoint publico via gateway: `GET /geolocalizacao/geocoding/reverse?latitude={latitude}&longitude={longitude}`
 
-Objetivo: validar o fluxo de reverse geocoding que recebe latitude/longitude, consulta uma API externa de geocodificacao e persiste o resultado normalizado em cache relacional.
+Endpoint interno do servico testado: `GET /geocoding/reverse?latitude={latitude}&longitude={longitude}`
+
+Objetivo: validar o fluxo de reverse geocoding do servico real `Spotlight.Geolocalizacao`, que recebe latitude/longitude, consulta OpenStreetMap/Nominatim e persiste o resultado normalizado em cache relacional.
 
 ## Coordenacao do grupo
 
@@ -21,12 +23,12 @@ Objetivo: validar o fluxo de reverse geocoding que recebe latitude/longitude, co
 ## Dependencias classificadas
 
 - Dependencia possuida: PostgreSQL, executado via `Testcontainers.PostgreSql`, com tabela `geocode_cache`.
-- Dependencia consumida: API externa de geocodificacao no formato OpenStreetMap/Nominatim/Google Maps-like, simulada com `WireMock.Net`.
+- Dependencia consumida: API externa OpenStreetMap/Nominatim, simulada com `WireMock.Net`.
 
 ## Cenarios
 
-1. Sucesso: WireMock retorna endereco formatado, endpoint responde `200 OK`, a API externa e chamada e o resultado e persistido no Postgres.
-2. Erro: WireMock retorna `503 Service Unavailable`, endpoint propaga o erro e nenhum registro e persistido no cache.
+1. Sucesso: WireMock retorna endereco formatado, o endpoint interno responde `200 OK`, a API externa e chamada e o resultado e persistido no Postgres.
+2. Erro: WireMock retorna `503 Service Unavailable`, o servico converte a falha externa em `409 Conflict` e nenhum registro e persistido no cache.
 
 ## RF validado
 
@@ -38,3 +40,12 @@ Falha critica coberta: indisponibilidade da API externa de geocodificacao.
 
 RNF03 - Confiabilidade: o fluxo deve se comportar de forma previsivel quando a dependencia externa falha, sem persistir dados incompletos ou incorretos no cache.
 
+## Como executar
+
+Requisito: Docker em execucao para o Testcontainers.
+
+```powershell
+dotnet test src\backend\tests\Spotlight.Geolocation.Tests -v minimal
+```
+
+Resultado esperado: 2 testes aprovados.

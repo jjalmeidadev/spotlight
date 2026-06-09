@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\services\geolocation\Spotlight.Geolocation.csproj" />
+    <ProjectReference Include="..\..\services\geolocalizacao\Spotlight.Geolocalizacao.csproj" />
   </ItemGroup>
 
 </Project>
