@@ -1980,7 +1980,6 @@
               "show_viewed",
               "search_performed",
               "favorite_toggled",
-              "rating_submitted",
               "purchase_clicked",
               "session_ended"
             ],
