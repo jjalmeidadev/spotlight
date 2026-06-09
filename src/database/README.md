@@ -17,7 +17,8 @@
 - [9. Planos de Execução — Queries Críticas](#planos-de-execução--queries-críticas)
 - [10. Timezone e Tipos Temporais](#timezone-e-tipos-temporais)
 - [11. Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais)
-- [12. Massa de Dados para Teste de Carga](#massa-de-dados-para-teste-de-carga)
+- [12. Rastreabilidade de Transações](#rastreabilidade-de-transações)
+- [13. Massa de Dados para Teste de Carga](#massa-de-dados-para-teste-de-carga)
 
 ---
 
@@ -55,7 +56,9 @@ src/database/
 │   ├── 07_constraints_sessao_usuario.sql              — UNIQUE em sessao e CHECK em usuario.data_nascimento
 │   ├── 07_constraints_sessao_usuario_rollback.sql
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao.sql    — função is_tipo_algoritmo_valido + UNIQUE em recomendacao
-│   └── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+│   ├── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+│   ├── 09_rastreabilidade_transacoes.sql              — tabela auditoria + trigger genérica de auditoria nas tabelas transacionais
+│   └── 09_rastreabilidade_transacoes_rollback.sql
 ├── load_test/               — massa sintética para testes de carga e performance
 │   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
 │   └── massa_carga_rollback.sql                       — remove apenas os dados de carga
@@ -1226,7 +1229,7 @@ A pasta [`src/database/migrations/`](migrations/) contém alterações increment
 
 1. **`01_create_database.sql` é imutável para alterações incrementais.** Qualquer mudança de schema posterior ao bootstrap deve ser feita via migration nova em `migrations/`. O arquivo original só é editado em cenários de reset completo (ambiente de desenvolvimento).
 2. **Cada migration tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação).
-3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`).
+3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `09` depende de todas as tabelas transacionais para registrar a auditoria).
 4. **Aplicação manual.** As migrations **não** são executadas automaticamente pelo Docker — apenas `01` e `02` rodam na inicialização do volume. Migrations em `migrations/` precisam ser aplicadas explicitamente via SQL Editor do Supabase ou via `psql`.
 
 ### Como aplicar uma migration
@@ -1266,6 +1269,57 @@ psql -h <host> -p <porta> -U postgres -d postgres \
 | Triggers prefixadas por `trg_<tabela>_<evento>` | `trg_espetaculo_updated_at` |
 | Constraints `UNIQUE` prefixadas por `uq_` | `uq_recomendacao_usuario_espetaculo_algo` |
 | Constraints `CHECK` prefixadas por `ck_` ou `chk_` (mantém estilo da tabela alvo) | `ck_usuario_data_nascimento`, `chk_tipo_algoritmo` |
+
+---
+
+## Rastreabilidade de Transações
+
+A migration [`09_rastreabilidade_transacoes.sql`](migrations/09_rastreabilidade_transacoes.sql) adiciona uma **trilha de auditoria** que registra toda operação de escrita (`INSERT`/`UPDATE`/`DELETE`) sobre as tabelas transacionais, permitindo responder *quem alterou o quê, quando e em qual transação*.
+
+### Como funciona
+
+- **Tabela `auditoria`** — uma linha por operação, contendo o estado anterior (`dados_anteriores`) e o novo (`dados_novos`) em JSONB, a tabela e a operação, o `registro_id` afetado e o ator responsável.
+- **Função `public.registrar_auditoria()`** — trigger genérica `AFTER INSERT/UPDATE/DELETE` (`SECURITY DEFINER`). Recebe o nome da coluna de PK como argumento (`TG_ARGV[0]`) para preencher `registro_id` de forma genérica.
+- **Triggers** instaladas em: `usuario`, `espetaculo`, `teatro`, `ator`, `sessao`, `avaliacao`, `recomendacao` e `similaridade_item` (8 no total).
+
+### Correlação por transação
+
+A coluna `id_transacao` recebe `txid_current()`, então **todas as operações de um mesmo `COMMIT` compartilham o mesmo identificador** — é o que torna possível reconstruir uma transação inteira a partir da trilha.
+
+### Colunas da tabela `auditoria`
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `id_auditoria` | `BIGSERIAL` PK | Identificador sequencial da entrada. |
+| `id_transacao` | `BIGINT` | `txid_current()` — agrupa operações do mesmo COMMIT. |
+| `tabela` | `VARCHAR(63)` | Tabela auditada (`TG_TABLE_NAME`). |
+| `operacao` | `VARCHAR(10)` | `INSERT`, `UPDATE` ou `DELETE`. |
+| `registro_id` | `TEXT` | Valor da PK do registro afetado. |
+| `dados_anteriores` | `JSONB` | Estado anterior (`NULL` em `INSERT`). |
+| `dados_novos` | `JSONB` | Estado novo (`NULL` em `DELETE`). |
+| `id_usuario_responsavel` | `UUID` | `auth.uid()` — `NULL` para escritas de sistema/seed/worker. |
+| `papel_banco` | `TEXT` | `current_user` — role do banco que executou. |
+| `registrado_em` | `TIMESTAMPTZ` | Momento do registro. |
+
+> **Segurança:** a tabela tem RLS habilitada e é legível apenas por usuários `administrador`; as inserções vêm da trigger `SECURITY DEFINER`, que ignora RLS. Não há FK em `id_usuario_responsavel` para que a trilha sobreviva à exclusão do usuário.
+
+### Consultas típicas
+
+```sql
+-- Histórico completo de um registro:
+SELECT operacao, dados_anteriores, dados_novos, id_usuario_responsavel, registrado_em
+FROM auditoria
+WHERE tabela = 'espetaculo' AND registro_id = '1'
+ORDER BY registrado_em;
+
+-- Reconstruir uma transação inteira:
+SELECT tabela, operacao, registro_id
+FROM auditoria
+WHERE id_transacao = :txid
+ORDER BY id_auditoria;
+```
+
+> **Interação com carga sintética:** as triggers disparam também durante a carga de `load_test/` (gerando ~1 linha de auditoria por linha inserida). Para medir o banco sem esse overhead, aplique a `09` **depois** do bulk load ou desabilite temporariamente as triggers durante a carga.
 
 ---
 
