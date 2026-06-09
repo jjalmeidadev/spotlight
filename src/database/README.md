@@ -19,6 +19,7 @@
 - [11. Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais)
 - [12. Rastreabilidade de Transações](#rastreabilidade-de-transações)
 - [13. Massa de Dados para Teste de Carga](#massa-de-dados-para-teste-de-carga)
+- [14. Teste de Carga (pgbench)](#teste-de-carga-pgbench)
 
 ---
 
@@ -59,9 +60,13 @@ src/database/
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
 │   ├── 09_rastreabilidade_transacoes.sql              — tabela auditoria + trigger genérica de auditoria nas tabelas transacionais
 │   └── 09_rastreabilidade_transacoes_rollback.sql
-├── load_test/               — massa sintética para testes de carga e performance
+├── load_test/               — massa sintética e teste de carga (pgbench)
 │   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
-│   └── massa_carga_rollback.sql                       — remove apenas os dados de carga
+│   ├── massa_carga_rollback.sql                       — remove apenas os dados de carga
+│   ├── run_pgbench.sh                                 — runner dos cenários de carga
+│   └── pgbench/
+│       ├── catalogo_leitura.sql                       — cenário de leitura (catálogo/busca/recomendações)
+│       └── avaliacao_escrita.sql                      — cenário de escrita (UPSERT + auditoria)
 └── README.md                — este arquivo
 ```
 
@@ -1361,4 +1366,63 @@ psql "$DATABASE_URL" -f src/database/load_test/massa_carga.sql
 psql "$DATABASE_URL" -f src/database/load_test/massa_carga_rollback.sql
 ```
 
-Também é executável via SQL Editor do Supabase / DBeaver (não usa metacomandos `psql`). Validado em `postgres:16-alpine` com o schema + migrations `04`–`08`: carga completa em ~24 s, sem erros, e rollback retornando exatamente aos volumes do seed.
+Também é executável via SQL Editor do Supabase / DBeaver (não usa metacomandos `psql`). Validado em `postgres:16-alpine` com o schema + migrations `04`–`09`: carga completa em ~24 s, sem erros, e rollback retornando exatamente aos volumes do seed.
+
+---
+
+## Teste de Carga (pgbench)
+
+Com a massa carregada, o comportamento do banco sob alto volume de operações foi avaliado com **`pgbench`** (ferramenta nativa de benchmark do PostgreSQL). Os scripts de cenário ficam versionados em [`src/database/load_test/pgbench/`](load_test/pgbench/) e o runner em [`run_pgbench.sh`](load_test/run_pgbench.sh).
+
+### Método
+
+- **Ferramenta:** `pgbench` 16 (cliente nativo).
+- **Cenários** (cada transação simula uma interação real da aplicação):
+  - `catalogo_leitura.sql` — **leitura**: catálogo em cartaz por popularidade, filtro por gênero, busca por título (trigram), sessões ordenadas e recomendações por usuário (as queries críticas da seção [Planos de Execução](#planos-de-execução--queries-críticas)).
+  - `avaliacao_escrita.sql` — **escrita**: UPSERT de avaliação, que dispara a trigger de auditoria (migration `09`) — mede também o overhead da rastreabilidade.
+- **Configuração:** 20 clientes concorrentes, 4 threads, 30 s por cenário.
+- **Massa:** ~208 mil linhas (ver seção anterior).
+
+### Resultados
+
+Ambiente de referência: `postgres:16-alpine` em Docker local (4 threads). Os números são **indicativos** e servem de baseline comparável — em produção (Supabase gerenciado) variam conforme tier e rede.
+
+| Cenário | Transações | TPS | Latência média | Falhas |
+|---|---:|---:|---:|---:|
+| Catálogo (leitura, 5 queries/tx) | 80.367 | **2.681** | 7,46 ms | 0 (0,000%) |
+| Avaliação (escrita + auditoria) | 159.059 | **5.306** | 3,77 ms | 0 (0,000%) |
+
+Latências por statement (cenário de leitura): cada uma das 5 queries ficou entre **1,3 e 1,6 ms**. No cenário de escrita, o UPSERT **com a trigger de auditoria disparando** custou **3,73 ms** por operação.
+
+### Evidências de uso de índice sob volume
+
+Sob ~208 mil linhas o otimizador passa a usar os índices criados na migration `06` (com o seed pequeno ele opta por `Seq Scan`, como observado na seção de Planos de Execução). `EXPLAIN ANALYZE` durante a carga:
+
+```text
+-- Catálogo em cartaz por popularidade:
+Limit (actual time=0.051..0.101 rows=20)
+  ->  Index Scan using idx_espetaculo_status_popularidade on espetaculo
+        Index Cond: (status = 'em_cartaz')
+Execution Time: 0.249 ms          -- índice composto cobre filtro + ordenação, sem sort
+
+-- Recomendações por usuário:
+->  Bitmap Index Scan on idx_recomendacao_usuario
+      Index Cond: (id_usuario = '...')
+```
+
+### Análise
+
+- **Estabilidade:** zero transações falhas em ~240 mil execuções somadas; sem erros de constraint, deadlock ou conexão.
+- **Leitura:** ~2,7 mil tx/s mesmo com 5 queries por transação, cada query em ~1,5 ms — os índices da migration `06` entregam o catálogo sem `Seq Scan` nem sort adicional sob volume.
+- **Escrita + rastreabilidade:** ~5,3 mil tx/s com a trilha de auditoria ativa. Cada escrita gerou a linha correspondente em `auditoria` (259.059 linhas em `avaliacao` ao final: 100 mil da massa + 159 mil da carga), confirmando que a rastreabilidade da migration `09` opera corretamente sob carga e com overhead baixo.
+- **Conclusão:** o banco sustenta o volume-alvo do contexto da aplicação com folga e latência baixa; os índices e a trilha de auditoria se comportam como projetado.
+
+### Como reproduzir
+
+```bash
+# 1) Banco no ar com schema + migrations 04–09 e massa carregada (seções acima).
+# 2) Rodar os cenários:
+DATABASE_URL="postgres://postgres:senha@host:porta/spotlight" \
+CLIENTS=20 THREADS=4 DURATION=30 \
+bash src/database/load_test/run_pgbench.sh
+```
