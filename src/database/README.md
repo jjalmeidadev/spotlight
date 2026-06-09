@@ -17,6 +17,7 @@
 - [9. Planos de Execução — Queries Críticas](#planos-de-execução--queries-críticas)
 - [10. Timezone e Tipos Temporais](#timezone-e-tipos-temporais)
 - [11. Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais)
+- [12. Massa de Dados para Teste de Carga](#massa-de-dados-para-teste-de-carga)
 
 ---
 
@@ -55,6 +56,9 @@ src/database/
 │   ├── 07_constraints_sessao_usuario_rollback.sql
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao.sql    — função is_tipo_algoritmo_valido + UNIQUE em recomendacao
 │   └── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+├── load_test/               — massa sintética para testes de carga e performance
+│   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
+│   └── massa_carga_rollback.sql                       — remove apenas os dados de carga
 └── README.md                — este arquivo
 ```
 
@@ -1262,3 +1266,45 @@ psql -h <host> -p <porta> -U postgres -d postgres \
 | Triggers prefixadas por `trg_<tabela>_<evento>` | `trg_espetaculo_updated_at` |
 | Constraints `UNIQUE` prefixadas por `uq_` | `uq_recomendacao_usuario_espetaculo_algo` |
 | Constraints `CHECK` prefixadas por `ck_` ou `chk_` (mantém estilo da tabela alvo) | `ck_usuario_data_nascimento`, `chk_tipo_algoritmo` |
+
+---
+
+## Massa de Dados para Teste de Carga
+
+Os scripts em [`src/database/load_test/`](load_test/) geram uma massa sintética e representativa sobre o schema já criado, tornando relevantes os testes de carga e performance (k6, `EXPLAIN ANALYZE` em volume real, etc.). Eles **não** fazem parte do setup inicial e devem ser aplicados manualmente, após `01`, `02` e as migrations `04`–`08`.
+
+### Volume gerado
+
+| Entidade | Linhas | Marcador de isolamento |
+|---|---:|---|
+| `usuario` (via `auth.users` + trigger) | 5.000 | `email LIKE '%@loadtest.local'` / UUID prefixo `10000000-…` |
+| `ator` | 1.000 | `nome LIKE 'Ator Carga %'` |
+| `teatro` | 100 | `parceiro_naming_rights = 'Carga LoadTest'` |
+| `espetaculo` | 2.000 | `produtora = 'Carga LoadTest'` |
+| `sessao` | ~20.000 | referencia espetáculos/teatros de carga |
+| `avaliacao` | ~100.000 | referencia usuários/espetáculos de carga |
+| `recomendacao` | ~50.000 | referencia usuários/espetáculos de carga |
+| `similaridade_item` | ~30.000 | referencia espetáculos de carga |
+| **Total** | **~208 mil** | |
+
+> Os marcadores garantem que a massa seja isolável: as tabelas-fato só referenciam entidades de carga, então o rollback as remove em cascata sem tocar no seed curado de `02_initial_data.sql`.
+
+### Características
+
+- **Idempotente por guarda.** Se a massa já estiver carregada, `massa_carga.sql` aborta com mensagem orientando a rodar o rollback antes — não duplica dados.
+- **Volume parametrizável.** As constantes no bloco `DECLARE` no topo de `massa_carga.sql` controlam o volume de cada entidade; ajuste-as para escalar a carga.
+- **Pares únicos.** Avaliações, recomendações e similaridades são geradas com mapeamento determinístico que respeita as constraints `UNIQUE` (com `ON CONFLICT DO NOTHING` como rede de segurança).
+- **Estatísticas atualizadas.** Ambos os scripts rodam `ANALYZE` ao final, de modo que os planos de execução observados nos testes reflitam o volume real.
+- **Senha única reaproveitada.** O hash bcrypt é calculado uma vez e reutilizado em todos os usuários de carga, evitando o custo de hashing por linha.
+
+### Como aplicar
+
+```bash
+# Carregar a massa
+psql "$DATABASE_URL" -f src/database/load_test/massa_carga.sql
+
+# Remover apenas a massa (preserva o seed)
+psql "$DATABASE_URL" -f src/database/load_test/massa_carga_rollback.sql
+```
+
+Também é executável via SQL Editor do Supabase / DBeaver (não usa metacomandos `psql`). Validado em `postgres:16-alpine` com o schema + migrations `04`–`08`: carga completa em ~24 s, sem erros, e rollback retornando exatamente aos volumes do seed.
