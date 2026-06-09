@@ -206,6 +206,19 @@ npm start
     * Artefato
     * Artefato
 
+## Tracker - Testes de Integracao (Aula 8)
+
+| Aluno | Fluxo testado | Dependencia possuida (Testcontainers) | Dependencia consumida (WireMock.Net) | RF | RNF / ISO 25010 | Status |
+|---|---|---|---|---|---|---|
+| Mariana | PUT /usuario/me/preferencias | PostgreSQL - tabela usuario, campo perfil_preferencias | Motor de recomendacao/notificacao de preferencias | RF03 | RNF03 - Confiabilidade | Concluido |
+| Rafael | GET /recomendacao/me | PostgreSQL - tabelas recomendacao, usuario, espetaculo | OpenStreetMap/Nominatim para contexto geografico | RF04 | RNF03 - Confiabilidade | Concluido |
+| Pessoa 2 | PUT /usuario/me/localizacao | PostgreSQL - tabela usuario, campo localizacao | OpenStreetMap/Nominatim | RF03 | RNF03 - Confiabilidade | Sugerido |
+| Pessoa 4 | GET /recomendacao/espetaculos/{id}/similares | PostgreSQL - tabelas similaridade_item e espetaculo | Motor externo de similaridade/k-NN simulado | RF14 | RNF02 - Desempenho | Sugerido |
+| Pessoa 5 | POST /catalogo/espetaculos/{id}/avaliacoes | PostgreSQL - tabelas usuario, espetaculo e avaliacao | Motor de recomendacao/telemetria recebendo evento de rating | RF09 ou RF11 | RNF03 - Confiabilidade | Sugerido |
+| Pessoa 6 | POST /catalogo/espetaculos | PostgreSQL - tabelas espetaculo, categoria e relacionamentos | API externa de armazenamento/validacao de imagem ou ticketeira simulada | RF16 | RNF05 - Seguranca | Sugerido |
+| Pessoa 7 | GET /geolocalizacao/geocoding/reverse | Cache ou PostgreSQL, se houver persistencia/cache do resultado | OpenStreetMap/Nominatim | RF03 | RNF03 - Confiabilidade | Mais arriscado |
+
+Observacao: os fluxos de Mariana e Rafael ja foram reservados/implementados. Os demais fluxos sao sugestoes para distribuicao do grupo, evitando duplicidade entre alunos.
 ## 📋 Licença/License
 
 <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="#">Spotlight</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.inteli.edu.br/">Inteli</a>, <a href="ttps://www.linkedin.com/in/celsojwnior/">Celso Rodrigues</a>, <a href="https://www.linkedin.com/in/jaimeandradedealmeida/">Jaime Almeida</a>, <a href="https://www.linkedin.com/in/leonardoramosvieira/">Leonardo Ramos</a>, <a href="https://www.linkedin.com/in/marianalacerdareis/">Mariana Lacerda</a>, <a href="https://www.linkedin.com/in/mariana-pereira-de-souza1/">Mariana Pereira</a>, <a href="https://www.linkedin.com/in/rafael-figueiredo-campos-72131735b/">Rafael Campos</a>, <a href="https://www.linkedin.com/in/vitor-ribeiro-ms/">Vitor Ribeiro</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>

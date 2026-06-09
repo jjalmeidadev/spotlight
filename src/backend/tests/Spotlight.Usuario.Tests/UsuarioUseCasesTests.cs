@@ -396,5 +396,4 @@ public class UsuarioUseCasesTests
             return Task.CompletedTask;
         }
     }
-    }
 }

@@ -116,10 +116,10 @@ dotnet test src\backend\tests\Spotlight.Usuario.Tests\Spotlight.Usuario.Tests.cs
 Resultado:
 
 ```text
-Aprovado: 21
+Aprovado: 23
 Falhou: 0
 Ignorado: 0
-Total: 21
+Total: 23
 ```
 
 Cobertura dos componentes diretamente relacionados ao fluxo:
