@@ -515,6 +515,97 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 ---
 
+### 4.7 `POST /usuario/telemetria`
+**Finalidade:** registrar eventos de telemetria comportamental gerados pelo aplicativo
+mobile, como visualização de tela, clique em card, busca, avaliação e abertura de
+compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
+
+**Autenticação**
+- Header `Authorization: Bearer <jwt>` opcional.
+- Se o JWT for enviado e válido, o backend associa o evento ao `sub` do token.
+- Se o JWT não for enviado, `anonymousId` é obrigatório.
+- Se o JWT for enviado, mas for inválido, a resposta deve ser `401`.
+
+**Request**
+- Headers: `Content-Type: application/json`; `Authorization` opcional.
+- Body:
+```json
+{
+  "eventId": "evt_01HX9F7M9XK2",
+  "eventType": "show_viewed",
+  "source": "mobile",
+  "sessionId": "sess_01HX9F7M8T",
+  "occurredAt": "2026-06-09T14:32:00Z",
+  "screen": "Detalhes",
+  "entity": {
+    "type": "espetaculo",
+    "id": "42"
+  },
+  "properties": {
+    "durationMs": 23000,
+    "origin": "catalog"
+  },
+  "device": {
+    "platform": "ios",
+    "appVersion": "1.0.0"
+  },
+  "anonymousId": "anon_01HX9F7M8T"
+}
+```
+
+**Campos**
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `eventId` | `string` | Não | Idempotência no cliente. Se omitido, o backend gera um identificador. |
+| `eventType` | `string` | Sim | Enum inicial: `session_started`, `screen_viewed`, `show_card_clicked`, `show_viewed`, `search_performed`, `favorite_toggled`, `rating_submitted`, `purchase_clicked`, `session_ended`. |
+| `source` | `string` | Sim | Origem do evento. Enum inicial: `mobile`. |
+| `sessionId` | `string` | Sim | Identificador da sessão de uso do app. |
+| `occurredAt` | `date-time` | Não | Momento em que o evento ocorreu no cliente. Se omitido, o backend usa o horário de recebimento. |
+| `screen` | `string` | Não | Tela onde o evento ocorreu. |
+| `entity.type` | `string` | Condicional | Obrigatório quando `entity` for enviado. Enum inicial: `espetaculo`, `sessao`, `teatro`, `categoria`, `busca`. |
+| `entity.id` | `string` | Condicional | Obrigatório quando `entity` for enviado. |
+| `properties` | `object` | Não | Metadados livres do evento. Não deve conter dados sensíveis. |
+| `device` | `object` | Não | Metadados do dispositivo/app. Não deve conter dados sensíveis. |
+| `anonymousId` | `string` | Condicional | Obrigatório quando não houver usuário autenticado. |
+
+> Limite alvo para `properties` + `device`: 16 KB serializados. Validações mais
+> estritas por tipo de evento devem ser implementadas na tarefa de validação do
+> payload.
+
+**Responses**
+- `202 Accepted` — evento aceito para persistência:
+```json
+{ "eventId": "evt_01HX9F7M9XK2", "status": "accepted" }
+```
+- `400 Bad Request` — validação (`Erro` com `details`).
+- `401 Unauthorized` — token enviado, mas ausente/inválido para associação autenticada. `Erro`.
+- `403 Forbidden` — token válido, mas usuário sem permissão quando a política exigir usuário cadastrado. `Erro`.
+- `500` — falha inesperada. `Erro`.
+
+**Documento persistido no MongoDB**
+
+O backend normaliza o payload para a coleção `interacoes` com campos em
+`snake_case`:
+```json
+{
+  "event_id": "evt_01HX9F7M9XK2",
+  "user_id": "a1b2c3d4-0000-0000-0000-000000000000",
+  "anonymous_id": "anon_01HX9F7M8T",
+  "session_id": "sess_01HX9F7M8T",
+  "event_type": "show_viewed",
+  "source": "mobile",
+  "screen": "Detalhes",
+  "occurred_at": "2026-06-09T14:32:00Z",
+  "received_at": "2026-06-09T14:32:01Z",
+  "entity": { "type": "espetaculo", "id": "42" },
+  "properties": { "durationMs": 23000, "origin": "catalog" },
+  "device": { "platform": "ios", "appVersion": "1.0.0" }
+}
+```
+
+---
+
 ## 5. Serviço de Geolocalização
 
 ### 5.1 `GET /geolocalizacao/geocoding`

@@ -797,6 +797,81 @@
         }
       }
     },
+    "/usuario/telemetria": {
+      "post": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Registrar evento de telemetria do aplicativo",
+        "description": "Registra eventos comportamentais do app mobile na colecao interacoes do MongoDB. O header Authorization e opcional: se enviado e valido, o evento e associado ao usuario autenticado; se ausente, anonymousId e obrigatorio.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetriaEventoCreate"
+              },
+              "examples": {
+                "visualizacaoEspetaculo": {
+                  "summary": "Visualizacao de espetaculo",
+                  "value": {
+                    "eventId": "evt_01HX9F7M9XK2",
+                    "eventType": "show_viewed",
+                    "source": "mobile",
+                    "sessionId": "sess_01HX9F7M8T",
+                    "occurredAt": "2026-06-09T14:32:00Z",
+                    "screen": "Detalhes",
+                    "entity": {
+                      "type": "espetaculo",
+                      "id": "42"
+                    },
+                    "properties": {
+                      "durationMs": 23000,
+                      "origin": "catalog"
+                    },
+                    "device": {
+                      "platform": "ios",
+                      "appVersion": "1.0.0"
+                    },
+                    "anonymousId": "anon_01HX9F7M8T"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Evento aceito para persistencia.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetriaEventoAceito"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
     "/recomendacao/me": {
       "get": {
         "tags": [
@@ -1853,6 +1928,133 @@
             "type": "number",
             "format": "float",
             "example": 150.0
+          }
+        }
+      },
+      "TelemetriaEntity": {
+        "type": "object",
+        "required": [
+          "type",
+          "id"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "espetaculo",
+              "sessao",
+              "teatro",
+              "categoria",
+              "busca"
+            ],
+            "example": "espetaculo"
+          },
+          "id": {
+            "type": "string",
+            "example": "42"
+          }
+        }
+      },
+      "TelemetriaEventoCreate": {
+        "type": "object",
+        "description": "Evento de telemetria gerado pelo aplicativo. Se Authorization nao for enviado, anonymousId e obrigatorio.",
+        "required": [
+          "eventType",
+          "source",
+          "sessionId"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "Identificador idempotente gerado pelo cliente. Se omitido, o backend gera um identificador.",
+            "example": "evt_01HX9F7M9XK2"
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "session_started",
+              "screen_viewed",
+              "show_card_clicked",
+              "show_viewed",
+              "search_performed",
+              "favorite_toggled",
+              "rating_submitted",
+              "purchase_clicked",
+              "session_ended"
+            ],
+            "example": "show_viewed"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "mobile"
+            ],
+            "example": "mobile"
+          },
+          "sessionId": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "sess_01HX9F7M8T"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-06-09T14:32:00Z"
+          },
+          "screen": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "Detalhes"
+          },
+          "entity": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TelemetriaEntity"
+              }
+            ],
+            "nullable": true
+          },
+          "properties": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "Metadados livres do evento. Nao deve conter dados sensiveis."
+          },
+          "device": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "Metadados do dispositivo/app. Nao deve conter dados sensiveis."
+          },
+          "anonymousId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "anon_01HX9F7M8T"
+          }
+        }
+      },
+      "TelemetriaEventoAceito": {
+        "type": "object",
+        "required": [
+          "eventId",
+          "status"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "example": "evt_01HX9F7M9XK2"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted"
+            ],
+            "example": "accepted"
           }
         }
       },
