@@ -1,4 +1,4 @@
-# Contratos de API — Spotlight 
+﻿# Contratos de API — Spotlight 
 
 Especificação das rotas que serão implementadas no backend, servindo como
 **fonte da verdade** para o desenvolvimento, para o Swagger  e para o
@@ -655,21 +655,21 @@ O backend normaliza o payload para a coleção `interacoes` com campos em
 
 ---
 
-## 6. Servico de Recomendacao
+## 6. Serviço de Recomendação
 
-### 6.1 Schemas do servico de recomendacao
+### 6.1 Schemas do serviço de recomendação
 
-#### EspetaculoRecomendado
+#### EspetáculoRecomendado
 
-Objeto usado dentro das respostas de recomendacao. Representa o subconjunto do espetaculo necessario para exibicao em listas e carroseis.
+Objeto usado dentro das respostas de recomendação. Representa o subconjunto do espetáculo necessário para exibição em listas e carrosséis.
 
-| Campo | Tipo | Obrigatorio | Descricao |
+| Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
-| `id` | integer | Sim | Identificador do espetaculo. |
-| `titulo` | string | Sim | Titulo do espetaculo. |
-| `genero` | string ou null | Nao | Genero textual do espetaculo, quando cadastrado. |
-| `status` | string | Sim | Status do espetaculo. Ex.: `em_cartaz`, `em_breve`, `encerrado`. |
-| `notaMedia` | number | Sim | Media de avaliacoes do espetaculo. |
+| `id` | integer | Sim | Identificador do espetáculo. |
+| `titulo` | string | Sim | Título do espetáculo. |
+| `genero` | string ou null | Não | Gênero textual do espetáculo, quando cadastrado. |
+| `status` | string | Sim | Status do espetáculo. Ex.: `em_cartaz`, `em_breve`, `encerrado`. |
+| `notaMedia` | number | Sim | Média de avaliações do espetáculo. |
 
 Exemplo:
 
@@ -677,7 +677,7 @@ Exemplo:
 {
   "id": 12,
   "titulo": "O Auto da Compadecida",
-  "genero": "Comedia",
+  "genero": "Comédia",
   "status": "em_cartaz",
   "notaMedia": 4.7
 }
@@ -687,13 +687,13 @@ Exemplo:
 
 Item retornado em `GET /recomendacao/me`.
 
-| Campo | Tipo | Obrigatorio | Descricao |
+| Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
-| `espetaculo` | EspetaculoRecomendado | Sim | Espetaculo recomendado. |
-| `score` | number | Sim | Pontuacao calculada pelo algoritmo de recomendacao. Deve ser maior ou igual a zero. |
-| `tipoAlgoritmo` | string | Sim | Algoritmo responsavel pela recomendacao. Ex.: `SVD`, `k-NN`, `content_based`. |
-| `motivo` | string ou null | Nao | Explicacao textual da recomendacao. |
-| `dataGeracao` | string date-time | Sim | Momento em que a recomendacao foi gerada. |
+| `espetaculo` | EspetáculoRecomendado | Sim | Espetáculo recomendado. |
+| `score` | number | Sim | Pontuação calculada pelo algoritmo de recomendação. Deve ser maior ou igual a zero. |
+| `tipoAlgoritmo` | string | Sim | Algoritmo responsável pela recomendação. Ex.: `SVD`, `k-NN`, `content_based`. |
+| `motivo` | string ou null | Não | Explicação textual da recomendação. |
+| `dataGeracao` | string date-time | Sim | Momento em que a recomendação foi gerada. |
 
 Exemplo:
 
@@ -702,13 +702,13 @@ Exemplo:
   "espetaculo": {
     "id": 12,
     "titulo": "O Auto da Compadecida",
-    "genero": "Comedia",
+    "genero": "Comédia",
     "status": "em_cartaz",
     "notaMedia": 4.7
   },
   "score": 0.934512,
   "tipoAlgoritmo": "SVD",
-  "motivo": "Por que voce gostou de outras comedias populares.",
+  "motivo": "Por que você gostou de outras comédias populares.",
   "dataGeracao": "2026-05-25T03:00:00Z"
 }
 ```
@@ -717,9 +717,9 @@ Exemplo:
 
 Item retornado em `GET /recomendacao/espetaculos/{id}/similares`.
 
-| Campo | Tipo | Obrigatorio | Descricao |
+| Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
-| `espetaculo` | EspetaculoRecomendado | Sim | Espetaculo similar ao espetaculo de origem. |
+| `espetaculo` | EspetáculoRecomendado | Sim | Espetáculo similar ao espetáculo de origem. |
 | `score` | number | Sim | Grau de similaridade no intervalo esperado de 0 a 1. |
 | `tipoAlgoritmo` | string | Sim | Algoritmo usado para calcular similaridade. Ex.: `k-NN`, `SVD`. |
 
@@ -739,13 +739,13 @@ Exemplo:
 }
 ```
 
-#### Lista de recomendacao
+#### Lista de recomendação
 
-Envelope usado pelas rotas de recomendacao.
+Envelope usado pelas rotas de recomendação.
 
-| Campo | Tipo | Obrigatorio | Descricao |
+| Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
-| `data` | array | Sim | Lista de itens retornados. Pode ser vazia quando nao houver recomendacoes disponiveis. |
+| `data` | array | Sim | Lista de itens retornados. Pode ser vazia quando não houver recomendações disponíveis. |
 
 Exemplo:
 
@@ -759,23 +759,23 @@ Exemplo:
 
 ### 6.2 `GET /recomendacao/me`
 
-**Finalidade:** recomendacoes personalizadas para o usuario autenticado, ordenadas por `score`. **Requer `cadastrado`.** Le predicoes pre-processadas da tabela `recomendacao`.
+**Finalidade:** recomendações personalizadas para o usuário autenticado, ordenadas por `score`. **Requer `cadastrado`.** Lê predições pré-processadas da tabela `recomendacao`.
 
-**Regra basica:** o backend retorna recomendacoes ja calculadas pelo pipeline/modelo de recomendacao. A rota nao treina o modelo nem recalcula scores em tempo real; ela consulta os resultados persistidos para o usuario autenticado.
+**Regra básica:** o backend retorna recomendações já calculadas pelo pipeline/modelo de recomendação. A rota não treina o modelo nem recalcula scores em tempo real; ela consulta os resultados persistidos para o usuário autenticado.
 
 **Request**
 
 - Headers:
 
-| Header | Obrigatorio | Descricao |
+| Header | Obrigatório | Descrição |
 |---|---|---|
-| `Authorization: Bearer <token-jwt>` | Sim | JWT valido de usuario `cadastrado`. |
+| `Authorization: Bearer <token-jwt>` | Sim | JWT válido de usuário `cadastrado`. |
 
 - Query params:
 
-| Campo | Tipo | Obrigatorio | Regra |
+| Campo | Tipo | Obrigatório | Regra |
 |---|---|---|---|
-| `limite` | integer | Nao | Default 10. Valores menores que 1 usam 10. Valor maximo 50. |
+| `limite` | integer | Não | Default 10. Valores menores que 1 usam 10. Valor máximo 50. |
 
 Exemplo de request:
 
@@ -795,20 +795,20 @@ Authorization: Bearer <token-jwt>
       "espetaculo": {
         "id": 12,
         "titulo": "O Auto da Compadecida",
-        "genero": "Comedia",
+        "genero": "Comédia",
         "status": "em_cartaz",
         "notaMedia": 4.7
       },
       "score": 0.934512,
       "tipoAlgoritmo": "SVD",
-      "motivo": "Por que voce gostou de outras comedias populares.",
+      "motivo": "Por que você gostou de outras comédias populares.",
       "dataGeracao": "2026-05-25T03:00:00Z"
     }
   ]
 }
 ```
 
-- `200 OK` - sem recomendacoes disponiveis:
+- `200 OK` - sem recomendações disponíveis:
 
 ```json
 {
@@ -816,31 +816,31 @@ Authorization: Bearer <token-jwt>
 }
 ```
 
-- `401 Unauthorized` - token ausente ou invalido. Schema `Erro`.
-- `403 Forbidden` - token valido, mas usuario sem permissao. Schema `Erro`.
+- `401 Unauthorized` - token ausente ou inválido. Schema `Erro`.
+- `403 Forbidden` - token válido, mas usuário sem permissão. Schema `Erro`.
 - `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
 
 ### 6.3 `GET /recomendacao/espetaculos/{id}/similares`
 
-**Finalidade:** espetaculos similares a um dado espetaculo (item-item). **Publico.**
+**Finalidade:** espetáculos similares a um dado espetáculo (item-item). **Público.**
 
-> **Fonte dos dados:** a similaridade item-item e **global** (igual para todos os usuarios), entao **nao** sai da tabela `recomendacao` - essa e por usuario e protegida por RLS (`auth.uid() = id_usuario`). Estes similares vem da tabela dedicada `similaridade_item` (definida em `01_create_database.sql`), populada em batch pelos algoritmos de recomendacao (k-NN, SVD, k-means) com leitura publica via politica RLS `similaridade_item: leitura publica`.
+> **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os usuários), então **não** sai da tabela `recomendacao` - essa é por usuário e protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm da tabela dedicada `similaridade_item` (definida em `01_create_database.sql`), populada em batch pelos algoritmos de recomendação (k-NN, SVD, k-means) com leitura pública via política RLS `similaridade_item: leitura pública`.
 
 **Request**
 
 - Path params:
 
-| Campo | Tipo | Obrigatorio | Regra |
+| Campo | Tipo | Obrigatório | Regra |
 |---|---|---|---|
-| `id` | integer | Sim | Identificador do espetaculo de origem. |
+| `id` | integer | Sim | Identificador do espetáculo de origem. |
 
 - Query params:
 
-| Campo | Tipo | Obrigatorio | Regra |
+| Campo | Tipo | Obrigatório | Regra |
 |---|---|---|---|
-| `limite` | integer | Nao | Default 10. Valores menores que 1 usam 10. Valor maximo 50. |
+| `limite` | integer | Não | Default 10. Valores menores que 1 usam 10. Valor máximo 50. |
 
 Exemplo de request:
 
@@ -870,7 +870,7 @@ GET /recomendacao/espetaculos/12/similares?limite=5
 }
 ```
 
-- `200 OK` - sem similares disponiveis:
+- `200 OK` - sem similares disponíveis:
 
 ```json
 {
@@ -878,7 +878,7 @@ GET /recomendacao/espetaculos/12/similares?limite=5
 }
 ```
 
-- `404 Not Found` - espetaculo de origem inexistente. Schema `Erro`.
+- `404 Not Found` - espetáculo de origem inexistente. Schema `Erro`.
 - `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
@@ -907,3 +907,4 @@ GET /recomendacao/espetaculos/12/similares?limite=5
 > (`similaridade_item: leitura pública` com `USING (true)`).
 
 ---
+
