@@ -12,6 +12,11 @@ public interface IRecomendacaoService
         CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Centraliza a regra de negocio de recomendacao personalizada. O service tenta
+/// usar o modelo incrementado quando habilitado e mantém fallback para as
+/// recomendacoes pre-processadas no PostgreSQL.
+/// </summary>
 public sealed class RecomendacaoService(
     IRecomendacaoRepository repositorio,
     IModeloRecomendacaoClient modeloClient,

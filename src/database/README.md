@@ -387,13 +387,13 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 
 | Item | Quantidade |
 |---|---:|
-| Tabelas | 11 |
+| Tabelas | 12 |
 | Tipos enumerados | 2 |
-| Funções | 3 |
-| Triggers | 2 |
-| Índices explícitos | 16 |
+| Funções | 4 |
+| Triggers | 10 |
+| Índices explícitos | 20 |
 
-> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/`. As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04) e `public.is_tipo_algoritmo_valido()` (08); os triggers são `on_auth_user_created` (01) e `trg_espetaculo_updated_at` (04).
+> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `09`). As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08) e `public.registrar_auditoria()` (09). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04) e os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional.
 
 #### Tabelas do Modelo
 
@@ -410,6 +410,7 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 | 9 | `avaliacao` | Avaliações de usuários sobre espetáculos. |
 | 10 | `recomendacao` | Recomendações personalizadas geradas para usuários. |
 | 11 | `similaridade_item` | Similaridade item-item entre espetáculos (global, leitura pública), populada em batch pelos algoritmos de recomendação. |
+| 12 | `auditoria` | Trilha de rastreabilidade: registra toda escrita (`INSERT`/`UPDATE`/`DELETE`) nas tabelas transacionais, agrupável por transação. Adicionada na migration `09`. |
 
 #### Tipos Enumerados
 
@@ -1085,7 +1086,68 @@ Entidade transacional / saída global de algoritmo de recomendação item-item.
 
 A constraint `chk_tipo_algoritmo_similaridade` delega a validação à função `public.is_tipo_algoritmo_valido(TEXT)` — mesma função usada por `recomendacao`. Centralizar a lista de algoritmos aceitos em um único lugar evita divergência entre as duas tabelas.
 
-### 13. Relacionamentos Gerais do Modelo
+### 13. Tabela `auditoria`
+
+#### Descrição
+
+Trilha de auditoria (audit log) que materializa a **rastreabilidade de transações** do banco. Cada operação de escrita (`INSERT`, `UPDATE`, `DELETE`) sobre as tabelas transacionais gera uma linha registrando o estado anterior e o novo (em JSONB), o ator responsável e o identificador da transação. Adicionada na migration [`09_rastreabilidade_transacoes.sql`](migrations/09_rastreabilidade_transacoes.sql).
+
+A coluna `id_transacao` recebe `txid_current()`, então **todas as operações de um mesmo `COMMIT` compartilham o mesmo valor** — é o que permite reconstruir uma transação inteira a partir da trilha.
+
+#### Tipo de Tabela
+
+Tabela de auditoria / rastreabilidade (append-only por design; escrita exclusivamente pela trigger).
+
+#### Políticas de Row Level Security
+
+| Política | Operação | Regra |
+|---|---|---|
+| `auditoria: leitura por administradores` | `SELECT` | Restringe a leitura a administradores: `USING (EXISTS (SELECT 1 FROM usuario u WHERE u.id_usuario = auth.uid() AND u.tipo_usuario = 'administrador'))`. |
+
+> Não há política de `INSERT`: as inserções vêm da função de trigger `public.registrar_auditoria()`, que é `SECURITY DEFINER` e ignora RLS. Sem política de `SELECT` para usuários comuns, a trilha fica visível apenas a administradores (e ao service role, que ignora RLS).
+
+#### Colunas
+
+| Coluna | Tipo | Nulo? | Default | PK / FK | Restrições | Descrição |
+|---|---|---|---|---|---|---|
+| `id_auditoria` | `BIGSERIAL` | Não | Sequência automática | PK | - | Identificador único e sequencial da entrada de auditoria. |
+| `id_transacao` | `BIGINT` | Não | - | - | - | `txid_current()` — agrupa operações do mesmo `COMMIT`. |
+| `tabela` | `VARCHAR(63)` | Não | - | - | - | Nome da tabela auditada (`TG_TABLE_NAME`). |
+| `operacao` | `VARCHAR(10)` | Não | - | - | `CHECK (operacao IN ('INSERT','UPDATE','DELETE'))` | Tipo de operação registrada. |
+| `registro_id` | `TEXT` | Sim | - | - | - | Valor da PK do registro afetado (extraído via argumento da trigger). |
+| `dados_anteriores` | `JSONB` | Sim | - | - | - | Estado anterior do registro (`NULL` em `INSERT`). |
+| `dados_novos` | `JSONB` | Sim | - | - | - | Estado novo do registro (`NULL` em `DELETE`). |
+| `id_usuario_responsavel` | `UUID` | Sim | - | - | Sem FK (ver nota) | Ator autenticado (`auth.uid()`); `NULL` para escritas de sistema/seed/worker. |
+| `papel_banco` | `TEXT` | Não | `current_user` | - | - | Role do banco que executou a operação. |
+| `registrado_em` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Momento do registro da operação. |
+
+> **Sem FK em `id_usuario_responsavel`:** o ator pode ser um processo de sistema sem linha em `usuario`, e a trilha deve sobreviver à exclusão do usuário — por isso a coluna é um `UUID` solto, não uma chave estrangeira.
+
+#### Constraints
+
+| Nome | Tipo | Definição |
+|---|---|---|
+| `auditoria_pkey` | Primary Key | `id_auditoria` |
+| Check implícito | Check | `operacao IN ('INSERT','UPDATE','DELETE')` |
+
+#### Relacionamentos
+
+A tabela é **desacoplada por design** — não declara chaves estrangeiras. O vínculo com os registros auditados é lógico (`tabela` + `registro_id`) e com o ator é informativo (`id_usuario_responsavel`), garantindo que a trilha permaneça íntegra mesmo após exclusões em cascata nas tabelas de origem.
+
+#### Índices
+
+| Índice | Colunas | Objetivo |
+|---|---|---|
+| `idx_auditoria_transacao` | `id_transacao` | Reconstruir todas as operações de uma mesma transação. |
+| `idx_auditoria_tabela_registro` | `tabela, registro_id` | Histórico de um registro específico. |
+| `idx_auditoria_registrado_em` | `registrado_em DESC` | Varredura cronológica (operações mais recentes). |
+| `idx_auditoria_usuario` | `id_usuario_responsavel` | Operações atribuídas a um ator. |
+
+#### Triggers e Functions
+
+Alimentada pela função de trigger genérica `public.registrar_auditoria()` (`SECURITY DEFINER`), instalada como 8 triggers `AFTER INSERT OR UPDATE OR DELETE` — uma por tabela transacional: `usuario`, `espetaculo`, `teatro`, `ator`, `sessao`, `avaliacao`, `recomendacao` e `similaridade_item`. A função recebe o nome da coluna de PK da tabela auditada como argumento (`TG_ARGV[0]`) para preencher `registro_id`. Detalhes operacionais na seção [Rastreabilidade de Transações](#rastreabilidade-de-transações).
+
+### 14. Relacionamentos Gerais do Modelo
 
 | Relacionamento | Cardinalidade | Implementação |
 |---|---|---|
@@ -1100,7 +1162,7 @@ A constraint `chk_tipo_algoritmo_similaridade` delega a validação à função 
 | `usuario` -> `recomendacao` | 1:N | `recomendacao.id_usuario`. |
 | `espetaculo` -> `recomendacao` | 1:N | `recomendacao.id_espetaculo`. |
 
-### 14. Índices Criados
+### 15. Índices Criados
 
 A tabela abaixo consolida todos os índices explícitos do schema. Os marcados com `*` foram adicionados pelas migrations incrementais (`src/database/migrations/`).
 
@@ -1122,8 +1184,12 @@ A tabela abaixo consolida todos os índices explícitos do schema. Os marcados c
 | `idx_espetaculo_status_popularidade` * | `espetaculo` | `status, popularidade DESC` | `06_indexes.sql` | Composto — cobre filtro de status combinado com ordenação por popularidade sem sort extra. |
 | `idx_sessao_espetaculo_data_horario` * | `sessao` | `id_espetaculo, data, horario` | `06_indexes.sql` | Composto — cobre sessões de um espetáculo já ordenadas por data/horário. |
 | `uq_recomendacao_usuario_espetaculo_algo` * | `recomendacao` | `id_usuario, id_espetaculo, tipo_algoritmo` | `08_tipo_algoritmo_e_unique_recomendacao.sql` | UNIQUE — viabiliza `ON CONFLICT ... DO UPDATE` (UPSERT) do Worker. |
+| `idx_auditoria_transacao` * | `auditoria` | `id_transacao` | `09_rastreabilidade_transacoes.sql` | Reconstrói todas as operações de uma mesma transação. |
+| `idx_auditoria_tabela_registro` * | `auditoria` | `tabela, registro_id` | `09_rastreabilidade_transacoes.sql` | Histórico de um registro específico. |
+| `idx_auditoria_registrado_em` * | `auditoria` | `registrado_em DESC` | `09_rastreabilidade_transacoes.sql` | Varredura cronológica da trilha. |
+| `idx_auditoria_usuario` * | `auditoria` | `id_usuario_responsavel` | `09_rastreabilidade_transacoes.sql` | Operações atribuídas a um ator. |
 
-Além desses 16 índices nomeados, o PostgreSQL cria automaticamente índices para:
+Além desses 20 índices nomeados, o PostgreSQL cria automaticamente índices para:
 - Toda chave primária declarada.
 - Toda constraint `UNIQUE`, incluindo a `uq_sessao_espetaculo_teatro_data_horario` (`id_espetaculo, id_teatro, data, horario`) adicionada em `07_constraints_sessao_usuario.sql` e a `uq_similaridade_item` (`id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo`) presente desde o schema inicial.
 
@@ -1168,6 +1234,9 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-33 | A data de nascimento, quando informada, deve estar entre 1900-01-01 e a data atual; `NULL` continua aceito para perfis sem cadastro de data. | Constraint `CHECK` (semântica three-valued logic do SQL ignora `NULL`). | `07_constraints_sessao_usuario.sql` — `ck_usuario_data_nascimento` |
 | RN-BD-34 | Cada par `(usuario, espetaculo, tipo_algoritmo)` tem no máximo uma recomendação ativa. O Worker grava com `ON CONFLICT ... DO UPDATE` (UPSERT) e o campo `prioridade_manual` **não** é sobrescrito pelo UPSERT automático — priorização editorial é via rota administrativa. | `UNIQUE INDEX`. | `08_tipo_algoritmo_e_unique_recomendacao.sql` — `uq_recomendacao_usuario_espetaculo_algo` |
 | RN-BD-35 | A lista de algoritmos de recomendação aceitos é definida em um único ponto reutilizado pelas duas tabelas (`recomendacao` e `similaridade_item`). Adicionar um algoritmo novo é uma única alteração, sem `ALTER TYPE` que bloquearia a tabela em produção. | Função SQL `IMMUTABLE` chamada pelos CHECKs `chk_tipo_algoritmo` (em `recomendacao`) e `chk_tipo_algoritmo_similaridade` (em `similaridade_item`). | `08_tipo_algoritmo_e_unique_recomendacao.sql` — `public.is_tipo_algoritmo_valido(TEXT)` |
+| RN-BD-36 | Toda escrita (`INSERT`/`UPDATE`/`DELETE`) nas tabelas transacionais deve ser registrada em uma trilha de auditoria com estado anterior e novo. | Função de trigger genérica `SECURITY DEFINER` + 8 triggers `AFTER INSERT/UPDATE/DELETE`, gravando em `auditoria`. | `09_rastreabilidade_transacoes.sql` — `public.registrar_auditoria()`, `trg_auditoria_*` |
+| RN-BD-37 | As operações de uma mesma transação devem ser correlacionáveis na trilha. | Coluna `auditoria.id_transacao` preenchida com `txid_current()` — compartilhada por todas as operações do mesmo `COMMIT`. | `09_rastreabilidade_transacoes.sql` — `auditoria.id_transacao` |
+| RN-BD-38 | A trilha de auditoria só pode ser lida por administradores. | Política de Row Level Security restrita a `tipo_usuario = 'administrador'`; inserções via trigger `SECURITY DEFINER`. | `09_rastreabilidade_transacoes.sql` — política `auditoria: leitura por administradores` |
 
 > **Sobre a decisão `VARCHAR + CHECK + função` no lugar de `ENUM` para `tipo_algoritmo`:** ENUMs nativos do PostgreSQL exigem `ALTER TYPE ... ADD VALUE` para incluir novos valores, operação que adquire lock na tabela. O time optou por `VARCHAR(50)` + constraint `CHECK` que chama a função `public.is_tipo_algoritmo_valido()`. Adicionar um algoritmo passa a ser um `CREATE OR REPLACE FUNCTION`, sem reescrita de constraint em duas tabelas e sem impacto operacional.
 

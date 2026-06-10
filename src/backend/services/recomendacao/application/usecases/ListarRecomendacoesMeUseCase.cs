@@ -4,8 +4,8 @@ using Spotlight.Recomendacao.Application.Services;
 namespace Spotlight.Recomendacao.Application.UseCases;
 
 /// <summary>
-/// Recomendações pré-processadas do usuário autenticado. Normaliza o
-/// <c>limite</c> dentro de 1..50 (default 10) — limites definidos no contrato.
+/// Caso de uso da rota de recomendacoes do usuario autenticado. A regra de
+/// recomendacao fica centralizada em <see cref="IRecomendacaoService" />.
 /// </summary>
 public class ListarRecomendacoesMeUseCase(IRecomendacaoService recomendacaoService)
 {
