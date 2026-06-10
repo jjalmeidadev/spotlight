@@ -9,6 +9,7 @@ using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Infrastructure.Auth;
 using Spotlight.Recomendacao.Infrastructure.Model;
 using Spotlight.Recomendacao.Infrastructure.Persistence;
+using Spotlight.Recomendacao.Infrastructure.Storage;
 using Spotlight.Recomendacao.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
@@ -85,6 +86,8 @@ builder.Services.AddCors(options =>
 // Controllers + Swagger / OpenAPI
 // ---------------------------------------------------------------------------
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
+builder.Services.AddHostedService<SupabaseModelArtifactsSyncHostedService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

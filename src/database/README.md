@@ -59,7 +59,9 @@ src/database/
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao.sql    — função is_tipo_algoritmo_valido + UNIQUE em recomendacao
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
 │   ├── 09_rastreabilidade_transacoes.sql              — tabela auditoria + trigger genérica de auditoria nas tabelas transacionais
-│   └── 09_rastreabilidade_transacoes_rollback.sql
+│   ├── 09_rastreabilidade_transacoes_rollback.sql
+│   ├── 10_supabase_storage_buckets.sql                 — bucket privado ml-artifacts no Supabase Storage
+│   └── 10_supabase_storage_buckets_rollback.sql
 ├── load_test/               — massa sintética e teste de carga (pgbench)
 │   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
 │   ├── massa_carga_rollback.sql                       — remove apenas os dados de carga
