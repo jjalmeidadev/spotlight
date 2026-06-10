@@ -9,4 +9,12 @@ public interface IRecomendacaoRepository
     /// </summary>
     Task<IReadOnlyList<Domain.Entities.Recomendacao>> ListarPorUsuarioAsync(
         Guid usuarioId, int limite, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Busca os espetaculos recomendados por identificador para enriquecer a
+    /// saida ranqueada pelo modelo incrementado.
+    /// </summary>
+    Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(
+        IEnumerable<int> espetaculoIds,
+        CancellationToken cancellationToken);
 }

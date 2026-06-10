@@ -1,4 +1,5 @@
 using Npgsql;
+using NpgsqlTypes;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Domain.Entities;
 
@@ -47,6 +48,43 @@ public class RecomendacaoRepository(NpgsqlDataSource dataSource) : IRecomendacao
                 }
             });
         }
+        return itens;
+    }
+
+    public async Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(
+        IEnumerable<int> espetaculoIds,
+        CancellationToken cancellationToken)
+    {
+        var ids = espetaculoIds.Distinct().ToArray();
+        if (ids.Length == 0)
+        {
+            return new Dictionary<int, EspetaculoRecomendado>();
+        }
+
+        await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
+        await using var cmd = conexao.CreateCommand();
+        cmd.CommandText = """
+            SELECT e.id_espetaculo, e.titulo, e.genero, e.status::text AS status, e.nota_media
+            FROM espetaculo e
+            WHERE e.id_espetaculo = ANY(@ids);
+            """;
+        cmd.Parameters.AddWithValue("ids", NpgsqlDbType.Array | NpgsqlDbType.Integer, ids);
+
+        var itens = new Dictionary<int, EspetaculoRecomendado>();
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var id = reader.GetInt32(0);
+            itens[id] = new EspetaculoRecomendado
+            {
+                Id = id,
+                Titulo = reader.GetString(1),
+                Genero = reader.IsDBNull(2) ? null : reader.GetString(2),
+                Status = reader.GetString(3),
+                NotaMedia = reader.GetDecimal(4)
+            };
+        }
+
         return itens;
     }
 }
