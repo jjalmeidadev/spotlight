@@ -4,13 +4,18 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
+using Spotlight.Recomendacao.Application.Services;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Infrastructure.Auth;
+using Spotlight.Recomendacao.Infrastructure.Model;
 using Spotlight.Recomendacao.Infrastructure.Persistence;
 using Spotlight.Recomendacao.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
-Env.TraversePath().Load();
+if (!AppContext.BaseDirectory.Contains("Spotlight.Recomendacao.Tests", StringComparison.OrdinalIgnoreCase))
+{
+    Env.TraversePath().Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +45,8 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 
     builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
     builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
+    builder.Services.AddSingleton<IModeloRecomendacaoClient, MlNetModeloRecomendacaoClient>();
+    builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
     builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
     builder.Services.AddScoped<ListarSimilaresUseCase>();
 }
