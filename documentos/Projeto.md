@@ -4789,7 +4789,24 @@ _conteúdo_
 
 &emsp;O planejamento abrange os doze RNFs do projeto (RNF01 a RNF12), organizados por identificador. A execução ocorrerá preferencialmente em ambiente de homologação ou produção controlada, conforme a natureza de cada teste, com registro de evidências para análise posterior.
 
-### 9.2.1.1 RNF01 — Tempo de carregamento das telas principais
+## 9.2.1.1 Mapeamento com a ISO/IEC 25010
+
+| RNF | Foco do requisito | Característica ISO/IEC 25010 | Justificativa |
+|-----|-------------------|-------------------------------|---------------|
+| RNF01 | Tempo de carregamento das telas | Eficiência de desempenho / comportamento temporal | Mede tempo percebido de carregamento nas telas principais. |
+| RNF02 | Tempo de geração de recomendações | Eficiência de desempenho / comportamento temporal | Mede latência entre interação do usuário e exibição de recomendações. |
+| RNF03 | Disponibilidade mensal | Confiabilidade / disponibilidade | Verifica se o sistema permanece acessível no período acordado. |
+| RNF04 | Mobile first e áreas de toque | Usabilidade / operabilidade e acessibilidade | Avalia se a interface pode ser operada confortavelmente em smartphones. |
+| RNF05 | JWT, bcrypt e HTTPS | Segurança / confidencialidade, integridade e autenticidade | Verifica proteção de credenciais, transporte seguro e controle de acesso. |
+| RNF06 | Carga e usuários simultâneos | Eficiência de desempenho / capacidade | Avalia comportamento sob concorrência e volume de uso. |
+| RNF07 | Logs estruturados | Manutenibilidade / analisabilidade | Garante evidências para diagnóstico e rastreabilidade operacional. |
+| RNF08 | Deploy independente SOA | Manutenibilidade / modularidade | Verifica se um serviço pode evoluir sem paralisar todo o sistema. |
+| RNF09 | Processamento assíncrono | Eficiência de desempenho / utilização de recursos | Avalia impacto da fila e do volume de eventos na experiência síncrona. |
+| RNF10 | Toques e taxa de sucesso | Usabilidade / operabilidade | Mede facilidade de conclusão das ações principais por usuários reais. |
+| RNF11 | Compatibilidade mobile | Compatibilidade / coexistência e adequação a plataformas | Verifica comportamento em Android e iOS nas versões-alvo. |
+| RNF12 | Execução em containers | Portabilidade / instalabilidade e adaptabilidade | Avalia execução isolada, reprodutível e recuperável em Docker. |
+
+### 9.2.1.2 RNF01 — Tempo de carregamento das telas principais
 
 **Identificador e nome:** RNF01 — Tempo de carregamento das telas em até 2 segundos (aspecto: Desempenho).
 
@@ -4816,7 +4833,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.2 RNF02 — Tempo de geração de recomendações personalizadas
+### 9.2.1.3 RNF02 — Tempo de geração de recomendações personalizadas
 
 **Identificador e nome:** RNF02 — Geração e exibição de recomendações em até 2 segundos (aspecto: Desempenho).
 
@@ -4843,7 +4860,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.3 RNF03 — Disponibilidade mensal do sistema
+### 9.2.1.4 RNF03 — Disponibilidade mensal do sistema
 
 **Identificador e nome:** RNF03 — Disponibilidade mínima de 99% (aspecto: Confiabilidade).
 
@@ -4869,7 +4886,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.4 RNF04 — Abordagem mobile first
+### 9.2.1.5 RNF04 — Abordagem mobile first
 
 **Identificador e nome:** RNF04 — Abordagem mobile first com áreas de toque mínimas (aspecto: Usabilidade).
 
@@ -4895,7 +4912,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.5 RNF05 — Segurança (JWT, bcrypt e HTTPS)
+### 9.2.1.6 RNF05 — Segurança (JWT, bcrypt e HTTPS)
 
 **Identificador e nome:** RNF05 — Segurança com JWT, bcrypt e HTTPS (aspecto: Segurança).
 
@@ -4922,7 +4939,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.6 RNF06 — Carga e escalabilidade
+### 9.2.1.7 RNF06 — Carga e escalabilidade
 
 **Identificador e nome:** RNF06 — Suporte a 200 usuários simultâneos (aspecto: Escalabilidade).
 
@@ -4948,7 +4965,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.7 RNF07 — Logs estruturados
+### 9.2.1.8 RNF07 — Logs estruturados
 
 **Identificador e nome:** RNF07 — Registro de logs estruturados (aspecto: Manutenibilidade).
 
@@ -4974,7 +4991,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.8 RNF08 — Deploy independente de serviços SOA
+### 9.2.1.9 RNF08 — Deploy independente de serviços SOA
 
 **Identificador e nome:** RNF08 — Deploy independente com indisponibilidade limitada (aspecto: Manutenibilidade).
 
@@ -5000,7 +5017,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.9 RNF09 — Processamento assíncrono com fila (Sprint 5)
+### 9.2.1.10 RNF09 — Processamento assíncrono com fila (Sprint 5)
 
 **Identificador e nome:** RNF09 — Processamento assíncrono de eventos (aspecto: Desempenho).
 
@@ -5026,7 +5043,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.10 RNF10 — Usabilidade (toques e taxa de sucesso)
+### 9.2.1.11 RNF10 — Usabilidade (toques e taxa de sucesso)
 
 **Identificador e nome:** RNF10 — Usabilidade: máximo de 3 toques e taxa de sucesso ≥ 85% (aspecto: Usabilidade).
 
@@ -5052,7 +5069,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.11 RNF11 — Compatibilidade mobile (Android e iOS)
+### 9.2.1.12 RNF11 — Compatibilidade mobile (Android e iOS)
 
 **Identificador e nome:** RNF11 — Compatibilidade com Android 10+ e iOS 15+ (aspecto: Compatibilidade).
 
@@ -5078,7 +5095,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.12 RNF12 — Containers Docker e tempo de reinicialização
+### 9.2.1.13 RNF12 — Containers Docker e tempo de reinicialização
 
 **Identificador e nome:** RNF12 — Execução em containers Docker (aspecto: Manutenibilidade).
 
@@ -5104,7 +5121,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.13 Tabela de rastreabilidade
+### 9.2.1.14 Tabela de rastreabilidade
 
 | RNF | Ferramenta principal | Cenário positivo (resumo) | Cenário negativo (resumo) | Critério de aceitação | RFs associados |
 |-----|----------------------|---------------------------|---------------------------|----------------------|----------------|
@@ -5123,7 +5140,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.14 Discussão de abrangência e limitações
+### 9.2.1.15 Discussão de abrangência e limitações
 
 **Abrangência**
 
@@ -5159,7 +5176,25 @@ _conteúdo_
 &emsp;A consolidação dos vereditos por RNF (aprovado / reprovado / aprovado com ressalvas) será registrada na seção 9.2.2 após a execução da bateria de testes.
 
 ## 9.2.2 Resultados
-_conteúdo_
+
+&emsp;Esta subseção consolida a execução dos testes de RNF. Cada resultado deve indicar data de execução, ambiente, ferramenta utilizada, métricas observadas, evidência gerada, veredito e limitação. Essa estrutura evita tratar planejamento como resultado executado e permite evolução incremental conforme demais verificações de RNF forem concluídas.
+
+| RNF | Status da execução | Ferramenta/evidência | Métricas registradas | Veredito | Limitações |
+|-----|--------------------|----------------------|----------------------|----------|------------|
+| RNF01 | A executar | Lighthouse mobile ou medição equivalente | FCP, TTI e tempo total por tela | Pendente | Depende de build acessível em dispositivo ou URL auditável |
+| RNF02 | A executar | Logs/timestamps do fluxo de recomendação | Tempo entre interação e exibição da recomendação | Pendente | Depende de perfil de teste com histórico e recomendação operacional |
+| RNF03 | A executar | UptimeRobot ou health checks programados | Percentual de disponibilidade | Pendente | Janela completa de 30 dias pode exceder o ciclo acadêmico |
+| RNF04 | A executar | Checklist em dispositivo físico | Tamanho de áreas de toque e comportamento mobile | Pendente | Amostra limitada de aparelhos |
+| RNF05 | A executar | OWASP ZAP, Postman ou evidências HTTP | HTTPS, 401/403, JWT e armazenamento de senha | Pendente | Varredura ativa exige escopo controlado |
+| RNF06 | Executado parcialmente | `src/database/load_test/resultados_pgbench.txt` | TPS, latência média, falhas e carga de leitura/escrita no PostgreSQL | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
+| RNF07 | A executar | Amostras de logs dos serviços | Campos obrigatórios e tempo de emissão | Pendente | Depende de ambiente com logs preservados |
+| RNF08 | A executar | Logs de deploy e health checks | Tempo de indisponibilidade por serviço | Pendente | Depende de pipeline/deploy isolado |
+| RNF09 | Planejado para Sprint 5 | k6/fila ou teste de broker | Eventos por segundo e impacto na latência | Não executado nesta sprint | RabbitMQ ainda tratado como evolução planejada |
+| RNF10 | A executar via seção 9.3.2 | Planilha SUS e tarefas T01 a T09 | Taxa de sucesso, toques e SUS | Pendente | Depende de consolidação dos participantes externos |
+| RNF11 | A executar | Matriz de dispositivos | Erros por plataforma e fluxo | Pendente | Amostra limitada de Android/iOS |
+| RNF12 | A executar | Docker/health checks | Tempo de reinicialização por container | Pendente | Depende de compose completo e ambiente local estável |
+
+&emsp;O resultado já disponível nesta revisão é o teste de carga de banco com `pgbench`, associado ao RNF06 e usado como evidência parcial de desempenho da camada de persistência. Os demais RNFs permanecem preparados para registro nas tasks de execução correspondentes, especialmente desempenho, segurança e usabilidade.
 
 ## 9.3 Testes de Usabilidade
 
@@ -5379,7 +5414,20 @@ _conteúdo_
 &emsp;Prevê-se a repetição da rodada após integração com API e incorporação dos ajustes prioritários identificados, preservando as mesmas tarefas quando possível para permitir comparação longitudinal.
 
 ## 9.3.2 Resultados
-_conteúdo_
+
+&emsp;Esta subseção será preenchida após a execução da rodada de usabilidade com participantes externos. Para manter coerência, os dados abaixo devem registrar apenas resultados efetivamente coletados na planilha de campo e no questionário SUS.
+
+| Métrica | Resultado observado | Critério de aceitação | Veredito |
+|---------|---------------------|-----------------------|----------|
+| Quantidade de participantes externos | A preencher | Mínimo de 5 participantes | Pendente |
+| Participante 60+ com baixa familiaridade tecnológica | A preencher | Pelo menos 1 participante | Pendente |
+| Média SUS | A preencher | SUS médio ≥ 68 | Pendente |
+| Taxa média de conclusão das tarefas | A preencher | ≥ 85% | Pendente |
+| Tarefas concluídas em até 3 toques | A preencher | ≥ 85% das execuções bem-sucedidas | Pendente |
+| Principais dificuldades observadas | A preencher | Registro qualitativo | Pendente |
+| Melhorias priorizadas | A preencher | Backlog de ajustes | Pendente |
+
+&emsp;As evidências esperadas são a planilha de anotações, os tempos por tarefa, a contagem de toques, a indicação de auxílio, as respostas SUS e os comentários espontâneos dos participantes. Esses registros serão usados para validar principalmente RNF04, RNF10 e RNF11.
 
 ## 9.4 Testes de Integração
 
@@ -5389,9 +5437,9 @@ _conteúdo_
 
 ### 9.4.1 Planejamento
 
-#### Módulo VHS — Mecanismo de Caching de Respostas de API Externa
+#### Módulo VHS — Mecanismo planejado de caching de respostas de API externa
 
-&emsp;Todos os testes de integração que envolvem chamadas a sistemas externos (Supabase Auth e API da Ticketeira) fazem uso obrigatório do módulo **VHS** (*Virtual HTTP Server*). O VHS é um mecanismo de caching que intercepta as chamadas HTTP realizadas pelo `HttpClient`, armazena a resposta real em memória (ou em arquivo `.json` no diretório `tests/cassettes/`), e a repete nas execuções seguintes até que o TTL expire ou o cassete seja invalidado manualmente.
+&emsp;Todos os testes de integração que envolvem chamadas a sistemas externos (Supabase Auth e API da Ticketeira) devem utilizar o módulo **VHS** (*Virtual HTTP Server*) quando esses cenários forem materializados no repositório. Nesta revisão, o VHS permanece como mecanismo planejado para interceptar chamadas HTTP realizadas pelo `HttpClient`, armazenar a resposta real em memória ou em arquivo `.json` no diretório `tests/cassettes/`, e repeti-la nas execuções seguintes até que o TTL expire ou o cassete seja invalidado manualmente. Essa redação evita tratar como implementado aquilo que ainda precisa ser criado e evidenciado nas próximas execuções.
 
 **Funcionamento do VHS:**
 
