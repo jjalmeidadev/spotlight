@@ -37,7 +37,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         ConfigureEnvironment(string.Empty, string.Empty, string.Empty);
     }
 
-    [Fact]
+    [MongoIntegrationFact]
     public async Task PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo()
     {
         var http = CreateClient();
@@ -70,7 +70,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.True(document.Contains("received_at"));
     }
 
-    [Fact]
+    [MongoIntegrationFact]
     public async Task Startup_ComMongoConfigurado_CriaIndicesOperacionais()
     {
         _ = CreateClient();
@@ -86,7 +86,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.Contains("ix_session_time", indexNames);
     }
 
-    [Fact]
+    [MongoIntegrationFact]
     public async Task PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento()
     {
         var http = CreateClient();
@@ -107,7 +107,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.Equal(before, await CountDocumentsAsync());
     }
 
-    [Fact]
+    [MongoIntegrationFact]
     public async Task PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento()
     {
         var http = CreateClient();
@@ -132,7 +132,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.Equal(1, await CountByEventIdAsync(eventId));
     }
 
-    [Fact]
+    [MongoIntegrationFact]
     public async Task PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort()
     {
         ConfigureEnvironment(
