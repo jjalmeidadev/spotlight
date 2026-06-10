@@ -138,6 +138,12 @@ Para habilitar telemetria no servico `usuario`, preencha as variaveis
 `src/backend/contracts/telemetria.md`, secao "Configuracao Operacional MongoDB
 Atlas".
 
+Para habilitar o bucket privado de artefatos do modelo no Supabase Storage,
+aplique a migration `src/database/migrations/10_supabase_storage_buckets.sql`.
+O backend e o CI acessam `ml-artifacts` apenas com
+`SUPABASE_SERVICE_ROLE_KEY` configurado como secret. O fluxo completo esta em
+`src/backend/contracts/supabase-storage.md`.
+
 Se o Docker estiver no Windows, mantenha o Docker Desktop aberto antes de subir os containers.
 
 Para acompanhar a execução:

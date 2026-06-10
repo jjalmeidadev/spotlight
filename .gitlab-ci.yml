@@ -3,6 +3,7 @@ image: mcr.microsoft.com/dotnet/sdk:9.0
 stages:
   - build
   - test
+  - publish
 
 variables:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
@@ -35,3 +36,42 @@ test:unit:
   artifacts:
     when: always
     expire_in: 1 week
+
+publish:model-artifacts:
+  stage: publish
+  image:
+    name: curlimages/curl:8.10.1
+    entrypoint: [""]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feat/bucket-supabase"'
+      when: manual
+    - when: never
+  variables:
+    SUPABASE_MODEL_BUCKET: "ml-artifacts"
+    SUPABASE_MODEL_PREFIX: "models/recomendacao/$CI_COMMIT_SHORT_SHA"
+    SUPABASE_MODEL_ALIAS_PREFIX: "models/recomendacao/current"
+  script:
+    - test -n "$SUPABASE_URL"
+    - test -n "$SUPABASE_SERVICE_ROLE_KEY"
+    - test -f src/models/artifacts/recomendacao_incrementada_mlnet.zip
+    - test -f src/models/artifacts/item_similarities.json
+    - test -f src/dataset/recomendacao_balanceado.csv
+    - >-
+      upload_artifact() {
+        local source_file="$1";
+        local object_path="$2";
+        curl --fail --show-error --silent
+        --request POST
+        --header "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}"
+        --header "apikey: ${SUPABASE_SERVICE_ROLE_KEY}"
+        --header "x-upsert: true"
+        --header "Content-Type: application/octet-stream"
+        --data-binary "@${source_file}"
+        "${SUPABASE_URL%/}/storage/v1/object/${SUPABASE_MODEL_BUCKET}/${object_path}";
+      }
+    - upload_artifact src/models/artifacts/recomendacao_incrementada_mlnet.zip "${SUPABASE_MODEL_PREFIX}/recomendacao_incrementada_mlnet.zip"
+    - upload_artifact src/models/artifacts/item_similarities.json "${SUPABASE_MODEL_PREFIX}/item_similarities.json"
+    - upload_artifact src/dataset/recomendacao_balanceado.csv "${SUPABASE_MODEL_PREFIX}/recomendacao_balanceado.csv"
+    - upload_artifact src/models/artifacts/recomendacao_incrementada_mlnet.zip "${SUPABASE_MODEL_ALIAS_PREFIX}/recomendacao_incrementada_mlnet.zip"
+    - upload_artifact src/models/artifacts/item_similarities.json "${SUPABASE_MODEL_ALIAS_PREFIX}/item_similarities.json"
+    - upload_artifact src/dataset/recomendacao_balanceado.csv "${SUPABASE_MODEL_ALIAS_PREFIX}/recomendacao_balanceado.csv"
