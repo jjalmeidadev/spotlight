@@ -8,6 +8,7 @@ using Npgsql;
 using Serilog;
 using Spotlight.Usuario.Application.UseCases;
 using Spotlight.Usuario.Infrastructure.Auth;
+using Spotlight.Usuario.Infrastructure.Geolocalizacao;
 using Spotlight.Usuario.Infrastructure.Persistence;
 using Spotlight.Usuario.Presentation.Middleware;
 
@@ -79,6 +80,16 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString)
     builder.Services.AddScoped<ITelemetriaRepository, MongoTelemetriaRepository>();
     builder.Services.AddScoped<ITelemetriaService, TelemetriaService>();
 }
+
+var geolocalizacaoBaseUrl =
+    Environment.GetEnvironmentVariable("GEOLOCALIZACAO_BASE_URL")
+    ?? builder.Configuration["Geolocalizacao:BaseUrl"]
+    ?? "http://geolocalizacao";
+
+builder.Services.AddHttpClient<IGeocodingClient, HttpGeocodingClient>(client =>
+{
+    client.BaseAddress = new Uri(geolocalizacaoBaseUrl.TrimEnd('/') + "/");
+});
 
 builder.Services.AddScoped<IUsuarioLocalizacaoService, UsuarioLocalizacaoService>();
 

@@ -16,6 +16,7 @@ npm-debug.log*
 
 # .NET test and coverage artifacts
 TestResults/
+coverage-report/
 
 # Artefatos gerados por notebooks e análises locais
 src/aad/*.png

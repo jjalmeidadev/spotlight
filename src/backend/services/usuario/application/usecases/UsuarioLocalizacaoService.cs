@@ -3,6 +3,7 @@ using Npgsql;
 using NpgsqlTypes;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Domain.Entities;
+using Spotlight.Usuario.Infrastructure.Geolocalizacao;
 
 namespace Spotlight.Usuario.Application.UseCases;
 
@@ -14,7 +15,9 @@ public interface IUsuarioLocalizacaoService
         CancellationToken cancellationToken);
 }
 
-public sealed class UsuarioLocalizacaoService(IEnumerable<NpgsqlDataSource> dataSources)
+public sealed class UsuarioLocalizacaoService(
+    IEnumerable<NpgsqlDataSource> dataSources,
+    IGeocodingClient geocodingClient)
     : IUsuarioLocalizacaoService
 {
     private readonly NpgsqlDataSource? dataSource = dataSources.FirstOrDefault();
@@ -24,12 +27,24 @@ public sealed class UsuarioLocalizacaoService(IEnumerable<NpgsqlDataSource> data
         AtualizarLocalizacaoRequest request,
         CancellationToken cancellationToken)
     {
-        Validate(request);
+        ValidateCoordenadas(request);
 
         if (dataSource is null)
         {
             throw new ConflictException("DATABASE_CONNECTION_STRING nao configurada.");
         }
+
+        var canonico = await geocodingClient.ReverseGeocodeAsync(
+            request.Latitude,
+            request.Longitude,
+            cancellationToken);
+
+        var localizacaoPersistida = new AtualizarLocalizacaoRequest(
+            FormattedAddress: canonico.FormattedAddress,
+            Latitude: request.Latitude,
+            Longitude: request.Longitude,
+            PlaceId: canonico.PlaceId,
+            Provider: canonico.Provider);
 
         await using var command = dataSource.CreateCommand("""
             UPDATE public.usuario
@@ -38,7 +53,8 @@ public sealed class UsuarioLocalizacaoService(IEnumerable<NpgsqlDataSource> data
             """);
 
         command.Parameters.AddWithValue("id_usuario", idUsuario);
-        command.Parameters.Add("localizacao", NpgsqlDbType.Jsonb).Value = JsonSerializer.Serialize(request);
+        command.Parameters.Add("localizacao", NpgsqlDbType.Jsonb).Value =
+            JsonSerializer.Serialize(localizacaoPersistida);
 
         var affectedRows = await command.ExecuteNonQueryAsync(cancellationToken);
         if (affectedRows == 0)
@@ -47,16 +63,8 @@ public sealed class UsuarioLocalizacaoService(IEnumerable<NpgsqlDataSource> data
         }
     }
 
-    private static void Validate(AtualizarLocalizacaoRequest request)
+    private static void ValidateCoordenadas(AtualizarLocalizacaoRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.FormattedAddress))
-        {
-            throw new ValidationException(new Dictionary<string, string[]>
-            {
-                ["formattedAddress"] = ["Endereco formatado e obrigatorio."]
-            });
-        }
-
         if (request.Latitude is < -90 or > 90 || request.Longitude is < -180 or > 180)
         {
             throw new ValidationException(new Dictionary<string, string[]>

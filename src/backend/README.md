@@ -225,3 +225,15 @@ Registre cada repositório no `Program.cs` com
 - **Contratos de API** (entrada/saída) ficam em `contracts/`.
 - **Swagger documentado** propriamente (descrições, exemplos) virá depois; aqui
   fica apenas o setup.
+
+##  Tracker de Testes de Integração
+
+| Aluno | Fluxo escolhido | Link do MR |
+|---|---|---|
+| Mariana Lacerda | `PUT /usuario/me/preferencias` | _em desenvolvimento_ |
+| Vitor | `PUT /usuario/me/localizacao` | _preencher após push_ |
+| Rafael | `GET /recomendacao/me` | _em desenvolvimento_ |
+| Celso | `GET /recomendacao/espetaculos/{id}/similares` |_em desenvolvimento_ |
+| Leonardo | `POST /catalogo/espetaculos/{id}/avaliacoes` | _em desenvolvimento_ |
+| Mariana Pereira | `POST /catalogo/espetaculos` | _livre_ |
+| Jaime | `GET /geolocalizacao/geocoding/reverse` | _em desenvolvimento_ |

@@ -7,6 +7,7 @@ using Npgsql;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Application.UseCases;
 using Spotlight.Usuario.Domain.Entities;
+using Spotlight.Usuario.Infrastructure.Geolocalizacao;
 using Spotlight.Usuario.Presentation.Controllers;
 using Xunit;
 using UsuarioConflictException = Spotlight.Usuario.Domain.Entities.ConflictException;
@@ -221,22 +222,11 @@ public class UsuarioUseCasesTests
     }
 
     [Fact]
-    public async Task UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco()
-    {
-        var service = new UsuarioLocalizacaoService(Array.Empty<NpgsqlDataSource>());
-
-        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.AtualizarLocalizacaoAsync(
-            Guid.NewGuid(),
-            new AtualizarLocalizacaoRequest("", -999, -999, "place", "provider"),
-            Ct));
-
-        Assert.Contains("formattedAddress", ex.Details.Keys);
-    }
-
-    [Fact]
     public async Task UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation()
     {
-        var service = new UsuarioLocalizacaoService(Array.Empty<NpgsqlDataSource>());
+        var service = new UsuarioLocalizacaoService(
+            Array.Empty<NpgsqlDataSource>(),
+            new FakeGeocodingClient());
 
         var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.AtualizarLocalizacaoAsync(
             Guid.NewGuid(),
@@ -250,7 +240,9 @@ public class UsuarioUseCasesTests
     [Fact]
     public async Task UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict()
     {
-        var service = new UsuarioLocalizacaoService(Array.Empty<NpgsqlDataSource>());
+        var service = new UsuarioLocalizacaoService(
+            Array.Empty<NpgsqlDataSource>(),
+            new FakeGeocodingClient());
 
         await Assert.ThrowsAsync<UsuarioConflictException>(() => service.AtualizarLocalizacaoAsync(
             Guid.NewGuid(),
@@ -456,6 +448,20 @@ public class UsuarioUseCasesTests
             LastPageSize = pageSize;
             return Task.FromResult(Result);
         }
+    }
+
+    private sealed class FakeGeocodingClient : IGeocodingClient
+    {
+        public Task<GeocodingResult> ReverseGeocodeAsync(
+            double latitude,
+            double longitude,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(new GeocodingResult(
+                FormattedAddress: "Endereco fake",
+                Latitude: latitude,
+                Longitude: longitude,
+                PlaceId: "fake-place",
+                Provider: "fake_provider"));
     }
 
     private sealed class FakeTelemetriaRepository : ITelemetriaRepository
