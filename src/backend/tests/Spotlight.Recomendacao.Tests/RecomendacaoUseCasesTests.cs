@@ -35,10 +35,8 @@ public class RecomendacaoUseCasesTests
             ]
         };
         var usuarioId = Guid.NewGuid();
-        var service = new RecomendacaoService(
-            repositorio,
-            new FakeModeloRecomendacaoClient(),
-            NullLogger<RecomendacaoService>.Instance);
+        var strategy = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var service = new RecomendacaoService(new FakeRecomendacaoStrategyFactory(strategy));
         var useCase = new ListarRecomendacoesMeUseCase(service);
 
         var resultado = await useCase.ExecutarAsync(usuarioId, limite, Ct);
@@ -49,6 +47,49 @@ public class RecomendacaoUseCasesTests
         Assert.Equal("content_based", item.TipoAlgoritmo);
         Assert.Equal("Hamlet", item.Espetaculo.Titulo);
         Assert.Equal(0.92m, item.Score);
+    }
+
+    [Fact]
+    public async Task RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            EspetaculosPorId = new Dictionary<int, EspetaculoRecomendado>
+            {
+                [9] = new()
+                {
+                    Id = 9,
+                    Titulo = "O Auto da Compadecida",
+                    Genero = "Comedia",
+                    Status = "em_cartaz",
+                    NotaMedia = 4.7m
+                }
+            }
+        };
+        var modelo = new FakeModeloRecomendacaoClient
+        {
+            Habilitado = true,
+            Predicoes =
+            [
+                new ModeloRecomendacaoPredicao(9, 0.98m, "mlnet_hibrido", "Modelo incrementado")
+            ]
+        };
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var strategyMlNet = new ModeloMlNetRecomendacaoStrategy(
+            repositorio,
+            modelo,
+            fallback,
+            NullLogger<ModeloMlNetRecomendacaoStrategy>.Instance);
+        var factory = new RecomendacaoStrategyFactory(modelo, strategyMlNet, fallback);
+        var service = new RecomendacaoService(factory);
+        var useCase = new ListarRecomendacoesMeUseCase(service);
+
+        var resultado = await useCase.ExecutarAsync(Guid.NewGuid(), 5, Ct);
+
+        var item = Assert.Single(resultado.Data);
+        Assert.Equal("mlnet_hibrido", item.TipoAlgoritmo);
+        Assert.Equal("O Auto da Compadecida", item.Espetaculo.Titulo);
+        Assert.Equal(0, repositorio.ListarPorUsuarioCalls);
     }
 
     [Fact]
@@ -78,7 +119,13 @@ public class RecomendacaoUseCasesTests
                 new ModeloRecomendacaoPredicao(7, 0.95m, "hibrido_svd", "Perfil do usuario")
             ]
         };
-        var service = new RecomendacaoService(repositorio, modelo, NullLogger<RecomendacaoService>.Instance);
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var strategy = new ModeloMlNetRecomendacaoStrategy(
+            repositorio,
+            modelo,
+            fallback,
+            NullLogger<ModeloMlNetRecomendacaoStrategy>.Instance);
+        var service = new RecomendacaoService(new FakeRecomendacaoStrategyFactory(strategy));
         var useCase = new ListarRecomendacoesMeUseCase(service);
 
         var resultado = await useCase.ExecutarAsync(Guid.NewGuid(), 5, Ct);
@@ -187,6 +234,12 @@ public class RecomendacaoUseCasesTests
             Guid usuarioId,
             int limite,
             CancellationToken cancellationToken) => Task.FromResult(Predicoes);
+    }
+
+    private sealed class FakeRecomendacaoStrategyFactory(IRecomendacaoStrategy strategy)
+        : IRecomendacaoStrategyFactory
+    {
+        public IRecomendacaoStrategy Criar() => strategy;
     }
 
     private sealed class FakeSimilaridadeRepository : ISimilaridadeRepository
