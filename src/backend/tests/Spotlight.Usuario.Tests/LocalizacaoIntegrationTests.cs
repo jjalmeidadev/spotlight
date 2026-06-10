@@ -161,6 +161,7 @@ public sealed class UsuarioLocalizacaoApiFixture : IAsyncLifetime
     }
 }
 
+[Trait("Category", "Integration")]
 public sealed class LocalizacaoIntegrationTests(UsuarioLocalizacaoApiFixture fixture)
     : IClassFixture<UsuarioLocalizacaoApiFixture>
 {
