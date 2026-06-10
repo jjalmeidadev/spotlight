@@ -1,0 +1,53 @@
+{
+  "dataset": {
+    "postgres_csv": "src/dataset/recomendacao_balanceado.csv",
+    "mongo_json": "src/dataset/interacoes_mongo_exemplo.jsonl",
+    "registros": 40848,
+    "eventos_mongo_aproveitados": 5,
+    "taxa_positiva": 0.39999510379945163,
+    "train": 32678,
+    "test": 8170
+  },
+  "referencia_funk_svd_notebook": {
+    "rmse_aproximado": 1.18,
+    "mae_aproximado": 0.97,
+    "fonte": "src/models/sistema_recomendacao_svd.ipynb"
+  },
+  "baseline_classificacao_svd_features": {
+    "accuracy": 0.6012239902080784,
+    "precision": 0.6470588235294118,
+    "recall": 0.006731946144430845,
+    "f1": 0.013325257419745608,
+    "roc_auc": 0.5010110653508897
+  },
+  "modelo_hibrido_incrementado": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "roc_auc": 1.0
+  },
+  "top_k": {
+    "precision_at_10": 0.8150168074605056,
+    "recall_at_10": 1.0,
+    "hit_rate_at_10": 1.0
+  },
+  "features": [
+    "score_implicito",
+    "svd_score",
+    "knn_item_score",
+    "mongo_interaction_score",
+    "mongo_interaction_count",
+    "user_rating_mean",
+    "user_interactions",
+    "item_rating_mean",
+    "item_interactions"
+  ],
+  "artefatos": {
+    "modelo": "src/models/artifacts/recomendacao_hibrida_svd_knn_incrementado.pkl",
+    "metricas": "src/models/reports/recomendacao_hibrida_svd_knn_metrics.json",
+    "relatorio": "src/models/reports/README_modelo_classificacao_recomendacao.md",
+    "exemplos": "src/models/reports/recomendacao_hibrida_exemplos.csv",
+    "inferencia": "src/models/scripts/inference_recomendacao.py"
+  }
+}
