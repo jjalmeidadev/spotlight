@@ -47,6 +47,9 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
     builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
     builder.Services.AddSingleton<IModeloRecomendacaoClient, MlNetModeloRecomendacaoClient>();
+    builder.Services.AddScoped<ModeloMlNetRecomendacaoStrategy>();
+    builder.Services.AddScoped<PostgresPreProcessadoRecomendacaoStrategy>();
+    builder.Services.AddScoped<IRecomendacaoStrategyFactory, RecomendacaoStrategyFactory>();
     builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
     builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
     builder.Services.AddScoped<ListarSimilaresUseCase>();
