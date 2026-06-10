@@ -520,9 +520,10 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 ---
 
 ### 4.7 `POST /usuario/telemetria`
-**Finalidade:** registrar eventos de telemetria comportamental gerados pelo aplicativo
+**Finalidade:** receber eventos de telemetria comportamental gerados pelo aplicativo
 mobile, como visualização de tela, clique em card, busca e abertura de
-compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
+compra. Os eventos válidos são enviados para persistência na coleção
+`interacoes` do MongoDB.
 
 > O catálogo completo de eventos, a justificativa de coleta, as propriedades por
 > evento e o schema lógico da collection estão detalhados em
@@ -582,10 +583,12 @@ compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
 > payload.
 
 **Responses**
-- `202 Accepted` — evento aceito para persistência:
+- `202 Accepted` — evento validado e aceito para processamento de telemetria:
 ```json
 { "eventId": "evt_01HX9F7M9XK2", "status": "accepted" }
 ```
+> A telemetria é best-effort: falhas transitórias de escrita no MongoDB são
+> registradas em log e não bloqueiam a navegação do aplicativo.
 - `400 Bad Request` — validação (`Erro` com `details`).
 - `401 Unauthorized` — token enviado, mas ausente/inválido para associação autenticada. `Erro`.
 - `503 Service Unavailable` — telemetria/MongoDB não configurados no ambiente. `Erro`.
