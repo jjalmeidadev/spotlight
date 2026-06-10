@@ -281,6 +281,24 @@ ou `anonymous_id`.
 
 ---
 
+## Tratamento de Falhas
+
+A telemetria e best-effort depois que o payload passa pela validacao do
+contrato. Isso significa:
+
+- payload invalido continua retornando `400 Bad Request`;
+- token enviado e invalido continua retornando `401 Unauthorized`;
+- MongoDB nao configurado continua retornando `503 Service Unavailable`;
+- falha transitoria ao gravar no MongoDB depois da validacao e registrada em
+  log, mas a API retorna `202 Accepted` com o `eventId`.
+
+Essa decisao evita que navegacao, busca, favoritos ou abertura de compra sejam
+bloqueados por indisponibilidade temporaria da base de telemetria. Como
+contrapartida, eventos podem ser perdidos enquanto MongoDB/Atlas estiver
+indisponivel; a task de testes de integracao deve cobrir esse comportamento.
+
+---
+
 ## Configuracao Operacional MongoDB Atlas
 
 A telemetria do servico de usuario depende de tres variaveis de ambiente:
