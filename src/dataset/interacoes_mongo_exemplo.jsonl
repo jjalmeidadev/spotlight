@@ -1,0 +1,5 @@
+{"eventId":"evt-001","userId":"10","sessionId":"s1","eventType":"show_viewed","source":"mobile","screen":"Detalhes","occurredAt":"2026-06-09T12:00:00Z","entity":{"type":"espetaculo","id":"10"},"properties":{"origem":"catalogo"}}
+{"eventId":"evt-002","userId":"10","sessionId":"s1","eventType":"favorite_toggled","source":"mobile","screen":"Detalhes","occurredAt":"2026-06-09T12:01:00Z","entity":{"type":"espetaculo","id":"10"},"properties":{"favorito":true}}
+{"eventId":"evt-003","userId":"25","sessionId":"s2","eventType":"show_card_clicked","source":"mobile","screen":"Catalogo","occurredAt":"2026-06-09T12:02:00Z","entity":{"type":"espetaculo","id":"25"},"properties":{"posicao":3}}
+{"eventId":"evt-004","userId":"25","sessionId":"s2","eventType":"purchase_clicked","source":"mobile","screen":"Detalhes","occurredAt":"2026-06-09T12:03:00Z","entity":{"type":"espetaculo","id":"25"},"properties":{"canal":"ticketeira"}}
+{"eventId":"evt-005","userId":"100","sessionId":"s3","eventType":"show_viewed","source":"mobile","screen":"Detalhes","occurredAt":"2026-06-09T12:04:00Z","entity":{"type":"espetaculo","id":"100"},"properties":{"duracaoSegundos":32}}
