@@ -24,6 +24,7 @@ public class PreferenciasIntegrationTests(PreferenciasIntegrationFixture fixture
     private const string MotorPath = "/recommendation/preferences-updated";
 
     [Fact]
+    [Trait("Category", "Integration")]
     public async Task DeveAtualizarPreferenciasQuandoMotorRecomendacaoConfirma()
     {
         fixture.ResetWireMock();
@@ -57,6 +58,7 @@ public class PreferenciasIntegrationTests(PreferenciasIntegrationFixture fixture
     }
 
     [Fact]
+    [Trait("Category", "Integration")]
     public async Task DeveRetornarConflitoQuandoMotorRecomendacaoEstaIndisponivel()
     {
         fixture.ResetWireMock();
