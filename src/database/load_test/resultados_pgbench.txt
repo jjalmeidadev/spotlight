@@ -1,0 +1,52 @@
+================================================================
+ Teste de carga do banco — Spotlight (pgbench)
+ Gerado em: 2026-06-09 16:45:59 -03
+ Ambiente : postgres:16-alpine (Docker local) | massa ~208 mil linhas
+ Config   : 20 clientes, 4 threads, 30 s por cenario
+================================================================
+
+########## CENARIO 1: CATALOGO (LEITURA) ##########
+pgbench (16.13)
+transaction type: /tmp/pgbench/catalogo_leitura.sql
+scaling factor: 1
+query mode: simple
+number of clients: 20
+number of threads: 4
+maximum number of tries: 1
+duration: 30 s
+number of transactions actually processed: 85108
+number of failed transactions: 0 (0.000%)
+latency average = 7.043 ms
+initial connection time = 43.685 ms
+tps = 2839.566653 (without initial connection time)
+statement latencies in milliseconds and failures:
+         0.002           0  \set esp random(1, 2000)
+         0.001           0  \set uid random(1, 5000)
+         1.369           0  SELECT id_espetaculo, titulo, popularidade
+         1.203           0  SELECT id_espetaculo, titulo
+         1.439           0  SELECT id_espetaculo, titulo
+         1.501           0  SELECT id_sessao, data, horario, preco_minimo
+         1.442           0  SELECT id_espetaculo, score_recomendacao
+
+########## CENARIO 2: AVALIACAO (ESCRITA + AUDITORIA) ##########
+pgbench (16.13)
+transaction type: /tmp/pgbench/avaliacao_escrita.sql
+scaling factor: 1
+query mode: simple
+number of clients: 20
+number of threads: 4
+maximum number of tries: 1
+duration: 30 s
+number of transactions actually processed: 156903
+number of failed transactions: 0 (0.000%)
+latency average = 3.823 ms
+initial connection time = 39.921 ms
+tps = 5232.145769 (without initial connection time)
+statement latencies in milliseconds and failures:
+         0.002           0  \set esp random(1, 2000)
+         0.001           0  \set uid random(1, 5000)
+         3.783           0  INSERT INTO avaliacao (id_usuario, id_espetaculo, nota, comentario)
+
+########## EVIDENCIA: trilha de auditoria gerada pela carga ##########
+ linhas em auditoria (avaliacao): 256903
+

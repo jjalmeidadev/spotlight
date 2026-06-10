@@ -17,6 +17,9 @@
 - [9. Planos de Execução — Queries Críticas](#planos-de-execução--queries-críticas)
 - [10. Timezone e Tipos Temporais](#timezone-e-tipos-temporais)
 - [11. Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais)
+- [12. Rastreabilidade de Transações](#rastreabilidade-de-transações)
+- [13. Massa de Dados para Teste de Carga](#massa-de-dados-para-teste-de-carga)
+- [14. Teste de Carga (pgbench)](#teste-de-carga-pgbench)
 
 ---
 
@@ -54,7 +57,16 @@ src/database/
 │   ├── 07_constraints_sessao_usuario.sql              — UNIQUE em sessao e CHECK em usuario.data_nascimento
 │   ├── 07_constraints_sessao_usuario_rollback.sql
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao.sql    — função is_tipo_algoritmo_valido + UNIQUE em recomendacao
-│   └── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+│   ├── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+│   ├── 09_rastreabilidade_transacoes.sql              — tabela auditoria + trigger genérica de auditoria nas tabelas transacionais
+│   └── 09_rastreabilidade_transacoes_rollback.sql
+├── load_test/               — massa sintética e teste de carga (pgbench)
+│   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
+│   ├── massa_carga_rollback.sql                       — remove apenas os dados de carga
+│   ├── run_pgbench.sh                                 — runner dos cenários de carga
+│   └── pgbench/
+│       ├── catalogo_leitura.sql                       — cenário de leitura (catálogo/busca/recomendações)
+│       └── avaliacao_escrita.sql                      — cenário de escrita (UPSERT + auditoria)
 └── README.md                — este arquivo
 ```
 
@@ -1222,7 +1234,7 @@ A pasta [`src/database/migrations/`](migrations/) contém alterações increment
 
 1. **`01_create_database.sql` é imutável para alterações incrementais.** Qualquer mudança de schema posterior ao bootstrap deve ser feita via migration nova em `migrations/`. O arquivo original só é editado em cenários de reset completo (ambiente de desenvolvimento).
 2. **Cada migration tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação).
-3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`).
+3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `09` depende de todas as tabelas transacionais para registrar a auditoria).
 4. **Aplicação manual.** As migrations **não** são executadas automaticamente pelo Docker — apenas `01` e `02` rodam na inicialização do volume. Migrations em `migrations/` precisam ser aplicadas explicitamente via SQL Editor do Supabase ou via `psql`.
 
 ### Como aplicar uma migration
@@ -1262,3 +1274,155 @@ psql -h <host> -p <porta> -U postgres -d postgres \
 | Triggers prefixadas por `trg_<tabela>_<evento>` | `trg_espetaculo_updated_at` |
 | Constraints `UNIQUE` prefixadas por `uq_` | `uq_recomendacao_usuario_espetaculo_algo` |
 | Constraints `CHECK` prefixadas por `ck_` ou `chk_` (mantém estilo da tabela alvo) | `ck_usuario_data_nascimento`, `chk_tipo_algoritmo` |
+
+---
+
+## Rastreabilidade de Transações
+
+A migration [`09_rastreabilidade_transacoes.sql`](migrations/09_rastreabilidade_transacoes.sql) adiciona uma **trilha de auditoria** que registra toda operação de escrita (`INSERT`/`UPDATE`/`DELETE`) sobre as tabelas transacionais, permitindo responder *quem alterou o quê, quando e em qual transação*.
+
+### Como funciona
+
+- **Tabela `auditoria`** — uma linha por operação, contendo o estado anterior (`dados_anteriores`) e o novo (`dados_novos`) em JSONB, a tabela e a operação, o `registro_id` afetado e o ator responsável.
+- **Função `public.registrar_auditoria()`** — trigger genérica `AFTER INSERT/UPDATE/DELETE` (`SECURITY DEFINER`). Recebe o nome da coluna de PK como argumento (`TG_ARGV[0]`) para preencher `registro_id` de forma genérica.
+- **Triggers** instaladas em: `usuario`, `espetaculo`, `teatro`, `ator`, `sessao`, `avaliacao`, `recomendacao` e `similaridade_item` (8 no total).
+
+### Correlação por transação
+
+A coluna `id_transacao` recebe `txid_current()`, então **todas as operações de um mesmo `COMMIT` compartilham o mesmo identificador** — é o que torna possível reconstruir uma transação inteira a partir da trilha.
+
+### Colunas da tabela `auditoria`
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `id_auditoria` | `BIGSERIAL` PK | Identificador sequencial da entrada. |
+| `id_transacao` | `BIGINT` | `txid_current()` — agrupa operações do mesmo COMMIT. |
+| `tabela` | `VARCHAR(63)` | Tabela auditada (`TG_TABLE_NAME`). |
+| `operacao` | `VARCHAR(10)` | `INSERT`, `UPDATE` ou `DELETE`. |
+| `registro_id` | `TEXT` | Valor da PK do registro afetado. |
+| `dados_anteriores` | `JSONB` | Estado anterior (`NULL` em `INSERT`). |
+| `dados_novos` | `JSONB` | Estado novo (`NULL` em `DELETE`). |
+| `id_usuario_responsavel` | `UUID` | `auth.uid()` — `NULL` para escritas de sistema/seed/worker. |
+| `papel_banco` | `TEXT` | `current_user` — role do banco que executou. |
+| `registrado_em` | `TIMESTAMPTZ` | Momento do registro. |
+
+> **Segurança:** a tabela tem RLS habilitada e é legível apenas por usuários `administrador`; as inserções vêm da trigger `SECURITY DEFINER`, que ignora RLS. Não há FK em `id_usuario_responsavel` para que a trilha sobreviva à exclusão do usuário.
+
+### Consultas típicas
+
+```sql
+-- Histórico completo de um registro:
+SELECT operacao, dados_anteriores, dados_novos, id_usuario_responsavel, registrado_em
+FROM auditoria
+WHERE tabela = 'espetaculo' AND registro_id = '1'
+ORDER BY registrado_em;
+
+-- Reconstruir uma transação inteira:
+SELECT tabela, operacao, registro_id
+FROM auditoria
+WHERE id_transacao = :txid
+ORDER BY id_auditoria;
+```
+
+> **Interação com carga sintética:** as triggers disparam também durante a carga de `load_test/` (gerando ~1 linha de auditoria por linha inserida). Para medir o banco sem esse overhead, aplique a `09` **depois** do bulk load ou desabilite temporariamente as triggers durante a carga.
+
+---
+
+## Massa de Dados para Teste de Carga
+
+Os scripts em [`src/database/load_test/`](load_test/) geram uma massa sintética e representativa sobre o schema já criado, tornando relevantes os testes de carga e performance (k6, `EXPLAIN ANALYZE` em volume real, etc.). Eles **não** fazem parte do setup inicial e devem ser aplicados manualmente, após `01`, `02` e as migrations `04`–`08`.
+
+### Volume gerado
+
+| Entidade | Linhas | Marcador de isolamento |
+|---|---:|---|
+| `usuario` (via `auth.users` + trigger) | 5.000 | `email LIKE '%@loadtest.local'` / UUID prefixo `10000000-…` |
+| `ator` | 1.000 | `nome LIKE 'Ator Carga %'` |
+| `teatro` | 100 | `parceiro_naming_rights = 'Carga LoadTest'` |
+| `espetaculo` | 2.000 | `produtora = 'Carga LoadTest'` |
+| `sessao` | ~20.000 | referencia espetáculos/teatros de carga |
+| `avaliacao` | ~100.000 | referencia usuários/espetáculos de carga |
+| `recomendacao` | ~50.000 | referencia usuários/espetáculos de carga |
+| `similaridade_item` | ~30.000 | referencia espetáculos de carga |
+| **Total** | **~208 mil** | |
+
+> Os marcadores garantem que a massa seja isolável: as tabelas-fato só referenciam entidades de carga, então o rollback as remove em cascata sem tocar no seed curado de `02_initial_data.sql`.
+
+### Características
+
+- **Idempotente por guarda.** Se a massa já estiver carregada, `massa_carga.sql` aborta com mensagem orientando a rodar o rollback antes — não duplica dados.
+- **Volume parametrizável.** As constantes no bloco `DECLARE` no topo de `massa_carga.sql` controlam o volume de cada entidade; ajuste-as para escalar a carga.
+- **Pares únicos.** Avaliações, recomendações e similaridades são geradas com mapeamento determinístico que respeita as constraints `UNIQUE` (com `ON CONFLICT DO NOTHING` como rede de segurança).
+- **Estatísticas atualizadas.** Ambos os scripts rodam `ANALYZE` ao final, de modo que os planos de execução observados nos testes reflitam o volume real.
+- **Senha única reaproveitada.** O hash bcrypt é calculado uma vez e reutilizado em todos os usuários de carga, evitando o custo de hashing por linha.
+
+### Como aplicar
+
+```bash
+# Carregar a massa
+psql "$DATABASE_URL" -f src/database/load_test/massa_carga.sql
+
+# Remover apenas a massa (preserva o seed)
+psql "$DATABASE_URL" -f src/database/load_test/massa_carga_rollback.sql
+```
+
+Também é executável via SQL Editor do Supabase / DBeaver (não usa metacomandos `psql`). Validado em `postgres:16-alpine` com o schema + migrations `04`–`09`: carga completa em ~24 s, sem erros, e rollback retornando exatamente aos volumes do seed.
+
+---
+
+## Teste de Carga (pgbench)
+
+Com a massa carregada, o comportamento do banco sob alto volume de operações foi avaliado com **`pgbench`** (ferramenta nativa de benchmark do PostgreSQL). Os scripts de cenário ficam versionados em [`src/database/load_test/pgbench/`](load_test/pgbench/) e o runner em [`run_pgbench.sh`](load_test/run_pgbench.sh).
+
+### Método
+
+- **Ferramenta:** `pgbench` 16 (cliente nativo).
+- **Cenários** (cada transação simula uma interação real da aplicação):
+  - `catalogo_leitura.sql` — **leitura**: catálogo em cartaz por popularidade, filtro por gênero, busca por título (trigram), sessões ordenadas e recomendações por usuário (as queries críticas da seção [Planos de Execução](#planos-de-execução--queries-críticas)).
+  - `avaliacao_escrita.sql` — **escrita**: UPSERT de avaliação, que dispara a trigger de auditoria (migration `09`) — mede também o overhead da rastreabilidade.
+- **Configuração:** 20 clientes concorrentes, 4 threads, 30 s por cenário.
+- **Massa:** ~208 mil linhas (ver seção anterior).
+
+### Resultados
+
+Ambiente de referência: `postgres:16-alpine` em Docker local (4 threads). Os números são **indicativos** e servem de baseline comparável — em produção (Supabase gerenciado) variam conforme tier e rede.
+
+| Cenário | Transações | TPS | Latência média | Falhas |
+|---|---:|---:|---:|---:|
+| Catálogo (leitura, 5 queries/tx) | 80.367 | **2.681** | 7,46 ms | 0 (0,000%) |
+| Avaliação (escrita + auditoria) | 159.059 | **5.306** | 3,77 ms | 0 (0,000%) |
+
+Latências por statement (cenário de leitura): cada uma das 5 queries ficou entre **1,3 e 1,6 ms**. No cenário de escrita, o UPSERT **com a trigger de auditoria disparando** custou **3,73 ms** por operação.
+
+### Evidências de uso de índice sob volume
+
+Sob ~208 mil linhas o otimizador passa a usar os índices criados na migration `06` (com o seed pequeno ele opta por `Seq Scan`, como observado na seção de Planos de Execução). `EXPLAIN ANALYZE` durante a carga:
+
+```text
+-- Catálogo em cartaz por popularidade:
+Limit (actual time=0.051..0.101 rows=20)
+  ->  Index Scan using idx_espetaculo_status_popularidade on espetaculo
+        Index Cond: (status = 'em_cartaz')
+Execution Time: 0.249 ms          -- índice composto cobre filtro + ordenação, sem sort
+
+-- Recomendações por usuário:
+->  Bitmap Index Scan on idx_recomendacao_usuario
+      Index Cond: (id_usuario = '...')
+```
+
+### Análise
+
+- **Estabilidade:** zero transações falhas em ~240 mil execuções somadas; sem erros de constraint, deadlock ou conexão.
+- **Leitura:** ~2,7 mil tx/s mesmo com 5 queries por transação, cada query em ~1,5 ms — os índices da migration `06` entregam o catálogo sem `Seq Scan` nem sort adicional sob volume.
+- **Escrita + rastreabilidade:** ~5,3 mil tx/s com a trilha de auditoria ativa. Cada escrita gerou a linha correspondente em `auditoria` (259.059 linhas em `avaliacao` ao final: 100 mil da massa + 159 mil da carga), confirmando que a rastreabilidade da migration `09` opera corretamente sob carga e com overhead baixo.
+- **Conclusão:** o banco sustenta o volume-alvo do contexto da aplicação com folga e latência baixa; os índices e a trilha de auditoria se comportam como projetado.
+
+### Como reproduzir
+
+```bash
+# 1) Banco no ar com schema + migrations 04–09 e massa carregada (seções acima).
+# 2) Rodar os cenários:
+DATABASE_URL="postgres://postgres:senha@host:porta/spotlight" \
+CLIENTS=20 THREADS=4 DURATION=30 \
+bash src/database/load_test/run_pgbench.sh
+```
