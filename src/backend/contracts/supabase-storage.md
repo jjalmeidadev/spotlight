@@ -71,22 +71,47 @@ RecommendationModel__CandidateCsvPath=/app/model-artifacts/recomendacao_balancea
 RecommendationModel__SimilaritiesPath=/app/model-artifacts/item_similarities.json
 ```
 
-## Publicacao pelo CI
+## Treinamento e publicacao pelo CI
 
-O job manual `publish:model-artifacts` em `.gitlab-ci.yml` publica os arquivos:
+O job `train:model-artifacts` gera os artefatos do modelo dentro da propria CI
+com o projeto:
+
+```text
+src/models/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
+```
+
+Ele usa como entrada:
+
+```text
+src/dataset/recomendacao_balanceado.csv
+src/dataset/interacoes_mongo_exemplo.jsonl
+```
+
+e gera:
+
+- `src/models/artifacts/recomendacao_incrementada_mlnet.zip`
+- `src/models/artifacts/item_similarities.json`
+- `src/models/reports/recomendacao_mlnet_metrics.json`
+- `src/models/reports/README_modelo_classificacao_recomendacao.md`
+- `src/models/reports/recomendacao_mlnet_exemplos.csv`
+
+Depois que os testes e o treinamento passam, o job `publish:model-artifacts`
+publica automaticamente no bucket quando a pipeline roda em `develop`.
+
+O upload envia:
 
 - `src/models/artifacts/recomendacao_incrementada_mlnet.zip`
 - `src/models/artifacts/item_similarities.json`
 - `src/dataset/recomendacao_balanceado.csv`
 
-Para executar o job, cadastre no GitLab CI/CD variables:
+Para permitir a publicacao, cadastre no GitLab CI/CD variables:
 
 | Variavel | Tipo | Protecao recomendada |
 |---|---|---|
 | `SUPABASE_URL` | variable | masked |
 | `SUPABASE_SERVICE_ROLE_KEY` | variable | masked + protected |
 
-O job envia os artefatos para dois prefixos:
+O job de publicacao envia os artefatos para dois prefixos:
 
 ```text
 models/recomendacao/$CI_COMMIT_SHORT_SHA/
@@ -98,7 +123,7 @@ fica disponivel para auditoria e rollback.
 
 ## Fluxo final
 
-1. Pipeline de treinamento gera o modelo e arquivos auxiliares.
+1. CI executa os testes e treina o modelo.
 2. CI publica os artefatos em `ml-artifacts` usando `SUPABASE_SERVICE_ROLE_KEY`.
 3. Servico de recomendacao baixa `current/` no startup quando
    `SUPABASE_MODEL_ARTIFACTS_ENABLED=true`.
