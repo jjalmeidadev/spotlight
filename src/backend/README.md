@@ -118,17 +118,31 @@ docker compose up -d --build
 Se preferir, crie um arquivo `.env` na raiz com pelo menos:
 
 ```env
-EXPO_PUBLIC_SUPABASE_URL=https://nyaxqgujyyvkjnqzbklf.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=REDACTED_FOR_PUBLIC_RELEASE
+EXPO_PUBLIC_SUPABASE_URL=https://project-ref.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_SITE_URL=http://localhost:3000
-EXPO_PUBLIC_API_BASE_URL=http://192.168.1.118:5000
-EXPO_PUBLIC_AUTH_REDIRECT_URL=exp://192.168.1.118:8081/--/email-confirmado
+EXPO_PUBLIC_API_BASE_URL=http://localhost:5000
+EXPO_PUBLIC_AUTH_REDIRECT_URL=spotlightmobile://email-confirmado
 ASPNETCORE_ENVIRONMENT=Development
 NOMINATIM_BASE_URL=https://nominatim.openstreetmap.org
 NOMINATIM_USER_AGENT=spotlight-inteli-g04/1.0
-DATABASE_CONNECTION_STRING=Host=db.nyaxqgujyyvkjnqzbklf.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=spotlight2026@#S;SSL Mode=Require;Trust Server Certificate=true
-SUPABASE_JWT_SECRET=REDACTED_FOR_PUBLIC_RELEASE
+DATABASE_CONNECTION_STRING=Host=db.project-ref.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=sua-senha;SSL Mode=Require;Trust Server Certificate=true
+SUPABASE_JWT_SECRET=
+MONGODB_CONNECTION_STRING=
+MONGODB_DATABASE=spotlight_telemetry
+MONGODB_TELEMETRY_COLLECTION=interacoes
 ```
+
+Para habilitar telemetria no servico `usuario`, preencha as variaveis
+`MONGODB_*` com os dados do MongoDB Atlas. O passo a passo operacional fica em
+`src/backend/contracts/telemetria.md`, secao "Configuracao Operacional MongoDB
+Atlas".
+
+Para habilitar o bucket privado de artefatos do modelo no Supabase Storage,
+aplique a migration `src/database/migrations/10_supabase_storage_buckets.sql`.
+O backend e o CI acessam `ml-artifacts` apenas com
+`SUPABASE_SERVICE_ROLE_KEY` configurado como secret. O fluxo completo esta em
+`src/backend/contracts/supabase-storage.md`.
 
 Se o Docker estiver no Windows, mantenha o Docker Desktop aberto antes de subir os containers.
 

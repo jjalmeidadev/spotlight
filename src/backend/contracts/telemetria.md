@@ -281,6 +281,98 @@ ou `anonymous_id`.
 
 ---
 
+## Tratamento de Falhas
+
+A telemetria e best-effort depois que o payload passa pela validacao do
+contrato. Isso significa:
+
+- payload invalido continua retornando `400 Bad Request`;
+- token enviado e invalido continua retornando `401 Unauthorized`;
+- MongoDB nao configurado continua retornando `503 Service Unavailable`;
+- falha transitoria ao gravar no MongoDB depois da validacao e registrada em
+  log, mas a API retorna `202 Accepted` com o `eventId`.
+
+Essa decisao evita que navegacao, busca, favoritos ou abertura de compra sejam
+bloqueados por indisponibilidade temporaria da base de telemetria. Como
+contrapartida, eventos podem ser perdidos enquanto MongoDB/Atlas estiver
+indisponivel; a task de testes de integracao deve cobrir esse comportamento.
+
+---
+
+## Configuracao Operacional MongoDB Atlas
+
+A telemetria do servico de usuario depende de tres variaveis de ambiente:
+
+| Variavel | Exemplo | Obrigatoria | Uso |
+|---|---|---|---|
+| `MONGODB_CONNECTION_STRING` | `mongodb+srv://usuario:senha@cluster.mongodb.net/?retryWrites=true&w=majority` | Sim | Conexao com o cluster Atlas. |
+| `MONGODB_DATABASE` | `spotlight_telemetry` | Sim | Database usado para telemetria comportamental. |
+| `MONGODB_TELEMETRY_COLLECTION` | `interacoes` | Sim | Collection append-only de eventos. |
+
+Se qualquer uma dessas variaveis estiver ausente, o endpoint
+`POST /usuario/telemetria` retorna `503 Service Unavailable` com a mensagem
+`Telemetria nao configurada.`. No Docker Compose, essas variaveis sao injetadas
+no container `usuario` a partir do arquivo `.env` da raiz do repositorio.
+
+### Provisionamento Atlas
+
+1. Criar ou selecionar um projeto no MongoDB Atlas.
+2. Criar um cluster Atlas para telemetria.
+3. Criar um database chamado `spotlight_telemetry`.
+4. Criar a collection `interacoes`.
+5. Criar um usuario de banco dedicado, por exemplo
+   `spotlight_telemetry_writer`.
+6. Conceder ao usuario somente a permissao `readWrite` no database
+   `spotlight_telemetry`.
+7. Configurar Network Access com o IP do ambiente que vai rodar o backend.
+   Para desenvolvimento local, usar o IP publico atual da maquina. Para
+   ambiente hospedado, usar o IP de saida do servidor/plataforma.
+8. Copiar a connection string SRV do Atlas e preencher
+   `MONGODB_CONNECTION_STRING` no `.env`, substituindo usuario e senha reais.
+
+Nao versionar o `.env` com a connection string preenchida.
+
+### Validacao de conexao
+
+Com o `.env` preenchido, subir o servico de usuario:
+
+```bash
+docker compose up -d --build usuario
+```
+
+Validar readiness:
+
+```bash
+curl -i http://localhost:5002/health/ready
+```
+
+Resultado esperado quando Atlas, Supabase e as variaveis estiverem corretos:
+`200 OK`. Se MongoDB/Atlas estiver indisponivel ou nao configurado, o readiness
+deve retornar `503`.
+
+Tambem e possivel validar diretamente via `mongosh`:
+
+```bash
+mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE').runCommand({ ping: 1 })"
+```
+
+Para validar escrita ponta a ponta, enviar um evento pelo gateway ou pelo
+servico de usuario e consultar a collection:
+
+```bash
+curl -i -X POST http://localhost:5002/telemetria \
+  -H "Content-Type: application/json" \
+  -d "{\"eventType\":\"screen_viewed\",\"source\":\"mobile\",\"sessionId\":\"sess_teste_atlas\",\"anonymousId\":\"anon_teste_atlas\",\"screen\":\"Catalogo\",\"properties\":{\"routeName\":\"CatalogView\"}}"
+
+mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE').getCollection('$MONGODB_TELEMETRY_COLLECTION').find({ session_id: 'sess_teste_atlas' }).sort({ received_at: -1 }).limit(1)"
+```
+
+O documento retornado deve conter `event_id`, `event_type`, `source`,
+`session_id`, `anonymous_id`, `occurred_at`, `received_at`, `screen` e
+`properties`.
+
+---
+
 ## Indices MongoDB
 
 O servico de usuario tenta criar os indices abaixo de forma idempotente no

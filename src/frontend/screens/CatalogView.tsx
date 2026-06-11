@@ -7,6 +7,7 @@ import { CatalogRail } from '../components/CatalogRail';
 import { FilterDropdown } from '../components/FilterDropdown';
 import { SearchBar } from '../components/SearchBar';
 import type { CatalogItem } from '../models/CatalogItem';
+import { emitTelemetryEvent } from '../repositories/TelemetryRepository';
 import { useCatalogViewModel } from '../viewmodels/useCatalogViewModel';
 
 type CatalogViewProps = {
@@ -52,6 +53,44 @@ export default function CatalogView({ accessToken, profileName, onItemPress }: C
 		);
 	}
 
+	function handleSearchSubmit() {
+		const query = vm.query.trim();
+		if (!query) return;
+
+		emitTelemetryEvent(
+			{
+				eventType: 'search_performed',
+				screen: 'CatalogView',
+				entity: { type: 'busca', id: getSearchEntityId(query) },
+				properties: {
+					query,
+					resultsCount: getSearchResultsCount(vm.sections, query),
+				},
+			},
+			accessToken,
+		);
+	}
+
+	function handleItemPress(
+		item: CatalogItem,
+		context: { railId?: string; railTitle: string; position: number },
+	) {
+		emitTelemetryEvent(
+			{
+				eventType: 'show_card_clicked',
+				screen: 'CatalogView',
+				entity: { type: 'espetaculo', id: item.id },
+				properties: {
+					origin: context.railId ?? context.railTitle,
+					position: context.position,
+				},
+			},
+			accessToken,
+		);
+
+		onItemPress?.(item);
+	}
+
 	return (
 		<View style={styles.container}>
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -71,7 +110,9 @@ export default function CatalogView({ accessToken, profileName, onItemPress }: C
 							<SearchBar
 								iconSource={vm.assets.searchIcon}
 								onChangeText={vm.setQuery}
+								onSubmitEditing={handleSearchSubmit}
 								placeholder=""
+								returnKeyType="search"
 								value={vm.query}
 							/>
 							<View style={styles.filterWrap}>
@@ -86,14 +127,24 @@ export default function CatalogView({ accessToken, profileName, onItemPress }: C
 
 						<View style={[styles.preExpansiveArea, { paddingHorizontal: horizontalPadding }]}>
 							{firstSection ? (
-								<CatalogRail items={firstSection.items} title={firstSection.title} onItemPress={onItemPress} />
+								<CatalogRail
+									id={firstSection.id}
+									items={firstSection.items}
+									title={firstSection.title}
+									onItemPress={handleItemPress}
+								/>
 							) : null}
 						</View>
 
 						<View style={[styles.expansiveWhiteArea, { paddingHorizontal: horizontalPadding }]}>
 							{remainingSections.map((section, index) => (
 								<View key={section.id} style={index === 0 ? undefined : styles.sectionGap}>
-									<CatalogRail items={section.items} title={section.title} onItemPress={onItemPress} />
+									<CatalogRail
+										id={section.id}
+										items={section.items}
+										title={section.title}
+										onItemPress={handleItemPress}
+									/>
 								</View>
 							))}
 						</View>
@@ -117,6 +168,22 @@ export default function CatalogView({ accessToken, profileName, onItemPress }: C
 			</ScrollView>
 		</View>
 	);
+}
+
+function getSearchEntityId(query: string) {
+	return `search_${query.toLowerCase().replace(/\s+/g, '_')}`.slice(0, 96);
+}
+
+function getSearchResultsCount(
+	sections: ReturnType<typeof useCatalogViewModel>['sections'],
+	query: string,
+) {
+	const normalizedQuery = query.toLowerCase();
+
+	return sections
+		.flatMap((section) => section.items)
+		.filter((item) => item.title.toLowerCase().includes(normalizedQuery))
+		.length;
 }
 
 const styles = StyleSheet.create({

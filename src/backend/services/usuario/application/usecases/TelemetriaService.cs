@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Domain.Entities;
 
@@ -18,7 +19,9 @@ public interface ITelemetriaService
         CancellationToken cancellationToken);
 }
 
-public sealed class TelemetriaService(ITelemetriaRepository repository) : ITelemetriaService
+public sealed class TelemetriaService(
+    ITelemetriaRepository repository,
+    ILogger<TelemetriaService>? logger = null) : ITelemetriaService
 {
     private const int MaxPayloadMetadataBytes = 16 * 1024;
     private const int MaxEventIdLength = 128;
@@ -77,7 +80,18 @@ public sealed class TelemetriaService(ITelemetriaRepository repository) : ITelem
             Device = request.Device
         };
 
-        await repository.InserirAsync(evento, cancellationToken);
+        try
+        {
+            await repository.InserirAsync(evento, cancellationToken);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            logger?.LogWarning(
+                exception,
+                "Falha ao persistir evento de telemetria {EventId}. A requisicao sera aceita para nao bloquear a experiencia do usuario.",
+                evento.EventId);
+        }
+
         return evento.EventId;
     }
 

@@ -13,6 +13,7 @@ import {
 	obterPreferenciasUsuario,
 	preferenciasEstaoCompletas,
 } from './src/frontend/repositories/PreferenceRepository';
+import { useTelemetrySession } from './src/frontend/hooks/useTelemetrySession';
 
 export default function App() {
 	const [screen, setScreen] = React.useState('loading');
@@ -25,6 +26,8 @@ export default function App() {
 		'Gotham-Medium': require('./assets/fonts/Gotham Medium.otf'),
 		'Gotham-Book': require('./assets/fonts/Gotham Book.otf'),
 	});
+
+	useTelemetrySession({ screen: getTelemetryScreenName(screen), accessToken });
 
 	React.useEffect(() => {
 		function handleUrl(url) {
@@ -139,6 +142,7 @@ export default function App() {
 	if (screen === 'detalhes') {
 		return (
 			<DetalhesView
+				accessToken={accessToken}
 				espetaculoId={espetaculoId}
 				onClose={() => setScreen('catalogo')}
 				onEspetaculoSemelhantePress={(id) => setEspetaculoId(id)}
@@ -177,6 +181,21 @@ export default function App() {
 			onLogin={handleLogin}
 		/>
 	);
+}
+
+function getTelemetryScreenName(screen) {
+	const screenNames = {
+		cadastro: 'CadastroView',
+		catalogo: 'CatalogView',
+		dashboard: 'AdminDashboardScreen',
+		detalhes: 'DetalhesView',
+		'email-confirmado': 'EmailConfirmedView',
+		loading: 'LoadingScreen',
+		login: 'LoginView',
+		preferencias: 'PreferenceSelectionScreen',
+	};
+
+	return screenNames[screen] ?? screen;
 }
 
 const styles = StyleSheet.create({

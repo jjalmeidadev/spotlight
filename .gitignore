@@ -1,6 +1,7 @@
 *.csv
 !src/dataset/
 !src/dataset/*.csv
+!src/models/reports/recomendacao_mlnet_exemplos.csv
 *.xls
 *.xlsx
 node_modules/
@@ -16,6 +17,8 @@ npm-debug.log*
 
 # .NET test and coverage artifacts
 TestResults/
+**/bin/
+**/obj/
 
 # Artefatos gerados por notebooks e análises locais
 src/aad/*.png

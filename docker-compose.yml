@@ -30,6 +30,15 @@ services:
       ASPNETCORE_URLS: http://+:8080
       DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING}
       SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      RecommendationModel__Enabled: ${RECOMMENDATION_MODEL_ENABLED:-false}
+      RecommendationModel__ModelPath: /app/model-artifacts/recomendacao_incrementada_mlnet.zip
+      RecommendationModel__CandidateCsvPath: /app/model-artifacts/recomendacao_balanceado.csv
+      RecommendationModel__SimilaritiesPath: /app/model-artifacts/item_similarities.json
+      SupabaseModelArtifacts__Enabled: ${SUPABASE_MODEL_ARTIFACTS_ENABLED:-false}
+      SupabaseModelArtifacts__Bucket: ${SUPABASE_MODEL_BUCKET:-ml-artifacts}
+      SupabaseModelArtifacts__TargetDirectory: /app/model-artifacts
     ports:
       - "5003:8080"
     healthcheck:
@@ -72,6 +81,9 @@ services:
       ASPNETCORE_URLS: http://+:8080
       DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING}
       SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      MONGODB_CONNECTION_STRING: ${MONGODB_CONNECTION_STRING}
+      MONGODB_DATABASE: ${MONGODB_DATABASE}
+      MONGODB_TELEMETRY_COLLECTION: ${MONGODB_TELEMETRY_COLLECTION}
     ports:
       - "5002:8080"
     healthcheck:

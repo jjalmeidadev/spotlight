@@ -17,6 +17,9 @@
 - [9. Planos de Execução — Queries Críticas](#planos-de-execução--queries-críticas)
 - [10. Timezone e Tipos Temporais](#timezone-e-tipos-temporais)
 - [11. Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais)
+- [12. Rastreabilidade de Transações](#rastreabilidade-de-transações)
+- [13. Massa de Dados para Teste de Carga](#massa-de-dados-para-teste-de-carga)
+- [14. Teste de Carga (pgbench)](#teste-de-carga-pgbench)
 
 ---
 
@@ -54,7 +57,18 @@ src/database/
 │   ├── 07_constraints_sessao_usuario.sql              — UNIQUE em sessao e CHECK em usuario.data_nascimento
 │   ├── 07_constraints_sessao_usuario_rollback.sql
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao.sql    — função is_tipo_algoritmo_valido + UNIQUE em recomendacao
-│   └── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+│   ├── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+│   ├── 09_rastreabilidade_transacoes.sql              — tabela auditoria + trigger genérica de auditoria nas tabelas transacionais
+│   ├── 09_rastreabilidade_transacoes_rollback.sql
+│   ├── 10_supabase_storage_buckets.sql                 — bucket privado ml-artifacts no Supabase Storage
+│   └── 10_supabase_storage_buckets_rollback.sql
+├── load_test/               — massa sintética e teste de carga (pgbench)
+│   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
+│   ├── massa_carga_rollback.sql                       — remove apenas os dados de carga
+│   ├── run_pgbench.sh                                 — runner dos cenários de carga
+│   └── pgbench/
+│       ├── catalogo_leitura.sql                       — cenário de leitura (catálogo/busca/recomendações)
+│       └── avaliacao_escrita.sql                      — cenário de escrita (UPSERT + auditoria)
 └── README.md                — este arquivo
 ```
 
@@ -375,13 +389,13 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 
 | Item | Quantidade |
 |---|---:|
-| Tabelas | 11 |
+| Tabelas | 12 |
 | Tipos enumerados | 2 |
-| Funções | 3 |
-| Triggers | 2 |
-| Índices explícitos | 16 |
+| Funções | 4 |
+| Triggers | 10 |
+| Índices explícitos | 20 |
 
-> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/`. As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04) e `public.is_tipo_algoritmo_valido()` (08); os triggers são `on_auth_user_created` (01) e `trg_espetaculo_updated_at` (04).
+> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `09`). As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08) e `public.registrar_auditoria()` (09). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04) e os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional.
 
 #### Tabelas do Modelo
 
@@ -398,6 +412,7 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 | 9 | `avaliacao` | Avaliações de usuários sobre espetáculos. |
 | 10 | `recomendacao` | Recomendações personalizadas geradas para usuários. |
 | 11 | `similaridade_item` | Similaridade item-item entre espetáculos (global, leitura pública), populada em batch pelos algoritmos de recomendação. |
+| 12 | `auditoria` | Trilha de rastreabilidade: registra toda escrita (`INSERT`/`UPDATE`/`DELETE`) nas tabelas transacionais, agrupável por transação. Adicionada na migration `09`. |
 
 #### Tipos Enumerados
 
@@ -1073,7 +1088,68 @@ Entidade transacional / saída global de algoritmo de recomendação item-item.
 
 A constraint `chk_tipo_algoritmo_similaridade` delega a validação à função `public.is_tipo_algoritmo_valido(TEXT)` — mesma função usada por `recomendacao`. Centralizar a lista de algoritmos aceitos em um único lugar evita divergência entre as duas tabelas.
 
-### 13. Relacionamentos Gerais do Modelo
+### 13. Tabela `auditoria`
+
+#### Descrição
+
+Trilha de auditoria (audit log) que materializa a **rastreabilidade de transações** do banco. Cada operação de escrita (`INSERT`, `UPDATE`, `DELETE`) sobre as tabelas transacionais gera uma linha registrando o estado anterior e o novo (em JSONB), o ator responsável e o identificador da transação. Adicionada na migration [`09_rastreabilidade_transacoes.sql`](migrations/09_rastreabilidade_transacoes.sql).
+
+A coluna `id_transacao` recebe `txid_current()`, então **todas as operações de um mesmo `COMMIT` compartilham o mesmo valor** — é o que permite reconstruir uma transação inteira a partir da trilha.
+
+#### Tipo de Tabela
+
+Tabela de auditoria / rastreabilidade (append-only por design; escrita exclusivamente pela trigger).
+
+#### Políticas de Row Level Security
+
+| Política | Operação | Regra |
+|---|---|---|
+| `auditoria: leitura por administradores` | `SELECT` | Restringe a leitura a administradores: `USING (EXISTS (SELECT 1 FROM usuario u WHERE u.id_usuario = auth.uid() AND u.tipo_usuario = 'administrador'))`. |
+
+> Não há política de `INSERT`: as inserções vêm da função de trigger `public.registrar_auditoria()`, que é `SECURITY DEFINER` e ignora RLS. Sem política de `SELECT` para usuários comuns, a trilha fica visível apenas a administradores (e ao service role, que ignora RLS).
+
+#### Colunas
+
+| Coluna | Tipo | Nulo? | Default | PK / FK | Restrições | Descrição |
+|---|---|---|---|---|---|---|
+| `id_auditoria` | `BIGSERIAL` | Não | Sequência automática | PK | - | Identificador único e sequencial da entrada de auditoria. |
+| `id_transacao` | `BIGINT` | Não | - | - | - | `txid_current()` — agrupa operações do mesmo `COMMIT`. |
+| `tabela` | `VARCHAR(63)` | Não | - | - | - | Nome da tabela auditada (`TG_TABLE_NAME`). |
+| `operacao` | `VARCHAR(10)` | Não | - | - | `CHECK (operacao IN ('INSERT','UPDATE','DELETE'))` | Tipo de operação registrada. |
+| `registro_id` | `TEXT` | Sim | - | - | - | Valor da PK do registro afetado (extraído via argumento da trigger). |
+| `dados_anteriores` | `JSONB` | Sim | - | - | - | Estado anterior do registro (`NULL` em `INSERT`). |
+| `dados_novos` | `JSONB` | Sim | - | - | - | Estado novo do registro (`NULL` em `DELETE`). |
+| `id_usuario_responsavel` | `UUID` | Sim | - | - | Sem FK (ver nota) | Ator autenticado (`auth.uid()`); `NULL` para escritas de sistema/seed/worker. |
+| `papel_banco` | `TEXT` | Não | `current_user` | - | - | Role do banco que executou a operação. |
+| `registrado_em` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Momento do registro da operação. |
+
+> **Sem FK em `id_usuario_responsavel`:** o ator pode ser um processo de sistema sem linha em `usuario`, e a trilha deve sobreviver à exclusão do usuário — por isso a coluna é um `UUID` solto, não uma chave estrangeira.
+
+#### Constraints
+
+| Nome | Tipo | Definição |
+|---|---|---|
+| `auditoria_pkey` | Primary Key | `id_auditoria` |
+| Check implícito | Check | `operacao IN ('INSERT','UPDATE','DELETE')` |
+
+#### Relacionamentos
+
+A tabela é **desacoplada por design** — não declara chaves estrangeiras. O vínculo com os registros auditados é lógico (`tabela` + `registro_id`) e com o ator é informativo (`id_usuario_responsavel`), garantindo que a trilha permaneça íntegra mesmo após exclusões em cascata nas tabelas de origem.
+
+#### Índices
+
+| Índice | Colunas | Objetivo |
+|---|---|---|
+| `idx_auditoria_transacao` | `id_transacao` | Reconstruir todas as operações de uma mesma transação. |
+| `idx_auditoria_tabela_registro` | `tabela, registro_id` | Histórico de um registro específico. |
+| `idx_auditoria_registrado_em` | `registrado_em DESC` | Varredura cronológica (operações mais recentes). |
+| `idx_auditoria_usuario` | `id_usuario_responsavel` | Operações atribuídas a um ator. |
+
+#### Triggers e Functions
+
+Alimentada pela função de trigger genérica `public.registrar_auditoria()` (`SECURITY DEFINER`), instalada como 8 triggers `AFTER INSERT OR UPDATE OR DELETE` — uma por tabela transacional: `usuario`, `espetaculo`, `teatro`, `ator`, `sessao`, `avaliacao`, `recomendacao` e `similaridade_item`. A função recebe o nome da coluna de PK da tabela auditada como argumento (`TG_ARGV[0]`) para preencher `registro_id`. Detalhes operacionais na seção [Rastreabilidade de Transações](#rastreabilidade-de-transações).
+
+### 14. Relacionamentos Gerais do Modelo
 
 | Relacionamento | Cardinalidade | Implementação |
 |---|---|---|
@@ -1088,7 +1164,7 @@ A constraint `chk_tipo_algoritmo_similaridade` delega a validação à função 
 | `usuario` -> `recomendacao` | 1:N | `recomendacao.id_usuario`. |
 | `espetaculo` -> `recomendacao` | 1:N | `recomendacao.id_espetaculo`. |
 
-### 14. Índices Criados
+### 15. Índices Criados
 
 A tabela abaixo consolida todos os índices explícitos do schema. Os marcados com `*` foram adicionados pelas migrations incrementais (`src/database/migrations/`).
 
@@ -1110,8 +1186,12 @@ A tabela abaixo consolida todos os índices explícitos do schema. Os marcados c
 | `idx_espetaculo_status_popularidade` * | `espetaculo` | `status, popularidade DESC` | `06_indexes.sql` | Composto — cobre filtro de status combinado com ordenação por popularidade sem sort extra. |
 | `idx_sessao_espetaculo_data_horario` * | `sessao` | `id_espetaculo, data, horario` | `06_indexes.sql` | Composto — cobre sessões de um espetáculo já ordenadas por data/horário. |
 | `uq_recomendacao_usuario_espetaculo_algo` * | `recomendacao` | `id_usuario, id_espetaculo, tipo_algoritmo` | `08_tipo_algoritmo_e_unique_recomendacao.sql` | UNIQUE — viabiliza `ON CONFLICT ... DO UPDATE` (UPSERT) do Worker. |
+| `idx_auditoria_transacao` * | `auditoria` | `id_transacao` | `09_rastreabilidade_transacoes.sql` | Reconstrói todas as operações de uma mesma transação. |
+| `idx_auditoria_tabela_registro` * | `auditoria` | `tabela, registro_id` | `09_rastreabilidade_transacoes.sql` | Histórico de um registro específico. |
+| `idx_auditoria_registrado_em` * | `auditoria` | `registrado_em DESC` | `09_rastreabilidade_transacoes.sql` | Varredura cronológica da trilha. |
+| `idx_auditoria_usuario` * | `auditoria` | `id_usuario_responsavel` | `09_rastreabilidade_transacoes.sql` | Operações atribuídas a um ator. |
 
-Além desses 16 índices nomeados, o PostgreSQL cria automaticamente índices para:
+Além desses 20 índices nomeados, o PostgreSQL cria automaticamente índices para:
 - Toda chave primária declarada.
 - Toda constraint `UNIQUE`, incluindo a `uq_sessao_espetaculo_teatro_data_horario` (`id_espetaculo, id_teatro, data, horario`) adicionada em `07_constraints_sessao_usuario.sql` e a `uq_similaridade_item` (`id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo`) presente desde o schema inicial.
 
@@ -1156,6 +1236,9 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-33 | A data de nascimento, quando informada, deve estar entre 1900-01-01 e a data atual; `NULL` continua aceito para perfis sem cadastro de data. | Constraint `CHECK` (semântica three-valued logic do SQL ignora `NULL`). | `07_constraints_sessao_usuario.sql` — `ck_usuario_data_nascimento` |
 | RN-BD-34 | Cada par `(usuario, espetaculo, tipo_algoritmo)` tem no máximo uma recomendação ativa. O Worker grava com `ON CONFLICT ... DO UPDATE` (UPSERT) e o campo `prioridade_manual` **não** é sobrescrito pelo UPSERT automático — priorização editorial é via rota administrativa. | `UNIQUE INDEX`. | `08_tipo_algoritmo_e_unique_recomendacao.sql` — `uq_recomendacao_usuario_espetaculo_algo` |
 | RN-BD-35 | A lista de algoritmos de recomendação aceitos é definida em um único ponto reutilizado pelas duas tabelas (`recomendacao` e `similaridade_item`). Adicionar um algoritmo novo é uma única alteração, sem `ALTER TYPE` que bloquearia a tabela em produção. | Função SQL `IMMUTABLE` chamada pelos CHECKs `chk_tipo_algoritmo` (em `recomendacao`) e `chk_tipo_algoritmo_similaridade` (em `similaridade_item`). | `08_tipo_algoritmo_e_unique_recomendacao.sql` — `public.is_tipo_algoritmo_valido(TEXT)` |
+| RN-BD-36 | Toda escrita (`INSERT`/`UPDATE`/`DELETE`) nas tabelas transacionais deve ser registrada em uma trilha de auditoria com estado anterior e novo. | Função de trigger genérica `SECURITY DEFINER` + 8 triggers `AFTER INSERT/UPDATE/DELETE`, gravando em `auditoria`. | `09_rastreabilidade_transacoes.sql` — `public.registrar_auditoria()`, `trg_auditoria_*` |
+| RN-BD-37 | As operações de uma mesma transação devem ser correlacionáveis na trilha. | Coluna `auditoria.id_transacao` preenchida com `txid_current()` — compartilhada por todas as operações do mesmo `COMMIT`. | `09_rastreabilidade_transacoes.sql` — `auditoria.id_transacao` |
+| RN-BD-38 | A trilha de auditoria só pode ser lida por administradores. | Política de Row Level Security restrita a `tipo_usuario = 'administrador'`; inserções via trigger `SECURITY DEFINER`. | `09_rastreabilidade_transacoes.sql` — política `auditoria: leitura por administradores` |
 
 > **Sobre a decisão `VARCHAR + CHECK + função` no lugar de `ENUM` para `tipo_algoritmo`:** ENUMs nativos do PostgreSQL exigem `ALTER TYPE ... ADD VALUE` para incluir novos valores, operação que adquire lock na tabela. O time optou por `VARCHAR(50)` + constraint `CHECK` que chama a função `public.is_tipo_algoritmo_valido()`. Adicionar um algoritmo passa a ser um `CREATE OR REPLACE FUNCTION`, sem reescrita de constraint em duas tabelas e sem impacto operacional.
 
@@ -1222,7 +1305,7 @@ A pasta [`src/database/migrations/`](migrations/) contém alterações increment
 
 1. **`01_create_database.sql` é imutável para alterações incrementais.** Qualquer mudança de schema posterior ao bootstrap deve ser feita via migration nova em `migrations/`. O arquivo original só é editado em cenários de reset completo (ambiente de desenvolvimento).
 2. **Cada migration tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação).
-3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`).
+3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `09` depende de todas as tabelas transacionais para registrar a auditoria).
 4. **Aplicação manual.** As migrations **não** são executadas automaticamente pelo Docker — apenas `01` e `02` rodam na inicialização do volume. Migrations em `migrations/` precisam ser aplicadas explicitamente via SQL Editor do Supabase ou via `psql`.
 
 ### Como aplicar uma migration
@@ -1262,3 +1345,155 @@ psql -h <host> -p <porta> -U postgres -d postgres \
 | Triggers prefixadas por `trg_<tabela>_<evento>` | `trg_espetaculo_updated_at` |
 | Constraints `UNIQUE` prefixadas por `uq_` | `uq_recomendacao_usuario_espetaculo_algo` |
 | Constraints `CHECK` prefixadas por `ck_` ou `chk_` (mantém estilo da tabela alvo) | `ck_usuario_data_nascimento`, `chk_tipo_algoritmo` |
+
+---
+
+## Rastreabilidade de Transações
+
+A migration [`09_rastreabilidade_transacoes.sql`](migrations/09_rastreabilidade_transacoes.sql) adiciona uma **trilha de auditoria** que registra toda operação de escrita (`INSERT`/`UPDATE`/`DELETE`) sobre as tabelas transacionais, permitindo responder *quem alterou o quê, quando e em qual transação*.
+
+### Como funciona
+
+- **Tabela `auditoria`** — uma linha por operação, contendo o estado anterior (`dados_anteriores`) e o novo (`dados_novos`) em JSONB, a tabela e a operação, o `registro_id` afetado e o ator responsável.
+- **Função `public.registrar_auditoria()`** — trigger genérica `AFTER INSERT/UPDATE/DELETE` (`SECURITY DEFINER`). Recebe o nome da coluna de PK como argumento (`TG_ARGV[0]`) para preencher `registro_id` de forma genérica.
+- **Triggers** instaladas em: `usuario`, `espetaculo`, `teatro`, `ator`, `sessao`, `avaliacao`, `recomendacao` e `similaridade_item` (8 no total).
+
+### Correlação por transação
+
+A coluna `id_transacao` recebe `txid_current()`, então **todas as operações de um mesmo `COMMIT` compartilham o mesmo identificador** — é o que torna possível reconstruir uma transação inteira a partir da trilha.
+
+### Colunas da tabela `auditoria`
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `id_auditoria` | `BIGSERIAL` PK | Identificador sequencial da entrada. |
+| `id_transacao` | `BIGINT` | `txid_current()` — agrupa operações do mesmo COMMIT. |
+| `tabela` | `VARCHAR(63)` | Tabela auditada (`TG_TABLE_NAME`). |
+| `operacao` | `VARCHAR(10)` | `INSERT`, `UPDATE` ou `DELETE`. |
+| `registro_id` | `TEXT` | Valor da PK do registro afetado. |
+| `dados_anteriores` | `JSONB` | Estado anterior (`NULL` em `INSERT`). |
+| `dados_novos` | `JSONB` | Estado novo (`NULL` em `DELETE`). |
+| `id_usuario_responsavel` | `UUID` | `auth.uid()` — `NULL` para escritas de sistema/seed/worker. |
+| `papel_banco` | `TEXT` | `current_user` — role do banco que executou. |
+| `registrado_em` | `TIMESTAMPTZ` | Momento do registro. |
+
+> **Segurança:** a tabela tem RLS habilitada e é legível apenas por usuários `administrador`; as inserções vêm da trigger `SECURITY DEFINER`, que ignora RLS. Não há FK em `id_usuario_responsavel` para que a trilha sobreviva à exclusão do usuário.
+
+### Consultas típicas
+
+```sql
+-- Histórico completo de um registro:
+SELECT operacao, dados_anteriores, dados_novos, id_usuario_responsavel, registrado_em
+FROM auditoria
+WHERE tabela = 'espetaculo' AND registro_id = '1'
+ORDER BY registrado_em;
+
+-- Reconstruir uma transação inteira:
+SELECT tabela, operacao, registro_id
+FROM auditoria
+WHERE id_transacao = :txid
+ORDER BY id_auditoria;
+```
+
+> **Interação com carga sintética:** as triggers disparam também durante a carga de `load_test/` (gerando ~1 linha de auditoria por linha inserida). Para medir o banco sem esse overhead, aplique a `09` **depois** do bulk load ou desabilite temporariamente as triggers durante a carga.
+
+---
+
+## Massa de Dados para Teste de Carga
+
+Os scripts em [`src/database/load_test/`](load_test/) geram uma massa sintética e representativa sobre o schema já criado, tornando relevantes os testes de carga e performance (k6, `EXPLAIN ANALYZE` em volume real, etc.). Eles **não** fazem parte do setup inicial e devem ser aplicados manualmente, após `01`, `02` e as migrations `04`–`08`.
+
+### Volume gerado
+
+| Entidade | Linhas | Marcador de isolamento |
+|---|---:|---|
+| `usuario` (via `auth.users` + trigger) | 5.000 | `email LIKE '%@loadtest.local'` / UUID prefixo `10000000-…` |
+| `ator` | 1.000 | `nome LIKE 'Ator Carga %'` |
+| `teatro` | 100 | `parceiro_naming_rights = 'Carga LoadTest'` |
+| `espetaculo` | 2.000 | `produtora = 'Carga LoadTest'` |
+| `sessao` | ~20.000 | referencia espetáculos/teatros de carga |
+| `avaliacao` | ~100.000 | referencia usuários/espetáculos de carga |
+| `recomendacao` | ~50.000 | referencia usuários/espetáculos de carga |
+| `similaridade_item` | ~30.000 | referencia espetáculos de carga |
+| **Total** | **~208 mil** | |
+
+> Os marcadores garantem que a massa seja isolável: as tabelas-fato só referenciam entidades de carga, então o rollback as remove em cascata sem tocar no seed curado de `02_initial_data.sql`.
+
+### Características
+
+- **Idempotente por guarda.** Se a massa já estiver carregada, `massa_carga.sql` aborta com mensagem orientando a rodar o rollback antes — não duplica dados.
+- **Volume parametrizável.** As constantes no bloco `DECLARE` no topo de `massa_carga.sql` controlam o volume de cada entidade; ajuste-as para escalar a carga.
+- **Pares únicos.** Avaliações, recomendações e similaridades são geradas com mapeamento determinístico que respeita as constraints `UNIQUE` (com `ON CONFLICT DO NOTHING` como rede de segurança).
+- **Estatísticas atualizadas.** Ambos os scripts rodam `ANALYZE` ao final, de modo que os planos de execução observados nos testes reflitam o volume real.
+- **Senha única reaproveitada.** O hash bcrypt é calculado uma vez e reutilizado em todos os usuários de carga, evitando o custo de hashing por linha.
+
+### Como aplicar
+
+```bash
+# Carregar a massa
+psql "$DATABASE_URL" -f src/database/load_test/massa_carga.sql
+
+# Remover apenas a massa (preserva o seed)
+psql "$DATABASE_URL" -f src/database/load_test/massa_carga_rollback.sql
+```
+
+Também é executável via SQL Editor do Supabase / DBeaver (não usa metacomandos `psql`). Validado em `postgres:16-alpine` com o schema + migrations `04`–`09`: carga completa em ~24 s, sem erros, e rollback retornando exatamente aos volumes do seed.
+
+---
+
+## Teste de Carga (pgbench)
+
+Com a massa carregada, o comportamento do banco sob alto volume de operações foi avaliado com **`pgbench`** (ferramenta nativa de benchmark do PostgreSQL). Os scripts de cenário ficam versionados em [`src/database/load_test/pgbench/`](load_test/pgbench/) e o runner em [`run_pgbench.sh`](load_test/run_pgbench.sh).
+
+### Método
+
+- **Ferramenta:** `pgbench` 16 (cliente nativo).
+- **Cenários** (cada transação simula uma interação real da aplicação):
+  - `catalogo_leitura.sql` — **leitura**: catálogo em cartaz por popularidade, filtro por gênero, busca por título (trigram), sessões ordenadas e recomendações por usuário (as queries críticas da seção [Planos de Execução](#planos-de-execução--queries-críticas)).
+  - `avaliacao_escrita.sql` — **escrita**: UPSERT de avaliação, que dispara a trigger de auditoria (migration `09`) — mede também o overhead da rastreabilidade.
+- **Configuração:** 20 clientes concorrentes, 4 threads, 30 s por cenário.
+- **Massa:** ~208 mil linhas (ver seção anterior).
+
+### Resultados
+
+Ambiente de referência: `postgres:16-alpine` em Docker local (4 threads). Os números são **indicativos** e servem de baseline comparável — em produção (Supabase gerenciado) variam conforme tier e rede.
+
+| Cenário | Transações | TPS | Latência média | Falhas |
+|---|---:|---:|---:|---:|
+| Catálogo (leitura, 5 queries/tx) | 80.367 | **2.681** | 7,46 ms | 0 (0,000%) |
+| Avaliação (escrita + auditoria) | 159.059 | **5.306** | 3,77 ms | 0 (0,000%) |
+
+Latências por statement (cenário de leitura): cada uma das 5 queries ficou entre **1,3 e 1,6 ms**. No cenário de escrita, o UPSERT **com a trigger de auditoria disparando** custou **3,73 ms** por operação.
+
+### Evidências de uso de índice sob volume
+
+Sob ~208 mil linhas o otimizador passa a usar os índices criados na migration `06` (com o seed pequeno ele opta por `Seq Scan`, como observado na seção de Planos de Execução). `EXPLAIN ANALYZE` durante a carga:
+
+```text
+-- Catálogo em cartaz por popularidade:
+Limit (actual time=0.051..0.101 rows=20)
+  ->  Index Scan using idx_espetaculo_status_popularidade on espetaculo
+        Index Cond: (status = 'em_cartaz')
+Execution Time: 0.249 ms          -- índice composto cobre filtro + ordenação, sem sort
+
+-- Recomendações por usuário:
+->  Bitmap Index Scan on idx_recomendacao_usuario
+      Index Cond: (id_usuario = '...')
+```
+
+### Análise
+
+- **Estabilidade:** zero transações falhas em ~240 mil execuções somadas; sem erros de constraint, deadlock ou conexão.
+- **Leitura:** ~2,7 mil tx/s mesmo com 5 queries por transação, cada query em ~1,5 ms — os índices da migration `06` entregam o catálogo sem `Seq Scan` nem sort adicional sob volume.
+- **Escrita + rastreabilidade:** ~5,3 mil tx/s com a trilha de auditoria ativa. Cada escrita gerou a linha correspondente em `auditoria` (259.059 linhas em `avaliacao` ao final: 100 mil da massa + 159 mil da carga), confirmando que a rastreabilidade da migration `09` opera corretamente sob carga e com overhead baixo.
+- **Conclusão:** o banco sustenta o volume-alvo do contexto da aplicação com folga e latência baixa; os índices e a trilha de auditoria se comportam como projetado.
+
+### Como reproduzir
+
+```bash
+# 1) Banco no ar com schema + migrations 04–09 e massa carregada (seções acima).
+# 2) Rodar os cenários:
+DATABASE_URL="postgres://postgres:senha@host:porta/spotlight" \
+CLIENTS=20 THREADS=4 DURATION=30 \
+bash src/database/load_test/run_pgbench.sh
+```

@@ -290,6 +290,59 @@ public class UsuarioUseCasesTests
     }
 
     [Fact]
+    public async Task TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro()
+    {
+        var repositorio = new FakeTelemetriaRepository
+        {
+            ExceptionToThrow = new InvalidOperationException("Mongo indisponivel")
+        };
+        var service = new TelemetriaService(repositorio);
+
+        var eventId = await service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: "evt-falha-mongo",
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: "detalhes",
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: null,
+                Device: null,
+                AnonymousId: null),
+            Ct);
+
+        Assert.Equal("evt-falha-mongo", eventId);
+        Assert.NotNull(repositorio.LastEvento);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_QuandoCancelado_PropagaCancelamento()
+    {
+        var repositorio = new FakeTelemetriaRepository
+        {
+            ExceptionToThrow = new OperationCanceledException()
+        };
+        var service = new TelemetriaService(repositorio);
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: "evt-cancelado",
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: "detalhes",
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: null,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+    }
+
+    [Fact]
     public async Task TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio()
     {
         var repositorio = new FakeTelemetriaRepository();
@@ -599,11 +652,13 @@ public class UsuarioUseCasesTests
 
     private sealed class FakeTelemetriaRepository : ITelemetriaRepository
     {
+        public Exception? ExceptionToThrow { get; init; }
         public TelemetriaEvento? LastEvento { get; private set; }
 
         public Task InserirAsync(TelemetriaEvento evento, CancellationToken cancellationToken)
         {
             LastEvento = evento;
+            if (ExceptionToThrow is not null) throw ExceptionToThrow;
             return Task.CompletedTask;
         }
     }

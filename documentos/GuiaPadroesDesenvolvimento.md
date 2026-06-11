@@ -468,6 +468,100 @@ O Strategy Pattern foi escolhido porque:
 - **Comparação facilitada**: Permite avaliar múltiplos modelos com a mesma interface
 - **Manutenibilidade**: Cada estratégia é independente e pode ser modificada isoladamente
 
+### 3.3 Aplicação no Backend C# da Sprint 4
+
+Na Sprint 4, os padrões de projeto também foram aplicados no backend C#, dentro do serviço `Spotlight.Recomendacao`. Essa aplicação endereça diretamente a evolução do artefato de desenvolvimento: o sistema deixou de ter os padrões apenas descritos no contexto dos notebooks de ML e passou a usá-los no fluxo real da API de recomendação.
+
+#### 3.3.1 Padrão Comportamental: Strategy no Serviço de Recomendação
+
+O padrão **Strategy** foi aplicado para permitir que o endpoint de recomendação personalize a escolha do algoritmo sem alterar o controller nem o use case.
+
+Arquivo principal:
+
+```text
+src/backend/services/recomendacao/application/services/RecomendacaoService.cs
+```
+
+Classes e interfaces envolvidas:
+
+| Elemento | Papel no padrão |
+|----------|-----------------|
+| `IRecomendacaoStrategy` | Contrato comum para qualquer estratégia de recomendação |
+| `ModeloMlNetRecomendacaoStrategy` | Estratégia que usa o modelo incrementado ML.NET e enriquece o resultado com dados do PostgreSQL |
+| `PostgresPreProcessadoRecomendacaoStrategy` | Estratégia de fallback baseada nas recomendações pré-processadas no PostgreSQL |
+| `RecomendacaoService` | Contexto que delega a execução para a strategy ativa |
+
+Com isso, a API consegue alternar entre:
+
+1. modelo incrementado ML.NET, quando `RecommendationModel:Enabled` está habilitado;
+2. recomendações pré-processadas no PostgreSQL, quando o modelo não está habilitado, não retorna itens ou falha.
+
+Essa decisão reduz acoplamento e melhora a manutenibilidade, porque novos algoritmos podem ser adicionados como novas strategies sem modificar o contrato público da API.
+
+#### 3.3.2 Padrão Criacional: Factory para Selecionar a Strategy Ativa
+
+O padrão criacional aplicado no backend foi uma **Factory** responsável por selecionar a strategy de recomendação ativa.
+
+Classes e interfaces envolvidas:
+
+| Elemento | Papel no padrão |
+|----------|-----------------|
+| `IRecomendacaoStrategyFactory` | Contrato de criação/seleção da strategy |
+| `RecomendacaoStrategyFactory` | Implementação que decide entre ML.NET e PostgreSQL |
+
+A factory encapsula a decisão de qual strategy usar:
+
+```csharp
+public IRecomendacaoStrategy Criar() =>
+    modeloClient.Habilitado ? modeloStrategy : postgresStrategy;
+```
+
+Sem a factory, o `RecomendacaoService` precisaria conhecer detalhes de configuração do modelo e de fallback. Com a factory, essa decisão fica centralizada, testável e substituível por injeção de dependência.
+
+#### 3.3.3 Registro por Injeção de Dependência
+
+O registro das implementações ocorre no `Program.cs` do serviço de recomendação:
+
+```text
+src/backend/services/recomendacao/Program.cs
+```
+
+Registros principais:
+
+```csharp
+builder.Services.AddSingleton<IModeloRecomendacaoClient, MlNetModeloRecomendacaoClient>();
+builder.Services.AddScoped<ModeloMlNetRecomendacaoStrategy>();
+builder.Services.AddScoped<PostgresPreProcessadoRecomendacaoStrategy>();
+builder.Services.AddScoped<IRecomendacaoStrategyFactory, RecomendacaoStrategyFactory>();
+builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
+```
+
+Essa estrutura mantém o controller dependente apenas do use case/service, preservando a Clean Architecture adotada no backend.
+
+#### 3.3.4 Validação por Testes
+
+A aplicação dos padrões foi validada no projeto:
+
+```text
+src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoUseCasesTests.cs
+```
+
+Cenários cobertos:
+
+- normalização de limite e mapeamento usando a strategy PostgreSQL;
+- seleção da strategy ML.NET pela factory quando o modelo está habilitado;
+- uso do ranking do modelo incrementado e enriquecimento dos itens no PostgreSQL;
+- fallback para PostgreSQL quando necessário.
+
+Resultado validado localmente:
+
+```text
+dotnet test src/backend/tests/Spotlight.Recomendacao.Tests/Spotlight.Recomendacao.Tests.csproj
+Aprovado: 16
+Falhou: 0
+Ignorado: 0
+```
+
 ## 4. Boas Práticas Implementadas
 
 ### 4.1 Gestão de Dados

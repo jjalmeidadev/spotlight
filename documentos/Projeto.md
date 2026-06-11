@@ -1541,7 +1541,7 @@ Essa entidade centraliza os dados comportamentais utilizados pelo sistema de rec
 | id_interacao | Identificador único da interação. |
 | id_usuario | Usuário responsável pela interação. |
 | id_espetaculo | Espetáculo relacionado à interação. |
-| tipo_interacao | Tipo de interação realizada. |
+| event_type | Tipo de evento comportamental registrado. |
 | data_hora | Data e horário da interação. |
 | tempo_permanencia | Tempo de permanência do usuário no conteúdo. |
 
@@ -2355,33 +2355,53 @@ O MongoDB armazena os eventos de telemetria comportamental gerados pelos usuári
 
 **Coleção: `interacoes`**
 
-Cada documento representa um evento de comportamento de um usuário em relação a um espetáculo:
+Cada documento representa um evento de telemetria recebido pelo serviço de usuário. O contrato atual usa `POST /usuario/telemetria` no Gateway, encaminhado para a rota interna `/telemetria` do serviço `usuario`. A escrita é feita diretamente no MongoDB Atlas pelo backend, em regime best-effort: payload inválido retorna erro, mas falhas transitórias de escrita são registradas em log para não bloquear a navegação do app.
 
 ```json
 {
   "_id": "ObjectId(...)",
-  "user_id": "uuid-do-usuario",
-  "espetaculo_id": 42,
-  "tipo_interacao": "visualizacao",
-  "timestamp": "2026-05-26T14:32:00.000Z",
-  "tempo_permanencia": 87,
+  "event_id": "evt_01HX9F7M9XK2",
+  "user_id": "a1b2c3d4-0000-0000-0000-000000000000",
+  "anonymous_id": "anon_01HX9F7M8T",
   "session_id": "sess_abc123",
-  "dispositivo": "mobile"
+  "event_type": "show_viewed",
+  "source": "mobile",
+  "screen": "DetalhesView",
+  "occurred_at": "2026-06-09T14:32:00Z",
+  "received_at": "2026-06-09T14:32:01Z",
+  "entity": {
+    "type": "espetaculo",
+    "id": "42"
+  },
+  "properties": {
+    "origin": "catalog",
+    "durationMs": 23000
+  },
+  "device": {
+    "platform": "ios"
+  }
 }
 ```
 
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
 | `_id` | `ObjectId` | Sim (automático) | Identificador único gerado pelo MongoDB |
-| `user_id` | `String` (UUID) | Sim | ID do usuário — corresponde a `usuario.id_usuario` no PostgreSQL |
-| `espetaculo_id` | `Integer` | Sim | ID do espetáculo — corresponde a `espetaculo.id_espetaculo` |
-| `tipo_interacao` | `String` | Sim | Tipo do evento: `"visualizacao"`, `"clique"`, `"favorito"` |
-| `timestamp` | `Date` | Sim | Momento do evento em ISO 8601 |
-| `tempo_permanencia` | `Integer` | Não | Segundos de permanência na página do espetáculo |
-| `session_id` | `String` | Não | Identificador da sessão de navegação |
-| `dispositivo` | `String` | Não | Plataforma de origem: `"mobile"`, `"web"` |
+| `event_id` | `String` | Sim | Identificador idempotente do evento; índice único `ux_event_id` evita duplicidade |
+| `user_id` | `String` (UUID) | Condicional | ID do usuário autenticado quando há JWT válido |
+| `anonymous_id` | `String` | Condicional | Identificador técnico anônimo quando não há usuário autenticado |
+| `session_id` | `String` | Sim | Identificador da sessão de navegação |
+| `event_type` | `String` | Sim | Evento do catálogo: `session_started`, `screen_viewed`, `show_card_clicked`, `show_viewed`, `search_performed`, `favorite_toggled`, `purchase_clicked` ou `session_ended` |
+| `source` | `String` | Sim | Origem do evento; no MVP, valor aceito: `mobile` |
+| `screen` | `String` | Não | Tela do app onde o evento ocorreu |
+| `occurred_at` | `Date` | Sim | Momento em que o evento ocorreu no cliente ou foi assumido pelo backend |
+| `received_at` | `Date` | Sim | Momento em que o backend recebeu o evento |
+| `entity` | `Object` | Condicional | Entidade de domínio associada ao evento, como `espetaculo`, `sessao`, `teatro`, `categoria` ou `busca` |
+| `properties` | `Object` | Não | Metadados mínimos por evento, limitados junto com `device` a 16 KB |
+| `device` | `Object` | Não | Metadados técnicos não sensíveis do dispositivo/app |
 
-Os Workers do ML Engine consomem esta coleção em lote, calculam os scores de recomendação e escrevem os resultados processados de volta na tabela `recomendacao` do PostgreSQL, completando o ciclo de dados do sistema.
+Todo documento deve ter `user_id` ou `anonymous_id`. Avaliações explícitas de espetáculos não são gravadas como documento canônico de nota no MongoDB; elas permanecem na tabela relacional `avaliacao` e podem ser combinadas posteriormente com a telemetria comportamental pelo motor de recomendação.
+
+Os índices operacionais da coleção são criados de forma idempotente pelo serviço `usuario` no startup quando as variáveis `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` e `MONGODB_TELEMETRY_COLLECTION` estão configuradas. A collection deve conter os índices `ux_event_id`, `ix_user_time`, `ix_anonymous_time`, `ix_entity_time`, `ix_event_type_time` e `ix_session_time`.
 
 ---
 
@@ -2576,7 +2596,7 @@ _conteúdo_
 |---|---|---|
 | `id_interacao` | `integer` | Identificador único da interação |
 | `id_usuario` | `integer` | Referência ao usuário que realizou a interação |
-| `tipo_interacao` | `varchar` | Tipo de ação realizada (ex: clique, visualização) |
+| `event_type` | `varchar` | Tipo do evento comportamental registrado |
 | `data_hora` | `timestamp` | Momento em que a interação ocorreu |
 | `tempo_permanencia` | `integer` | Duração da interação em segundos |
 
@@ -2833,7 +2853,7 @@ _conteúdo_
 
 ## 5.2 Diagrama de Componentes UML
 
-Um diagrama de componentes é um modelo arquitetural da UML que representa os principais módulos de um sistema, suas responsabilidades e a forma como eles se comunicam entre si. Ele é importante para o Spotlight porque permite visualizar claramente a separação entre frontend, APIs, motor de recomendação, mensageria e bancos de dados, facilitando o entendimento da arquitetura, a escalabilidade e a manutenção do sistema. Além disso, o diagrama evidencia como os serviços trabalham de forma desacoplada, especialmente o uso do RabbitMQ e do ML Engine, garantindo maior desempenho, organização e evolução contínua da plataforma de recomendação inteligente do Portal Aventura.
+Um diagrama de componentes é um modelo arquitetural da UML que representa os principais módulos de um sistema, suas responsabilidades e a forma como eles se comunicam entre si. Ele é importante para o Spotlight porque permite visualizar claramente a separação entre frontend, APIs, motor de recomendação e bancos de dados, facilitando o entendimento da arquitetura, a escalabilidade e a manutenção do sistema. Além disso, o diagrama evidencia como os serviços trabalham com fronteiras claras, com telemetria persistida no MongoDB Atlas pelo serviço de usuário e mensageria planejada como evolução da Sprint 5.
 
 <div align="center">
 
@@ -2873,7 +2893,7 @@ O **ML Engine**, componente especializado e isolado, responsável por processar 
 
 ### Mensageria
 
-O **RabbitMQ**, atuando como *message broker* para o desacoplamento de eventos transacionais e comportamentais.
+O **RabbitMQ** está planejado para a Sprint 5 como *message broker* para desacoplar a ingestão de telemetria. No estado atual, a telemetria é enviada por HTTP ao Gateway e persistida diretamente pelo serviço de usuário no MongoDB Atlas.
 
 ### Camada de Dados
 
@@ -2895,7 +2915,7 @@ Infraestrutura de persistência segregada por perfil de carga, contendo:
 | **Serviço de Recomendação** | Orquestração do fluxo de sugestões, consultando predições pré-processadas pelo Motor de ML. | ASP.NET Core Web API |
 | **Serviço de Geolocalização** | Normalização de localização, consulta de proximidade e integração com OpenStreetMap/Nominatim para apoiar recomendações contextuais. | ASP.NET Core Web API |
 | **Motor de ML** | Processamento de algoritmos de filtragem colaborativa (k-NN, SVD) para geração de recomendações. | C# + ML.NET |
-| **RabbitMQ** | Message Broker dedicado ao enfileiramento de eventos assíncronos de telemetria e interações. | RabbitMQ |
+| **Fila de telemetria (Sprint 5)** | Message broker planejado para enfileiramento, retry e dead-letter de eventos de telemetria. | RabbitMQ ou equivalente |
 | **Supabase Auth** | Provedor de Identidade, responsável por autenticação e emissão de tokens JWT. | Supabase Auth |
 | **OpenStreetMap/Nominatim API** | API externa para geocodificação e geocodificação reversa entre localização do usuário e endereços normalizados. | OpenStreetMap/Nominatim |
 | **Supabase DB (PostgreSQL)** | Banco de dados relacional primário para perfis, catálogo e metadados transacionais. | PostgreSQL via Supabase |
@@ -2945,8 +2965,8 @@ O diagrama estabelece portas e interfaces estritas (conectores e receptores) ent
 | **ICatalog** | Contrato interno roteado pelo Gateway para o Serviço de Catálogo. |
 | **IRecommendation** | Contrato interno roteado pelo Gateway para o Serviço de Recomendação. |
 | **IGeolocation** | Contrato interno roteado pelo Gateway para o Serviço de Geolocalização. |
-| **IEvents** | Contrato de publicação de mensagens (*Producer*) em tópicos/filas do RabbitMQ. |
-| **Worker** | Interface de consumo (*Consumer*) onde o ML Engine extrai lotes de eventos do RabbitMQ continuamente e de forma desacoplada. |
+| **Telemetry HTTP** | Contrato de envio de eventos comportamentais via `POST /usuario/telemetria`. |
+| **Worker** | Rotina posterior de processamento que pode combinar telemetria do MongoDB e avaliações relacionais do PostgreSQL para recalcular recomendações. |
 | **SQL / NoSQL** | Abstrações de conexão de persistência (Npgsql/ADO.NET — SQL puro, sem ORM / MongoDB Driver). |
 
 ---
@@ -2993,17 +3013,15 @@ Responsabilidades centrais:
 
 Isso evita validações repetitivas de token em cada serviço interno.
 
-### Desacoplamento de Telemetria via RabbitMQ
+### Telemetria Comportamental no MVP
 
 Aplicações mobile geram grande volume de eventos e telemetria.
 
-O uso do RabbitMQ (`IEvents → Worker`) garante:
+Na Sprint 4, o fluxo implementado prioriza simplicidade operacional e validação ponta a ponta: o app envia eventos para `POST /usuario/telemetria`, o Gateway encaminha para o serviço de usuário, e o serviço valida o contrato antes de gravar os documentos na collection `interacoes` do MongoDB Atlas.
 
-- Resposta imediata ao frontend
-- Processamento assíncrono
-- Treinamento contínuo do ML Engine
-- Redução de gargalos transacionais
-- Maior resiliência operacional
+O envio no frontend é fire-and-forget e o backend trata a persistência como best-effort após a validação do payload. Assim, falhas transitórias do MongoDB não quebram a navegação do usuário, embora eventos possam ser perdidos enquanto a fila ainda não existir.
+
+O desacoplamento via RabbitMQ fica planejado para a Sprint 5. Quando implementado, a fila deve entrar entre o serviço de usuário e o MongoDB, mantendo o schema atual e adicionando retry, dead-letter e maior resiliência operacional.
 
 ### Separação entre Transacional e Analítico
 
@@ -3072,11 +3090,11 @@ TypeScript adiciona tipagem estática, especialmente relevante num contexto com 
 
 O gerenciamento de estado é feito com **Redux Toolkit** e **RTK Query**, que eliminam boilerplate e tratam o caching de requisições de forma declarativa.
 
-### 5.3.5 Comunicação Assíncrona: RabbitMQ
+### 5.3.5 Comunicação de Telemetria e Fila Planejada
 
-A comunicação entre os serviços de negócio e o motor de recomendação é feita via fila de mensagens com **RabbitMQ**. Cada interação do usuário (clique, favorito, compra) gera um evento publicado na fila. O motor de ML consome esses eventos de forma assíncrona, atualizando os modelos incrementalmente sem bloquear a resposta ao usuário.
+Na implementação corrente, cada interação relevante do usuário (sessão, visualização de tela, clique em card, busca, visualização de espetáculo, favorito e clique de compra) é enviada por HTTP para o Gateway e persistida pelo serviço de usuário no MongoDB Atlas.
 
-Essa abordagem garante desacoplamento temporal entre os serviços e suporta picos de carga sem degradação.
+RabbitMQ permanece como evolução planejada para a Sprint 5. A fila será útil para desacoplamento temporal, retry, dead-letter e redução de perda de eventos, mas não é dependência do fluxo atual de telemetria.
 
 ### 5.3.6 Motor de Recomendação: C# + ML.NET
 
@@ -3086,7 +3104,7 @@ O motor de recomendação é implementado como um serviço C# separado utilizand
 - **SVD**: para usuários com histórico. Fatora a matriz usuário × espetáculo e gera predições de afinidade latente.
 - **k-means**: para segmentação de público. Agrupa espectadores em clusters comportamentais (ex.: Famílias, Musical Adulto, Ballet Clássico, Experimental), alimentando relatórios de marketing.
 
-A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à capacidade de rodar os três algoritmos de forma nativa, sem dependências externas. O serviço expõe uma API interna consumida pelo serviço de recomendação via RabbitMQ.
+A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à capacidade de rodar os três algoritmos de forma nativa, sem dependências externas. A integração entre recomendação, avaliações relacionais e telemetria comportamental deve consumir PostgreSQL e MongoDB como fontes de dados; a comunicação por fila fica reservada para a Sprint 5.
 
 ### 5.3.7 Tabela de Stacks
 
@@ -3099,7 +3117,7 @@ A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à
 | Armazenamento       | Supabase Storage                    | Assets de espetáculos via CDN |
 | API Gateway         | ASP.NET Core (.NET 9)               | Roteamento · validação JWT · rate limiting |
 | Serviços SOA        | ASP.NET Core Web API (C#)           | Obrigatoriedade · maturidade · DI nativa |
-| Mensageria          | RabbitMQ                            | Desacoplamento assíncrono entre serviços |
+| Mensageria          | RabbitMQ (Sprint 5)                 | Desacoplamento futuro de telemetria, retry e dead-letter |
 | Motor de ML         | C# + ML.NET                         | Obrigatoriedade C# · k-NN, SVD, k-means nativos |
 
 ## 5.4 Diagramas de Sequência da UML
@@ -3508,7 +3526,6 @@ Interface exposta: `ISpotlightAPI`
 Responsabilidades detalhadas:
 
 - Valida o token emitido pelo Supabase Auth antes de rotear qualquer requisição.
-- Publica eventos de telemetria de forma assíncrona no RabbitMQ via interface `IEvents`.
 - Roteia para o serviço SOA correto com base no recurso solicitado.
 
 ##### 4. Serviços de Negócio (SOA)
@@ -3520,7 +3537,8 @@ Responsabilidades detalhadas:
 - Gestão de perfis de usuário.
 - Preferências explícitas selecionadas na onboarding (tags e categorias).
 - Histórico de consumo (espetáculos visualizados, avaliados, favoritados).
-- Persiste no Supabase DB (PostgreSQL).
+- Persiste dados transacionais no Supabase DB (PostgreSQL).
+- Recebe telemetria comportamental pela rota `/telemetria` e grava os eventos na collection `interacoes` do MongoDB Atlas.
 
 **Serviço do Catálogo (`ICatalog`)**
 
@@ -3531,7 +3549,7 @@ Responsabilidades detalhadas:
 **Serviço de Recomendação (`IRecommendation`)**
 
 - Orquestra o fluxo de sugestões personalizadas para o usuário.
-- Consulta predições pré-processadas pelo ML Engine via interface `Worker`.
+- Consulta dados relacionais e resultados pré-processados disponíveis no PostgreSQL.
 - Consulta o Serviço de Geolocalização quando a recomendação utiliza contexto geográfico.
 - Persiste resultados no Supabase DB (PostgreSQL).
 
@@ -3552,15 +3570,15 @@ Responsabilidades detalhadas:
 - Lê dados estruturados do Supabase DB (PostgreSQL) via interface SQL.
 - Componente isolado — não exposto diretamente ao Gateway.
 
-**RabbitMQ**
+**Fila de eventos (planejada para Sprint 5)**
 
 | Componente | Tecnologia | Responsabilidade |
 |---|---|---|
-| RabbitMQ | RabbitMQ | Message broker para enfileiramento de eventos assíncronos de telemetria e interações comportamentais |
+| Fila de telemetria | RabbitMQ ou broker equivalente | Desacoplar a ingestão de eventos, permitir retry/dead-letter e reduzir perda de eventos quando MongoDB/Atlas estiver indisponível |
 
-- Recebe eventos publicados pelo API Gateway (interface `IEvents`).
-- Descarrega o banco relacional de escritas de alto volume.
-- Eventos consumidos são persistidos no MongoDB.
+- Este componente ainda não faz parte da implementação corrente da Sprint 4.
+- A escrita atual de telemetria é direta: App → Gateway → Serviço do Usuário → MongoDB Atlas.
+- Na Sprint 5, a fila pode ser inserida entre o serviço do usuário e o MongoDB sem alterar o schema principal da collection `interacoes`.
 
 ##### 6. Camada de Dados (Persistência Poliglota)
 
@@ -3571,9 +3589,9 @@ Responsabilidades detalhadas:
 | Supabase DB | PostgreSQL via Supabase | Banco relacional principal: perfis, catálogo, recomendações, metadados transacionais |
 | MongoDB | MongoDB | Repositório de alto volume: logs comportamentais brutos, telemetria, cliques, tempo de tela |
 
-Supabase DB é utilizado por: Serviço do Usuário, Serviço do Catálogo, Serviço de Recomendação e ML Engine (leitura via SQL).
+Supabase DB é utilizado por: Serviço do Usuário, Serviço do Catálogo, Serviço de Recomendação e rotinas/modelos de recomendação (leitura via SQL).
 
-MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
+MongoDB é utilizado por: Serviço do Usuário para escrita de telemetria bruta. Na Sprint 5, esse papel pode ser movido para um consumer de fila.
 
 #### Interfaces do Sistema
 
@@ -3587,10 +3605,10 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 | `ICatalog` | Gateway → Serv. Catálogo | Espetáculos e metadados |
 | `IRecommendation` | Gateway → Serv. Recomendação | Sugestões personalizadas |
 | `IGeolocation` | Gateway / Serv. Recomendação → Serv. Geolocalização | Contexto geográfico e proximidade |
-| `Worker` | Serv. Recomendação → ML Engine | Predições e vetores de afinidade |
-| `IEvents` | Gateway → RabbitMQ | Publicação assíncrona de eventos de telemetria |
+| `Telemetry HTTP` | App → Gateway → Serv. Usuário | Envio de eventos para `POST /usuario/telemetria` |
+| `Worker` | Rotinas/modelos de recomendação → PostgreSQL/MongoDB | Processamento posterior de avaliações relacionais e telemetria comportamental |
 | `SQL` | Serviços SOA + ML Engine → PostgreSQL | Leitura/escrita relacional |
-| `NoSQL` | RabbitMQ consumer → MongoDB | Ingestão de telemetria bruta |
+| `NoSQL` | Serviço do Usuário → MongoDB Atlas | Ingestão de telemetria bruta |
 
 #### Fluxo de Dados — Exemplos
 
@@ -3608,8 +3626,9 @@ MongoDB é utilizado por: Consumer do RabbitMQ (escrita de telemetria bruta).
 9. Serviço de Recomendação combina afinidade e contexto geográfico
 10. Serviço de Recomendação retorna lista ranqueada ao Gateway → App
 11. App registra interação do usuário (clique, tempo de tela)
-12. Gateway publica evento no RabbitMQ (IEvents) — assíncrono
-13. Consumer do RabbitMQ persiste evento no MongoDB
+12. App envia `POST /usuario/telemetria` ao Gateway
+13. Gateway roteia para o Serviço do Usuário
+14. Serviço do Usuário valida o contrato e persiste o documento no MongoDB Atlas
 ```
 
 **Consulta de Geolocalização**
@@ -3644,8 +3663,8 @@ Fonte: Material produzido pelos autores (2026).
 4. Serviço do Catálogo consulta disponibilidade no PostgreSQL
 5. Serviço do Catálogo aciona API das Ticketeiras (ITickets)
 6. Confirmação → ingresso gravado no PostgreSQL
-7. Gateway publica evento de compra no RabbitMQ
-8. Consumer persiste log no MongoDB
+7. App registra o clique de compra via `POST /usuario/telemetria`
+8. Serviço do Usuário persiste o evento `purchase_clicked` no MongoDB Atlas
 9. Resposta de sucesso retorna ao App
 ```
 
@@ -3659,7 +3678,7 @@ Fonte: Material produzido pelos autores (2026).
 | Controle de acesso | RBAC (usuario, admin) | Separação clara entre perfis de uso |
 | Banco relacional | PostgreSQL via Supabase | Dados estruturados, integridade referencial |
 | Banco de telemetria | MongoDB | Alto volume, esquema flexível, sem onerar o relacional |
-| Mensageria | RabbitMQ | Desacoplamento de eventos, resiliência a picos |
+| Mensageria | RabbitMQ planejado para Sprint 5 | Desacoplamento futuro de eventos, retry e dead-letter sem alterar o schema MongoDB |
 | Motor de ML | ML.NET | Ecossistema .NET, integração nativa com os serviços SOA |
 | Containerização | Docker + Docker Compose | Portabilidade entre ambientes dev/prod |
 
@@ -3982,7 +4001,7 @@ divergências entre o contrato negociado e o que está implementado.
 
 # 9. Planejamento e Execução de Testes
 
-&emsp;O Spotlight é um sistema de recomendação de espetáculos para o Portal Aventura Teatros, construído sobre arquitetura SOA (API Gateway, serviços de catálogo, usuário, recomendação e geolocalização, fila RabbitMQ e motor de ML) e aplicativo mobile first em React Native/Expo. Diante desse desenho distribuído e de um público heterogêneo, incluindo personas com baixa familiaridade tecnológica, como **Carlos Nóbrega** (seção 2.4), a validação sistemática deixa de ser etapa opcional e passa a condicionar a confiança na solução: recomendações relevantes, autenticação segura, integrações externas estáveis e interface utilizável em smartphones devem ser verificadas de forma planejada, rastreável e complementar entre si.
+&emsp;O Spotlight é um sistema de recomendação de espetáculos para o Portal Aventura Teatros, construído sobre arquitetura SOA (API Gateway, serviços de catálogo, usuário, recomendação e geolocalização, MongoDB Atlas para telemetria e motor de ML) e aplicativo mobile first em React Native/Expo. A fila RabbitMQ permanece como evolução planejada para a Sprint 5. Diante desse desenho distribuído e de um público heterogêneo, incluindo personas com baixa familiaridade tecnológica, como **Carlos Nóbrega** (seção 2.4), a validação sistemática deixa de ser etapa opcional e passa a condicionar a confiança na solução: recomendações relevantes, autenticação segura, integrações externas estáveis e interface utilizável em smartphones devem ser verificadas de forma planejada, rastreável e complementar entre si.
 
 &emsp;Esta seção consolida a estratégia geral de testes do ciclo de desenvolvimento. Ela orienta e justifica os esforços detalhados nas subseções 9.1 a 9.4, sem substituir seus planejamentos específicos. Os resultados de cada frente serão registrados nas respectivas subseções de resultados ao longo da execução.
 
@@ -3996,7 +4015,7 @@ divergências entre o contrato negociado e o que está implementado.
 | **Testes de RNFs** | Avaliam características de qualidade — desempenho, disponibilidade, segurança, escalabilidade, usabilidade mobile e manutenibilidade — conforme os doze RNFs da seção 3.2. | [9.2](#92-testes-de-rnfs) |
 | **Testes de usabilidade** | Validam a experiência com usuários reais no aplicativo mobile, mensurando conclusão de tarefas, número de toques e percepção global via **System Usability Scale (SUS)**. | [9.3](#93-testes-de-usabilidade) |
 | **Testes de APIs externas** | Exercitam contratos e respostas dos serviços terceiros integrados ao Spotlight — **Supabase Auth**, **API da Ticketeira** e, no escopo de geolocalização, **OpenStreetMap/Nominatim** (seções 5.3 e 8.1) — com cenários positivos e negativos de indisponibilidade, autenticação e formato de payload. | Integrados ao planejamento da seção [9.4](#94-testes-de-integração) (IT-02, IT-06 e fluxos de geocodificação) |
-| **Testes de integração** | Validam interações entre componentes internos (Gateway, serviços SOA, PostgreSQL, MongoDB, RabbitMQ, ML Engine) e fronteiras externas. Chamadas a Supabase Auth e Ticketeira utilizam obrigatoriamente o módulo **VHS** (*Virtual HTTP Server*) para cache determinístico de respostas HTTP em `tests/cassettes/`. | [9.4](#94-testes-de-integração) |
+| **Testes de integração** | Validam interações entre componentes internos (Gateway, serviços SOA, PostgreSQL, MongoDB, motor de recomendação e, na Sprint 5, RabbitMQ) e fronteiras externas. Chamadas a Supabase Auth e Ticketeira utilizam obrigatoriamente o módulo **VHS** (*Virtual HTTP Server*) para cache determinístico de respostas HTTP em `tests/cassettes/`. | [9.4](#94-testes-de-integração) |
 
 ### Ferramentas por tipo de teste
 
@@ -4008,7 +4027,7 @@ divergências entre o contrato negociado e o que está implementado.
 | Testes de RNFs | Lighthouse (mobile), k6, UptimeRobot, OWASP ZAP, Postman, dispositivos físicos Android/iOS, inspeção manual de logs, scripts shell, pipeline CI/CD | Detalhamento por RNF na seção 9.2.1 |
 | Testes de usabilidade | Roteiro estruturado (T01–T09), planilha de campo, questionário **SUS** | Detalhamento na seção 9.3.1; resultados subsidiam RNF10 |
 | Testes de APIs externas | Módulo **VHS** (`VhsCachingHandler`), cassetes JSON em `tests/cassettes/supabase/` e `tests/cassettes/ticketeira/`, `xUnit` | Respostas gravadas garantem determinismo; modo `VHS_MODE=record` para geração inicial de cassetes |
-| Testes de integração | `xUnit`, `Testcontainers` (PostgreSQL, MongoDB, RabbitMQ), `Microsoft.AspNetCore.Mvc.Testing`, `Respawn`, **VHS**, `docker compose` | Seis fronteiras IT-01 a IT-06 documentadas na seção 9.4.1 |
+| Testes de integração | `xUnit`, `Testcontainers` (PostgreSQL, MongoDB e, futuramente, RabbitMQ), `Microsoft.AspNetCore.Mvc.Testing`, `Respawn`, **VHS**, `docker compose` | Seis fronteiras IT-01 a IT-06 documentadas na seção 9.4.1 |
 
 ### Organização dos arquivos de teste
 
@@ -4042,7 +4061,7 @@ tests/
 
 ### Abordagem TDD
 
-&emsp;O desenvolvimento incremental por sprints (seção 8.3) prevê a adoção de **Test-Driven Development (TDD)** nos componentes de maior criticidade e risco de regressão: casos de uso do serviço de recomendação, pipeline assíncrono RabbitMQ → ML Engine, validação JWT no API Gateway e fluxos de geolocalização via `IGeocoding`. A prática consiste em definir cenários de teste a partir dos RFs e RNFs associados, implementar o teste automatizado com `xUnit` antes ou em paralelo à implementação, e refatorar mantendo a suíte verde. A seção 8.4 reserva o detalhamento da estratégia unitária; o capítulo 9 operacionaliza essa visão no planejamento e na execução formal das rodadas.
+&emsp;O desenvolvimento incremental por sprints (seção 8.3) prevê a adoção de **Test-Driven Development (TDD)** nos componentes de maior criticidade e risco de regressão: casos de uso do serviço de recomendação, persistência de telemetria no MongoDB, futura fila RabbitMQ da Sprint 5, validação JWT no API Gateway e fluxos de geolocalização via `IGeocoding`. A prática consiste em definir cenários de teste a partir dos RFs e RNFs associados, implementar o teste automatizado com `xUnit` antes ou em paralelo à implementação, e refatorar mantendo a suíte verde. A seção 8.4 reserva o detalhamento da estratégia unitária; o capítulo 9 operacionaliza essa visão no planejamento e na execução formal das rodadas.
 
 ### Critérios de cobertura
 
@@ -4052,7 +4071,7 @@ tests/
 |----------|-----------------|----------------------|
 | Cobertura de RFs | Todos os dezesseis RFs devem possuir ao menos um cenário de teste funcional ou de integração documentado | Recomendação (RF04, RF12–RF15), autenticação (RF01–RF02), geolocalização e preferências (RF03) |
 | Cobertura de RNFs | Os doze RNFs devem possuir planejamento formal com critério objetivo de aceitação (seção 9.2.1) | Desempenho (RNF01, RNF02), segurança (RNF05), usabilidade mobile (RNF04, RNF10) |
-| Cobertura de integração | Mínimo de três cenários negativos por fronteira IT-01 a IT-06; meta documentada de **15/16 RFs** e **8/12 RNFs** cobertos diretamente pelos testes de integração (seção 9.4) | Gateway ↔ serviços SOA, Supabase Auth, RabbitMQ ↔ ML Engine |
+| Cobertura de integração | Mínimo de três cenários negativos por fronteira IT-01 a IT-06; meta documentada de **15/16 RFs** e **8/12 RNFs** cobertos diretamente pelos testes de integração (seção 9.4) | Gateway ↔ serviços SOA, Supabase Auth, MongoDB Atlas e fila de telemetria planejada |
 | Cobertura de usabilidade | **≥ 85%** de conclusão por tarefa e **≤ 3 toques** nas execuções bem-sucedidas (RNF10); média SUS **≥ 68** (seção 9.3.1.8) | Fluxos de catálogo, busca, filtro e detalhes (RF04–RF07) |
 | Cenários de falha | Mínimo de **22 cenários negativos** planejados nas fronteiras de integração, abrangendo indisponibilidade externa, tokens inválidos e violações de constraint (seção 9.4) | Autenticação, persistência PostgreSQL, fila de telemetria |
 
@@ -4088,14 +4107,14 @@ tests/
 
 &emsp;As pré-condições abaixo são compartilhadas por toda a bateria e, portanto, não são repetidas em cada caso de teste:
 
-- Containers Docker do stack provisionados via `docker compose up -d` (PostgreSQL, MongoDB, RabbitMQ, ML Engine — ver seção [4.4.5 Implantação Local com Docker](#445-implantação-local-com-docker))
+- Containers Docker do stack provisionados via `docker compose up -d` para os serviços implementados; MongoDB Atlas configurado via variáveis de ambiente para telemetria; RabbitMQ fica reservado à Sprint 5
 - Massa de dados seed carregada (script `dotnet run --project src/backend/seed`) garantindo: 20 espetáculos em 4+ categorias (drama, comédia, infantil, musical), 5 teatros em São Paulo, 50 sessões nos próximos 60 dias, 30 usuários sintéticos com histórico de interações
 - Três usuários de teste cadastrados no Supabase Auth:
   - `usuario.comum@spotlighttest.com` — `tipo_usuario=comum`, com histórico de 10+ interações
   - `usuario.novo@spotlighttest.com` — `tipo_usuario=comum`, sem histórico (cenário cold start)
   - `admin.test@spotlighttest.com` — `tipo_usuario=admin`
 - Aplicativo mobile instalado em pelo menos um dispositivo físico Android (≥ 10) e um iOS (≥ 15) ou em emuladores equivalentes
-- Variáveis de ambiente `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_JWT_SECRET`, `POSTGRES_CONNECTION_STRING`, `MONGO_CONNECTION_STRING`, `RABBITMQ_URL` definidas no arquivo `.env.test`
+- Variáveis de ambiente `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_JWT_SECRET`, `POSTGRES_CONNECTION_STRING`, `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` e `MONGODB_TELEMETRY_COLLECTION` definidas no arquivo `.env.test`
 
 #### Instruções de Execução Globais
 
@@ -4232,7 +4251,7 @@ detox test --testNamePattern "RF03"
 | TF-RF03-N02 | Tentativa de salvar sem autenticação | Forjar chamada `PUT /api/usuario/preferencias` sem JWT | HTTP 401 | Nenhuma alteração |
 | TF-RF03-N03 | Categoria inexistente | Forjar chamada com `categoria_id=99999` | HTTP 400; mensagem "Categoria inválida" | Nenhuma alteração |
 
-**Pós-condições gerais:** Após salvar, o evento `user_preferences_updated` é publicado em RabbitMQ para que o ML Engine recalcule recomendações sob demanda (RF13).
+**Pós-condições gerais:** Após salvar, as preferências ficam persistidas no PostgreSQL e disponíveis para o serviço de recomendação. A publicação assíncrona de eventos de preferência fica reservada à evolução com fila na Sprint 5.
 
 ---
 
@@ -4441,7 +4460,7 @@ detox test --testNamePattern "RF09"
 |---|---|---|---|---|
 | TF-RF09-P01 | Submeter nota | Em detalhes de "Hamlet", tocar 4 estrelas; confirmar | HTTP 201; toast "Avaliação registrada"; estrelas exibidas como "Sua avaliação: 4 ★" | Linha em `avaliacao` com `usuario_id`, `espetaculo_id`, `nota=4` |
 | TF-RF09-P02 | Editar avaliação | Após P01, voltar e alterar para 5 estrelas | HTTP 200; "Sua avaliação: 5 ★"; média recalculada | Linha atualizada (não duplicada) |
-| TF-RF09-P03 | Avaliação atualiza média na hora | Submeter nota e verificar média | Média do espetáculo recalculada e exibida em ≤ 2 s | Evento `rating_submitted` publicado em RabbitMQ |
+| TF-RF09-P03 | Avaliação atualiza média na hora | Submeter nota e verificar média | Média do espetáculo recalculada e exibida em ≤ 2 s | Linha relacional em `avaliacao` permanece como fonte canônica |
 
 **Cenários Negativos:**
 
@@ -4495,40 +4514,41 @@ detox test --testNamePattern "RF10"
 
 #### TF-RF11 — Registrar Interações do Usuário
 
-**Propósito:** Verificar que toda interação significativa (clique em card, busca, visualização de detalhe, avaliação, scroll prolongado) gera um documento na coleção `interacoes` do MongoDB com `usuario_id`, `espetaculo_id` (quando aplicável), `tipo_acao`, `timestamp` e contexto. Confirmar que o registro acontece de forma assíncrona, sem impactar a UX.
+**Propósito:** Verificar que interações comportamentais significativas (sessão, visualização de tela, clique em card, busca, visualização de detalhe, favorito e clique de compra) geram documentos na coleção `interacoes` do MongoDB com `event_id`, `event_type`, `source`, `session_id`, `user_id` ou `anonymous_id`, `entity`, `occurred_at`, `received_at` e `properties`. Avaliações explícitas permanecem na tabela relacional `avaliacao` e não são duplicadas como nota canônica no MongoDB.
 
 **Pré-condições específicas:**
 
 - Usuário autenticado
-- MongoDB acessível em `mongodb://localhost:27017`
-- RabbitMQ funcional para envio assíncrono
+- MongoDB Atlas configurado por `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` e `MONGODB_TELEMETRY_COLLECTION`
+- Serviço de usuário e API Gateway em execução
 - Coleção `interacoes` vazia ou com snapshot conhecido
 
 **Instruções de execução:**
 ```bash
-dotnet test src/backend/telemetria-service --filter "Category=Functional&RF=RF11"
+$env:RUN_MONGO_INTEGRATION_TESTS="true"
+dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.csproj --filter "Mongo|Telemetria"
 detox test --testNamePattern "RF11"
 # Conferência manual
-mongosh "mongodb://localhost:27017/spotlight" --eval "db.interacoes.find().sort({timestamp:-1}).limit(20)"
+mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE').getCollection('$MONGODB_TELEMETRY_COLLECTION').find().sort({received_at:-1}).limit(20)"
 ```
 
 **Cenários Positivos:**
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| TF-RF11-P01 | Clique em card é registrado | Tocar um card de espetáculo na Home | Documento `{tipo_acao:'click_card', espetaculo_id, usuario_id, timestamp, contexto:'home'}` aparece em ≤ 1 s | — |
-| TF-RF11-P02 | Busca é registrada | Executar busca por "Hamlet" | Documento `{tipo_acao:'search', query:'Hamlet', resultados:N}` | — |
-| TF-RF11-P03 | Visualização de detalhe é registrada | Acessar detalhes de espetáculo | Documento `{tipo_acao:'view_detail', espetaculo_id, dwell_time_ms}` | — |
-| TF-RF11-P04 | Avaliação é registrada como evento | Submeter avaliação | Além da linha em `avaliacao`, documento `{tipo_acao:'rate', nota:4}` em MongoDB | — |
+| TF-RF11-P01 | Clique em card é registrado | Tocar um card de espetáculo no catálogo | Documento com `event_type:'show_card_clicked'`, `entity.type:'espetaculo'`, `entity.id` e `properties.origin` | — |
+| TF-RF11-P02 | Busca é registrada | Executar busca por "Hamlet" | Documento com `event_type:'search_performed'`, `entity.type:'busca'`, `properties.query:'Hamlet'` e `properties.resultsCount` | — |
+| TF-RF11-P03 | Visualização de detalhe é registrada | Acessar detalhes de espetáculo | Documento com `event_type:'show_viewed'` e entidade `espetaculo` | — |
+| TF-RF11-P04 | Sessão é registrada | Abrir e encerrar o app | Documentos `session_started` e `session_ended` com o mesmo `session_id` | — |
 | TF-RF11-P05 | Registro não bloqueia UX | Tocar card e observar tempo até abrir detalhes | Tempo de abertura idêntico ao de cenário sem telemetria (variação ≤ 50 ms) | RNF02 preservado |
 
 **Cenários Negativos:**
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| TF-RF11-N01 | MongoDB indisponível | Derrubar container MongoDB; gerar interação | Evento empilha em RabbitMQ; UX permanece fluida; processamento retoma após MongoDB voltar | Nenhum evento perdido (DLQ ativa) |
-| TF-RF11-N02 | Usuário sem sessão | Forjar evento sem JWT | Evento descartado em camada de coleta; HTTP 401 | Nenhum documento inserido |
-| TF-RF11-N03 | Volume burst (1 000 cliques/s) | Simular com `k6` | Sistema processa sem perda; backpressure ativa | Métricas confirmam ≥ 100 eventos/s (RNF09) |
+| TF-RF11-N01 | MongoDB indisponível | Configurar connection string indisponível; gerar interação | API retorna `202 Accepted` após payload válido; falha é logada para não bloquear UX | Evento pode ser perdido enquanto a fila da Sprint 5 não existir |
+| TF-RF11-N02 | Usuário anônimo sem `anonymousId` | Forjar evento sem JWT e sem `anonymousId` | HTTP 400 por ausência de identificador de usuário ou anônimo | Nenhum documento inserido |
+| TF-RF11-N03 | Payload incompatível com evento | Enviar `search_performed` sem `query` ou com entidade diferente de `busca` | HTTP 400 por violação das regras do contrato | Nenhum documento inserido |
 
 **Pós-condições gerais:** Documentos persistidos alimentam a base de dados comportamental que o ML Engine usa para recomputar recomendações (RF13, RF14).
 
@@ -4592,7 +4612,7 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 |---|---|---|---|---|
 | TF-RF13-P01 | Avaliação positiva ajusta lista | Avaliar com 5 ★ um espetáculo de "musical" (categoria pouco presente em `L0`); requisitar recomendação | Nova lista `L1` contém ≥ 2 espetáculos de "musical" a mais que `L0` | — |
 | TF-RF13-P02 | Comportamento de longo prazo prevalece | Após P01, voltar a interagir com "drama" por 5 ciclos | Lista volta a priorizar "drama" sem ignorar o sinal recente de "musical" | — |
-| TF-RF13-P03 | Atualização propaga em ≤ 1 min | Avaliar e requisitar recomendação após 60 s | Mudança refletida | Evento processado via RabbitMQ |
+| TF-RF13-P03 | Atualização propaga em ≤ 1 min | Avaliar e requisitar recomendação após 60 s | Mudança refletida | Avaliação relacional considerada pelo fluxo de recomendação |
 
 **Cenários Negativos:**
 
@@ -4600,7 +4620,7 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 |---|---|---|---|---|
 | TF-RF13-N01 | Interação irrelevante não distorce | Apenas scroll sem clique | `L1 ≈ L0` (Jaccard ≥ 0,8) | — |
 | TF-RF13-N02 | Avaliação 1★ reduz exposição | Avaliar com 1★ um espetáculo presente em `L0` | Item removido da próxima `L1` | — |
-| TF-RF13-N03 | Falha de fila RabbitMQ | Derrubar fila; interagir | Evento bufferizado; após restabelecimento, recomendação se atualiza | Nenhum evento perdido |
+| TF-RF13-N03 | Falha de telemetria | Simular indisponibilidade do MongoDB durante interação | Navegação não é bloqueada; recomendação continua usando avaliações e dados já persistidos | Perda de evento registrada como limitação até a Sprint 5 |
 
 **Pós-condições gerais:** Recomputo é assíncrono e não impacta a latência da requisição original.
 
@@ -4694,7 +4714,7 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| TF-RF16-P01 | Criar espetáculo | Painel → "Novo espetáculo"; preencher campos obrigatórios; salvar | HTTP 201; espetáculo aparece no catálogo do app mobile em ≤ 30 s | Linha em `espetaculo`; evento `catalog_updated` em RabbitMQ |
+| TF-RF16-P01 | Criar espetáculo | Painel → "Novo espetáculo"; preencher campos obrigatórios; salvar | HTTP 201; espetáculo aparece no catálogo do app mobile em ≤ 30 s | Linha em `espetaculo`; publicação assíncrona de `catalog_updated` fica planejada para Sprint 5 |
 | TF-RF16-P02 | Editar espetáculo | Alterar título e salvar | HTTP 200; mudança visível no catálogo após refresh | Histórico de alteração em `audit_log` |
 | TF-RF16-P03 | Remover espetáculo | Excluir espetáculo sem sessões futuras | HTTP 204; espetáculo some do catálogo | Soft delete (`deleted_at` preenchido) |
 | TF-RF16-P04 | Criar categoria | Adicionar "dança contemporânea" | HTTP 201; disponível como filtro (RF06) | — |
@@ -4761,7 +4781,7 @@ _conteúdo_
 
 ## 9.2 Testes de RNFs
 
-&emsp;Os testes de requisitos não funcionais (RNFs) do Spotlight complementam os testes funcionais e de usabilidade ao validar **como** o sistema se comporta em termos de desempenho, confiabilidade, segurança, escalabilidade e experiência mobile. No contexto do Portal Aventura Teatros, trata-se de um sistema de recomendação de espetáculos com arquitetura SOA, aplicativo mobile first (React Native/Expo) e integração com serviços externos (autenticação, catálogo, fila de eventos e ticketeira). A validação sistemática desses aspectos de qualidade assegura que a descoberta cultural e o fluxo até a intenção de compra permaneçam utilizáveis sob carga, disponíveis em produção e adequados aos dispositivos-alvo.
+&emsp;Os testes de requisitos não funcionais (RNFs) do Spotlight complementam os testes funcionais e de usabilidade ao validar **como** o sistema se comporta em termos de desempenho, confiabilidade, segurança, escalabilidade e experiência mobile. No contexto do Portal Aventura Teatros, trata-se de um sistema de recomendação de espetáculos com arquitetura SOA, aplicativo mobile first (React Native/Expo) e integração com serviços externos (autenticação, catálogo, MongoDB Atlas para telemetria e ticketeira). A fila de eventos entra como evolução planejada para a Sprint 5. A validação sistemática desses aspectos de qualidade assegura que a descoberta cultural e o fluxo até a intenção de compra permaneçam utilizáveis sob carga, disponíveis em produção e adequados aos dispositivos-alvo.
 
 &emsp;Cada RNF está especificado na seção 3.2 com pré-condição, procedimento e resultado esperado. Esta seção evolui essa base para um planejamento formal de execução, com cenários positivos e negativos, ferramentas definidas, critérios objetivos de aprovação e rastreabilidade aos RFs associados. Os resultados consolidados serão documentados em [9.2.2 Resultados](#922-resultados).
 
@@ -4769,7 +4789,24 @@ _conteúdo_
 
 &emsp;O planejamento abrange os doze RNFs do projeto (RNF01 a RNF12), organizados por identificador. A execução ocorrerá preferencialmente em ambiente de homologação ou produção controlada, conforme a natureza de cada teste, com registro de evidências para análise posterior.
 
-### 9.2.1.1 RNF01 — Tempo de carregamento das telas principais
+## 9.2.1.1 Mapeamento com a ISO/IEC 25010
+
+| RNF | Foco do requisito | Característica ISO/IEC 25010 | Justificativa |
+|-----|-------------------|-------------------------------|---------------|
+| RNF01 | Tempo de carregamento das telas | Eficiência de desempenho / comportamento temporal | Mede tempo percebido de carregamento nas telas principais. |
+| RNF02 | Tempo de geração de recomendações | Eficiência de desempenho / comportamento temporal | Mede latência entre interação do usuário e exibição de recomendações. |
+| RNF03 | Disponibilidade mensal | Confiabilidade / disponibilidade | Verifica se o sistema permanece acessível no período acordado. |
+| RNF04 | Mobile first e áreas de toque | Usabilidade / operabilidade e acessibilidade | Avalia se a interface pode ser operada confortavelmente em smartphones. |
+| RNF05 | JWT, bcrypt e HTTPS | Segurança / confidencialidade, integridade e autenticidade | Verifica proteção de credenciais, transporte seguro e controle de acesso. |
+| RNF06 | Carga e usuários simultâneos | Eficiência de desempenho / capacidade | Avalia comportamento sob concorrência e volume de uso. |
+| RNF07 | Logs estruturados | Manutenibilidade / analisabilidade | Garante evidências para diagnóstico e rastreabilidade operacional. |
+| RNF08 | Deploy independente SOA | Manutenibilidade / modularidade | Verifica se um serviço pode evoluir sem paralisar todo o sistema. |
+| RNF09 | Processamento assíncrono | Eficiência de desempenho / utilização de recursos | Avalia impacto da fila e do volume de eventos na experiência síncrona. |
+| RNF10 | Toques e taxa de sucesso | Usabilidade / operabilidade | Mede facilidade de conclusão das ações principais por usuários reais. |
+| RNF11 | Compatibilidade mobile | Compatibilidade / coexistência e adequação a plataformas | Verifica comportamento em Android e iOS nas versões-alvo. |
+| RNF12 | Execução em containers | Portabilidade / instalabilidade e adaptabilidade | Avalia execução isolada, reprodutível e recuperável em Docker. |
+
+### 9.2.1.2 RNF01 — Tempo de carregamento das telas principais
 
 **Identificador e nome:** RNF01 — Tempo de carregamento das telas em até 2 segundos (aspecto: Desempenho).
 
@@ -4796,7 +4833,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.2 RNF02 — Tempo de geração de recomendações personalizadas
+### 9.2.1.3 RNF02 — Tempo de geração de recomendações personalizadas
 
 **Identificador e nome:** RNF02 — Geração e exibição de recomendações em até 2 segundos (aspecto: Desempenho).
 
@@ -4813,7 +4850,7 @@ _conteúdo_
 
 **Cenário positivo:** Para cada perfil, será registrado o timestamp da interação que dispara atualização de recomendações e o timestamp da exibição do novo conteúdo na interface. O procedimento será repetido **10 vezes por perfil**. Considera-se sucesso quando a diferença entre timestamps for ≤ **2 segundos em 100% das execuções**.
 
-**Cenário negativo:** Será simulada latência elevada no serviço de recomendação ou indisponibilidade momentânea da fila de processamento (RNF09). Espera-se exibição de spinner ou feedback de carregamento em caso de atraso; tempos acima de 2 segundos serão registrados como não conformidade.
+**Cenário negativo:** Será simulada latência elevada no serviço de recomendação ou indisponibilidade momentânea de dependências de dados. Espera-se exibição de spinner ou feedback de carregamento em caso de atraso; tempos acima de 2 segundos serão registrados como não conformidade.
 
 **Pós-condições:** Tempos registrados em planilha ou logs. Evidências: `[INSERIR_REGISTRO_TEMPOS_RNF02]`.
 
@@ -4823,7 +4860,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.3 RNF03 — Disponibilidade mensal do sistema
+### 9.2.1.4 RNF03 — Disponibilidade mensal do sistema
 
 **Identificador e nome:** RNF03 — Disponibilidade mínima de 99% (aspecto: Confiabilidade).
 
@@ -4849,7 +4886,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.4 RNF04 — Abordagem mobile first
+### 9.2.1.5 RNF04 — Abordagem mobile first
 
 **Identificador e nome:** RNF04 — Abordagem mobile first com áreas de toque mínimas (aspecto: Usabilidade).
 
@@ -4875,7 +4912,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.5 RNF05 — Segurança (JWT, bcrypt e HTTPS)
+### 9.2.1.6 RNF05 — Segurança (JWT, bcrypt e HTTPS)
 
 **Identificador e nome:** RNF05 — Segurança com JWT, bcrypt e HTTPS (aspecto: Segurança).
 
@@ -4902,7 +4939,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.6 RNF06 — Carga e escalabilidade
+### 9.2.1.7 RNF06 — Carga e escalabilidade
 
 **Identificador e nome:** RNF06 — Suporte a 200 usuários simultâneos (aspecto: Escalabilidade).
 
@@ -4928,7 +4965,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.7 RNF07 — Logs estruturados
+### 9.2.1.8 RNF07 — Logs estruturados
 
 **Identificador e nome:** RNF07 — Registro de logs estruturados (aspecto: Manutenibilidade).
 
@@ -4940,7 +4977,7 @@ _conteúdo_
 
 - Sistema com logging configurado em todos os serviços SOA e no API Gateway.
 - Acesso de leitura aos agregadores ou arquivos de log do ambiente de teste.
-- Lista de ações disparadoras definida (login, busca, interação com recomendação, publicação em fila).
+- Lista de ações disparadoras definida (login, busca, interação com recomendação e emissão de telemetria).
 
 **Cenário positivo:** Serão executadas ações representativas no sistema. Para cada evento, será verificada a presença do log em até **1 segundo**, contendo os **5 campos obrigatórios**: timestamp, nível, serviço, sessão e dispositivo. Considera-se sucesso em **100%** dos eventos amostrados.
 
@@ -4954,7 +4991,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.8 RNF08 — Deploy independente de serviços SOA
+### 9.2.1.9 RNF08 — Deploy independente de serviços SOA
 
 **Identificador e nome:** RNF08 — Deploy independente com indisponibilidade limitada (aspecto: Manutenibilidade).
 
@@ -4980,11 +5017,11 @@ _conteúdo_
 
 ---
 
-### 9.2.1.9 RNF09 — Processamento assíncrono com fila
+### 9.2.1.10 RNF09 — Processamento assíncrono com fila (Sprint 5)
 
 **Identificador e nome:** RNF09 — Processamento assíncrono de eventos (aspecto: Desempenho).
 
-**Objetivo do teste:** Validar que o processamento via fila (RabbitMQ) não degrada a experiência síncrona do usuário além do limite e atinge a taxa mínima de eventos, condição para telemetria e recomendações (RF11 a RF14).
+**Objetivo do teste:** Validar, na Sprint 5, que o processamento via fila (RabbitMQ ou equivalente) não degrada a experiência síncrona do usuário além do limite e atinge a taxa mínima de eventos, condição para endurecer a telemetria e reduzir perda de sinais comportamentais (RF11 a RF14).
 
 **Ferramenta(s):** k6 com cenário de eventos simultâneos.
 
@@ -5006,7 +5043,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.10 RNF10 — Usabilidade (toques e taxa de sucesso)
+### 9.2.1.11 RNF10 — Usabilidade (toques e taxa de sucesso)
 
 **Identificador e nome:** RNF10 — Usabilidade: máximo de 3 toques e taxa de sucesso ≥ 85% (aspecto: Usabilidade).
 
@@ -5032,7 +5069,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.11 RNF11 — Compatibilidade mobile (Android e iOS)
+### 9.2.1.12 RNF11 — Compatibilidade mobile (Android e iOS)
 
 **Identificador e nome:** RNF11 — Compatibilidade com Android 10+ e iOS 15+ (aspecto: Compatibilidade).
 
@@ -5058,7 +5095,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.12 RNF12 — Containers Docker e tempo de reinicialização
+### 9.2.1.13 RNF12 — Containers Docker e tempo de reinicialização
 
 **Identificador e nome:** RNF12 — Execução em containers Docker (aspecto: Manutenibilidade).
 
@@ -5084,7 +5121,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.13 Tabela de rastreabilidade
+### 9.2.1.14 Tabela de rastreabilidade
 
 | RNF | Ferramenta principal | Cenário positivo (resumo) | Cenário negativo (resumo) | Critério de aceitação | RFs associados |
 |-----|----------------------|---------------------------|---------------------------|----------------------|----------------|
@@ -5103,7 +5140,7 @@ _conteúdo_
 
 ---
 
-### 9.2.1.14 Discussão de abrangência e limitações
+### 9.2.1.15 Discussão de abrangência e limitações
 
 **Abrangência**
 
@@ -5116,11 +5153,11 @@ _conteúdo_
 
 | Relação | RNFs | Impacto na validação |
 |---------|------|----------------------|
-| Desempenho percebido × backend | RNF01, RNF02, RNF06, RNF09 | Falha em fila ou carga elevada pode invalidar tempos de tela e recomendação |
+| Desempenho percebido × backend | RNF01, RNF02, RNF06, RNF09 | Falha na futura fila ou carga elevada pode invalidar tempos de tela e recomendação |
 | Disponibilidade × segurança | RNF03, RNF05 | Indisponibilidade do gateway impede testes de JWT; varreduras ZAP dependem de ambiente estável |
 | Mobile × usabilidade | RNF04, RNF10, RNF11 | Compatibilidade e áreas de toque influenciam taxa de sucesso e número de toques |
 | Infraestrutura × deploy | RNF08, RNF12 | Containers e pipeline CI/CD são pré-requisito para deploy independente |
-| Observabilidade × recomendação | RNF07, RNF09, RNF02 | Logs e fila sustentam diagnóstico de atraso em recomendações |
+| Observabilidade × recomendação | RNF07, RNF09, RNF02 | Logs e, na Sprint 5, fila sustentam diagnóstico de atraso em recomendações |
 
 **Maior complexidade no contexto acadêmico**
 
@@ -5139,7 +5176,25 @@ _conteúdo_
 &emsp;A consolidação dos vereditos por RNF (aprovado / reprovado / aprovado com ressalvas) será registrada na seção 9.2.2 após a execução da bateria de testes.
 
 ## 9.2.2 Resultados
-_conteúdo_
+
+&emsp;Esta subseção consolida a execução dos testes de RNF. Cada resultado deve indicar data de execução, ambiente, ferramenta utilizada, métricas observadas, evidência gerada, veredito e limitação. Essa estrutura evita tratar planejamento como resultado executado e permite evolução incremental conforme demais verificações de RNF forem concluídas.
+
+| RNF | Status da execução | Ferramenta/evidência | Métricas registradas | Veredito | Limitações |
+|-----|--------------------|----------------------|----------------------|----------|------------|
+| RNF01 | A executar | Lighthouse mobile ou medição equivalente | FCP, TTI e tempo total por tela | Pendente | Depende de build acessível em dispositivo ou URL auditável |
+| RNF02 | A executar | Logs/timestamps do fluxo de recomendação | Tempo entre interação e exibição da recomendação | Pendente | Depende de perfil de teste com histórico e recomendação operacional |
+| RNF03 | A executar | UptimeRobot ou health checks programados | Percentual de disponibilidade | Pendente | Janela completa de 30 dias pode exceder o ciclo acadêmico |
+| RNF04 | A executar | Checklist em dispositivo físico | Tamanho de áreas de toque e comportamento mobile | Pendente | Amostra limitada de aparelhos |
+| RNF05 | A executar | OWASP ZAP, Postman ou evidências HTTP | HTTPS, 401/403, JWT e armazenamento de senha | Pendente | Varredura ativa exige escopo controlado |
+| RNF06 | Executado parcialmente | `src/database/load_test/resultados_pgbench.txt` | TPS, latência média, falhas e carga de leitura/escrita no PostgreSQL | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
+| RNF07 | A executar | Amostras de logs dos serviços | Campos obrigatórios e tempo de emissão | Pendente | Depende de ambiente com logs preservados |
+| RNF08 | A executar | Logs de deploy e health checks | Tempo de indisponibilidade por serviço | Pendente | Depende de pipeline/deploy isolado |
+| RNF09 | Planejado para Sprint 5 | k6/fila ou teste de broker | Eventos por segundo e impacto na latência | Não executado nesta sprint | RabbitMQ ainda tratado como evolução planejada |
+| RNF10 | A executar via seção 9.3.2 | Planilha SUS e tarefas T01 a T09 | Taxa de sucesso, toques e SUS | Pendente | Depende de consolidação dos participantes externos |
+| RNF11 | A executar | Matriz de dispositivos | Erros por plataforma e fluxo | Pendente | Amostra limitada de Android/iOS |
+| RNF12 | A executar | Docker/health checks | Tempo de reinicialização por container | Pendente | Depende de compose completo e ambiente local estável |
+
+&emsp;O resultado já disponível nesta revisão é o teste de carga de banco com `pgbench`, associado ao RNF06 e usado como evidência parcial de desempenho da camada de persistência. Os demais RNFs permanecem preparados para registro nas tasks de execução correspondentes, especialmente desempenho, segurança e usabilidade.
 
 ## 9.3 Testes de Usabilidade
 
@@ -5359,19 +5414,32 @@ _conteúdo_
 &emsp;Prevê-se a repetição da rodada após integração com API e incorporação dos ajustes prioritários identificados, preservando as mesmas tarefas quando possível para permitir comparação longitudinal.
 
 ## 9.3.2 Resultados
-_conteúdo_
+
+&emsp;Esta subseção será preenchida após a execução da rodada de usabilidade com participantes externos. Para manter coerência, os dados abaixo devem registrar apenas resultados efetivamente coletados na planilha de campo e no questionário SUS.
+
+| Métrica | Resultado observado | Critério de aceitação | Veredito |
+|---------|---------------------|-----------------------|----------|
+| Quantidade de participantes externos | A preencher | Mínimo de 5 participantes | Pendente |
+| Participante 60+ com baixa familiaridade tecnológica | A preencher | Pelo menos 1 participante | Pendente |
+| Média SUS | A preencher | SUS médio ≥ 68 | Pendente |
+| Taxa média de conclusão das tarefas | A preencher | ≥ 85% | Pendente |
+| Tarefas concluídas em até 3 toques | A preencher | ≥ 85% das execuções bem-sucedidas | Pendente |
+| Principais dificuldades observadas | A preencher | Registro qualitativo | Pendente |
+| Melhorias priorizadas | A preencher | Backlog de ajustes | Pendente |
+
+&emsp;As evidências esperadas são a planilha de anotações, os tempos por tarefa, a contagem de toques, a indicação de auxílio, as respostas SUS e os comentários espontâneos dos participantes. Esses registros serão usados para validar principalmente RNF04, RNF10 e RNF11.
 
 ## 9.4 Testes de Integração
 
 &emsp;Os testes de integração têm como objetivo validar as interações entre os componentes internos do Spotlight e os sistemas externos com os quais ele se comunica. Enquanto os testes unitários verificam o comportamento isolado de cada módulo, os testes de integração verificam que as fronteiras entre serviços, bancos de dados, filas de mensagens e APIs externas funcionam corretamente em conjunto.
 
-&emsp;A arquitetura SOA do Spotlight introduz múltiplos pontos de integração críticos: o API Gateway valida tokens com o Supabase Auth, os serviços de negócio persistem dados no PostgreSQL e no MongoDB, o RabbitMQ transporta eventos de telemetria até o ML Engine e o aplicativo mobile redireciona o usuário para a API da ticketeira parceira. Cada uma dessas fronteiras é um ponto potencial de falha e, portanto, deve ser coberta por cenários de teste positivos e negativos.
+&emsp;A arquitetura SOA do Spotlight introduz múltiplos pontos de integração críticos: o API Gateway valida tokens com o Supabase Auth, os serviços de negócio persistem dados no PostgreSQL e no MongoDB, e o aplicativo mobile redireciona o usuário para a API da ticketeira parceira. A fila de telemetria com RabbitMQ é uma fronteira planejada para a Sprint 5. Cada uma dessas fronteiras é um ponto potencial de falha e, portanto, deve ser coberta por cenários de teste positivos e negativos.
 
 ### 9.4.1 Planejamento
 
-#### Módulo VHS — Mecanismo de Caching de Respostas de API Externa
+#### Módulo VHS — Mecanismo planejado de caching de respostas de API externa
 
-&emsp;Todos os testes de integração que envolvem chamadas a sistemas externos (Supabase Auth e API da Ticketeira) fazem uso obrigatório do módulo **VHS** (*Virtual HTTP Server*). O VHS é um mecanismo de caching que intercepta as chamadas HTTP realizadas pelo `HttpClient`, armazena a resposta real em memória (ou em arquivo `.json` no diretório `tests/cassettes/`), e a repete nas execuções seguintes até que o TTL expire ou o cassete seja invalidado manualmente.
+&emsp;Todos os testes de integração que envolvem chamadas a sistemas externos (Supabase Auth e API da Ticketeira) devem utilizar o módulo **VHS** (*Virtual HTTP Server*) quando esses cenários forem materializados no repositório. Nesta revisão, o VHS permanece como mecanismo planejado para interceptar chamadas HTTP realizadas pelo `HttpClient`, armazenar a resposta real em memória ou em arquivo `.json` no diretório `tests/cassettes/`, e repeti-la nas execuções seguintes até que o TTL expire ou o cassete seja invalidado manualmente. Essa redação evita tratar como implementado aquilo que ainda precisa ser criado e evidenciado nas próximas execuções.
 
 **Funcionamento do VHS:**
 
@@ -5465,7 +5533,7 @@ Os testes cobrem seis fronteiras de integração definidas pela arquitetura do S
 | IT-02 | API Gateway → Supabase Auth (validação de token) | Externo | **Sim** |
 | IT-03 | Serviços SOA → Supabase PostgreSQL | Interno | Não |
 | IT-04 | Serviços SOA → MongoDB (telemetria) | Interno | Não |
-| IT-05 | Serviços SOA → RabbitMQ → ML Engine | Interno | Não |
+| IT-05 | Serviço do Usuário → Fila de Telemetria → MongoDB/Motor de Recomendação (Sprint 5) | Interno | Não |
 | IT-06 | App Mobile → API Ticketeira (link de compra) | Externo | **Sim** |
 
 ---
@@ -5625,8 +5693,8 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" 
 |---|---|---|---|---|
 | IT-03-P01 | Cadastro de espetáculo persiste no banco | Chamar `POST /api/catalogo/espetaculos` com payload completo e válido | Registro inserido na tabela `espetaculo` com `id` gerado; `status='em_cartaz'`; `popularidade=0.0`; `nota_media=0.0` | Linha verificada via `SELECT` direto no banco de teste |
 | IT-03-P02 | Atualização de preferências do usuário | Chamar `PUT /api/usuario/preferencias` com array de categorias e faixa de preço | Campo `perfil_preferencias` do usuário atualizado no PostgreSQL com as novas preferências em JSON | Campo verificado via query `SELECT perfil_preferencias FROM usuario WHERE id=$1` |
-| IT-03-P03 | Geração de recomendação persiste resultado | ML Engine publica resultado via RabbitMQ; Serviço de Recomendação consome e persiste | Registro na tabela `recomendacao` com `score_recomendacao > 0`, `tipo_algoritmo` preenchido e `referencia_origem_id` vinculando ao evento de telemetria | Linha verificada via `SELECT` com JOIN em `usuario` e `espetaculo` |
-| IT-03-P04 | Avaliação registrada atualiza nota_media do espetáculo | Inserir avaliação com nota 4.5; verificar `nota_media` do espetáculo antes e depois | `nota_media` do espetáculo atualizado para refletir a nova avaliação (média recalculada pelo Worker) | Campo `nota_media` verificado na tabela `espetaculo` após processamento |
+| IT-03-P03 | Geração de recomendação persiste resultado | Executar caso de uso do serviço de recomendação com usuário e catálogo previamente semeados | Registro na tabela `recomendacao` com `score_recomendacao > 0`, `tipo_algoritmo` preenchido e vínculo com usuário/espetáculo | Linha verificada via `SELECT` com JOIN em `usuario` e `espetaculo` |
+| IT-03-P04 | Avaliação registrada permanece relacional | Inserir avaliação com nota 4.5; verificar tabela `avaliacao` e campos derivados do espetáculo antes e depois | Avaliação gravada no PostgreSQL como fonte canônica de feedback explícito; nenhuma nota é duplicada como evento canônico no MongoDB | Campo verificado na tabela `avaliacao`; atualização de agregados deve seguir a regra implementada no serviço relacional |
 | IT-03-P05 | Consulta com filtros retorna subset correto | Chamar `GET /api/catalogo/espetaculos?categoria=musical&preco_max=100` | Apenas espetáculos da categoria "musical" com `preco_minimo ≤ 100` são retornados; nenhum espetáculo fora do filtro presente na lista | Nenhuma alteração de estado no banco |
 
 **Cenários Negativos:**
@@ -5651,7 +5719,7 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" 
 
 #### IT-04 — Serviços SOA ↔ MongoDB: Registro de Telemetria Comportamental
 
-**Descrição:** Valida que os eventos de comportamento do usuário (cliques, visualizações, tempo de permanência) são registrados corretamente no MongoDB e que o ML Engine consegue lê-los para alimentar os algoritmos de recomendação.
+**Descrição:** Valida que os eventos de comportamento do usuário são recebidos pelo serviço de usuário, validados conforme o contrato `POST /usuario/telemetria` e registrados corretamente no MongoDB. Esta fronteira cobre a persistência da telemetria bruta; o consumo pelo motor de recomendação é tratado como etapa posterior de integração de dados.
 
 **Ferramentas utilizadas:**
 - `xUnit` com `Testcontainers.MongoDb` — instância isolada do MongoDB em container Docker
@@ -5660,8 +5728,8 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" 
 
 **Instruções de execução:**
 ```bash
-dotnet test src/backend/services/usuario --filter "Category=Integration&Tag=MongoDB" \
-  --logger "console;verbosity=normal"
+$env:RUN_MONGO_INTEGRATION_TESTS="true"
+dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.csproj --filter "Mongo|Telemetria"
 ```
 
 ---
@@ -5669,10 +5737,10 @@ dotnet test src/backend/services/usuario --filter "Category=Integration&Tag=Mong
 **Pré-condições:**
 
 - Docker disponível para instanciar o container MongoDB via `Testcontainers`
+- Variável `RUN_MONGO_INTEGRATION_TESTS=true` definida para habilitar os testes marcados com `MongoIntegrationFact`
 - Coleção `interacoes` vazia no banco de teste (garantido por `IAsyncLifetime.InitializeAsync`)
-- `user_id` de teste disponível (`"user_test_001"`)
-- `espetaculo_id` de teste disponível (`"espetaculo_test_001"`)
-- Pelo menos 3 tipos de interação definidos no enum: `visualizacao`, `clique`, `favorito`
+- Variáveis `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` e `MONGODB_TELEMETRY_COLLECTION` configuradas dinamicamente pelo teste
+- Eventos usando o catálogo atual: `session_started`, `screen_viewed`, `show_card_clicked`, `show_viewed`, `search_performed`, `favorite_toggled`, `purchase_clicked` e `session_ended`
 
 ---
 
@@ -5680,31 +5748,32 @@ dotnet test src/backend/services/usuario --filter "Category=Integration&Tag=Mong
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| IT-04-P01 | Evento de visualização é persistido corretamente | O Serviço de Usuário recebe evento de visualização e chama repositório MongoDB | Documento inserido na coleção `interacoes` com campos: `user_id`, `espetaculo_id`, `tipo_interacao="visualizacao"`, `timestamp` (ISO 8601), `tempo_permanencia` | Documento verificado via `collection.FindAsync(filter)` |
-| IT-04-P02 | Múltiplos eventos do mesmo usuário são registrados independentemente | Enviar 10 eventos de clique para o mesmo espetáculo em sequência rápida | 10 documentos distintos inseridos na coleção `interacoes`; cada um com `timestamp` diferente | Count verificado via `collection.CountDocumentsAsync` |
-| IT-04-P03 | ML Engine lê últimas interações de um usuário | ML Engine consulta `interacoes` do `user_test_001` para gerar recomendação | Consulta retorna documentos ordenados por `timestamp DESC`; campos `espetaculo_id` e `tipo_interacao` presentes em todos | Nenhuma alteração de estado na coleção |
-| IT-04-P04 | Agregação de interações por espetáculo | Consultar total de visualizações do `espetaculo_test_001` | Pipeline de agregação MongoDB retorna contagem correta; resultado coerente com os documentos inseridos | Nenhuma alteração de estado |
+| IT-04-P01 | Evento de visualização é persistido corretamente | Enviar payload `show_viewed` para `/telemetria` com entidade `espetaculo` | Documento inserido na coleção `interacoes` com `event_id`, `event_type`, `source`, `session_id`, `anonymous_id`, `entity`, `occurred_at` e `received_at` | Documento verificado via `collection.Find(filter)` |
+| IT-04-P02 | Índices operacionais são criados | Subir o serviço com MongoDB configurado no Testcontainers | Collection contém `_id_`, `ux_event_id`, `ix_user_time`, `ix_anonymous_time`, `ix_entity_time`, `ix_event_type_time` e `ix_session_time` | Índices listados via `collection.Indexes.ListAsync()` |
+| IT-04-P03 | Duplicidade por `event_id` não gera documentos repetidos | Enviar duas vezes o mesmo payload com `eventId` fixo | API retorna `202 Accepted` nas duas chamadas por ser best-effort; MongoDB mantém apenas um documento por causa do índice único | Count por `event_id` igual a 1 |
+| IT-04-P04 | Escrita anônima via rota HTTP funciona | Enviar evento sem JWT e com `anonymousId` | API retorna `202 Accepted` e grava documento associado ao identificador anônimo | Documento consultado por `event_id` |
 
 **Cenários Negativos:**
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| IT-04-N01 | Evento com `espetaculo_id` nulo | Tentar inserir documento com `espetaculo_id: null` | Documento rejeitado pela validação do repositório antes de chegar ao MongoDB; HTTP 400 retornado ao chamador | Nenhum documento inserido; log de erro registrado |
-| IT-04-N02 | MongoDB indisponível durante escrita | Derrubar container MongoDB e enviar evento de interação | Evento enfileirado no RabbitMQ como fallback; HTTP 202 retornado ao frontend; evento será reprocessado quando MongoDB voltar | Evento persistido na fila RabbitMQ; log de aviso registrado |
-| IT-04-N03 | Consulta com `user_id` sem histórico | ML Engine solicita interações de usuário sem nenhum evento registrado | Array vazio retornado `[]`; serviço trata cold start ativando algoritmo k-NN baseado em popularidade | Nenhuma exceção lançada; fallback de cold start ativado |
+| IT-04-N01 | Payload inválido não é gravado | Enviar `search_performed` sem `query`/`resultsCount` e com entidade incompatível | API retorna `400 Bad Request` e nenhum documento novo é inserido | Count da collection permanece igual ao valor anterior |
+| IT-04-N02 | MongoDB indisponível durante escrita | Configurar connection string indisponível e enviar evento válido | API retorna `202 Accepted` para não bloquear UX; falha é registrada em log | Evento pode ser perdido enquanto a fila da Sprint 5 não existir |
+| IT-04-N03 | MongoDB não configurado | Subir serviço sem `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` ou `MONGODB_TELEMETRY_COLLECTION` | Endpoint retorna `503 Service Unavailable` com `Telemetria nao configurada.` | Readiness indica falha de configuração |
 
 **Pós-condições gerais:** Container MongoDB destruído ao final da suite via `IAsyncLifetime.DisposeAsync`.
 
 **Método de validação dos resultados:**
-1. Verificar documentos inseridos via `FindAsync` com filtro exato
-2. Comparar `timestamp` dos documentos para garantir ordenação correta
-3. Confirmar que dados com campos inválidos não chegam à coleção MongoDB
+1. Verificar documentos inseridos via filtro exato por `event_id`
+2. Listar índices da coleção e comparar com os nomes esperados
+3. Confirmar que payloads inválidos não chegam à coleção MongoDB
+4. Confirmar que duplicidades por `event_id` não geram documentos repetidos
 
 ---
 
-#### IT-05 — Serviços SOA ↔ RabbitMQ ↔ ML Engine: Pipeline de Eventos Assíncronos
+#### IT-05 — Fila de Telemetria ↔ MongoDB ↔ Motor de Recomendação (Planejado para Sprint 5)
 
-**Descrição:** Valida o fluxo completo de publicação e consumo de eventos de telemetria via RabbitMQ, desde o Serviço de Usuário (publisher) até o ML Engine (consumer), incluindo o processamento do evento e a geração de recomendação resultante.
+**Descrição:** Valida o fluxo futuro de publicação e consumo de eventos de telemetria via fila. Este cenário não faz parte da implementação corrente da Sprint 4. A meta da Sprint 5 é inserir uma fila entre o Serviço do Usuário e o MongoDB, mantendo o schema atual da collection `interacoes`, adicionando retry/dead-letter e preparando o consumo posterior dos sinais comportamentais pelo motor de recomendação.
 
 **Ferramentas utilizadas:**
 - `xUnit` com `Testcontainers.RabbitMq` — instância isolada do RabbitMQ em container Docker
@@ -5714,8 +5783,7 @@ dotnet test src/backend/services/usuario --filter "Category=Integration&Tag=Mong
 
 **Instruções de execução:**
 ```bash
-dotnet test src/backend/services --filter "Category=Integration&Tag=RabbitMQ" \
-  --timeout 30000
+dotnet test src/backend/tests --filter "Category=Integration&Tag=RabbitMQ"
 ```
 
 ---
@@ -5723,11 +5791,11 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=RabbitMQ" \
 **Pré-condições:**
 
 - Docker disponível para instanciar o container RabbitMQ via `Testcontainers`
-- Exchange `spotlight.telemetry` e filas `q.interacoes` e `q.recomendacoes` criadas no broker de teste
-- ML Engine configurado para consumir `q.interacoes` no ambiente de teste
-- Banco PostgreSQL de teste disponível para persistência do resultado da recomendação
-- Banco MongoDB de teste disponível para registro do evento de interação
-- Pelo menos 1 usuário e 5 espetáculos no banco de teste para que o algoritmo produza resultado
+- Publisher no Serviço do Usuário implementado para publicar eventos validados
+- Consumer implementado para ler eventos da fila e chamar o repositório MongoDB
+- Exchange `spotlight.telemetry`, fila `q.telemetria` e DLQ `q.telemetria.dlq` criadas no broker de teste
+- Banco MongoDB de teste disponível para persistência dos documentos
+- Índice único `ux_event_id` ativo para idempotência em reentregas
 
 ---
 
@@ -5735,25 +5803,25 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=RabbitMQ" \
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| IT-05-P01 | Evento de interação publicado chega ao ML Engine | Serviço de Usuário publica `InteracaoEvent { user_id, espetaculo_id, tipo="clique" }` na exchange `spotlight.telemetry`; aguardar até 5 s | ML Engine consome o evento da fila `q.interacoes`; evento registrado no MongoDB; recomendação gerada e publicada em `q.recomendacoes` | Coleção `interacoes` no MongoDB contém o documento; tabela `recomendacao` no PostgreSQL contém novo registro |
-| IT-05-P02 | Múltiplos eventos processados sem perda | Publicar 50 eventos em burst na exchange; aguardar 10 s | Todos os 50 eventos consumidos; 0 mensagens na fila após processamento; contagem no MongoDB = 50 | Todas as mensagens processadas e removidas da fila; verificado via Management API do RabbitMQ |
-| IT-05-P03 | Recomendação publicada pelo ML Engine é consumida pelo Serviço de Recomendação | ML Engine publica `RecomendacaoEvent` em `q.recomendacoes`; Serviço de Recomendação consome | Registro na tabela `recomendacao` com `score > 0` e `tipo_algoritmo` preenchido | Linha verificada no PostgreSQL de teste |
-| IT-05-P04 | Mensagem com dead-letter move para DLQ após 3 falhas | Configurar consumer para falhar intencionalmente; publicar 1 mensagem | Após 3 tentativas de reentrega, mensagem movida para `q.interacoes.dlq`; erro registrado em log | Mensagem disponível na DLQ para inspeção; sistema continua processando demais mensagens |
+| IT-05-P01 | Evento validado é publicado na fila | Enviar payload válido para `POST /usuario/telemetria` | Serviço retorna `202 Accepted` e publica mensagem com o mesmo `event_id` na fila | Mensagem presente em `q.telemetria` |
+| IT-05-P02 | Consumer grava no MongoDB | Publicar mensagem válida em `q.telemetria` e aguardar o consumer | Documento inserido na collection `interacoes` com o mesmo schema da Sprint 4 | Mensagem removida da fila após ack |
+| IT-05-P03 | Reentrega não duplica documento | Publicar duas mensagens com o mesmo `event_id` | Consumer trata duplicidade como idempotente; collection mantém apenas um documento | Count por `event_id` igual a 1 |
+| IT-05-P04 | Burst de eventos é processado | Publicar 50 eventos válidos em sequência | Todos os eventos são consumidos e persistidos sem erro | Fila esvaziada; contagem no MongoDB = 50 |
 
 **Cenários Negativos:**
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| IT-05-N01 | RabbitMQ indisponível durante publicação | Derrubar container RabbitMQ e tentar publicar evento de interação | Serviço de Usuário retorna HTTP 202 ao frontend (aceita o evento); evento é salvo em buffer local (arquivo ou memória) para reenvio | Buffer de retry ativo; log de aviso `[RABBITMQ] broker_unavailable` registrado |
-| IT-05-N02 | Mensagem com schema inválido no payload | Publicar mensagem com `user_id` ausente na fila `q.interacoes` | ML Engine rejeita a mensagem; mensagem movida para DLQ; nenhuma recomendação gerada | DLQ contém a mensagem inválida; log de erro registrado com detalhes do schema |
-| IT-05-N03 | ML Engine indisponível | Parar o container do ML Engine e publicar 5 eventos | Mensagens acumuladas na fila `q.interacoes` (não processadas); ao reiniciar o ML Engine, mensagens são consumidas sem perda | Fila verificada via Management API durante a pausa; processamento retomado sem perda de dados |
+| IT-05-N01 | Broker indisponível durante publicação | Derrubar RabbitMQ e enviar evento válido | Serviço registra falha operacional; decisão de retorno deve ser documentada antes da implementação (`202` com perda controlada ou `503`) | Nenhum bloqueio indefinido no endpoint |
+| IT-05-N02 | Mensagem inválida no consumer | Publicar mensagem sem campos obrigatórios | Consumer rejeita e move para DLQ após política de retry | DLQ contém a mensagem inválida com motivo registrável |
+| IT-05-N03 | MongoDB indisponível no consumer | Parar MongoDB e publicar eventos válidos | Mensagens permanecem pendentes ou são reencaminhadas conforme política de retry | Eventos não são perdidos sem passar por DLQ |
 
-**Pós-condições gerais:** Containers RabbitMQ, PostgreSQL e MongoDB destruídos ao final da suite; nenhuma fila ou binding persiste entre execuções.
+**Pós-condições gerais:** Containers RabbitMQ e MongoDB destruídos ao final da suite; nenhuma fila, binding ou documento de teste persiste entre execuções.
 
 **Método de validação dos resultados:**
-1. Verificar mensagens remanescentes na fila via RabbitMQ Management API (`GET /api/queues/%2F/q.interacoes`)
+1. Verificar mensagens remanescentes na fila via RabbitMQ Management API
 2. Confirmar documentos no MongoDB via `CountDocumentsAsync`
-3. Confirmar registros no PostgreSQL via `SELECT count(*) FROM recomendacao WHERE data_geracao > now() - interval '1 minute'`
+3. Confirmar idempotência via consulta por `event_id`
 4. Verificar DLQ após cenários negativos
 
 ---
@@ -5828,8 +5896,8 @@ dotnet test src/backend/services/catalogo \
 | IT-01: API Gateway ↔ Serviços SOA | RF01, RF02, RF04, RF05, RF06, RF07, RF16 | RNF05 (segurança JWT), RNF08 (deploy independente) | Toda a comunicação do app passa pelo Gateway; falha aqui interrompe 100% das funcionalidades |
 | IT-02: API Gateway ↔ Supabase Auth | RF01, RF02 | RNF05 (JWT, HTTPS), RNF03 (disponibilidade) | Autenticação é pré-requisito para todas as funcionalidades personalizadas; VHS garante isolamento do teste |
 | IT-03: Serviços SOA ↔ PostgreSQL | RF03, RF04, RF07, RF08, RF09, RF10, RF12, RF16 | RNF01 (tempo de carregamento), RNF06 (200 usuários) | Banco relacional é a fonte de verdade para catálogo, usuários e recomendações |
-| IT-04: Serviços SOA ↔ MongoDB | RF11, RF12, RF13, RF14 | RNF09 (processamento assíncrono), RNF07 (logs) | Telemetria comportamental alimenta o motor de ML; perda de eventos degrada a qualidade das recomendações ao longo do tempo |
-| IT-05: RabbitMQ ↔ ML Engine | RF12, RF13, RF14, RF15 | RNF09 (100 eventos/s), RNF02 (recomendações em 2 s) | Desacoplamento assíncrono é o pilar de escalabilidade; falha aqui impede a geração de recomendações personalizadas |
+| IT-04: Serviços SOA ↔ MongoDB | RF11, RF12, RF13, RF14 | RNF07 (logs), RNF02 (UX não bloqueada) | Telemetria comportamental alimenta o motor de ML; perda de eventos degrada a qualidade das recomendações ao longo do tempo |
+| IT-05: Fila de Telemetria ↔ MongoDB/Motor de Recomendação (Sprint 5) | RF12, RF13, RF14, RF15 | RNF09 (100 eventos/s), RNF02 (recomendações em 2 s) | Desacoplamento assíncrono será o pilar de resiliência futura; falha aqui pode reduzir atualização de sinais comportamentais |
 | IT-06: Serviço de Catálogo ↔ Ticketeira | RF07 | RNF01, RNF03 | Redirecionamento para compra é o ponto final da conversão; VHS isola a dependência externa |
 
 &emsp;Em termos de **cobertura de requisitos**, os testes de integração planejados cobrem diretamente 15 dos 16 Requisitos Funcionais (RF01–RF15 integralmente; RF16 parcialmente via IT-01-P04) e 8 dos 12 Requisitos Não Funcionais (RNF01, RNF02, RNF03, RNF05, RNF06, RNF07, RNF08, RNF09).

@@ -19,10 +19,12 @@ import { Carousel, CarouselItem } from '@/frontend/components/Carousel';
 import { ShowcaseCard } from '@/frontend/components/ShowcaseCard';
 import { colors, spacing, typography } from '@/frontend/theme';
 import type { EspetaculoSemelhante } from '../models/DetalhesModels';
+import { emitTelemetryEvent } from '../repositories/TelemetryRepository';
 import { useDetalhesViewModel } from '../viewmodels/DetalhesViewModels';
 
 
 type DetalhesViewProps = {
+  accessToken?: string | null;
   espetaculoId: string;
   onClose?: () => void;
   onEspetaculoSemelhantePress?: (espetaculoId: string) => void;
@@ -35,6 +37,7 @@ const HERO_HEIGHT = 280;
 
 
 export default function DetalhesView({
+  accessToken,
   espetaculoId,
   onClose,
   onEspetaculoSemelhantePress,
@@ -45,6 +48,7 @@ export default function DetalhesView({
   const [heroImageSize, setHeroImageSize] = React.useState<{ width: number; height: number } | null>(null);
   const espetaculo = viewModel.detalhe;
   const imagemDestaqueUrl = espetaculo?.imagemUrl;
+  const lastViewedIdRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     if (!imagemDestaqueUrl) {
@@ -71,6 +75,25 @@ export default function DetalhesView({
       cancelled = true;
     };
   }, [imagemDestaqueUrl]);
+
+
+  React.useEffect(() => {
+    if (!viewModel.detalhe || lastViewedIdRef.current === viewModel.detalhe.id) {
+      return;
+    }
+
+
+    lastViewedIdRef.current = viewModel.detalhe.id;
+    emitTelemetryEvent(
+      {
+        eventType: 'show_viewed',
+        screen: 'DetalhesView',
+        entity: { type: 'espetaculo', id: viewModel.detalhe.id },
+        properties: { origin: 'catalog' },
+      },
+      accessToken,
+    );
+  }, [accessToken, viewModel.detalhe]);
 
 
   if (viewModel.loading) {
@@ -124,6 +147,7 @@ export default function DetalhesView({
     return null;
   }
 
+  const detalheAtual = espetaculo;
 
   const similarCarouselData: Array<CarouselItem<EspetaculoSemelhante>> =
     viewModel.espetaculosSemelhantes.map((item: EspetaculoSemelhante) => ({
@@ -134,11 +158,28 @@ export default function DetalhesView({
 
   const renderSimilarItem = ({
     item,
+    index,
   }: ListRenderItemInfo<CarouselItem<EspetaculoSemelhante>>) => (
     <ShowcaseCard
       title={item.titulo}
       imageUri={item.imagemUrl}
-      onPress={() => onEspetaculoSemelhantePress?.(item.id)}
+      onPress={() => {
+        emitTelemetryEvent(
+          {
+            eventType: 'show_card_clicked',
+            screen: 'DetalhesView',
+            entity: { type: 'espetaculo', id: item.id },
+            properties: {
+              origin: 'similar',
+              position: index,
+            },
+          },
+          accessToken,
+        );
+
+
+        onEspetaculoSemelhantePress?.(item.id);
+      }}
     />
   );
 
@@ -147,6 +188,46 @@ export default function DetalhesView({
   const heroHeight = heroImageSize
     ? Math.round((width * heroImageSize.height) / heroImageSize.width)
     : HERO_HEIGHT;
+
+
+  function handleFavoritePress() {
+    const active = !viewModel.favorito;
+
+
+    viewModel.alternarFavorito();
+    emitTelemetryEvent(
+      {
+        eventType: 'favorite_toggled',
+        screen: 'DetalhesView',
+        entity: { type: 'espetaculo', id: detalheAtual.id },
+        properties: { active },
+      },
+      accessToken,
+    );
+  }
+
+
+  function handleBuyPress() {
+    if (!detalheAtual.linkCompra) {
+      return;
+    }
+
+
+    emitTelemetryEvent(
+      {
+        eventType: 'purchase_clicked',
+        screen: 'DetalhesView',
+        entity: { type: 'espetaculo', id: detalheAtual.id },
+        properties: {
+          provider: getPurchaseProvider(detalheAtual.linkCompra),
+        },
+      },
+      accessToken,
+    );
+
+
+    viewModel.comprarIngresso();
+  }
 
 
   return (
@@ -225,7 +306,7 @@ export default function DetalhesView({
                 }
                 accessibilityRole="button"
                 hitSlop={8}
-                onPress={viewModel.alternarFavorito}
+                onPress={handleFavoritePress}
                 style={({ pressed }: { pressed: boolean }) => [
                   styles.favoriteButton,
                   pressed && styles.pressed,
@@ -241,7 +322,7 @@ export default function DetalhesView({
 
               <Pressable
                 accessibilityRole="button"
-                onPress={viewModel.comprarIngresso}
+                onPress={handleBuyPress}
                 style={({ pressed }: { pressed: boolean }) => [
                   styles.buyButton,
                   pressed && styles.pressed,
@@ -275,6 +356,15 @@ export default function DetalhesView({
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+
+function getPurchaseProvider(linkCompra: string) {
+  try {
+    return new URL(linkCompra).hostname.replace(/^www\./, '');
+  } catch {
+    return 'unknown';
+  }
 }
 
 

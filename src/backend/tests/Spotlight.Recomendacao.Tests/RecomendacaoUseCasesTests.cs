@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging.Abstractions;
+using Spotlight.Recomendacao.Application.Services;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Domain.Entities;
 using Xunit;
@@ -33,7 +35,9 @@ public class RecomendacaoUseCasesTests
             ]
         };
         var usuarioId = Guid.NewGuid();
-        var useCase = new ListarRecomendacoesMeUseCase(repositorio);
+        var strategy = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var service = new RecomendacaoService(new FakeRecomendacaoStrategyFactory(strategy));
+        var useCase = new ListarRecomendacoesMeUseCase(service);
 
         var resultado = await useCase.ExecutarAsync(usuarioId, limite, Ct);
 
@@ -43,6 +47,100 @@ public class RecomendacaoUseCasesTests
         Assert.Equal("content_based", item.TipoAlgoritmo);
         Assert.Equal("Hamlet", item.Espetaculo.Titulo);
         Assert.Equal(0.92m, item.Score);
+    }
+
+    [Fact]
+    public async Task RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            EspetaculosPorId = new Dictionary<int, EspetaculoRecomendado>
+            {
+                [9] = new()
+                {
+                    Id = 9,
+                    Titulo = "O Auto da Compadecida",
+                    Genero = "Comedia",
+                    Status = "em_cartaz",
+                    NotaMedia = 4.7m
+                }
+            }
+        };
+        var modelo = new FakeModeloRecomendacaoClient
+        {
+            Habilitado = true,
+            Predicoes =
+            [
+                new ModeloRecomendacaoPredicao(9, 0.98m, "mlnet_hibrido", "Modelo incrementado")
+            ]
+        };
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var strategyMlNet = new ModeloMlNetRecomendacaoStrategy(
+            repositorio,
+            modelo,
+            fallback,
+            NullLogger<ModeloMlNetRecomendacaoStrategy>.Instance);
+        var factory = new RecomendacaoStrategyFactory(modelo, strategyMlNet, fallback);
+        var service = new RecomendacaoService(factory);
+        var useCase = new ListarRecomendacoesMeUseCase(service);
+
+        var resultado = await useCase.ExecutarAsync(Guid.NewGuid(), 5, Ct);
+
+        var item = Assert.Single(resultado.Data);
+        Assert.Equal("mlnet_hibrido", item.TipoAlgoritmo);
+        Assert.Equal("O Auto da Compadecida", item.Espetaculo.Titulo);
+        Assert.Equal(0, repositorio.ListarPorUsuarioCalls);
+    }
+
+    [Fact]
+    public async Task ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            EspetaculosPorId = new Dictionary<int, EspetaculoRecomendado>
+            {
+                [7] = Espetaculo(),
+                [9] = new()
+                {
+                    Id = 9,
+                    Titulo = "O Auto da Compadecida",
+                    Genero = "Comedia",
+                    Status = "em_cartaz",
+                    NotaMedia = 4.7m
+                }
+            }
+        };
+        var modelo = new FakeModeloRecomendacaoClient
+        {
+            Habilitado = true,
+            Predicoes =
+            [
+                new ModeloRecomendacaoPredicao(9, 0.98m, "hibrido_svd_knn", "Vizinho de item favorito"),
+                new ModeloRecomendacaoPredicao(7, 0.95m, "hibrido_svd", "Perfil do usuario")
+            ]
+        };
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var strategy = new ModeloMlNetRecomendacaoStrategy(
+            repositorio,
+            modelo,
+            fallback,
+            NullLogger<ModeloMlNetRecomendacaoStrategy>.Instance);
+        var service = new RecomendacaoService(new FakeRecomendacaoStrategyFactory(strategy));
+        var useCase = new ListarRecomendacoesMeUseCase(service);
+
+        var resultado = await useCase.ExecutarAsync(Guid.NewGuid(), 5, Ct);
+
+        Assert.Equal(0, repositorio.ListarPorUsuarioCalls);
+        Assert.Equal([9, 7], repositorio.LastEspetaculoIds);
+        Assert.Collection(
+            resultado.Data,
+            primeiro =>
+            {
+                Assert.Equal("O Auto da Compadecida", primeiro.Espetaculo.Titulo);
+                Assert.Equal("hibrido_svd_knn", primeiro.TipoAlgoritmo);
+                Assert.Equal(0.98m, primeiro.Score);
+            },
+            segundo => Assert.Equal("Hamlet", segundo.Espetaculo.Titulo));
     }
 
     [Theory]
@@ -100,18 +198,48 @@ public class RecomendacaoUseCasesTests
     private sealed class FakeRecomendacaoRepository : IRecomendacaoRepository
     {
         public IReadOnlyList<RecomendacaoEntity> Recomendacoes { get; set; } = [];
+        public IReadOnlyDictionary<int, EspetaculoRecomendado> EspetaculosPorId { get; set; } =
+            new Dictionary<int, EspetaculoRecomendado>();
         public Guid LastUsuarioId { get; private set; }
         public int LastLimite { get; private set; }
+        public int ListarPorUsuarioCalls { get; private set; }
+        public int[] LastEspetaculoIds { get; private set; } = [];
 
         public Task<IReadOnlyList<RecomendacaoEntity>> ListarPorUsuarioAsync(
             Guid usuarioId,
             int limite,
             CancellationToken cancellationToken)
         {
+            ListarPorUsuarioCalls++;
             LastUsuarioId = usuarioId;
             LastLimite = limite;
             return Task.FromResult(Recomendacoes);
         }
+
+        public Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(
+            IEnumerable<int> espetaculoIds,
+            CancellationToken cancellationToken)
+        {
+            LastEspetaculoIds = espetaculoIds.ToArray();
+            return Task.FromResult(EspetaculosPorId);
+        }
+    }
+
+    private sealed class FakeModeloRecomendacaoClient : IModeloRecomendacaoClient
+    {
+        public bool Habilitado { get; init; }
+        public IReadOnlyList<ModeloRecomendacaoPredicao> Predicoes { get; init; } = [];
+
+        public Task<IReadOnlyList<ModeloRecomendacaoPredicao>> PredizerAsync(
+            Guid usuarioId,
+            int limite,
+            CancellationToken cancellationToken) => Task.FromResult(Predicoes);
+    }
+
+    private sealed class FakeRecomendacaoStrategyFactory(IRecomendacaoStrategy strategy)
+        : IRecomendacaoStrategyFactory
+    {
+        public IRecomendacaoStrategy Criar() => strategy;
     }
 
     private sealed class FakeSimilaridadeRepository : ISimilaridadeRepository

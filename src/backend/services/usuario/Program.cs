@@ -11,7 +11,7 @@ using Spotlight.Usuario.Infrastructure.Auth;
 using Spotlight.Usuario.Infrastructure.Persistence;
 using Spotlight.Usuario.Presentation.Middleware;
 
-Env.TraversePath().NoClobber().Load();
+Env.NoClobber().TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 

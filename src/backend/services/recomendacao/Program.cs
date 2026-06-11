@@ -4,13 +4,19 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using Serilog;
+using Spotlight.Recomendacao.Application.Services;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Infrastructure.Auth;
+using Spotlight.Recomendacao.Infrastructure.Model;
 using Spotlight.Recomendacao.Infrastructure.Persistence;
+using Spotlight.Recomendacao.Infrastructure.Storage;
 using Spotlight.Recomendacao.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
-Env.TraversePath().NoClobber().Load();
+if (!AppContext.BaseDirectory.Contains("Spotlight.Recomendacao.Tests", StringComparison.OrdinalIgnoreCase))
+{
+    Env.NoClobber().TraversePath().Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +46,11 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 
     builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
     builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
+    builder.Services.AddSingleton<IModeloRecomendacaoClient, MlNetModeloRecomendacaoClient>();
+    builder.Services.AddScoped<ModeloMlNetRecomendacaoStrategy>();
+    builder.Services.AddScoped<PostgresPreProcessadoRecomendacaoStrategy>();
+    builder.Services.AddScoped<IRecomendacaoStrategyFactory, RecomendacaoStrategyFactory>();
+    builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
     builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
     builder.Services.AddScoped<ListarSimilaresUseCase>();
 }
@@ -78,6 +89,8 @@ builder.Services.AddCors(options =>
 // Controllers + Swagger / OpenAPI
 // ---------------------------------------------------------------------------
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
+builder.Services.AddHostedService<SupabaseModelArtifactsSyncHostedService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

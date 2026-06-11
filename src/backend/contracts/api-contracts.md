@@ -1,4 +1,4 @@
-# Contratos de API — Spotlight 
+﻿# Contratos de API — Spotlight
 
 Especificação das rotas que serão implementadas no backend, servindo como
 **fonte da verdade** para o desenvolvimento, para o Swagger  e para o
@@ -315,7 +315,7 @@ Em erros de validação (400), inclui `details` por campo:
   "data": [
     { "id": 88, "data": "2026-06-10", "horario": "20:00",
       "precoMinimo": 40.00, "precoMaximo": 120.00, "disponibilidade": 230,
-      "linkCompra": "https://...", 
+      "linkCompra": "https://...",
       "teatro": { "id": 2, "nome": "Teatro Aventura", "cidade": "Campinas", "estado": "SP" } }
   ]
 }
@@ -520,9 +520,10 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 ---
 
 ### 4.7 `POST /usuario/telemetria`
-**Finalidade:** registrar eventos de telemetria comportamental gerados pelo aplicativo
+**Finalidade:** receber eventos de telemetria comportamental gerados pelo aplicativo
 mobile, como visualização de tela, clique em card, busca e abertura de
-compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
+compra. Os eventos válidos são enviados para persistência na coleção
+`interacoes` do MongoDB.
 
 > O catálogo completo de eventos, a justificativa de coleta, as propriedades por
 > evento e o schema lógico da collection estão detalhados em
@@ -582,10 +583,12 @@ compra. Os eventos são armazenados na coleção `interacoes` do MongoDB.
 > payload.
 
 **Responses**
-- `202 Accepted` — evento aceito para persistência:
+- `202 Accepted` — evento validado e aceito para processamento de telemetria:
 ```json
 { "eventId": "evt_01HX9F7M9XK2", "status": "accepted" }
 ```
+> A telemetria é best-effort: falhas transitórias de escrita no MongoDB são
+> registradas em log e não bloqueiam a navegação do aplicativo.
 - `400 Bad Request` — validação (`Erro` com `details`).
 - `401 Unauthorized` — token enviado, mas ausente/inválido para associação autenticada. `Erro`.
 - `503 Service Unavailable` — telemetria/MongoDB não configurados no ambiente. `Erro`.
@@ -657,25 +660,148 @@ O backend normaliza o payload para a coleção `interacoes` com campos em
 
 ## 6. Serviço de Recomendação
 
-### 6.1 `GET /recomendacao/me`
-**Finalidade:** recomendações personalizadas para o usuário autenticado, ordenadas
-por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `recomendacao`).
+### 6.1 Schemas do serviço de recomendação
+
+#### EspetáculoRecomendado
+
+Objeto usado dentro das respostas de recomendação. Representa o subconjunto do espetáculo necessário para exibição em listas e carrosséis.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `id` | integer | Sim | Identificador do espetáculo. |
+| `titulo` | string | Sim | Título do espetáculo. |
+| `genero` | string ou null | Não | Gênero textual do espetáculo, quando cadastrado. |
+| `status` | string | Sim | Status do espetáculo. Ex.: `em_cartaz`, `em_breve`, `encerrado`. |
+| `notaMedia` | number | Sim | Média de avaliações do espetáculo. |
+
+Exemplo:
+
+```json
+{
+  "id": 12,
+  "titulo": "O Auto da Compadecida",
+  "genero": "Comédia",
+  "status": "em_cartaz",
+  "notaMedia": 4.7
+}
+```
+
+#### RecomendacaoItem
+
+Item retornado em `GET /recomendacao/me`.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `espetaculo` | EspetáculoRecomendado | Sim | Espetáculo recomendado. |
+| `score` | number | Sim | Pontuação calculada pelo algoritmo de recomendação. Deve ser maior ou igual a zero. |
+| `tipoAlgoritmo` | string | Sim | Algoritmo responsável pela recomendação. Ex.: `SVD`, `k-NN`, `content_based`. |
+| `motivo` | string ou null | Não | Explicação textual da recomendação. |
+| `dataGeracao` | string date-time | Sim | Momento em que a recomendação foi gerada. |
+
+Exemplo:
+
+```json
+{
+  "espetaculo": {
+    "id": 12,
+    "titulo": "O Auto da Compadecida",
+    "genero": "Comédia",
+    "status": "em_cartaz",
+    "notaMedia": 4.7
+  },
+  "score": 0.934512,
+  "tipoAlgoritmo": "SVD",
+  "motivo": "Por que você gostou de outras comédias populares.",
+  "dataGeracao": "2026-05-25T03:00:00Z"
+}
+```
+
+#### SimilarItem
+
+Item retornado em `GET /recomendacao/espetaculos/{id}/similares`.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `espetaculo` | EspetáculoRecomendado | Sim | Espetáculo similar ao espetáculo de origem. |
+| `score` | number | Sim | Grau de similaridade no intervalo esperado de 0 a 1. |
+| `tipoAlgoritmo` | string | Sim | Algoritmo usado para calcular similaridade. Ex.: `k-NN`, `SVD`. |
+
+Exemplo:
+
+```json
+{
+  "espetaculo": {
+    "id": 18,
+    "titulo": "Morte e Vida Severina",
+    "genero": "Drama",
+    "status": "em_cartaz",
+    "notaMedia": 4.5
+  },
+  "score": 0.81234,
+  "tipoAlgoritmo": "k-NN"
+}
+```
+
+#### Lista de recomendação
+
+Envelope usado pelas rotas de recomendação.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `data` | array | Sim | Lista de itens retornados. Pode ser vazia quando não houver recomendações disponíveis. |
+
+Exemplo:
+
+```json
+{
+  "data": []
+}
+```
+
+---
+
+### 6.2 `GET /recomendacao/me`
+
+**Finalidade:** recomendações personalizadas para o usuário autenticado, ordenadas por `score`. **Requer `cadastrado`.** Lê predições pré-processadas da tabela `recomendacao`.
+
+**Regra básica:** o backend retorna recomendações já calculadas pelo pipeline/modelo de recomendação. A rota não treina o modelo nem recalcula scores em tempo real; ela consulta os resultados persistidos para o usuário autenticado.
 
 **Request**
-- Header: `Authorization`.
+
+- Headers:
+
+| Header | Obrigatório | Descrição |
+|---|---|---|
+| `Authorization: Bearer <token-jwt>` | Sim | JWT válido de usuário `cadastrado`. |
+
 - Query params:
-```json
-{ "limite": "integer (default 10, máx 50)" }
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `limite` | integer | Não | Default 10. Valores menores que 1 usam 10. Valor máximo 50. |
+
+Exemplo de request:
+
+```http
+GET /recomendacao/me?limite=5
+Authorization: Bearer <token-jwt>
 ```
 
 **Responses**
-- `200 OK`:
+
+- `200 OK` - lista de `RecomendacaoItem`:
+
 ```json
 {
   "data": [
     {
-      "espetaculo": { "id": 12, "titulo": "O Auto da Compadecida", "genero": "Comédia",
-                      "status": "em_cartaz", "notaMedia": 4.7 },
+      "espetaculo": {
+        "id": 12,
+        "titulo": "O Auto da Compadecida",
+        "genero": "Comédia",
+        "status": "em_cartaz",
+        "notaMedia": 4.7
+      },
       "score": 0.934512,
       "tipoAlgoritmo": "SVD",
       "motivo": "Por que você gostou de outras comédias populares.",
@@ -684,40 +810,81 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
   ]
 }
 ```
-- `401` — token ausente ou inválido. `Erro`.
-- `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
-- `500` — `Erro`.
+
+- `200 OK` - sem recomendações disponíveis:
+
+```json
+{
+  "data": []
+}
+```
+
+- `401 Unauthorized` - token ausente ou inválido. Schema `Erro`.
+- `403 Forbidden` - token válido, mas usuário sem permissão. Schema `Erro`.
+- `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
 
-### 6.2 `GET /recomendacao/espetaculos/{id}/similares`
+### 6.3 `GET /recomendacao/espetaculos/{id}/similares`
+
 **Finalidade:** espetáculos similares a um dado espetáculo (item-item). **Público.**
 
-> **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os
-> usuários), então **não** sai da tabela `recomendacao` — essa é por-usuário e
-> protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm da tabela
-> dedicada `similaridade_item` (definida em `01_create_database.sql`), populada
-> em batch pelos algoritmos de recomendação (k-NN, SVD, k-means) com leitura
-> pública via política RLS `similaridade_item: leitura pública`.
+> **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os usuários), então **não** sai da tabela `recomendacao` - essa é por usuário e protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm da tabela dedicada `similaridade_item` (definida em `01_create_database.sql`), populada em batch pelos algoritmos de recomendação (k-NN, SVD, k-means) com leitura pública via política RLS `similaridade_item: leitura pública`.
 
 **Request**
-- Path param: `id`. Query: `limite` (default 10, máx 50).
+
+- Path params:
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `id` | integer | Sim | Identificador do espetáculo de origem. |
+
+- Query params:
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `limite` | integer | Não | Default 10. Valores menores que 1 usam 10. Valor máximo 50. |
+
+Exemplo de request:
+
+```http
+GET /recomendacao/espetaculos/12/similares?limite=5
+```
 
 **Responses**
-- `200 OK`:
+
+- `200 OK` - lista de `SimilarItem`:
+
 ```json
 {
   "data": [
-    { "espetaculo": { "id": 18, "titulo": "Morte e Vida Severina", "genero": "Drama",
-                      "status": "em_cartaz", "notaMedia": 4.5 },
-      "score": 0.812340, "tipoAlgoritmo": "k-NN" }
+    {
+      "espetaculo": {
+        "id": 18,
+        "titulo": "Morte e Vida Severina",
+        "genero": "Drama",
+        "status": "em_cartaz",
+        "notaMedia": 4.5
+      },
+      "score": 0.81234,
+      "tipoAlgoritmo": "k-NN"
+    }
   ]
 }
 ```
-- `404` (espetáculo inexistente) / `500` — `Erro`.
+
+- `200 OK` - sem similares disponíveis:
+
+```json
+{
+  "data": []
+}
+```
+
+- `404 Not Found` - espetáculo de origem inexistente. Schema `Erro`.
+- `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
-
 ## 7. Rastreabilidade (rota → entidade do banco)
 
 | Rota | Tabela(s) principal(is) |
