@@ -5186,7 +5186,7 @@ _conteúdo_
 | RNF03 | A executar | UptimeRobot ou health checks programados | Percentual de disponibilidade | Pendente | Janela completa de 30 dias pode exceder o ciclo acadêmico |
 | RNF04 | A executar | Checklist em dispositivo físico | Tamanho de áreas de toque e comportamento mobile | Pendente | Amostra limitada de aparelhos |
 | RNF05 | A executar | OWASP ZAP, Postman ou evidências HTTP | HTTPS, 401/403, JWT e armazenamento de senha | Pendente | Varredura ativa exige escopo controlado |
-| RNF06 | Executado parcialmente | `src/database/load_test/resultados_pgbench.txt` | TPS, latência média, falhas e carga de leitura/escrita no PostgreSQL | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
+| RNF06 | Executado | `src/database/load_test/resultados_pgbench.txt` | 2.839,57 TPS em leitura, 5.232,15 TPS em escrita, latências médias de 7,043 ms e 3,823 ms, 0% de falhas | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
 | RNF07 | A executar | Amostras de logs dos serviços | Campos obrigatórios e tempo de emissão | Pendente | Depende de ambiente com logs preservados |
 | RNF08 | A executar | Logs de deploy e health checks | Tempo de indisponibilidade por serviço | Pendente | Depende de pipeline/deploy isolado |
 | RNF09 | Planejado para Sprint 5 | k6/fila ou teste de broker | Eventos por segundo e impacto na latência | Não executado nesta sprint | RabbitMQ ainda tratado como evolução planejada |
@@ -5195,6 +5195,47 @@ _conteúdo_
 | RNF12 | A executar | Docker/health checks | Tempo de reinicialização por container | Pendente | Depende de compose completo e ambiente local estável |
 
 &emsp;O resultado já disponível nesta revisão é o teste de carga de banco com `pgbench`, associado ao RNF06 e usado como evidência parcial de desempenho da camada de persistência. Os demais RNFs permanecem preparados para registro nas tasks de execução correspondentes, especialmente desempenho, segurança e usabilidade.
+
+### 9.2.2.1. Execução de testes de RNF de desempenho
+
+&emsp;Foi executado um teste básico de desempenho sobre a camada PostgreSQL do Spotlight, utilizando `pgbench` para simular carga de leitura e escrita em condições controladas. O objetivo foi avaliar tempo de resposta, estabilidade e possíveis gargalos na persistência que sustenta os fluxos de catálogo, sessões, recomendações e avaliações.
+
+**Ambiente e ferramenta**
+
+| Item | Configuração |
+|------|--------------|
+| Ferramenta | `pgbench 16.13` |
+| Ambiente | `postgres:16-alpine` em Docker local |
+| Massa de dados | Aproximadamente 208 mil linhas |
+| Clientes simultâneos | 20 |
+| Threads | 4 |
+| Duração | 30 segundos por cenário |
+| Evidência | `src/database/load_test/resultados_pgbench.txt` |
+| Scripts | `src/database/load_test/run_pgbench.sh`, `src/database/load_test/pgbench/catalogo_leitura.sql`, `src/database/load_test/pgbench/avaliacao_escrita.sql` |
+
+**Cenários executados**
+
+| Cenário | Objetivo | Resultado observado |
+|---------|----------|--------------------|
+| Catálogo (leitura) | Simular navegação de catálogo, filtro por gênero, busca por título, listagem de sessões e leitura de recomendações por usuário | 85.108 transações processadas, 0 falhas, latência média de 7,043 ms e 2.839,57 TPS |
+| Avaliação (escrita + auditoria) | Simular escrita de avaliações com acionamento da trilha de auditoria | 156.903 transações processadas, 0 falhas, latência média de 3,823 ms e 5.232,15 TPS |
+
+**Análise dos resultados**
+
+&emsp;Nos dois cenários, a taxa de falhas foi de **0,000%**, indicando estabilidade da camada de banco durante a janela executada. A latência média ficou abaixo de 10 ms nos dois fluxos, o que sugere que as consultas críticas de catálogo e recomendação, bem como a escrita de avaliações, estão adequadamente suportadas pelos índices e constraints existentes para a massa sintética utilizada. A evidência de auditoria também foi validada, com registro de **256.903 linhas em auditoria** relacionadas ao fluxo de avaliação.
+
+&emsp;Não foram identificados gargalos críticos no PostgreSQL durante a execução com 20 clientes simultâneos. O cenário de leitura concentrou mais consultas por transação e, por isso, apresentou latência média maior que o cenário de escrita. Ainda assim, o resultado permaneceu confortável para o escopo avaliado e reforça que a camada de persistência não foi o principal ponto de risco observado nesta rodada.
+
+**Veredito**
+
+&emsp;O RNF06 foi considerado **aprovado no escopo de desempenho de banco**, pois o teste registrou alta vazão, baixa latência média e ausência de falhas transacionais na carga executada.
+
+**Limitações**
+
+- O teste mede a camada PostgreSQL diretamente, não o tempo de resposta completo percebido pelo usuário na API ou no aplicativo mobile.
+- O ambiente utilizado foi Docker local, portanto não representa integralmente uma infraestrutura de produção ou homologação publicada.
+- A execução usou 20 clientes simultâneos por 30 segundos, enquanto o planejamento completo do RNF06 prevê validação com até 200 usuários simultâneos por janela maior.
+- Os resultados não substituem testes complementares com k6 contra o API Gateway, nem medições de RNF01 e RNF02 com Lighthouse, timestamps ou dispositivo físico.
 
 ## 9.3 Testes de Usabilidade
 
