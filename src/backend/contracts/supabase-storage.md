@@ -123,12 +123,11 @@ fica disponivel para auditoria e rollback.
 
 ## Fluxo final
 
-1. Pipeline de treinamento gera o modelo e arquivos auxiliares.
-2. CI treina o modelo e gera os artefatos.
-3. CI publica os artefatos em `ml-artifacts` usando `SUPABASE_SERVICE_ROLE_KEY`.
-4. Servico de recomendacao baixa `current/` no startup quando
+1. CI executa os testes e treina o modelo.
+2. CI publica os artefatos em `ml-artifacts` usando `SUPABASE_SERVICE_ROLE_KEY`.
+3. Servico de recomendacao baixa `current/` no startup quando
    `SUPABASE_MODEL_ARTIFACTS_ENABLED=true`.
-5. API `GET /recomendacao/me` usa o modelo carregado ou faz fallback para
+4. API `GET /recomendacao/me` usa o modelo carregado ou faz fallback para
    recomendacoes pre-processadas no PostgreSQL.
 
 ## Cuidados

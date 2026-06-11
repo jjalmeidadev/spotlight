@@ -71,6 +71,8 @@ publish:model-artifacts:
   needs:
     - job: train:model-artifacts
       artifacts: true
+    - job: test:unit
+      artifacts: false
   image:
     name: curlimages/curl:8.10.1
     entrypoint: [""]
