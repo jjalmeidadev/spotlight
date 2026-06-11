@@ -11,6 +11,14 @@ export type CatalogShow = {
   imageUrl?: string | null;
 };
 
+export type ListCatalogShowsOptions = {
+  genre?: string | null;
+  limit?: number;
+  query?: string | null;
+  sortBy?: 'popularidade' | 'nota_media' | 'titulo';
+  status?: string | null;
+};
+
 export type CatalogShowDetail = CatalogShow & {
   description?: string | null;
   sessions: CatalogSession[];
@@ -65,12 +73,23 @@ type CatalogDetailItem = CatalogListItem & {
   }>;
 };
 
-export async function listarEspetaculosPopulares(limite = 8): Promise<CatalogShow[]> {
+export async function listarEspetaculos(options: ListCatalogShowsOptions = {}): Promise<CatalogShow[]> {
   const params = new URLSearchParams({
-    ordenarPor: 'popularidade',
-    status: 'em_cartaz',
-    pageSize: String(limite),
+    ordenarPor: options.sortBy ?? 'popularidade',
+    pageSize: String(options.limit ?? 8),
   });
+
+  if (options.status) {
+    params.set('status', options.status);
+  }
+
+  if (options.genre) {
+    params.set('genero', options.genre);
+  }
+
+  if (options.query?.trim()) {
+    params.set('q', options.query.trim());
+  }
 
   const response = await fetch(`${API_BASE_URL}/catalogo/espetaculos?${params.toString()}`, {
     headers: { Accept: 'application/json' },
@@ -84,6 +103,18 @@ export async function listarEspetaculosPopulares(limite = 8): Promise<CatalogSho
   return (payload.data ?? [])
     .map(toCatalogShow)
     .filter((item): item is CatalogShow => item !== null);
+}
+
+export async function listarEspetaculosEmCartaz(limite = 12): Promise<CatalogShow[]> {
+  return listarEspetaculos({ limit: limite, sortBy: 'titulo', status: 'em_cartaz' });
+}
+
+export async function listarCatalogoCompleto(limite = 20): Promise<CatalogShow[]> {
+  return listarEspetaculos({ limit: limite, sortBy: 'popularidade' });
+}
+
+export async function listarEspetaculosPopulares(limite = 10): Promise<CatalogShow[]> {
+  return listarEspetaculos({ limit: limite, sortBy: 'popularidade', status: 'em_cartaz' });
 }
 
 export async function listarEspetaculosPertoDe(

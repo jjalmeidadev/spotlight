@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
-import { CatalogRail } from '../models/CatalogItem';
+import { useEffect, useMemo, useState } from 'react';
+import { CatalogItem, CatalogRail } from '../models/CatalogItem';
 import {
 	CatalogShow,
+	listarCatalogoCompleto,
+	listarEspetaculos,
+	listarEspetaculosEmCartaz,
 	listarEspetaculosPertoDe,
 	listarEspetaculosPopulares,
 } from '../repositories/CatalogRepository';
@@ -22,7 +25,13 @@ const CATALOG_IMAGE = {
 	hair: require('../../../assets/images/catalog/catalog-hair.png'),
 } as const;
 
-const FILTER_OPTIONS = ['Musical', 'Stand-up', 'Show', 'Espetaculo', 'Palestra', 'Meet-up'] as const;
+const FILTER_OPTIONS = [
+	'Teatro Musical',
+	'Dramaturgia',
+	'Show Musical',
+	'Concerto e Show',
+	'Teatro Infantil',
+] as const;
 
 const FALLBACK_POPULAR_ITEMS = [
 	{ id: '16', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
@@ -42,6 +51,9 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const [recommendations, setRecommendations] = useState<RecommendedShow[]>([]);
 	const [popularShows, setPopularShows] = useState<CatalogShow[]>([]);
 	const [nearbyShows, setNearbyShows] = useState<CatalogShow[]>([]);
+	const [emCartazShows, setEmCartazShows] = useState<CatalogShow[]>([]);
+	const [catalogShows, setCatalogShows] = useState<CatalogShow[]>([]);
+	const [filteredShows, setFilteredShows] = useState<CatalogShow[]>([]);
 	const [recommendationsLoading, setRecommendationsLoading] = useState(false);
 	const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
@@ -89,9 +101,16 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 
 		async function loadCatalogSections() {
 			try {
-				const popular = await listarEspetaculosPopulares(8);
+				const [popular, emCartaz, catalogo] = await Promise.all([
+					listarEspetaculosPopulares(10),
+					listarEspetaculosEmCartaz(20),
+					listarCatalogoCompleto(20),
+				]);
+
 				if (active) {
 					setPopularShows(popular);
+					setEmCartazShows(emCartaz);
+					setCatalogShows(catalogo);
 				}
 
 				const nearby = await listarEspetaculosPertoDe(options?.userLocationAddress, 8);
@@ -101,6 +120,8 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 			} catch {
 				if (active) {
 					setPopularShows([]);
+					setEmCartazShows([]);
+					setCatalogShows([]);
 					setNearbyShows([]);
 				}
 			}
@@ -112,6 +133,39 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 			active = false;
 		};
 	}, [options?.userLocationAddress]);
+
+	useEffect(() => {
+		let active = true;
+		const timeout = setTimeout(async () => {
+			const trimmedQuery = query.trim();
+			if (!trimmedQuery && !selectedFilter) {
+				setFilteredShows([]);
+				return;
+			}
+
+			try {
+				const data = await listarEspetaculos({
+					genre: selectedFilter,
+					limit: 20,
+					query: trimmedQuery,
+					sortBy: 'popularidade',
+				});
+
+				if (active) {
+					setFilteredShows(data);
+				}
+			} catch {
+				if (active) {
+					setFilteredShows([]);
+				}
+			}
+		}, 260);
+
+		return () => {
+			active = false;
+			clearTimeout(timeout);
+		};
+	}, [query, selectedFilter]);
 
 	const recommendationItems = recommendations.map((item) => ({
 		id: item.id,
@@ -127,13 +181,24 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		},
 	}));
 
+	const filteredItems = filteredShows.map(toCatalogItem);
 	const popularItems = popularShows.map(toCatalogItem);
 	const nearbyItems = nearbyShows.map((item) => ({
 		...toCatalogItem(item),
 		subtitle: item.genre ?? 'Perto de voce',
 	}));
+	const emCartazItems = emCartazShows.map(toCatalogItem);
+	const catalogItems = catalogShows.map(toCatalogItem);
+
+	const heroItem = useMemo<CatalogItem | null>(
+		() => recommendationItems[0] ?? popularItems[0] ?? emCartazItems[0] ?? null,
+		[recommendationItems, popularItems, emCartazItems],
+	);
 
 	const sections: CatalogRail[] = [
+		...(filteredItems.length > 0
+			? [{ id: 'search-results', title: 'Resultados encontrados:', items: filteredItems }]
+			: []),
 		...(recommendationItems.length > 0
 			? [{ id: 'recommended', title: 'Recomendados para voce:', items: recommendationItems }]
 			: []),
@@ -145,11 +210,18 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 			title: 'Os mais populares do momento:',
 			items: popularItems.length > 0 ? popularItems : FALLBACK_POPULAR_ITEMS,
 		},
+		...(emCartazItems.length > 0
+			? [{ id: 'em-cartaz', title: 'Em cartaz:', items: emCartazItems }]
+			: []),
+		...(catalogItems.length > 0
+			? [{ id: 'catalogo-completo', title: 'Catalogo completo:', items: catalogItems }]
+			: []),
 	];
 
 	return {
 		assets: CATALOG_IMAGE,
 		filterOptions: FILTER_OPTIONS,
+		heroItem,
 		query,
 		recommendationsError,
 		recommendationsLoading,

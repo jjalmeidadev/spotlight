@@ -8,6 +8,7 @@ type CatalogHeroProps = {
 	subtitle: string;
 	actionLabel: string;
 	heroSource: ImageSourcePropType;
+	onActionPress?: () => void;
 	overSource: ImageSourcePropType;
 	profileLabel: string;
 	profileSource?: ImageSourcePropType | null;
@@ -18,6 +19,7 @@ export function CatalogHero({
 	subtitle,
 	actionLabel,
 	heroSource,
+	onActionPress,
 	profileLabel,
 	profileSource,
 }: CatalogHeroProps) {
@@ -46,7 +48,7 @@ export function CatalogHero({
 				<Text style={styles.subtitle} numberOfLines={2}>
 					{subtitle}
 				</Text>
-				<Pressable style={styles.cta} accessibilityRole="button">
+				<Pressable onPress={onActionPress} style={styles.cta} accessibilityRole="button">
 					<Text style={styles.ctaText}>{actionLabel}</Text>
 				</Pressable>
 			</View>

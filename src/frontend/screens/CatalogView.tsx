@@ -73,11 +73,20 @@ export default function CatalogView({ accessToken, profileName, userLocationAddr
 					<CatalogHero
 						actionLabel="Comprar"
 						heroSource={vm.assets.hero}
+						onActionPress={() => {
+							if (vm.heroItem) {
+								handleItemPress(vm.heroItem, {
+									railId: 'hero',
+									railTitle: 'Hero',
+									position: 0,
+								});
+							}
+						}}
 						overSource={vm.assets.heroArtwork}
 						profileLabel={profileName ?? vm.userName}
 						profileSource={null}
-						subtitle="Um dos maiores clássicos da broadway"
-						title="A Noviça Rebelde"
+						subtitle={vm.heroItem?.subtitle ?? 'Um dos maiores classicos da broadway'}
+						title={vm.heroItem?.title ?? 'A Novica Rebelde'}
 					/>
 
 					<CatalogContentShell topBackgroundSource={vm.assets.whiteShell} logoSource={vm.assets.logo}>
@@ -86,7 +95,7 @@ export default function CatalogView({ accessToken, profileName, userLocationAddr
 								iconSource={vm.assets.searchIcon}
 								onChangeText={vm.setQuery}
 								onSubmitEditing={handleSearchSubmit}
-								placeholder=""
+								placeholder="Buscar espetaculo"
 								returnKeyType="search"
 								value={vm.query}
 							/>
