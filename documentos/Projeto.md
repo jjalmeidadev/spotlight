@@ -1205,7 +1205,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 </div>
 
-&emsp;No Brasil, o IA4People não opera no vácuo: ele encontra correspondência direta na **Lei Geral de Proteção de Dados Pessoais (LGPD — Lei nº 13.709/2018)**, no **Marco Civil da Internet (Lei nº 12.965/2014)** e na **Estratégia Brasileira de Inteligência Artificial (EBIA)**. Por isso, esta análise trata o IA4People como camada ética e a LGPD como camada normativa: o que o framework recomenda, a lei brasileira exige. A tabela abaixo explicita esse paralelo e ancora cada princípio em um artigo concreto, transformando boas intenções em obrigações verificáveis no Spotlight.
+&emsp;No Brasil, o IA4People não opera no vácuo: ele encontra correspondência — não equivalência — na **Lei Geral de Proteção de Dados Pessoais (LGPD — Lei nº 13.709/2018)**, no **Marco Civil da Internet (Lei nº 12.965/2014)** e na **Estratégia Brasileira de Inteligência Artificial (EBIA)**. Por isso, esta análise trata o IA4People como camada ética e a LGPD como camada normativa: a LGPD traduz parte desses princípios em obrigações verificáveis, mas as duas camadas não se sobrepõem perfeitamente. A tabela abaixo explicita o paralelo possível e ancora cada princípio em um artigo concreto, transformando boas intenções em obrigações observáveis no Spotlight.
 
 <div align="center">
 
@@ -1214,10 +1214,10 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 | Princípio IA4People | Princípio / Direito LGPD | Implicação prática no Spotlight |
 |---|---|---|
 | Beneficência | Finalidade (Art. 6º, I) | Coleta limitada à recomendação cultural; telemetria não é revendida nem usada para fins não declarados |
-| Não-Maleficência | Necessidade, Segurança e Prevenção (Art. 6º, III, VII e VIII) | Dados pseudonimizados; RLS no PostgreSQL; JWT no Gateway; minimização da coleta |
+| Não-Maleficência | Necessidade, Segurança e Prevenção (Art. 6º, III, VII e VIII) | Telemetria com identificadores técnicos (pseudônimos quando autenticado, anônimos quando não); RLS no PostgreSQL para escrita/edição de dados privados; validação de JWT no serviço de usuário (validação centralizada no Gateway está planejada); minimização da coleta |
 | Autonomia | Direitos do titular (Art. 18) | Edição de preferências; futuro endpoint de exclusão de conta; consentimento explícito de localização |
-| Justiça | Não discriminação (Art. 6º, IX) | Camada de serendipidade, fallback cold start, persona idosa no escopo de testes |
-| Explicabilidade | Transparência (Art. 6º, VI) e revisão de decisões automatizadas (Art. 20) | Justificativa visível no card de recomendação; logs estruturados auditáveis |
+| Justiça | Não discriminação (Art. 6º, IX) | Camada de serendipidade, fallback cold start por popularidade global, persona idosa no escopo de testes |
+| Explicabilidade | Transparência (Art. 6º, VI) e revisão de decisões automatizadas (Art. 20) | Campo `motivo` exposto pela API de recomendação; exibição no card planejada para o frontend; logs estruturados auditáveis |
 
 <sup>Fonte: Material produzido pelos autores, 2026, com base em Floridi et al. (2018) e Lei nº 13.709/2018.</sup>
 
@@ -1232,7 +1232,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 &emsp;No produto, esse princípio se traduz em decisões concretas:
 
 - **Recomendação para descoberta, não para retenção compulsiva**: o objetivo declarado nos objetivos estratégicos (seção 2.3.4) é descoberta de conteúdo e engajamento qualificado, não tempo de tela. Métricas de sucesso priorizam diversidade de espetáculos visualizados (cobertura do catálogo, *intra-list diversity*), não volume de impressões. Essa escolha de KPI desincentiva padrões manipulativos como infinite scroll otimizado para retenção.
-- **Conteúdos populares como fallback (Cold Start, RF15)**: usuários sem histórico recebem produções relevantes para o público amplo, evitando que a ausência de dados se traduza em ausência de valor — e em desigualdade de experiência.
+- **Conteúdos populares como fallback (Cold Start, RF15)**: usuários sem histórico recebem produções ordenadas por popularidade global do catálogo, evitando que a ausência de dados se traduza em ausência de valor — e em desigualdade de experiência. O refinamento por segmento (faixa etária, gênero declarado) e por região consentida está no roadmap, ainda não implementado.
 - **Reforço da identidade cultural da Aventura**: a curadoria algorítmica amplifica todo o portfólio, não só os títulos de maior bilheteria, alinhada ao reposicionamento de rebranding da empresa (seção 2.2). O ganho cultural é tratado como métrica de sucesso, não como externalidade.
 - **Acessibilidade desde o desenho**: a inclusão da persona Carlos Nóbrega (idoso, seção 2.4.1.6) força a equipe a tratar contraste, tamanho de fonte e clareza de navegação como requisitos beneficentes, não como ajustes posteriores.
 
@@ -1240,7 +1240,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 &emsp;Sistemas de recomendação podem causar danos por **vazamento de dados**, por **manipulação de escolha**, por **perfilamento sensível** (deduzir orientação política, religiosa ou sexual a partir do consumo cultural) e por **fechamento da bolha** (filter bubble), em que o usuário deixa de ver conteúdos que ampliariam seu horizonte. O Spotlight enfrenta cada um desses vetores:
 
-- **Privacidade dos dados comportamentais**: a telemetria é armazenada no MongoDB Atlas em coleção `interacoes` com identificadores pseudonimizados; o acesso é restrito pelo API Gateway (validação JWT) e pelo serviço de usuário, não pelo cliente. Dados estruturados sensíveis (perfil, preferências, avaliações) ficam no PostgreSQL com **Row Level Security** ativa, garantindo que cada usuário só leia o que é seu (seção 4.4.3, "Row Level Security (RLS)").
+- **Privacidade dos dados comportamentais**: a telemetria é armazenada no MongoDB Atlas em coleção `interacoes` com identificadores técnicos — `user_id` (pseudônimo) quando o evento chega com JWT válido, ou `anonymous_id` (anônimo de cliente) quando não há autenticação. A validação do JWT é feita no serviço de usuário quando o token é enviado (`TelemetriaController`); a validação centralizada no API Gateway está prevista no roadmap — hoje o gateway só faz roteamento via YARP. Dados estruturados sensíveis (perfil, preferências) ficam no PostgreSQL com **Row Level Security** ativa, garantindo que cada usuário só leia/edite o que é seu. Já as **avaliações** têm leitura pública por design (catálogo aberto: nota e comentário aparecem para qualquer visitante), enquanto inserção e exclusão ficam restritas ao próprio autor via `auth.uid()` — esse é um trade-off explícito de transparência do catálogo, não uma falha de privacidade (seção 4.4.3, "Row Level Security (RLS)").
 - **Não inferência de atributos sensíveis**: o modelo opera sobre interações item-usuário e features explícitas do catálogo (categoria, atores, teatro). Não há classificação latente que produza rótulos como orientação política ou religiosa. Não se faz cruzamento com bases externas de perfilamento.
 - **Diversidade na recomendação para mitigar bolhas**: a estratégia priorizada na seção 2.7.2 inclui camadas de contexto, heurísticas e **serendipidade** (média prioridade) para inserir espetáculos fora da zona de conforto do usuário, evitando reforço puro de afinidade.
 - **Localização como recurso opcional**: o consentimento de localização é tratado como opt-in (rota `PUT /usuario/me/localizacao`); falhas ou recusas não interrompem o fluxo (seção 10.2.2).
@@ -1261,7 +1261,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 &emsp;O princípio de justiça se desdobra em **justiça para o usuário** (todos têm acesso a recomendações relevantes, independentemente de perfil) e **justiça para o catálogo** (produções menos populares têm chance real de serem descobertas). O Spotlight enfrenta dois vieses estruturais típicos de recomendadores:
 
 - **Viés de popularidade**: filtragem colaborativa tende a recomendar o que já é muito interagido, criando feedback loop que sufoca a cauda longa. A estratégia priorizada em 2.7.2 reserva camadas explícitas para serendipidade e contexto, e o catálogo da Aventura é tratado como bem cultural a ser distribuído amplamente — incluindo produções premiadas mas pouco buscadas, citadas no problema da seção 2.2.
-- **Cold start de usuário (RF15)**: usuários novos ou sem histórico recebem recomendações baseadas em popularidade entre o público amplo, evitando a tela vazia ou genérica demais.
+- **Cold start de usuário (RF15)**: usuários novos ou sem histórico recebem recomendações baseadas em popularidade global do catálogo (ordenação `popularidade DESC` no `EspetaculoRepository`), evitando a tela vazia. Fallbacks segmentados por persona ou região ainda não estão implementados — são item de refino.
 - **Heterogeneidade do público**: as personas (seção 2.4.1) cobrem perfis amplos — estudante, mãe, turista, universitário iniciante, idoso — e os testes funcionais (seção 9.1) e de usabilidade (seção 9.3) validam o sistema em múltiplos contextos. A persona de **Carlos Nóbrega (idoso interessado em teatro)** força a equipe a tratar acessibilidade não como exceção, mas como requisito.
 - **Justiça regional**: o uso de geocoding via OpenStreetMap/Nominatim (seção 5.2) é gratuito e sem billing proprietário, reduzindo dependência de provedores que possam viesar oferta por região.
 
@@ -1269,7 +1269,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 &emsp;Explicabilidade é o princípio sem o qual os outros não podem ser auditados. Ela também é exigência normativa: o **Art. 20 da LGPD** garante ao titular o direito de solicitar revisão de decisões tomadas unicamente com base em tratamento automatizado que afetem seus interesses. Recomendação cultural não é decisão judicial, mas a obrigação de transparência aplica-se por princípio de boa-fé. No Spotlight, a explicabilidade tem três níveis:
 
-- **Explicabilidade ao usuário**: cada bloco de recomendação carrega contexto curto e legível (ex.: "porque você gostou de musicais clássicos", "popular entre quem viu este espetáculo"). A justificativa não revela detalhes do modelo, mas dá ao usuário a chance de discordar e reconfigurar suas preferências.
+- **Explicabilidade ao usuário (parcial)**: o backend já produz e expõe um campo `motivo` para cada recomendação no endpoint `GET /recomendacao/me` (`RecomendacaoDto.Motivo`), contendo um contexto curto e legível (ex.: "porque você gostou de musicais clássicos"). A exibição desse texto no card de recomendação ainda **não** está implementada no frontend — hoje o `CatalogPosterCard` renderiza apenas a imagem e a tela do catálogo opera sobre dados estáticos. O consumo do campo pelo app está planejado para a Sprint 4, fechando o ciclo de explicabilidade ao usuário final.
 - **Explicabilidade técnica e auditabilidade**: o motor de ML é treinado em pipeline reprodutível (k-NN para similaridade item-item, SVD para fatoração latente — seção 5.2.4). O pipeline de treinamento é versionado e publica artefatos do modelo no storage do projeto após bateria de testes obrigatória (referência: histórico recente da branch `develop`). Logs estruturados (RNF07) permitem rastrear cada recomendação até o snapshot do modelo que a gerou.
 - **Explicabilidade institucional**: a documentação (seção 8.2 e este capítulo) explicita os algoritmos, suas limitações, os dados usados e as decisões éticas tomadas. Qualquer auditor externo — interno à Aventura, acadêmico ou regulatório — encontra na documentação como o sistema decide.
 
@@ -1304,12 +1304,12 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 | ID | Risco | Princípio impactado | Cuidado | Ação mitigadora | Status | Responsável |
 |---|---|---|---|---|---|---|
-| RE01 | Vazamento de dados pessoais e comportamentais | Não-Maleficência | Pseudonimização, RLS no PostgreSQL, JWT no Gateway | Auditoria periódica das policies RLS e revisão de logs de acesso | Implementado (RLS) / Planejado (auditoria) | Time de Backend |
+| RE01 | Vazamento de dados pessoais e comportamentais | Não-Maleficência | Pseudonimização da telemetria, RLS no PostgreSQL para dados privados, validação de JWT no serviço de usuário | Centralizar validação de JWT no API Gateway; auditoria periódica das policies RLS e revisão de logs de acesso | Parcial (RLS ativa, JWT validado por serviço) / Planejado (JWT no Gateway + auditoria) | Time de Backend |
 | RE02 | Perfilamento sensível (orientação política, religiosa, sexual) | Não-Maleficência / Justiça | Modelo restrito a interações item-usuário, sem rótulos sensíveis | Code review obrigatório de novas features do modelo para barrar variáveis proxy | Implementado | Time de Dados |
 | RE03 | Bolha de filtro (filter bubble) | Autonomia / Justiça | Camada de serendipidade e contexto na recomendação (2.7.2) | Métrica de diversidade de gênero teatral por usuário em painel de monitoramento | Planejado (Sprint 5) | Time de Dados |
 | RE04 | Viés de popularidade que sufoca cauda longa | Justiça | Reserva de slots para conteúdo menos popular | Re-ranking com penalização de popularidade no top-N | Planejado (Sprint 5) | Time de Dados |
-| RE05 | Cold start gerando experiência ruim | Beneficência / Justiça | Fallback de populares por região e segmento | RF15 implementado; revisar critérios de "popular" por persona | Implementado / Em refino | Time de Dados |
-| RE06 | Recomendação opaca, sem justificativa | Explicabilidade | Texto curto de contexto em cada bloco | Padronização do copy de explicação (Sprint 4) | Implementado parcialmente | Time de Frontend |
+| RE05 | Cold start gerando experiência ruim | Beneficência / Justiça | Fallback por popularidade global do catálogo (RF15) | Evoluir fallback para considerar segmento (faixa etária, gênero declarado) e região consentida; revisar critérios de "popular" por persona | Parcial (popularidade global ativa; segmentação pendente) | Time de Dados |
+| RE06 | Recomendação opaca, sem justificativa | Explicabilidade | Campo `motivo` no DTO de recomendação exposto pela API | Consumir e exibir `motivo` no card no frontend; padronizar copy de explicação (Sprint 4) | Parcial (API expõe; UI pendente) | Time de Frontend |
 | RE07 | Manipulação comercial (promoção disfarçada de recomendação) | Não-Maleficência / Autonomia | Distinção visual entre "para você", "patrocinado" e "destaque editorial" | Definir guideline visual e revisar interface | Planejado | Produto + Design |
 | RE08 | Acessibilidade insuficiente para idosos e PCDs | Justiça | Persona Carlos Nóbrega no escopo desde 2.4.1 | Teste de usabilidade SUS com participantes representativos (9.3) | Em execução | UX + QA |
 | RE09 | Modelo degradado em produção sem detecção | Beneficência / Explicabilidade | Pipeline reprodutível e publicação de artefatos versionados | Métricas de drift e re-treino agendado; alerta em queda de qualidade | Planejado | Time de Dados / DevOps |
@@ -1325,7 +1325,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 ### 2.9.5 Plano de Ações Éticas por Sprint
 
-&emsp;Para não tratar a ética como capítulo separado da execução, as ações mitigadoras foram distribuídas ao longo das sprints, em paralelo às entregas técnicas. Sprints anteriores já endereçaram a base (RLS, RF15, pseudonimização); as sprints seguintes consolidam diversidade, explicabilidade e governança.
+&emsp;Para não tratar a ética como capítulo separado da execução, as ações mitigadoras foram distribuídas ao longo das sprints, em paralelo às entregas técnicas. Sprints anteriores já endereçaram a base (RLS para dados privados, RF15 com fallback por popularidade global, pseudonimização da telemetria); as sprints seguintes consolidam explicabilidade na UI, diversidade, centralização de JWT no Gateway e governança.
 
 <div align="center">
 
@@ -1333,9 +1333,9 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 | Sprint | Ações éticas previstas | Princípios reforçados |
 |---|---|---|
-| Sprint 3 (concluída) | RLS ativa no PostgreSQL, JWT no Gateway, RF15 (cold start), persona idosa incluída no escopo | Não-Maleficência, Justiça |
-| Sprint 4 | Copy padronizado de explicação da recomendação; testes de usabilidade SUS com participantes representativos; documentação ética (esta seção) | Explicabilidade, Justiça, Autonomia |
-| Sprint 5 | Re-ranking com penalização de popularidade; métricas de diversidade de gênero teatral; fila RabbitMQ para telemetria; ação "não me mostre mais" no card; revisão de guideline visual entre patrocinado e personalizado | Justiça, Autonomia, Não-Maleficência |
+| Sprint 3 (concluída) | RLS ativa no PostgreSQL para dados privados, validação de JWT no serviço de usuário, RF15 (cold start por popularidade global), persona idosa incluída no escopo | Não-Maleficência, Justiça |
+| Sprint 4 | Exibição do campo `motivo` no card de recomendação (consumo no frontend) e copy padronizado da explicação; testes de usabilidade SUS com participantes representativos; documentação ética (esta seção) | Explicabilidade, Justiça, Autonomia |
+| Sprint 5 | Centralização da validação de JWT no API Gateway; re-ranking com penalização de popularidade; métricas de diversidade de gênero teatral; fila RabbitMQ para telemetria; ação "não me mostre mais" no card; revisão de guideline visual entre patrocinado e personalizado | Justiça, Autonomia, Não-Maleficência |
 | Pós-MVP | Painel de monitoramento de drift do modelo; auditoria periódica de RLS; re-treino agendado; relatório semestral de impacto ético publicado junto à doc | Explicabilidade, Beneficência |
 
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
@@ -1346,7 +1346,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 &emsp;O Spotlight não é eticamente neutro: ele decide, em escala, o que cada usuário do Portal Aventura encontra primeiro. Aplicar o IA4People à arquitetura desde o entendimento do negócio — e ancorá-lo na LGPD — força a equipe a tratar **Beneficência** (descoberta cultural), **Não-Maleficência** (privacidade e ausência de perfilamento sensível), **Autonomia** (consentimento, edição de preferências, direitos do titular), **Justiça** (cold start, viés de popularidade, acessibilidade) e **Explicabilidade** (justificativa visível, logs, doc viva) como restrições de projeto, não como verniz a posteriori.
 
-&emsp;Boa parte das ações já está incorporada à arquitetura entregue até a Sprint 3 — RLS, pseudonimização, fallback de cold start, persona idosa, documentação aberta. As próximas sprints fecham as lacunas críticas: re-ranking para combater viés de popularidade, métrica de diversidade, fila resiliente de telemetria, ação de contestação no card de recomendação e governança de drift. No pós-MVP, ficam endereçados os direitos do titular pela LGPD (portabilidade, exclusão) e a definição formal de Encarregado de Dados. O compromisso é tratar essas ações como entregas auditáveis, com responsável e status, e revisitar esta seção ao final de cada sprint para refletir o estado real do sistema.
+&emsp;Boa parte das ações já está incorporada à arquitetura entregue até a Sprint 3 — RLS para dados privados, pseudonimização da telemetria, fallback de cold start por popularidade global, persona idosa, documentação aberta e campo `motivo` exposto pela API de recomendação. Permanecem lacunas honestas para as próximas sprints: exibir o `motivo` no card (a explicabilidade está disponível na API, ainda não na UI), centralizar a validação de JWT no API Gateway, evoluir o fallback de cold start para considerar segmento e região, re-ranking contra viés de popularidade, métrica de diversidade, fila resiliente de telemetria, ação de contestação no card e governança de drift. No pós-MVP, ficam endereçados os direitos do titular pela LGPD (portabilidade, exclusão) e a definição formal de Encarregado de Dados. O compromisso é tratar essas ações como entregas auditáveis, com responsável e status, e revisitar esta seção ao final de cada sprint para refletir o estado real do sistema.
 
 ### 2.9.7 Nota Metodológica e Limites da Análise
 
