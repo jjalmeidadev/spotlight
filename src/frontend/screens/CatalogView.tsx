@@ -19,7 +19,7 @@ type CatalogViewProps = {
 
 export default function CatalogView({ accessToken, profileName, onItemPress }: CatalogViewProps) {
 	const { width } = useWindowDimensions();
-	const vm = useCatalogViewModel();
+	const vm = useCatalogViewModel({ accessToken });
 	const horizontalPadding = Math.max(16, Math.round(width * 0.044));
 	const firstSection = vm.sections[0];
 	const remainingSections = vm.sections.slice(1);
@@ -54,6 +54,9 @@ export default function CatalogView({ accessToken, profileName, onItemPress }: C
 				properties: {
 					origin: context.railId ?? context.railTitle,
 					position: context.position,
+					recommendationAlgorithm: item.recommendation?.algorithm,
+					recommendationScore: item.recommendation?.score,
+					recommendationReason: item.recommendation?.reason,
 				},
 			},
 			accessToken,

@@ -148,6 +148,8 @@ export default function DetalhesView({
             properties: {
               origin: 'similar',
               position: index,
+              recommendationAlgorithm: item.algoritmo,
+              recommendationScore: item.score,
             },
           },
           accessToken,

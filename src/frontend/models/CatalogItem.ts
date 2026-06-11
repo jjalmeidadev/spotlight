@@ -5,6 +5,12 @@ export type CatalogItem = {
 	title: string;
 	subtitle?: string;
 	image: ImageSourcePropType;
+	recommendation?: {
+		score: number;
+		algorithm: string;
+		reason?: string | null;
+		generatedAt?: string;
+	};
 };
 
 export type CatalogRail = {

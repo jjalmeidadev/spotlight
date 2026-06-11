@@ -1,7 +1,11 @@
+import { listarEspetaculosSimilares } from '../repositories/RecommendationRepository';
+
 export type EspetaculoSemelhante = {
   id: string;
   titulo: string;
   imagemUrl?: string;
+  score?: number;
+  algoritmo?: string;
 };
 
 export type EspetaculoDetalhe = {
@@ -66,11 +70,25 @@ export async function obterDetalhesEspetaculo(espetaculoId: string): Promise<Esp
 export async function obterEspetaculosSemelhantes(
   espetaculoId: string,
 ): Promise<EspetaculoSemelhante[]> {
-  await wait(250);
-
   if (!espetaculoId.trim()) {
     return [];
   }
 
+  try {
+    const similares = await listarEspetaculosSimilares(espetaculoId, 8);
+
+    if (similares.length > 0) {
+      return similares.map((item) => ({
+        id: item.id,
+        titulo: item.title,
+        score: item.score,
+        algoritmo: item.algorithm,
+      }));
+    }
+  } catch {
+    // Mantem a tela navegavel quando o backend local nao estiver ativo.
+  }
+
+  await wait(250);
   return MOCK_SEMELHANTES;
 }
