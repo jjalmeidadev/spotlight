@@ -11,15 +11,39 @@ Este documento estabelece os padrões de codificação e padrões de projeto ado
 #### 2.1.1 Estrutura de Diretórios
 ```
 g04/
-├── documentos/          # Documentação do projeto
-│   ├── img/            # Imagens e diagramas
-│   └── *.md            # Arquivos Markdown de documentação
-├── src/                # Código-fonte
-│   ├── aad/            # Análise e tratamento de dados
-│   ├── database/       # Scripts SQL e configurações de BD
-│   ├── dataset/        # Datasets processados
-│   └── models/         # Modelos de machine learning
-└── colab_csv_utf8/     # Datasets originais
+├── documentos/                          # Documentação do projeto (markdowns + imagens)
+│   ├── img/                             # Imagens, diagramas, mockups, wireframes
+│   └── *.md                             # Projeto, Manual de instalação, padrões, SOA, etc.
+├── src/
+│   ├── aad/                             # Notebooks de análise e tratamento de dados
+│   ├── backend/                         # Backend SOA em ASP.NET Core (.NET 9)
+│   │   ├── Spotlight.sln                # Solution: gateway + 4 serviços + projetos de teste
+│   │   ├── api-gateway/                 # Spotlight.Gateway (porta 5000) — YARP
+│   │   ├── services/
+│   │   │   ├── catalogo/                # Spotlight.Catalogo        (5001)
+│   │   │   ├── usuario/                 # Spotlight.Usuario         (5002) + telemetria Mongo
+│   │   │   ├── recomendacao/            # Spotlight.Recomendacao    (5003) + ML.NET strategy
+│   │   │   └── geolocalizacao/          # Spotlight.Geolocalizacao  (5004) — Nominatim
+│   │   ├── contracts/                   # Contratos de API/eventos e docs operacionais
+│   │   ├── scripts/                     # Scripts auxiliares (PowerShell)
+│   │   └── tests/                       # Projetos xUnit por serviço
+│   ├── frontend/                        # App Expo / React Native em arquitetura MVVM
+│   │   ├── components/                  # Componentes visuais reutilizáveis
+│   │   ├── screens/                     # Telas (Views)
+│   │   ├── viewmodels/                  # ViewModels (hooks de tela)
+│   │   ├── repositories/                # Acesso aos serviços backend
+│   │   ├── models/                      # Tipos/entidades de UI
+│   │   ├── hooks/, theme/, config/      # Suporte (sessão, paleta, endpoints)
+│   ├── database/                        # Scripts SQL (PostgreSQL/Supabase)
+│   │   ├── 0X_*.sql                     # Bootstrap (criação, seed, rollback)
+│   │   ├── migrations/                  # Migrations numeradas (04+) com rollback
+│   │   └── load_test/{,pgbench/}        # Massa sintética e cenários de carga
+│   ├── dataset/                         # Datasets processados (input do training)
+│   └── models/                          # Notebooks + treino ML.NET + artefatos publicados
+│       ├── Spotlight.Recomendacao.ModelTraining/   # Projeto .NET de treino
+│       ├── artifacts/                              # Modelo .zip e similaridades
+│       └── reports/                                # Métricas e exemplos do modelo
+└── colab_csv_utf8/                      # Datasets originais (CSV bruto)
 ```
 
 #### 2.1.2 Nomenclatura de Arquivos
