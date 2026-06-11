@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
   ImageBackground,
   ListRenderItemInfo,
@@ -46,7 +47,7 @@ export default function DetalhesView({
   onEspetaculoSemelhantePress,
   onComprarIngresso,
 }: DetalhesViewProps) {
-  const viewModel = useDetalhesViewModel(espetaculoId, { onComprarIngresso });
+  const viewModel = useDetalhesViewModel(espetaculoId, { accessToken, onComprarIngresso });
   const lastViewedIdRef = React.useRef<string | null>(null);
 
 
@@ -283,7 +284,32 @@ export default function DetalhesView({
 
 
           <View style={styles.actionsRow}>
-            <StarRating value={espetaculo.notaMedia} />
+            <StarRating
+              disabled={viewModel.avaliando}
+              onChange={async (nota) => {
+                try {
+                  await viewModel.avaliar(nota);
+                  emitTelemetryEvent(
+                    {
+                      eventType: 'show_card_clicked',
+                      screen: 'DetalhesView',
+                      entity: { type: 'espetaculo', id: detalheAtual.id },
+                      properties: {
+                        origin: 'rating',
+                        rating: nota,
+                      },
+                    },
+                    accessToken,
+                  );
+                } catch (error) {
+                  Alert.alert(
+                    'Avaliacao nao salva',
+                    error instanceof Error ? error.message : 'Nao foi possivel salvar sua avaliacao.',
+                  );
+                }
+              }}
+              value={viewModel.avaliacaoUsuario ?? espetaculo.notaMedia}
+            />
 
 
             <View style={styles.actionsRight}>
@@ -356,11 +382,13 @@ function getPurchaseProvider(linkCompra: string) {
 
 
 type StarRatingProps = {
+  disabled?: boolean;
+  onChange?: (value: number) => void;
   value: number;
 };
 
 
-function StarRating({ value }: StarRatingProps) {
+function StarRating({ disabled, onChange, value }: StarRatingProps) {
   const filledStars = Math.max(0, Math.min(STAR_COUNT, Math.round(value)));
 
 
@@ -375,9 +403,19 @@ function StarRating({ value }: StarRatingProps) {
 
 
         return (
-          <Text key={index} style={[styles.star, filled ? styles.starFilled : styles.starEmpty]}>
-            {filled ? '★' : '☆'}
-          </Text>
+          <Pressable
+            accessibilityLabel={`Avaliar com ${index + 1} de 5 estrelas`}
+            accessibilityRole="button"
+            disabled={disabled || !onChange}
+            hitSlop={6}
+            key={index}
+            onPress={() => onChange?.(index + 1)}
+            style={({ pressed }: { pressed: boolean }) => pressed && styles.pressed}
+          >
+            <Text style={[styles.star, filled ? styles.starFilled : styles.starEmpty]}>
+              {filled ? '★' : '☆'}
+            </Text>
+          </Pressable>
         );
       })}
     </View>

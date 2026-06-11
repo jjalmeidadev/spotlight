@@ -7,9 +7,11 @@ import {
   obterDetalhesEspetaculo,
   obterEspetaculosSemelhantes,
 } from '../models/DetalhesModels';
+import { avaliarEspetaculo } from '../repositories/RatingRepository';
 
 
 type UseDetalhesViewModelOptions = {
+  accessToken?: string | null;
   onComprarIngresso?: (linkCompra: string) => void;
 };
 
@@ -23,6 +25,8 @@ export function useDetalhesViewModel(
   const [detalhe, setDetalhe] = useState<EspetaculoDetalhe | null>(null);
   const [espetaculosSemelhantes, setEspetaculosSemelhantes] = useState<EspetaculoSemelhante[]>([]);
   const [favorito, setFavorito] = useState(false);
+  const [avaliacaoUsuario, setAvaliacaoUsuario] = useState<number | null>(null);
+  const [avaliando, setAvaliando] = useState(false);
 
 
   const recarregar = useCallback(async () => {
@@ -58,6 +62,17 @@ export function useDetalhesViewModel(
     setFavorito((atual: boolean) => !atual);
   }
 
+  async function avaliar(nota: number) {
+    try {
+      setAvaliando(true);
+      await avaliarEspetaculo(espetaculoId, nota, options?.accessToken);
+      setAvaliacaoUsuario(nota);
+      setDetalhe((atual) => atual ? { ...atual, notaMedia: nota } : atual);
+    } finally {
+      setAvaliando(false);
+    }
+  }
+
 
   function comprarIngresso() {
     if (!detalhe?.linkCompra) {
@@ -75,11 +90,13 @@ export function useDetalhesViewModel(
     detalhe,
     espetaculosSemelhantes,
     favorito,
+    avaliacaoUsuario,
+    avaliando,
     alternarFavorito,
+    avaliar,
     recarregar,
     comprarIngresso,
   };
 }
-
 
 

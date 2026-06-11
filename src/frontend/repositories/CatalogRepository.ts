@@ -20,6 +20,10 @@ export type CatalogSession = {
   id: number;
   date?: string;
   time?: string;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  availability?: number;
+  purchaseLink?: string | null;
   theater?: {
     id: number;
     name: string;
@@ -48,6 +52,10 @@ type CatalogDetailItem = CatalogListItem & {
     id?: number;
     data?: string;
     horario?: string;
+    precoMinimo?: number | string | null;
+    precoMaximo?: number | string | null;
+    disponibilidade?: number;
+    linkCompra?: string | null;
     teatro?: {
       id?: number;
       nome?: string;
@@ -82,7 +90,7 @@ export async function listarEspetaculosPertoDe(
   formattedAddress: string | null | undefined,
   limite = 8,
 ): Promise<CatalogShow[]> {
-  const address = formattedAddress?.toLowerCase();
+  const address = normalizeText(formattedAddress);
   if (!address) {
     return [];
   }
@@ -120,6 +128,10 @@ export async function obterDetalheEspetaculoCatalogo(id: string): Promise<Catalo
       id: Number(session.id ?? 0),
       date: session.data,
       time: session.horario,
+      minPrice: session.precoMinimo == null ? null : Number(session.precoMinimo),
+      maxPrice: session.precoMaximo == null ? null : Number(session.precoMaximo),
+      availability: session.disponibilidade,
+      purchaseLink: session.linkCompra,
       theater: session.teatro
         ? {
           id: Number(session.teatro.id ?? 0),
@@ -159,10 +171,18 @@ function buildStorageImageUrl(id: string) {
 }
 
 function isSessionNearAddress(session: CatalogSession, address: string) {
-  const city = session.theater?.city?.toLowerCase();
-  const state = session.theater?.state?.toLowerCase();
+  const city = normalizeText(session.theater?.city);
+  const state = normalizeText(session.theater?.state);
 
   return Boolean((city && address.includes(city)) || (state && address.includes(state)));
+}
+
+function normalizeText(value: string | null | undefined) {
+  return value
+    ?.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 }
 
 function getApiErrorMessage(payload: any, fallback: string) {
