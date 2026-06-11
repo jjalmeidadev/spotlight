@@ -1,6 +1,8 @@
 import { PreferenceOption, PreferenceSelection } from '@/frontend/models/Preference';
+import { getApiBaseUrl } from '@/frontend/config/api';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
+const API_BASE_URL = getApiBaseUrl();
+const REQUEST_TIMEOUT_MS = 10000;
 
 export type PreferenceOptions = {
   priceRanges: PreferenceOption[];
@@ -47,7 +49,7 @@ export async function salvarPreferenciasUsuario(
     faixaPrecoMax: requestPayload.faixaPrecoMax,
   });
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -65,6 +67,38 @@ export async function salvarPreferenciasUsuario(
   }
 
   return responsePayload;
+}
+
+export async function obterPreferenciasUsuario(accessToken: string | null | undefined) {
+  if (!accessToken) {
+    return null;
+  }
+
+  const url = `${API_BASE_URL}/usuario/me/preferencias`;
+
+  const response = await fetchWithTimeout(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const responsePayload = await parseJsonResponse(response);
+
+  console.log('Resposta ao buscar preferencias:', response.status, responsePayload);
+
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(responsePayload, 'Nao foi possivel carregar suas preferencias.'));
+  }
+
+  return responsePayload;
+}
+
+export function preferenciasEstaoCompletas(preferencias: any) {
+  return Array.isArray(preferencias?.generosFavoritos)
+    && preferencias.generosFavoritos.length > 0
+    && preferencias?.faixaPrecoMax !== null
+    && preferencias?.faixaPrecoMax !== undefined;
 }
 
 function toApiPayload(selection: PreferenceSelection) {
@@ -108,4 +142,24 @@ async function parseJsonResponse(response: Response) {
   }
 
   return JSON.parse(text);
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Tempo esgotado ao salvar preferencias. Verifique se o app esta na mesma rede do backend.');
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }

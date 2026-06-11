@@ -49,4 +49,3 @@ statement latencies in milliseconds and failures:
 
 ########## EVIDENCIA: trilha de auditoria gerada pela carga ##########
  linhas em auditoria (avaliacao): 256903
-

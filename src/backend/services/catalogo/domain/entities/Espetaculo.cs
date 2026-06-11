@@ -21,4 +21,15 @@ public class Espetaculo
 
     public decimal NotaMedia { get; init; }
     public decimal Popularidade { get; init; }
+    public IReadOnlyList<EspetaculoMidia> Midias { get; init; } = [];
+}
+
+/// <summary>Metadado de arquivo no Supabase Storage associado ao espetáculo.</summary>
+public class EspetaculoMidia
+{
+    public string TipoMidia { get; init; } = string.Empty;
+    public string StorageBucket { get; init; } = string.Empty;
+    public string StoragePath { get; init; } = string.Empty;
+    public string? AltText { get; init; }
+    public int OrdemExibicao { get; init; }
 }

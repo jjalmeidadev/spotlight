@@ -1,4 +1,5 @@
 import * as Location from 'expo-location';
+import { getApiBaseUrl } from '@/frontend/config/api';
 
 export type LocalizacaoUsuario = {
   formattedAddress: string;
@@ -8,7 +9,7 @@ export type LocalizacaoUsuario = {
   provider: string;
 };
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
+const API_BASE_URL = getApiBaseUrl();
 
 export async function obterLocalizacaoAtual(): Promise<LocalizacaoUsuario> {
   const { status } = await Location.requestForegroundPermissionsAsync();

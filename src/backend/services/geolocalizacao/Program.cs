@@ -4,7 +4,7 @@ using Serilog;
 using Spotlight.Geolocalizacao.Application.UseCases;
 using Spotlight.Geolocalizacao.Presentation.Middleware;
 
-Env.TraversePath().Load();
+Env.TraversePath().NoClobber().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 

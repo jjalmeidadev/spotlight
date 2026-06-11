@@ -1,59 +1,141 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CatalogRail } from '../models/CatalogItem';
+import {
+	EspetaculoResumoApi,
+	listarEspetaculosCatalogo,
+	listarRecomendacoesUsuario,
+	obterUrlMidia,
+} from '../repositories/CatalogRepository';
+import { CATALOG_IMAGE, normalizarTitulo } from '../config/catalogImages';
 
-const CATALOG_IMAGE = {
-	hero: require('../../../assets/images/catalog/catalog-hero.png'),
-	heroArtwork: require('../../../assets/images/catalog/catalog-hero-overimage.png'),
-	whiteShell: require('../../../assets/images/catalog/component-whitebgtop.png'),
-	logo: require('../../../assets/images/catalog/logo-spotlight.png'),
-	searchIcon: require('../../../assets/images/catalog/searchbar-icon.png'),
-	filterIcon: require('../../../assets/images/catalog/filter-config-component.png'),
-	mammaMia: require('../../../assets/images/catalog/catalog-mammamia.png'),
-	elis: require('../../../assets/images/catalog/catalog-elis.png'),
-	hair: require('../../../assets/images/catalog/catalog-hair.png'),
-} as const;
+const FILTER_OPTIONS = ['Musical', 'Stand-up', 'Show', 'Espetaculo', 'Palestra', 'Meet-up'] as const;
 
-const FILTER_OPTIONS = ['Musical', 'Stand-up', 'Show', 'Espetáculo', 'Palestra', 'Meet-up'] as const;
-
-const POPULAR_ITEMS = [
-	{ id: 'm1', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-	{ id: 'm2', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-	{ id: 'm3', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-	{ id: 'm4', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-];
-
-const WATCHED_ITEMS = [
-	{ id: 'e1', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-	{ id: 'e2', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-	{ id: 'e3', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-	{ id: 'e4', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-];
-
-const AFFINITY_ITEMS = [
-	{ id: 'h1', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-	{ id: 'h2', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-	{ id: 'h3', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-	{ id: 'h4', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-];
-
-export function useCatalogViewModel() {
+export function useCatalogViewModel(accessToken?: string | null) {
 	const [query, setQuery] = useState('');
 	const [selectedFilter, setSelectedFilter] = useState<(typeof FILTER_OPTIONS)[number] | null>(null);
+	const [espetaculos, setEspetaculos] = useState<EspetaculoResumoApi[]>([]);
+	const [recomendacoes, setRecomendacoes] = useState<EspetaculoResumoApi[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		let ativo = true;
+
+		async function carregar() {
+			try {
+				setLoading(true);
+				setError(null);
+
+				const dados = await listarEspetaculosCatalogo();
+				if (!ativo) return;
+				setEspetaculos(dados);
+
+				if (!accessToken) {
+					setRecomendacoes([]);
+					return;
+				}
+
+				try {
+					const recomendacoesUsuario = await listarRecomendacoesUsuario(accessToken);
+					if (ativo) setRecomendacoes(recomendacoesUsuario.map((item) => item.espetaculo));
+				} catch (err) {
+					console.log('Nao foi possivel carregar recomendacoes personalizadas:', err);
+					if (ativo) setRecomendacoes([]);
+				}
+			} catch (err) {
+				if (ativo) {
+					setError(err instanceof Error ? err.message : 'Nao foi possivel carregar o catalogo.');
+					setEspetaculos([]);
+					setRecomendacoes([]);
+				}
+			} finally {
+				if (ativo) setLoading(false);
+			}
+		}
+
+		carregar();
+
+		return () => {
+			ativo = false;
+		};
+	}, [accessToken]);
+
+	const filtrados = useMemo(() => {
+		const termo = query.trim().toLocaleLowerCase('pt-BR');
+		return filtrarEspetaculos(espetaculos, termo, selectedFilter);
+	}, [espetaculos, query, selectedFilter]);
+
+	const recomendacoesFiltradas = useMemo(() => {
+		const termo = query.trim().toLocaleLowerCase('pt-BR');
+		return filtrarEspetaculos(recomendacoes, termo, selectedFilter);
+	}, [recomendacoes, query, selectedFilter]);
+
+	const heroEspetaculo =
+		espetaculos.find((item) => normalizarTitulo(item.titulo).includes('elis')) ?? espetaculos[0];
+	const heroBackgroundUrl = heroEspetaculo
+		? obterUrlMidia(heroEspetaculo, 'catalog_hero_background')
+		: undefined;
+	const heroArtworkUrl = heroEspetaculo
+		? obterUrlMidia(heroEspetaculo, 'catalog_hero_artwork')
+		: undefined;
+
+	const assets = {
+		...CATALOG_IMAGE,
+		hero: heroBackgroundUrl ? { uri: heroBackgroundUrl } : undefined,
+		heroArtwork: heroArtworkUrl ? { uri: heroArtworkUrl } : undefined,
+	};
+
+	const categoriaMaiorScore = recomendacoes[0]?.genero?.trim();
+	const affinityItems = recomendacoesFiltradas.length > 0
+		? recomendacoesFiltradas
+		: filtrados.slice(10, 20);
+	const affinityTitle = categoriaMaiorScore
+		? `Porque voce gostou de ${categoriaMaiorScore}:`
+		: 'Porque voce gostou de musicais:';
 
 	const sections: CatalogRail[] = [
-		{ id: 'popular', title: 'Os mais populares do momento:', items: POPULAR_ITEMS },
-		{ id: 'watched', title: 'Outras pessoas também assistiram:', items: WATCHED_ITEMS },
-		{ id: 'affinity', title: 'Porque você gostou de “Macacos”:', items: AFFINITY_ITEMS },
+		{ id: 'popular', title: 'Os mais populares do momento:', items: filtrados.slice(0, 10).map(mapCatalogItem) },
+		{ id: 'watched', title: 'Outras pessoas tambem assistiram:', items: filtrados.slice(5, 15).map(mapCatalogItem) },
+		{ id: 'affinity', title: affinityTitle, items: affinityItems.map(mapCatalogItem) },
 	];
 
 	return {
-		assets: CATALOG_IMAGE,
+		assets,
+		error,
 		filterOptions: FILTER_OPTIONS,
+		heroEspetaculo,
+		loading,
 		query,
 		selectedFilter,
-		sections,
+		sections: sections.filter((section) => section.items.length > 0),
 		setQuery,
 		setSelectedFilter,
 		userName: 'Leonardo',
+	};
+}
+
+function filtrarEspetaculos(
+	espetaculos: EspetaculoResumoApi[],
+	termo: string,
+	selectedFilter: (typeof FILTER_OPTIONS)[number] | null,
+) {
+	return espetaculos.filter((item) => {
+		const combinaBusca = !termo || item.titulo.toLocaleLowerCase('pt-BR').includes(termo);
+		const combinaFiltro =
+			!selectedFilter ||
+			item.genero?.toLocaleLowerCase('pt-BR').includes(selectedFilter.toLocaleLowerCase('pt-BR'));
+
+		return combinaBusca && combinaFiltro;
+	});
+}
+
+function mapCatalogItem(espetaculo: EspetaculoResumoApi) {
+	const imageUrl = obterUrlMidia(espetaculo, 'catalog_card');
+
+	return {
+		id: String(espetaculo.id),
+		title: espetaculo.titulo,
+		subtitle: 'VER MAIS',
+		image: imageUrl ? { uri: imageUrl } : undefined,
 	};
 }

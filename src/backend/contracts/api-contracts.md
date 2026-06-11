@@ -1,4 +1,4 @@
-﻿# Contratos de API — Spotlight 
+﻿# Contratos de API — Spotlight
 
 Especificação das rotas que serão implementadas no backend, servindo como
 **fonte da verdade** para o desenvolvimento, para o Swagger  e para o
@@ -315,7 +315,7 @@ Em erros de validação (400), inclui `details` por campo:
   "data": [
     { "id": 88, "data": "2026-06-10", "horario": "20:00",
       "precoMinimo": 40.00, "precoMaximo": 120.00, "disponibilidade": 230,
-      "linkCompra": "https://...", 
+      "linkCompra": "https://...",
       "teatro": { "id": 2, "nome": "Teatro Aventura", "cidade": "Campinas", "estado": "SP" } }
   ]
 }
@@ -910,4 +910,3 @@ GET /recomendacao/espetaculos/12/similares?limite=5
 > (`similaridade_item: leitura pública` com `USING (true)`).
 
 ---
-

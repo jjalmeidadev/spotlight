@@ -10,16 +10,18 @@ type CurvedWhiteTopProps = {
 };
 
 export function CurvedWhiteTop({ style, side = 'left', radius = 160 }: CurvedWhiteTopProps) {
+  void radius;
+
   return (
     <View style={[styles.top, style]}>
       <Svg
         height="100%"
-        width="90%"
-        viewBox="0 0 365 611"
-        preserveAspectRatio="xMidYMin slice"
+        width="100%"
+        viewBox="0 0 365 210"
+        preserveAspectRatio="none"
         style={side === 'right' ? styles.mirroredSvg : undefined}
       >
-        <Path d="M259 178.896C259 128.911 239.53 1.40311 122.228 0H0V178.896H259Z" fill="#FFFFFF" />
+        <Path d="M0 0H124C220 0 288 70 330 132H365V210H0V0Z" fill="#FFFFFF" />
       </Svg>
     </View>
   );

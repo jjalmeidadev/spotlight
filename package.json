@@ -15,8 +15,10 @@
     "expo-linear-gradient": "~15.0.8",
     "expo-location": "~19.0.8",
     "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
-    "react-native-svg": "^15.15.5"
+    "react-native-svg": "^15.15.5",
+    "react-native-web": "^0.21.0"
   },
   "devDependencies": {
     "@expo/metro-config": "^54.0.15",

@@ -9,6 +9,10 @@ import DetalhesView from './src/frontend/screens/DetalhesView';
 import LoadingScreen from './src/frontend/screens/LoadingScreen';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
+import {
+	obterPreferenciasUsuario,
+	preferenciasEstaoCompletas,
+} from './src/frontend/repositories/PreferenceRepository';
 import { useTelemetrySession } from './src/frontend/hooks/useTelemetrySession';
 
 export default function App() {
@@ -42,10 +46,32 @@ export default function App() {
 		return () => subscription.remove();
 	}, []);
 
-	function handleLogin(usuario) {
+	async function handleLogin(usuario) {
 		setUserName(usuario.nome);
 		setAccessToken(usuario.accessToken ?? null);
-		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
+		await direcionarAposAutenticacao(usuario);
+	}
+
+	async function direcionarAposAutenticacao(usuario) {
+		if (usuario.tipoUsuario === 'administrador') {
+			setScreen('dashboard');
+			return;
+		}
+
+		if (!usuario.accessToken) {
+			setScreen('preferencias');
+			return;
+		}
+
+		setScreen('verificando-preferencias');
+
+		try {
+			const preferencias = await obterPreferenciasUsuario(usuario.accessToken);
+			setScreen(preferenciasEstaoCompletas(preferencias) ? 'catalogo' : 'preferencias');
+		} catch (error) {
+			console.log('Nao foi possivel verificar preferencias salvas:', error);
+			setScreen('preferencias');
+		}
 	}
 
 	if (screen === 'loading') {
@@ -70,7 +96,7 @@ export default function App() {
 		return (
 			<CadastroView
 				onBackPress={() => setScreen('login')}
-				onCadastro={(usuario) => {
+				onCadastro={async (usuario) => {
 					if (usuario.requerConfirmacaoEmail) {
 						setScreen('login');
 						Alert.alert(
@@ -82,9 +108,17 @@ export default function App() {
 
 					setUserName(usuario.nome);
 					setAccessToken(usuario.accessToken ?? null);
-					setScreen('preferencias');
+					await direcionarAposAutenticacao(usuario);
 				}}
 			/>
+		);
+	}
+
+	if (screen === 'verificando-preferencias') {
+		return (
+			<View style={styles.loading}>
+				<ActivityIndicator color="#111412" />
+			</View>
 		);
 	}
 

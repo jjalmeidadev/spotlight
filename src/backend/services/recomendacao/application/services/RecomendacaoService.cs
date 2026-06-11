@@ -125,7 +125,8 @@ public sealed class ModeloMlNetRecomendacaoStrategy(
         Titulo = espetaculo.Titulo,
         Genero = espetaculo.Genero,
         Status = espetaculo.Status,
-        NotaMedia = espetaculo.NotaMedia
+        NotaMedia = espetaculo.NotaMedia,
+        Midias = espetaculo.Midias.Select(ListarSimilaresUseCase.MapearMidia).ToList()
     };
 }
 
@@ -147,15 +148,16 @@ public sealed class PostgresPreProcessadoRecomendacaoStrategy(
         TipoAlgoritmo = recomendacao.TipoAlgoritmo,
         Motivo = recomendacao.Motivo,
         DataGeracao = recomendacao.DataGeracao,
-        Espetaculo = new EspetaculoRecomendadoDto
-        {
-            Id = recomendacao.Espetaculo.Id,
-            Titulo = recomendacao.Espetaculo.Titulo,
-            Genero = recomendacao.Espetaculo.Genero,
-            Status = recomendacao.Espetaculo.Status,
-            NotaMedia = recomendacao.Espetaculo.NotaMedia
-        }
-    };
+            Espetaculo = new EspetaculoRecomendadoDto
+            {
+                Id = recomendacao.Espetaculo.Id,
+                Titulo = recomendacao.Espetaculo.Titulo,
+                Genero = recomendacao.Espetaculo.Genero,
+                Status = recomendacao.Espetaculo.Status,
+                NotaMedia = recomendacao.Espetaculo.NotaMedia,
+                Midias = recomendacao.Espetaculo.Midias.Select(ListarSimilaresUseCase.MapearMidia).ToList()
+            }
+        };
 }
 
 public interface IModeloRecomendacaoClient

@@ -18,6 +18,7 @@ public class EspetaculoDetalheDto
     public IReadOnlyList<CategoriaResumoDto> Categorias { get; init; } = [];
     public IReadOnlyList<AtorResumoDto> Atores { get; init; } = [];
     public IReadOnlyList<SessaoDto> Sessoes { get; init; } = [];
+    public IReadOnlyList<EspetaculoMidiaDto> Midias { get; init; } = [];
 
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }

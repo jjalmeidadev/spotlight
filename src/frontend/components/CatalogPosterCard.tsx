@@ -1,30 +1,35 @@
 import React from 'react';
 import { ImageBackground, ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
 
+const CARD_WIDTH = 118;
+const CATALOG_CARD_ASPECT_RATIO = 368 / 416;
+
 type CatalogPosterCardProps = {
 	title: string;
 	subtitle?: string;
-	imageSource: ImageSourcePropType;
+	imageSource?: ImageSourcePropType;
 	onPress?: () => void;
 };
 
 export function CatalogPosterCard({ imageSource, onPress }: CatalogPosterCardProps) {
 	return (
 		<Pressable onPress={onPress} style={styles.pressable} accessibilityRole="button">
-			<ImageBackground source={imageSource} style={styles.card} imageStyle={styles.image}>
-				<View style={styles.overlay} />
-			</ImageBackground>
+			{imageSource ? (
+				<ImageBackground source={imageSource} style={styles.card} imageStyle={styles.image} />
+			) : (
+				<View style={[styles.card, styles.placeholder]} />
+			)}
 		</Pressable>
 	);
 }
 
 const styles = StyleSheet.create({
 	pressable: {
-		width: 118,
+		width: CARD_WIDTH,
 	},
 	card: {
+		aspectRatio: CATALOG_CARD_ASPECT_RATIO,
 		borderRadius: 10,
-		height: 162,
 		overflow: 'hidden',
 		justifyContent: 'flex-end',
 		width: '100%',
@@ -32,8 +37,7 @@ const styles = StyleSheet.create({
 	image: {
 		borderRadius: 10,
 	},
-	overlay: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: 'rgba(12, 12, 12, 0.1)',
+	placeholder: {
+		backgroundColor: '#17211D',
 	},
 });

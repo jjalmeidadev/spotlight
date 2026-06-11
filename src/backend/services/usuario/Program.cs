@@ -110,12 +110,6 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString)
 {
     healthChecks.AddCheck<MongoDbHealthCheck>("mongodb", tags: ["ready"]);
 }
-else
-{
-    healthChecks.AddCheck("mongodb", () =>
-        HealthCheckResult.Unhealthy("Configuracao do MongoDB de telemetria nao informada."),
-        tags: ["ready"]);
-}
 
 const string CorsPolicy = "SpotlightCors";
 builder.Services.AddCors(options =>

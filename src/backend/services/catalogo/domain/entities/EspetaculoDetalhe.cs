@@ -23,6 +23,7 @@ public class EspetaculoDetalhe
     public IReadOnlyList<CategoriaResumo> Categorias { get; init; } = [];
     public IReadOnlyList<AtorElenco> Atores { get; init; } = [];
     public IReadOnlyList<Sessao> Sessoes { get; init; } = [];
+    public IReadOnlyList<EspetaculoMidia> Midias { get; init; } = [];
 }
 
 /// <summary>Categoria resumida (id + nome) — usada dentro de detalhes de espetáculo.</summary>

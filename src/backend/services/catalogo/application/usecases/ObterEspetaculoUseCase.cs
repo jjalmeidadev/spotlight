@@ -37,6 +37,7 @@ public class ObterEspetaculoUseCase(IEspetaculoRepository repositorio)
             Id = a.Id, Nome = a.Nome, Papel = a.Papel, OrdemExibicao = a.OrdemExibicao
         }).ToList(),
         Sessoes = e.Sessoes.Select(MapearSessao).ToList(),
+        Midias = e.Midias.Select(ListarEspetaculosUseCase.MapearMidia).ToList(),
         CreatedAt = e.CreatedAt,
         UpdatedAt = e.UpdatedAt
     };
