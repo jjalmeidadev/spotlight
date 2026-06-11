@@ -4,6 +4,7 @@ export type RecommendedShow = {
   id: string;
   title: string;
   genre?: string | null;
+  imageUrl?: string | null;
   status: string;
   averageRating: number;
   score: number;
@@ -16,6 +17,7 @@ export type SimilarShow = {
   id: string;
   title: string;
   genre?: string | null;
+  imageUrl?: string | null;
   status: string;
   averageRating: number;
   score: number;
@@ -35,6 +37,7 @@ type RecommendationItem = {
     id?: number | string;
     titulo?: string;
     genero?: string | null;
+    imagemUrl?: string | null;
     status?: string;
     notaMedia?: number | string;
   };
@@ -49,6 +52,7 @@ type SimilarItem = {
     id?: number | string;
     titulo?: string;
     genero?: string | null;
+    imagemUrl?: string | null;
     status?: string;
     notaMedia?: number | string;
   };
@@ -121,6 +125,7 @@ function toRecommendedShow(item: RecommendationItem): RecommendedShow | null {
     id: String(item.espetaculo.id),
     title: item.espetaculo.titulo,
     genre: item.espetaculo.genero,
+    imageUrl: item.espetaculo.imagemUrl,
     status: item.espetaculo.status ?? '',
     averageRating: Number(item.espetaculo.notaMedia ?? 0),
     score: Number(item.score ?? 0),
@@ -139,6 +144,7 @@ function toSimilarShow(item: SimilarItem): SimilarShow | null {
     id: String(item.espetaculo.id),
     title: item.espetaculo.titulo,
     genre: item.espetaculo.genero,
+    imageUrl: item.espetaculo.imagemUrl,
     status: item.espetaculo.status ?? '',
     averageRating: Number(item.espetaculo.notaMedia ?? 0),
     score: Number(item.score ?? 0),

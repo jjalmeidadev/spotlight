@@ -5,6 +5,7 @@ export type CatalogItem = {
 	title: string;
 	subtitle?: string;
 	image: ImageSourcePropType;
+	imageUri?: string | null;
 	recommendation?: {
 		score: number;
 		algorithm: string;

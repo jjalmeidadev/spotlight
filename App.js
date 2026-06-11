@@ -45,14 +45,14 @@ export default function App() {
 	function handleLogin(usuario) {
 		setUserName(usuario.nome);
 		setAccessToken(usuario.accessToken ?? null);
-		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
+		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'catalogo');
 	}
 
 	if (screen === 'loading') {
 		return (
 			<LoadingScreen
 				onFinish={(status) => {
-					setScreen(status === 'authenticated' ? 'preferencias' : 'login');
+					setScreen(status === 'authenticated' ? 'catalogo' : 'login');
 				}}
 			/>
 		);
