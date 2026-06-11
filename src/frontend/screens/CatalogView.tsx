@@ -14,12 +14,13 @@ import { useCatalogViewModel } from '../viewmodels/useCatalogViewModel';
 type CatalogViewProps = {
 	accessToken?: string | null;
 	profileName?: string;
+	userLocationAddress?: string | null;
 	onItemPress?: (item: CatalogItem) => void;
 };
 
-export default function CatalogView({ accessToken, profileName, onItemPress }: CatalogViewProps) {
+export default function CatalogView({ accessToken, profileName, userLocationAddress, onItemPress }: CatalogViewProps) {
 	const { width } = useWindowDimensions();
-	const vm = useCatalogViewModel({ accessToken });
+	const vm = useCatalogViewModel({ accessToken, userLocationAddress });
 	const horizontalPadding = Math.max(16, Math.round(width * 0.044));
 	const firstSection = vm.sections[0];
 	const remainingSections = vm.sections.slice(1);

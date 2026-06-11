@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { CatalogRail } from '../models/CatalogItem';
 import {
+	CatalogShow,
+	listarEspetaculosPertoDe,
+	listarEspetaculosPopulares,
+} from '../repositories/CatalogRepository';
+import {
 	listarRecomendacoesUsuario,
 	RecommendedShow,
 } from '../repositories/RecommendationRepository';
@@ -17,37 +22,26 @@ const CATALOG_IMAGE = {
 	hair: require('../../../assets/images/catalog/catalog-hair.png'),
 } as const;
 
-const FILTER_OPTIONS = ['Musical', 'Stand-up', 'Show', 'Espetáculo', 'Palestra', 'Meet-up'] as const;
+const FILTER_OPTIONS = ['Musical', 'Stand-up', 'Show', 'Espetaculo', 'Palestra', 'Meet-up'] as const;
 
-const POPULAR_ITEMS = [
+const FALLBACK_POPULAR_ITEMS = [
 	{ id: '16', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
 	{ id: '17', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
 	{ id: '18', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
 	{ id: '19', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
 ];
 
-const WATCHED_ITEMS = [
-	{ id: '20', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-	{ id: '21', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-	{ id: '22', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-	{ id: '23', title: 'Elis, a Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.elis },
-];
-
-const AFFINITY_ITEMS = [
-	{ id: '24', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-	{ id: '25', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-	{ id: '26', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-	{ id: '27', title: 'Hair, o Musical', subtitle: 'VER MAIS', image: CATALOG_IMAGE.hair },
-];
-
 type UseCatalogViewModelOptions = {
 	accessToken?: string | null;
+	userLocationAddress?: string | null;
 };
 
 export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const [query, setQuery] = useState('');
 	const [selectedFilter, setSelectedFilter] = useState<(typeof FILTER_OPTIONS)[number] | null>(null);
 	const [recommendations, setRecommendations] = useState<RecommendedShow[]>([]);
+	const [popularShows, setPopularShows] = useState<CatalogShow[]>([]);
+	const [nearbyShows, setNearbyShows] = useState<CatalogShow[]>([]);
 	const [recommendationsLoading, setRecommendationsLoading] = useState(false);
 	const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
@@ -90,10 +84,39 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		};
 	}, [options?.accessToken]);
 
+	useEffect(() => {
+		let active = true;
+
+		async function loadCatalogSections() {
+			try {
+				const popular = await listarEspetaculosPopulares(8);
+				if (active) {
+					setPopularShows(popular);
+				}
+
+				const nearby = await listarEspetaculosPertoDe(options?.userLocationAddress, 8);
+				if (active) {
+					setNearbyShows(nearby);
+				}
+			} catch {
+				if (active) {
+					setPopularShows([]);
+					setNearbyShows([]);
+				}
+			}
+		}
+
+		loadCatalogSections();
+
+		return () => {
+			active = false;
+		};
+	}, [options?.userLocationAddress]);
+
 	const recommendationItems = recommendations.map((item) => ({
 		id: item.id,
 		title: item.title,
-		subtitle: item.reason ?? item.genre ?? 'VER MAIS',
+		subtitle: item.genre ?? 'Recomendado para voce',
 		image: getRecommendationImage(item),
 		imageUri: item.imageUrl,
 		recommendation: {
@@ -104,13 +127,24 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		},
 	}));
 
+	const popularItems = popularShows.map(toCatalogItem);
+	const nearbyItems = nearbyShows.map((item) => ({
+		...toCatalogItem(item),
+		subtitle: item.genre ?? 'Perto de voce',
+	}));
+
 	const sections: CatalogRail[] = [
 		...(recommendationItems.length > 0
-			? [{ id: 'recommended', title: 'Recomendados para você:', items: recommendationItems }]
+			? [{ id: 'recommended', title: 'Recomendados para voce:', items: recommendationItems }]
 			: []),
-		{ id: 'popular', title: 'Os mais populares do momento:', items: POPULAR_ITEMS },
-		{ id: 'watched', title: 'Outras pessoas também assistiram:', items: WATCHED_ITEMS },
-		{ id: 'affinity', title: 'Porque você gostou de "Macacos":', items: AFFINITY_ITEMS },
+		...(nearbyItems.length > 0
+			? [{ id: 'nearby', title: 'Perto de voce:', items: nearbyItems }]
+			: []),
+		{
+			id: 'popular',
+			title: 'Os mais populares do momento:',
+			items: popularItems.length > 0 ? popularItems : FALLBACK_POPULAR_ITEMS,
+		},
 	];
 
 	return {
@@ -127,6 +161,16 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	};
 }
 
+function toCatalogItem(item: CatalogShow) {
+	return {
+		id: item.id,
+		title: item.title,
+		subtitle: item.genre ?? 'VER MAIS',
+		image: getCatalogImage(item),
+		imageUri: item.imageUrl,
+	};
+}
+
 function getRecommendationImage(item: RecommendedShow) {
 	const normalized = `${item.title} ${item.genre ?? ''}`.toLowerCase();
 
@@ -139,4 +183,22 @@ function getRecommendationImage(item: RecommendedShow) {
 	}
 
 	return CATALOG_IMAGE.hair;
+}
+
+function getCatalogImage(item: CatalogShow) {
+	const normalized = `${item.title} ${item.genre ?? ''}`.toLowerCase();
+
+	if (normalized.includes('mamma')) {
+		return CATALOG_IMAGE.mammaMia;
+	}
+
+	if (normalized.includes('elis')) {
+		return CATALOG_IMAGE.elis;
+	}
+
+	if (normalized.includes('hair')) {
+		return CATALOG_IMAGE.hair;
+	}
+
+	return CATALOG_IMAGE.heroArtwork;
 }
