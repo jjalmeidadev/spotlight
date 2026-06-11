@@ -261,9 +261,7 @@ class ModeloRecomendacaoBuilder:
     def configurar_modelo(self, n_vizinhos=20):
         """Etapa 3: Configuração do modelo KNN"""
         self.modelo = NearestNeighbors(
-            n_neighbors=n_vizinhos,
-            metric='cosine',
-            algorithm='brute'
+            n_neighbors=n_vizinhos, metric='cosine', algorithm='brute'
         )
         return self
     
