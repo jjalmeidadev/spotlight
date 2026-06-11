@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 
@@ -31,10 +32,6 @@ type DetalhesViewProps = {
 
 const STAR_COUNT = 5;
 const HERO_HEIGHT = 280;
-const NOVICA_REBELDE_CAPA = require('../../../assets/images/novicarebelde.png');
-const novicaRebeldeCapaSource = Image.resolveAssetSource(NOVICA_REBELDE_CAPA);
-const NOVICA_REBELDE_CAPA_ASPECT_RATIO =
-  novicaRebeldeCapaSource.width / novicaRebeldeCapaSource.height;
 
 
 export default function DetalhesView({
@@ -44,6 +41,36 @@ export default function DetalhesView({
   onComprarIngresso,
 }: DetalhesViewProps) {
   const viewModel = useDetalhesViewModel(espetaculoId, { onComprarIngresso });
+  const { width } = useWindowDimensions();
+  const [heroImageSize, setHeroImageSize] = React.useState<{ width: number; height: number } | null>(null);
+  const espetaculo = viewModel.detalhe;
+  const imagemDestaqueUrl = espetaculo?.imagemUrl;
+
+  React.useEffect(() => {
+    if (!imagemDestaqueUrl) {
+      setHeroImageSize(null);
+      return;
+    }
+
+    let cancelled = false;
+    Image.getSize(
+      imagemDestaqueUrl,
+      (imageWidth, imageHeight) => {
+        if (!cancelled) {
+          setHeroImageSize({ width: imageWidth, height: imageHeight });
+        }
+      },
+      () => {
+        if (!cancelled) {
+          setHeroImageSize(null);
+        }
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [imagemDestaqueUrl]);
 
 
   if (viewModel.loading) {
@@ -93,9 +120,6 @@ export default function DetalhesView({
   }
 
 
-  const espetaculo = viewModel.detalhe;
-
-
   if (!espetaculo) {
     return null;
   }
@@ -119,13 +143,10 @@ export default function DetalhesView({
   );
 
 
-  const heroImageSource =
-    espetaculo.titulo === 'A Noviça Rebelde'
-      ? NOVICA_REBELDE_CAPA
-      : espetaculo.imagemUrl
-        ? { uri: espetaculo.imagemUrl }
-        : undefined;
-  const usaCapaLocal = espetaculo.titulo === 'A Noviça Rebelde';
+  const heroImageSource = imagemDestaqueUrl ? { uri: imagemDestaqueUrl } : undefined;
+  const heroHeight = heroImageSize
+    ? Math.round((width * heroImageSize.height) / heroImageSize.width)
+    : HERO_HEIGHT;
 
 
   return (
@@ -139,24 +160,18 @@ export default function DetalhesView({
         contentContainerStyle={styles.scrollContent}
       >
         <View
-          style={[
-            styles.heroWrapper,
-            usaCapaLocal && {
-              height: undefined,
-              aspectRatio: NOVICA_REBELDE_CAPA_ASPECT_RATIO,
-            },
-          ]}
+          style={[styles.heroWrapper, { height: heroHeight }]}
         >
           {heroImageSource ? (
             <ImageBackground
               source={heroImageSource}
-              resizeMode={usaCapaLocal ? 'contain' : 'cover'}
-              style={[styles.heroImage, usaCapaLocal && styles.heroImageLocalCapa]}
+              resizeMode="cover"
+              style={[styles.heroImage, { height: heroHeight }]}
             >
               <View style={styles.heroOverlay} />
             </ImageBackground>
           ) : (
-            <View style={[styles.heroImage, styles.heroPlaceholder]}>
+            <View style={[styles.heroImage, styles.heroPlaceholder, { height: heroHeight }]}>
               <View style={styles.heroOverlay} />
             </View>
           )}
@@ -190,8 +205,8 @@ export default function DetalhesView({
 
 
             <View style={styles.tagsRow}>
-              {espetaculo.tags.map((tag: string) => (
-                <View key={tag} style={styles.tag}>
+              {espetaculo.tags.map((tag: string, index: number) => (
+                <View key={`${tag}-${index}`} style={styles.tag}>
                   <Text style={styles.tagLabel}>{tag}</Text>
                 </View>
               ))}
@@ -342,14 +357,11 @@ const styles = StyleSheet.create({
   heroWrapper: {
     position: 'relative',
     height: HERO_HEIGHT,
-    backgroundColor: colors.borderStrong,
+    backgroundColor: '#0E1512',
   },
   heroImage: {
     width: '100%',
     height: HERO_HEIGHT,
-  },
-  heroImageLocalCapa: {
-    height: '100%',
   },
   heroPlaceholder: {
     backgroundColor: colors.borderStrong,
@@ -499,6 +511,3 @@ const styles = StyleSheet.create({
     opacity: 0.82,
   },
 });
-
-
-

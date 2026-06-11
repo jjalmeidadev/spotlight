@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -8,21 +9,8 @@ using Spotlight.Catalogo.Application.UseCases;
 namespace Spotlight.Catalogo.Infrastructure.Auth;
 
 /// <summary>
-/// Configuração de autenticação/autorização para o serviço de Catálogo.
-///
-/// <para>
-/// <b>Modelo:</b> Supabase Auth emite JWTs HS256 assinados com o segredo do projeto
-/// (env <c>SUPABASE_JWT_SECRET</c>). As políticas <c>Cadastrado</c> e
-/// <c>Administrador</c> validam o claim custom <c>tipo_usuario</c> — esse claim
-/// precisa ser emitido pelo Supabase (via Auth Hook / Database Trigger que copie
-/// <c>usuario.tipo_usuario</c> para o JWT). Se o claim não estiver presente, a
-/// política falha e devolve <b>403</b>.
-/// </para>
-///
-/// <para>
-/// Sem token / token inválido → <b>401</b>. Ambos os casos retornam o envelope
-/// padrão do contrato via os eventos <c>OnChallenge</c> e <c>OnForbidden</c>.
-/// </para>
+/// Configura autenticacao/autorizacao JWT para o servico de Catalogo.
+/// Aceita tokens Supabase assinados por segredo HS256 ou por chaves expostas no JWKS.
 /// </summary>
 public static class AuthSetup
 {
@@ -34,15 +22,31 @@ public static class AuthSetup
     public static void AdicionarAutenticacaoESupabase(this WebApplicationBuilder builder)
     {
         var jwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET");
+        var jwksUrl =
+            Environment.GetEnvironmentVariable("SUPABASE_AUTH_JWKS_URL")
+            ?? BuildJwksUrl(FirstNotBlank(
+                Environment.GetEnvironmentVariable("SUPABASE_URL"),
+                Environment.GetEnvironmentVariable("EXPO_PUBLIC_SUPABASE_URL")));
 
-        // Sem segredo configurado o serviço sobe sem auth (útil para testes/dev sem Supabase).
-        // Nesse modo, rotas com [Authorize] devolvem 401 (não há ticket emitido).
-        if (string.IsNullOrWhiteSpace(jwtSecret)) return;
+        void AddPolicies(AuthorizationOptions options)
+        {
+            options.AddPolicy(PolicyCadastrado, p => p.RequireAssertion(ctx =>
+                ctx.User.HasClaim(ClaimTipoUsuario, "cadastrado") ||
+                ctx.User.HasClaim(ClaimTipoUsuario, "administrador")));
+
+            options.AddPolicy(PolicyAdministrador, p => p.RequireClaim(ClaimTipoUsuario, "administrador"));
+        }
+
+        if (string.IsNullOrWhiteSpace(jwtSecret) && string.IsNullOrWhiteSpace(jwksUrl))
+        {
+            builder.Services.AddAuthorization(AddPolicies);
+            return;
+        }
 
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<IUsuarioContexto, UsuarioContextoHttp>();
 
-        var chave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+        var chaves = GetSigningKeys(jwtSecret, jwksUrl);
 
         builder.Services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,49 +55,109 @@ public static class AuthSetup
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = chave,
+                    IssuerSigningKeys = chaves,
+                    IssuerSigningKeyResolver = (_, _, _, _) => chaves,
                     ValidateLifetime = true,
-                    ValidateIssuer = false, // Supabase varia por projeto — o segredo já garante origem.
+                    ValidateIssuer = false,
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.FromSeconds(30)
                 };
 
-                // Customiza 401/403 para usar o envelope padrão do contrato.
                 options.Events = new JwtBearerEvents
                 {
+                    OnAuthenticationFailed = ctx =>
+                    {
+                        ctx.HttpContext.Items["auth_error"] = ctx.Exception.Message;
+                        return Task.CompletedTask;
+                    },
                     OnChallenge = async ctx =>
                     {
                         ctx.HandleResponse();
+                        var details = builder.Environment.IsDevelopment()
+                            ? ctx.HttpContext.Items["auth_error"] as string
+                            : null;
+
                         await EscreverErroAsync(ctx.Response, StatusCodes.Status401Unauthorized,
-                            "Token ausente ou inválido.", ctx.HttpContext.TraceIdentifier);
+                            "Token ausente ou invalido.", ctx.HttpContext.TraceIdentifier, details);
                     },
                     OnForbidden = async ctx =>
                     {
                         await EscreverErroAsync(ctx.Response, StatusCodes.Status403Forbidden,
-                            "Usuário sem permissão para esta operação.", ctx.HttpContext.TraceIdentifier);
+                            "Usuario sem permissao para esta operacao.", ctx.HttpContext.TraceIdentifier);
                     }
                 };
             });
 
-        builder.Services.AddAuthorization(options =>
-        {
-            // "Cadastrado" inclui também administrador (admin pode tudo que cadastrado pode).
-            options.AddPolicy(PolicyCadastrado, p => p.RequireAssertion(ctx =>
-                ctx.User.HasClaim(ClaimTipoUsuario, "cadastrado") ||
-                ctx.User.HasClaim(ClaimTipoUsuario, "administrador")));
-
-            options.AddPolicy(PolicyAdministrador, p => p.RequireClaim(ClaimTipoUsuario, "administrador"));
-        });
+        builder.Services.AddAuthorization(AddPolicies);
     }
 
-    private static Task EscreverErroAsync(HttpResponse response, int status, string mensagem, string traceId)
+    private static Task EscreverErroAsync(
+        HttpResponse response,
+        int status,
+        string mensagem,
+        string traceId,
+        string? details = null)
     {
         response.Clear();
         response.StatusCode = status;
         response.ContentType = "application/json";
         var payload = JsonSerializer.Serialize(
-            new { error = mensagem, traceId },
+            new { error = mensagem, traceId, details },
             new JsonSerializerOptions(JsonSerializerDefaults.Web));
         return response.WriteAsync(payload);
+    }
+
+    private static IReadOnlyList<SecurityKey> GetSigningKeys(string? jwtSecret, string? jwksUrl)
+    {
+        var keys = new List<SecurityKey>();
+
+        if (!string.IsNullOrWhiteSpace(jwtSecret))
+        {
+            keys.Add(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)));
+
+            try
+            {
+                var decodedSecret = Convert.FromBase64String(jwtSecret);
+                keys.Add(new SymmetricSecurityKey(decodedSecret));
+            }
+            catch (FormatException)
+            {
+                // Supabase projects can expose the JWT secret as plain text or base64.
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(jwksUrl))
+        {
+            try
+            {
+                var jwks = new HttpClient().GetStringAsync(jwksUrl).GetAwaiter().GetResult();
+                keys.AddRange(new JsonWebKeySet(jwks).Keys);
+            }
+            catch (HttpRequestException)
+            {
+                // Local environments can be offline during service startup.
+            }
+            catch (SocketException)
+            {
+                // Same fallback for socket-level network failures.
+            }
+        }
+
+        return keys;
+    }
+
+    private static string? BuildJwksUrl(string? supabaseUrl)
+    {
+        if (string.IsNullOrWhiteSpace(supabaseUrl))
+        {
+            return null;
+        }
+
+        return $"{supabaseUrl.TrimEnd('/')}/auth/v1/.well-known/jwks.json";
+    }
+
+    private static string? FirstNotBlank(params string?[] values)
+    {
+        return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
     }
 }

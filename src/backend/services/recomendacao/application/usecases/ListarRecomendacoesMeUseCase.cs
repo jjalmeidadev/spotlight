@@ -37,7 +37,8 @@ public class ListarRecomendacoesMeUseCase(IRecomendacaoRepository repositorio)
                     Titulo = r.Espetaculo.Titulo,
                     Genero = r.Espetaculo.Genero,
                     Status = r.Espetaculo.Status,
-                    NotaMedia = r.Espetaculo.NotaMedia
+                    NotaMedia = r.Espetaculo.NotaMedia,
+                    Midias = r.Espetaculo.Midias.Select(ListarSimilaresUseCase.MapearMidia).ToList()
                 }
             }).ToList()
         };

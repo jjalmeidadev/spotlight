@@ -10,7 +10,7 @@ using Spotlight.Recomendacao.Infrastructure.Persistence;
 using Spotlight.Recomendacao.Presentation.Middleware;
 
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
-Env.TraversePath().Load();
+Env.TraversePath().NoClobber().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 

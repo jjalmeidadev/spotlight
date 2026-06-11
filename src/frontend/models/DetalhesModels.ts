@@ -1,3 +1,9 @@
+import {
+  listarEspetaculosSimilares,
+  obterEspetaculoCatalogo,
+  obterUrlMidia,
+} from '../repositories/CatalogRepository';
+
 export type EspetaculoSemelhante = {
   id: string;
   titulo: string;
@@ -15,62 +21,51 @@ export type EspetaculoDetalhe = {
   linkCompra?: string;
 };
 
-const MOCK_DETALHES: Record<string, EspetaculoDetalhe> = {
-  '16': {
-    id: '16',
-    titulo: 'A Noviça Rebelde',
-    descricao:
-      'Maria é uma jovem noviça que deixa o convento para ser governanta dos sete filhos do capitão Von Trapp. Com música e afeto, ela transforma a casa e ajuda a família a redescobrir o amor em meio às mudanças da Áustria nos anos 1930.',
-    imagemUrl:
-      'https://images.unsplash.com/photo-1503095396549-759542698bca?auto=format&fit=crop&w=1200&q=80',
-    percentualAprovacao: 93,
-    notaMedia: 3,
-    tags: ['Espetáculo', '23/07', '60min'],
-    linkCompra: 'https://bilheteria.aventura.com.br/novica-rebelde',
-  },
-};
-
-const MOCK_SEMELHANTES: EspetaculoSemelhante[] = [
-  {
-    id: '3',
-    titulo: 'Mamma Mia!',
-    imagemUrl:
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '3b',
-    titulo: 'Mamma Mia!',
-    imagemUrl:
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
-  },
-];
-
-function wait(ms = 450) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 export async function obterDetalhesEspetaculo(espetaculoId: string): Promise<EspetaculoDetalhe> {
-  await wait();
+  const detalhe = await obterEspetaculoCatalogo(espetaculoId);
+  const primeiraSessao = detalhe.sessoes?.[0];
+  const categorias = detalhe.categorias?.map((categoria) => categoria.nome) ?? [];
+  const tags = deduplicar([
+    detalhe.genero,
+    primeiraSessao ? formatarDataSessao(primeiraSessao.data) : undefined,
+    detalhe.duracao ? `${detalhe.duracao}min` : undefined,
+    ...categorias.slice(0, 1),
+  ].filter(Boolean) as string[]);
 
-  const detalhe = MOCK_DETALHES[espetaculoId] ?? MOCK_DETALHES['16'];
-
-  if (!detalhe) {
-    throw new Error('Não foi possível carregar os detalhes do espetáculo.');
-  }
-
-  return { ...detalhe, id: espetaculoId };
+  return {
+    id: String(detalhe.id),
+    titulo: detalhe.titulo,
+    descricao: detalhe.descricao ?? 'Descricao indisponivel para este espetaculo.',
+    imagemUrl: obterUrlMidia(detalhe, 'detail_image'),
+    percentualAprovacao: Math.round(Number(detalhe.notaMedia ?? 0) * 20),
+    notaMedia: Number(detalhe.notaMedia ?? 0),
+    tags,
+    linkCompra: primeiraSessao?.linkCompra ?? undefined,
+  };
 }
 
 export async function obterEspetaculosSemelhantes(
   espetaculoId: string,
 ): Promise<EspetaculoSemelhante[]> {
-  await wait(250);
+  if (!espetaculoId.trim()) return [];
 
-  if (!espetaculoId.trim()) {
-    return [];
-  }
+  const similares = await listarEspetaculosSimilares(espetaculoId);
 
-  return MOCK_SEMELHANTES;
+  return similares.map((item) => ({
+    id: String(item.id),
+    titulo: item.titulo,
+    imagemUrl: obterUrlMidia(item, 'catalog_card'),
+  }));
+}
+
+function formatarDataSessao(data: string) {
+  const [, mes, dia] = data.split('-');
+
+  if (!dia || !mes) return data;
+
+  return `${dia}/${mes}`;
+}
+
+function deduplicar(valores: string[]) {
+  return valores.filter((valor, index, todos) => todos.indexOf(valor) === index);
 }

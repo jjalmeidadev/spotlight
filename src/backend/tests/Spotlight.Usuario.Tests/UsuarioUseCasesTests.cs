@@ -550,6 +550,14 @@ public class UsuarioUseCasesTests
         public Task<Domain.Entities.Usuario?> ObterAsync(Guid id, CancellationToken cancellationToken) =>
             Task.FromResult(Usuario);
 
+        public Task GarantirPerfilAsync(
+            Guid id,
+            string email,
+            string? nome,
+            DateOnly? dataNascimento,
+            CancellationToken cancellationToken) =>
+            Task.CompletedTask;
+
         public Task<bool> AtualizarAsync(Guid id, UsuarioUpdateDto dados, CancellationToken cancellationToken)
         {
             AtualizarCalled = true;

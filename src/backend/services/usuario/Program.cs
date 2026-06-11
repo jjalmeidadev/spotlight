@@ -11,7 +11,7 @@ using Spotlight.Usuario.Infrastructure.Auth;
 using Spotlight.Usuario.Infrastructure.Persistence;
 using Spotlight.Usuario.Presentation.Middleware;
 
-Env.TraversePath().Load();
+Env.TraversePath().NoClobber().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,12 +109,6 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString)
     && !string.IsNullOrWhiteSpace(mongoTelemetryCollectionName))
 {
     healthChecks.AddCheck<MongoDbHealthCheck>("mongodb", tags: ["ready"]);
-}
-else
-{
-    healthChecks.AddCheck("mongodb", () =>
-        HealthCheckResult.Unhealthy("Configuracao do MongoDB de telemetria nao informada."),
-        tags: ["ready"]);
 }
 
 const string CorsPolicy = "SpotlightCors";
