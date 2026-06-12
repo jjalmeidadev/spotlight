@@ -98,7 +98,13 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Spotlight — Serviço de Recomendação",
         Version = "v1",
-        Description = "Orquestra o fluxo de sugestões, consultando predições do Motor de ML."
+        Description =
+            "Orquestra o fluxo de sugestões, consultando predições do Motor de ML.\n\n" +
+            "**Endpoints públicos** (prefixo `/recomendacao` é adicionado pelo API Gateway):\n" +
+            "- `GET /recomendacao` — catálogo dos endpoints expostos (descoberta).\n" +
+            "- `GET /recomendacao/me` — recomendações personalizadas (requer JWT do Supabase com papel `cadastrado`).\n" +
+            "- `GET /recomendacao/espetaculos/{id}/similares` — similares item-item (público).\n\n" +
+            "O parâmetro `limite` (quando aplicável) aceita 1..50; valores fora do intervalo caem no padrão 10."
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

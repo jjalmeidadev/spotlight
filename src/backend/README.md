@@ -245,6 +245,13 @@ Registre cada repositório no `Program.cs` com
 - **Entidades, repositórios e rotas de negócio** (catálogo, usuário, recomendação)
   serão implementadas depois, preenchendo as pastas `application`/`domain`/
   `infrastructure`/`presentation` de cada serviço.
-- **Contratos de API** (entrada/saída) ficam em `contracts/`.
-- **Swagger documentado** propriamente (descrições, exemplos) virá depois; aqui
-  fica apenas o setup.
+- **Contratos de API** (entrada/saída) ficam em `contracts/` (OpenAPI fonte da
+  verdade em `contracts/openapi.json` + descrição textual em `contracts/api-contracts.md`).
+- **Swagger das APIs** — cada serviço expõe sua spec em
+  `http://localhost:{porta}/swagger/v1/swagger.json` e a UI em
+  `http://localhost:{porta}/swagger`. O API Gateway agrega as quatro specs em
+  `http://localhost:5000/swagger` (seletor "Gateway / Catálogo / Usuário /
+  Recomendação / Geolocalização"). O serviço de **Recomendação** já está
+  documentado com descrições, parâmetros e exemplos de request/response em
+  `http://localhost:5003/swagger` (rotas `GET /recomendacao`,
+  `GET /recomendacao/me`, `GET /recomendacao/espetaculos/{id}/similares`).

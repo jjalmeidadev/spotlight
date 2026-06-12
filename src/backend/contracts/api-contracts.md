@@ -670,6 +670,7 @@ Objeto usado dentro das respostas de recomendação. Representa o subconjunto do
 | `genero` | string ou null | Não | Gênero textual do espetáculo, quando cadastrado. |
 | `status` | string | Sim | Status do espetáculo. Ex.: `em_cartaz`, `em_breve`, `encerrado`. |
 | `notaMedia` | number | Sim | Média de avaliações do espetáculo. |
+| `midias` | array | Sim | Mídias do espetáculo (capas, banners) ordenadas por `ordemExibicao`. Pode ser vazia. Cada item tem `tipoMidia`, `storageBucket`, `storagePath`, `altText` (nullable) e `ordemExibicao`. |
 
 Exemplo:
 
@@ -679,7 +680,16 @@ Exemplo:
   "titulo": "O Auto da Compadecida",
   "genero": "Comédia",
   "status": "em_cartaz",
-  "notaMedia": 4.7
+  "notaMedia": 4.7,
+  "midias": [
+    {
+      "tipoMidia": "capa",
+      "storageBucket": "espetaculos",
+      "storagePath": "12/capa.jpg",
+      "altText": "Cartaz de O Auto da Compadecida",
+      "ordemExibicao": 1
+    }
+  ]
 }
 ```
 
