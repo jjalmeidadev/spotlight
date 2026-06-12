@@ -2442,6 +2442,7 @@ Todos os scripts estão em `src/database/` e devem ser executados na ordem indic
 | [`migrations/06_indexes.sql`](../src/database/migrations/06_indexes.sql) | Habilita extensão `pg_trgm` e cria 4 índices novos para queries reais do catálogo (busca por título, filtro por gênero, status+popularidade, sessões por espetáculo) | 5º (manual) |
 | [`migrations/07_constraints_sessao_usuario.sql`](../src/database/migrations/07_constraints_sessao_usuario.sql) | `UNIQUE` em `sessao(id_espetaculo, id_teatro, data, horario)` e `CHECK` em `usuario.data_nascimento` | 6º (manual) |
 | [`migrations/08_tipo_algoritmo_e_unique_recomendacao.sql`](../src/database/migrations/08_tipo_algoritmo_e_unique_recomendacao.sql) | Função central `public.is_tipo_algoritmo_valido()` reusada por `recomendacao` e `similaridade_item`, e `UNIQUE INDEX` em `recomendacao(id_usuario, id_espetaculo, tipo_algoritmo)` viabilizando UPSERT pelo Worker | 7º (manual) |
+| [`migrations/13_rls_similaridade_item_avaliacao.sql`](../src/database/migrations/13_rls_similaridade_item_avaliacao.sql) | Restringe `INSERT`, `UPDATE` e `DELETE` de `similaridade_item` a administradores e permite `UPDATE` de `avaliacao` somente pelo próprio autor | Após a migration `12` (manual) |
 
 Cada migration em `src/database/migrations/` tem um arquivo `_rollback.sql` correspondente. As migrations são aplicadas **manualmente** via SQL Editor do Supabase ou `psql` após o setup inicial (`01` + `02`) — o Docker só executa automaticamente os scripts de bootstrap (`00`, `01`, `02`). Detalhes do contrato operacional estão na seção "Estratégia de Migrations Incrementais" do [README do banco](../src/database/README.md#estratégia-de-migrations-incrementais).
 
@@ -2512,7 +2513,8 @@ Todas as 11 tabelas têm RLS habilitado. As políticas implementadas seguem dois
 | Padrão | Tabelas | Regra |
 |---|---|---|
 | **Leitura pública** | `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao`, `avaliacao` | `USING (true)` — qualquer requisição pode ler |
-| **Acesso restrito ao próprio usuário** | `usuario`, `avaliacao` (INSERT/DELETE), `recomendacao` | `USING (auth.uid() = id_usuario)` — apenas o titular acessa |
+| **Acesso restrito ao próprio usuário** | `usuario`, `avaliacao` (INSERT/UPDATE/DELETE), `recomendacao` | `auth.uid() = id_usuario` — apenas o titular acessa; no `UPDATE` de `avaliacao`, a condição também é aplicada em `WITH CHECK` |
+| **Escrita administrativa** | `similaridade_item` (INSERT/UPDATE/DELETE) | `public.is_admin()` — somente administradores podem alterar similaridades; a leitura pública é preservada |
 
 O RLS é a camada de segurança de dados mais próxima do banco. Mesmo que um token com permissões elevadas chegue ao banco, as políticas garantem que cada usuário só enxerga e modifica seus próprios registros onde aplicável.
 
