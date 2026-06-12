@@ -67,12 +67,12 @@ public class ListarEspetaculosUseCase(IEspetaculoRepository repositorio)
         Midias = e.Midias.Select(MapearMidia).ToList()
     };
 
-    internal static EspetaculoMidiaDto MapearMidia(EspetaculoMidia midia) => new()
+    internal static EspetaculoMidiaDto MapearMidia(EspetaculoMidia m) => new()
     {
-        TipoMidia = midia.TipoMidia,
-        StorageBucket = midia.StorageBucket,
-        StoragePath = midia.StoragePath,
-        AltText = midia.AltText,
-        OrdemExibicao = midia.OrdemExibicao
+        TipoMidia = m.TipoMidia,
+        StorageBucket = m.StorageBucket,
+        StoragePath = m.StoragePath,
+        AltText = m.AltText,
+        OrdemExibicao = m.OrdemExibicao
     };
 }

@@ -4,7 +4,7 @@ export type CatalogItem = {
 	id: string;
 	title: string;
 	subtitle?: string;
-	image: ImageSourcePropType;
+	image?: ImageSourcePropType;
 	imageUri?: string | null;
 	recommendation?: {
 		score: number;

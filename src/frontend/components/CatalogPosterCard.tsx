@@ -7,7 +7,7 @@ const CATALOG_CARD_ASPECT_RATIO = 368 / 416;
 type CatalogPosterCardProps = {
 	title: string;
 	subtitle?: string;
-	imageSource: ImageSourcePropType;
+	imageSource?: ImageSourcePropType;
 	imageUri?: string | null;
 	onPress?: () => void;
 };
@@ -20,7 +20,11 @@ export function CatalogPosterCard({ title, subtitle, imageSource, imageUri, onPr
 
 	return (
 		<Pressable onPress={onPress} style={styles.pressable} accessibilityRole="button">
-			<ImageBackground source={source} style={styles.card} imageStyle={styles.image} />
+			{source ? (
+				<ImageBackground source={source} style={styles.card} imageStyle={styles.image} />
+			) : (
+				<View style={[styles.card, styles.placeholder]} />
+			)}
 		</Pressable>
 	);
 }
@@ -38,5 +42,8 @@ const styles = StyleSheet.create({
 	},
 	image: {
 		borderRadius: 10,
+	},
+	placeholder: {
+		backgroundColor: '#17211D',
 	},
 });

@@ -24,7 +24,7 @@ public class EspetaculoRecomendado
     public IReadOnlyList<EspetaculoMidia> Midias { get; init; } = [];
 }
 
-/// <summary>Metadado de arquivo no Supabase Storage associado ao espetáculo.</summary>
+/// <summary>Metadado de arquivo no Supabase Storage associado ao espetáculo recomendado.</summary>
 public class EspetaculoMidia
 {
     public string TipoMidia { get; init; } = string.Empty;

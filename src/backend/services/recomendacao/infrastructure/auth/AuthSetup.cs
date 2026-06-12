@@ -9,9 +9,8 @@ using Spotlight.Recomendacao.Application.UseCases;
 namespace Spotlight.Recomendacao.Infrastructure.Auth;
 
 /// <summary>
-/// Configuracao de autenticacao/autorizacao para o servico de Recomendacao.
-/// Supabase Auth pode validar tokens pelo segredo JWT local ou pelas chaves JWKS
-/// publicas do projeto Supabase.
+/// Configura autenticacao/autorizacao JWT para o servico de Recomendacao.
+/// Aceita tokens Supabase assinados por segredo HS256 ou por chaves expostas no JWKS.
 /// </summary>
 public static class AuthSetup
 {
@@ -25,8 +24,9 @@ public static class AuthSetup
         var jwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET");
         var jwksUrl =
             Environment.GetEnvironmentVariable("SUPABASE_AUTH_JWKS_URL")
-            ?? BuildJwksUrl(Environment.GetEnvironmentVariable("SUPABASE_URL")
-                ?? Environment.GetEnvironmentVariable("EXPO_PUBLIC_SUPABASE_URL"));
+            ?? BuildJwksUrl(FirstNotBlank(
+                Environment.GetEnvironmentVariable("SUPABASE_URL"),
+                Environment.GetEnvironmentVariable("EXPO_PUBLIC_SUPABASE_URL")));
 
         void AddPolicies(AuthorizationOptions options)
         {
@@ -56,6 +56,7 @@ public static class AuthSetup
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKeys = chaves,
+                    IssuerSigningKeyResolver = (_, _, _, _) => chaves,
                     ValidateLifetime = true,
                     ValidateIssuer = false,
                     ValidateAudience = false,
@@ -134,11 +135,11 @@ public static class AuthSetup
             }
             catch (HttpRequestException)
             {
-                // Local environments can block external calls during startup.
+                // Local environments can be offline during service startup.
             }
             catch (SocketException)
             {
-                // Same reason above, but some network blocks surface as socket errors.
+                // Same fallback for socket-level network failures.
             }
         }
 
@@ -153,5 +154,10 @@ public static class AuthSetup
         }
 
         return $"{supabaseUrl.TrimEnd('/')}/auth/v1/.well-known/jwks.json";
+    }
+
+    private static string? FirstNotBlank(params string?[] values)
+    {
+        return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
     }
 }

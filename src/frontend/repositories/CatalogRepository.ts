@@ -1,4 +1,6 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
+import { getApiBaseUrl } from '@/frontend/config/api';
+
+const API_BASE_URL = getApiBaseUrl();
 const CATALOG_IMAGE_BASE_URL = process.env.EXPO_PUBLIC_CATALOG_IMAGE_BASE_URL;
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
 

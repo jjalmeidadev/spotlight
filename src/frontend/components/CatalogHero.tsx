@@ -9,9 +9,9 @@ type CatalogHeroProps = {
 	title: string;
 	subtitle: string;
 	actionLabel: string;
-	heroSource: ImageSourcePropType;
+	heroSource?: ImageSourcePropType;
 	onActionPress?: () => void;
-	overSource: ImageSourcePropType;
+	overSource?: ImageSourcePropType;
 	profileLabel: string;
 	profileSource?: ImageSourcePropType | null;
 };
@@ -27,7 +27,11 @@ export function CatalogHero({
 }: CatalogHeroProps) {
 	return (
 		<View style={styles.hero}>
-			<Image source={heroSource} style={styles.heroImage} />
+			{heroSource ? (
+				<Image source={heroSource} style={styles.heroImage} />
+			) : (
+				<View style={[styles.heroImage, styles.heroPlaceholder]} />
+			)}
 			<View style={styles.overlay} />
 			<View style={styles.headerRow}>
 				<View style={styles.headerSpacer} />
@@ -72,6 +76,9 @@ const styles = StyleSheet.create({
 		right: 0,
 		width: '100%',
 		resizeMode: 'cover',
+	},
+	heroPlaceholder: {
+		backgroundColor: '#17211D',
 	},
 	overlay: {
 		...StyleSheet.absoluteFillObject,

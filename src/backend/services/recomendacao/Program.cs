@@ -15,7 +15,7 @@ using Spotlight.Recomendacao.Presentation.Middleware;
 // Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
 if (!AppContext.BaseDirectory.Contains("Spotlight.Recomendacao.Tests", StringComparison.OrdinalIgnoreCase))
 {
-    Env.TraversePath().Load();
+    Env.NoClobber().TraversePath().Load();
 }
 
 var builder = WebApplication.CreateBuilder(args);

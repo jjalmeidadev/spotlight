@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
+import { getApiBaseUrl } from '@/frontend/config/api';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
+const API_BASE_URL = getApiBaseUrl();
 const TELEMETRY_PATH = '/usuario/telemetria';
 const TELEMETRY_ENABLED = process.env.EXPO_PUBLIC_TELEMETRY_ENABLED !== 'false';
 const TELEMETRY_TIMEOUT_MS = 1200;

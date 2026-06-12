@@ -13,18 +13,7 @@ import {
 	listarRecomendacoesUsuario,
 	RecommendedShow,
 } from '../repositories/RecommendationRepository';
-
-const CATALOG_IMAGE = {
-	hero: require('../../../assets/images/catalog/catalog-hero.png'),
-	heroArtwork: require('../../../assets/images/catalog/catalog-hero-overimage.png'),
-	whiteShell: require('../../../assets/images/catalog/component-whitebgtop.png'),
-	logo: require('../../../assets/images/catalog/logo-spotlight.png'),
-	searchIcon: require('../../../assets/images/catalog/searchbar-icon.png'),
-	filterIcon: require('../../../assets/images/catalog/filter-config-component.png'),
-	mammaMia: require('../../../assets/images/catalog/catalog-mammamia.png'),
-	elis: require('../../../assets/images/catalog/catalog-elis.png'),
-	hair: require('../../../assets/images/catalog/catalog-hair.png'),
-} as const;
+import { CATALOG_IMAGE, normalizarTitulo } from '../config/catalogImages';
 
 const FILTER_OPTIONS = [
 	'Teatro Musical',
@@ -33,13 +22,6 @@ const FILTER_OPTIONS = [
 	'Concerto e Show',
 	'Teatro Infantil',
 ] as const;
-
-const FALLBACK_POPULAR_ITEMS = [
-	{ id: '16', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-	{ id: '17', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-	{ id: '18', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-	{ id: '19', title: 'Mamma Mia!', subtitle: 'VER MAIS', image: CATALOG_IMAGE.mammaMia },
-];
 
 type UseCatalogViewModelOptions = {
 	accessToken?: string | null;
@@ -195,7 +177,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		.slice(0, 10)
 		.map(toCatalogItem);
 	const heroShow = useMemo(
-		() => catalogShows.find((item) => normalizeTitle(item.title).includes('elis')) ?? popularShows[0] ?? null,
+		() => catalogShows.find((item) => normalizarTitulo(item.title).includes('elis')) ?? popularShows[0] ?? null,
 		[catalogShows, popularShows],
 	);
 	const heroBackgroundUrl = heroShow ? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_background') : null;
@@ -203,8 +185,8 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const assets = useMemo(
 		() => ({
 			...CATALOG_IMAGE,
-			hero: heroBackgroundUrl ? { uri: heroBackgroundUrl } : CATALOG_IMAGE.hero,
-			heroArtwork: heroArtworkUrl ? { uri: heroArtworkUrl } : CATALOG_IMAGE.heroArtwork,
+			hero: heroBackgroundUrl ? { uri: heroBackgroundUrl } : undefined,
+			heroArtwork: heroArtworkUrl ? { uri: heroArtworkUrl } : undefined,
 		}),
 		[heroBackgroundUrl, heroArtworkUrl],
 	);
@@ -227,7 +209,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		{
 			id: 'popular',
 			title: 'Os mais populares do momento:',
-			items: popularItems.length > 0 ? popularItems : FALLBACK_POPULAR_ITEMS,
+			items: popularItems,
 		},
 		...(watchedItems.length > 0
 			? [{ id: 'watched', title: 'Outras pessoas tambem assistiram:', items: watchedItems }]
@@ -255,51 +237,16 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	};
 }
 
-function normalizeTitle(value: string) {
-	return value
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
-		.toLowerCase();
-}
-
 function toCatalogItem(item: CatalogShow) {
 	return {
 		id: item.id,
 		title: item.title,
 		subtitle: item.genre ?? 'VER MAIS',
-		image: getCatalogImage(item),
 		imageUri: item.imageUrl,
 	};
 }
 
 function getRecommendationImage(item: RecommendedShow) {
-	const normalized = `${item.title} ${item.genre ?? ''}`.toLowerCase();
-
-	if (normalized.includes('mamma') || normalized.includes('musical')) {
-		return CATALOG_IMAGE.mammaMia;
-	}
-
-	if (normalized.includes('elis') || normalized.includes('drama')) {
-		return CATALOG_IMAGE.elis;
-	}
-
-	return CATALOG_IMAGE.hair;
-}
-
-function getCatalogImage(item: CatalogShow) {
-	const normalized = `${item.title} ${item.genre ?? ''}`.toLowerCase();
-
-	if (normalized.includes('mamma')) {
-		return CATALOG_IMAGE.mammaMia;
-	}
-
-	if (normalized.includes('elis')) {
-		return CATALOG_IMAGE.elis;
-	}
-
-	if (normalized.includes('hair')) {
-		return CATALOG_IMAGE.hair;
-	}
-
-	return CATALOG_IMAGE.heroArtwork;
+	void item;
+	return undefined;
 }

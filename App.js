@@ -43,11 +43,33 @@ export default function App() {
 		return () => subscription.remove();
 	}, []);
 
-	function handleLogin(usuario) {
+	async function handleLogin(usuario) {
 		setUserName(usuario.nome);
 		setAccessToken(usuario.accessToken ?? null);
 		setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
-		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'catalogo');
+		await direcionarAposAutenticacao(usuario);
+	}
+
+	async function direcionarAposAutenticacao(usuario) {
+		if (usuario.tipoUsuario === 'administrador') {
+			setScreen('dashboard');
+			return;
+		}
+
+		if (!usuario.accessToken) {
+			setScreen('preferencias');
+			return;
+		}
+
+		setScreen('verificando-preferencias');
+
+		try {
+			const preferencias = await obterPreferenciasUsuario(usuario.accessToken);
+			setScreen(preferenciasEstaoCompletas(preferencias) ? 'catalogo' : 'preferencias');
+		} catch (error) {
+			console.log('Nao foi possivel verificar preferencias salvas:', error);
+			setScreen('preferencias');
+		}
 	}
 
 	if (screen === 'loading') {
@@ -72,7 +94,7 @@ export default function App() {
 		return (
 			<CadastroView
 				onBackPress={() => setScreen('login')}
-				onCadastro={(usuario) => {
+				onCadastro={async (usuario) => {
 					if (usuario.requerConfirmacaoEmail) {
 						setScreen('login');
 						Alert.alert(
@@ -85,7 +107,7 @@ export default function App() {
 					setUserName(usuario.nome);
 					setAccessToken(usuario.accessToken ?? null);
 					setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
-					setScreen('preferencias');
+					await direcionarAposAutenticacao(usuario);
 				}}
 			/>
 		);
@@ -93,6 +115,14 @@ export default function App() {
 
 	if (screen === 'preferencias') {
 		return <PreferenceSelectionScreen accessToken={accessToken} onComplete={() => setScreen('catalogo')} />;
+	}
+
+	if (screen === 'verificando-preferencias') {
+		return (
+			<View style={styles.loading}>
+				<ActivityIndicator color="#111412" />
+			</View>
+		);
 	}
 
 	if (screen === 'catalogo') {
@@ -163,6 +193,7 @@ function getTelemetryScreenName(screen) {
 		loading: 'LoadingScreen',
 		login: 'LoginView',
 		preferencias: 'PreferenceSelectionScreen',
+		'verificando-preferencias': 'PreferenceCheckView',
 	};
 
 	return screenNames[screen] ?? screen;

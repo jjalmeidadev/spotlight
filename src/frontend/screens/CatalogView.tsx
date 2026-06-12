@@ -144,18 +144,20 @@ export default function CatalogView({ accessToken, profileName, userLocationAddr
 						</View>
 					</CatalogContentShell>
 
-					<HeroFloatingArtwork
-						source={vm.assets.heroArtwork}
-						style={[
-							styles.heroArtworkOverlay,
-							{
-								height: heroArtworkHeight,
-								right: heroArtworkRight,
-								top: heroArtworkTop,
-								width: heroArtworkWidth,
-							},
-						]}
-					/>
+					{vm.assets.heroArtwork ? (
+						<HeroFloatingArtwork
+							source={vm.assets.heroArtwork}
+							style={[
+								styles.heroArtworkOverlay,
+								{
+									height: heroArtworkHeight,
+									right: heroArtworkRight,
+									top: heroArtworkTop,
+									width: heroArtworkWidth,
+								},
+							]}
+						/>
+					) : null}
 				</View>
 			</ScrollView>
 		</View>
