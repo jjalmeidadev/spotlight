@@ -3321,10 +3321,115 @@ _conteúdo_
 _conteúdo_
 
 ## 6.1 Diagrama de Implantação da UML
-_conteúdo_
+
+O diagrama de implantação (*deployment diagram*) é um modelo da UML que representa a topologia física da solução: os nós de execução (dispositivos e ambientes de servidor), os artefatos implantados em cada nó e os caminhos de comunicação entre eles. Para o Spotlight, ele é importante porque evidencia como o **frontend**, o **backend**, o **servidor de aplicação**, os **contêineres Docker**, os **bancos de dados** e as **integrações externas** se distribuem na infraestrutura real do projeto, deixando claras as fronteiras de rede, os protocolos utilizados e as dependências de nuvem.
+
+A solução é organizada em quatro grandes blocos de implantação:
+
+- **Dispositivo Móvel (Android / iOS):** executa o artefato do **App Spotlight**, construído em Expo SDK 54 / React Native 0.81, que consome as APIs por HTTPS/REST.
+- **Servidor de Aplicação (Host Linux + Docker Engine):** hospeda os quatro microsserviços do backend (.NET 9) em contêineres isolados, todos conectados à rede Docker `spotlight_network`.
+- **Supabase (Cloud):** provê o banco relacional **PostgreSQL** (catálogo, usuários e recomendações) e o serviço de **Auth/JWT** para autenticação e validação de tokens.
+- **Serviços externos de nuvem:** **MongoDB Atlas**, que armazena a telemetria de uso, e **OpenStreetMap/Nominatim**, utilizado para *geocoding* pelo serviço de geolocalização.
+
+<div align="center">
+
+<sub>Figura X - Diagrama de Implantação UML</sub><br>
+
+  <img src="./img/diagrama-implementacao.png" width="100%" alt="Diagrama de implantação da solução Spotlight"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### Nós, artefatos e integrações
+
+| Nó / Ambiente | Artefato / Componente | Tecnologia | Comunicação |
+|---|---|---|---|
+| **Dispositivo Móvel** | App Spotlight | Expo SDK 54 / React Native 0.81 | HTTPS/REST com as APIs; login via JWT no Supabase Auth |
+| **Container: catalogo** | API de Catálogo | .NET 9 API | PostgreSQL (connection string); valida JWT no Supabase Auth |
+| **Container: recomendacao** | API de Recomendação | .NET 9 API | PostgreSQL (connection string); valida JWT no Supabase Auth |
+| **Container: geolocalizacao** | API de Geolocalização | .NET 9 API | HTTPS para Nominatim (geocoding) |
+| **Container: usuario** | API de Usuário | .NET 9 API | PostgreSQL; telemetria no MongoDB Atlas; valida JWT no Supabase Auth |
+| **Supabase (Cloud)** | PostgreSQL + Auth/JWT | Supabase | Persistência relacional e provedor de identidade |
+| **MongoDB Atlas (Cloud)** | MongoDB | MongoDB | Persistência de telemetria de uso |
+| **OpenStreetMap** | Nominatim API | OpenStreetMap | Geocodificação de endereços |
+
+Os quatro contêineres do backend são orquestrados no mesmo host pela rede Docker `spotlight_network`, o que permite isolamento de processos, padronização do ambiente de execução e comunicação interna entre serviços, enquanto a exposição externa ocorre por HTTPS para o aplicativo móvel.
+
+### Código-fonte do diagrama (PlantUML)
+
+O diagrama acima foi gerado a partir do seguinte código PlantUML, mantido versionado para permitir futuras atualizações da topologia:
+
+```plantuml
+@startuml
+title Diagrama de Implantação - Spotlight (g04)
+
+skinparam shadowing false
+skinparam monochrome true
+skinparam defaultFontName "Helvetica"
+
+node "Dispositivo Móvel\n(Android / iOS)" as Device {
+  artifact "App Spotlight\n(Expo SDK 54 / React Native 0.81)" as App
+}
+
+cloud "Servidor de Aplicação\n(Host Linux + Docker Engine)" as Servidor {
+  node "Rede Docker: spotlight_network" as DockerNet {
+    node "Container: catalogo" as Catalogo {
+      artifact ".NET 9 API" as ApiCat
+    }
+    node "Container: recomendacao" as Recomendacao {
+      artifact ".NET 9 API" as ApiRec
+    }
+    node "Container: geolocalizacao" as Geo {
+      artifact ".NET 9 API" as ApiGeo
+    }
+    node "Container: usuario" as Usuario {
+      artifact ".NET 9 API" as ApiUsr
+    }
+  }
+}
+
+cloud "Supabase (Cloud)" as Supabase {
+  database "PostgreSQL\n(catálogo, usuários,\nrecomendações)" as Postgres
+  component "Auth / JWT" as Auth
+}
+
+cloud "MongoDB Atlas (Cloud)" as MongoCloud {
+  database "MongoDB\n(telemetria de uso)" as Mongo
+}
+
+cloud "OpenStreetMap" as OSM {
+  component "Nominatim API\n(geocoding)" as Nominatim
+}
+
+App -down-> Catalogo : HTTPS / REST
+App -down-> Recomendacao : HTTPS / REST
+App -down-> Geo : HTTPS / REST
+App -down-> Usuario : HTTPS / REST
+App ..> Auth : Login (JWT)
+
+Catalogo --> Postgres : connection string
+Recomendacao --> Postgres
+Usuario --> Postgres
+Usuario --> Mongo : telemetria
+
+Catalogo ..> Auth : valida JWT
+Recomendacao ..> Auth : valida JWT
+Usuario ..> Auth : valida JWT
+
+Geo --> Nominatim : HTTPS
+@enduml
+```
 
 ## 6.2 Justificativa das Escolhas de Implantação
-_conteúdo_
+
+As escolhas de implantação priorizam **padronização do ambiente**, **baixo custo operacional no MVP** e **clareza das fronteiras entre serviços**:
+
+- **Contêineres Docker no host Linux:** cada microsserviço .NET 9 roda em um contêiner próprio na rede `spotlight_network`, garantindo isolamento, paridade entre ambientes de desenvolvimento e produção e facilidade de orquestração via `docker-compose`. Isso reduz o atrito de configuração e mantém a arquitetura SOA com fronteiras bem definidas.
+- **Supabase (PostgreSQL + Auth):** concentra persistência relacional e identidade em uma plataforma gerenciada, eliminando a necessidade de manter servidores de banco e de autenticação próprios. O PostgreSQL padrão evita *vendor lock-in* e o Auth/JWT integra-se nativamente ao banco (ver Seção 6.3).
+- **MongoDB Atlas para telemetria:** a telemetria de uso, de alto volume e escrita intensa, é segregada em um banco documental gerenciado na nuvem, preservando o desempenho do banco transacional e seguindo o princípio de persistência poliglota.
+- **OpenStreetMap/Nominatim:** atende ao *geocoding* do serviço de geolocalização sem dependência de billing proprietário, adequando-se ao escopo e ao orçamento do MVP.
+- **App móvel desacoplado:** o aplicativo comunica-se exclusivamente por HTTPS/REST com o backend e por JWT com o Supabase Auth, mantendo o cliente independente da infraestrutura interna e permitindo evolução dos serviços sem impacto na camada de apresentação.
 
 ## 6.3 Autenticação e Segurança
 
