@@ -16,8 +16,9 @@ se for chamado diretamente (sem passar pelo gateway), continua funcionando.
 |---|---|---|---|
 | **Spotlight.Gateway** | `api-gateway/` | 5000 | Ponto único de entrada; roteia para os serviços (YARP) e validará JWT |
 | **Spotlight.Catalogo** | `services/catalogo/` | 5001 | Espetáculos, teatros, gêneros e precificação |
-| **Spotlight.Usuario** | `services/usuario/` | 5002 | Perfis, preferências declaradas e histórico |
-| **Spotlight.Recomendacao** | `services/recomendacao/` | 5003 | Orquestra sugestões consultando o Motor de ML |
+| **Spotlight.Usuario** | `services/usuario/` | 5002 | Perfis, preferências declaradas, histórico e telemetria (MongoDB) |
+| **Spotlight.Recomendacao** | `services/recomendacao/` | 5003 | Orquestra sugestões via strategy ML.NET / PostgreSQL pré-processado |
+| **Spotlight.Geolocalizacao** | `services/geolocalizacao/` | 5004 | Geocodificação de endereços (Nominatim/OpenStreetMap) |
 
 Cada serviço tem um projeto de teste correspondente em `tests/`.
 
@@ -41,7 +42,7 @@ Cada serviço tem um projeto de teste correspondente em `tests/`.
 
 ```text
 src/backend/
-├── Spotlight.sln                     # solution: 4 apps + 4 projetos de teste
+├── Spotlight.sln                     # solution: 5 apps + 5 projetos de teste
 ├── api-gateway/                      # Spotlight.Gateway (porta 5000)
 │   ├── Spotlight.Gateway.csproj
 │   ├── Program.cs
@@ -57,15 +58,23 @@ src/backend/
 │   │   ├── domain/{entities,value-objects}/    # Models do domínio
 │   │   ├── infrastructure/persistence/         # Repositórios SQL puro
 │   │   └── presentation/{controllers,middleware}/
-│   ├── usuario/                      # Spotlight.Usuario (porta 5002) — mesma estrutura
-│   └── recomendacao/                 # Spotlight.Recomendacao (porta 5003) — mesma estrutura
-├── ml-engine/                        # Motor de ML (fora do escopo do backend de APIs)
-├── contracts/{dtos,events}/          # Contratos de API/eventos
+│   ├── usuario/                      # Spotlight.Usuario (porta 5002) — mesma estrutura + telemetria Mongo
+│   ├── recomendacao/                 # Spotlight.Recomendacao (porta 5003) — strategy ML.NET / Postgres
+│   └── geolocalizacao/               # Spotlight.Geolocalizacao (porta 5004) — Nominatim
+├── ml-engine/                        # Placeholder para motor de ML (hoje o treino vive em src/models/)
+├── contracts/                        # Contratos de API/eventos e docs operacionais
+│   ├── dtos/, events/
+│   ├── api-contracts.md
+│   ├── openapi.json
+│   ├── supabase-storage.md
+│   └── telemetria.md
+├── scripts/                          # Scripts auxiliares (PowerShell)
 └── tests/
     ├── Spotlight.Gateway.Tests/
     ├── Spotlight.Catalogo.Tests/
     ├── Spotlight.Usuario.Tests/
-    └── Spotlight.Recomendacao.Tests/
+    ├── Spotlight.Recomendacao.Tests/
+    └── Spotlight.Geolocalizacao.Tests/
 ```
 
 ## Pré-requisitos
