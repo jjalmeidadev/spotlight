@@ -25,8 +25,9 @@ g04/
 │   │   │   ├── recomendacao/            # Spotlight.Recomendacao    (5003) + ML.NET strategy
 │   │   │   └── geolocalizacao/          # Spotlight.Geolocalizacao  (5004) — Nominatim
 │   │   ├── contracts/                   # Contratos de API/eventos e docs operacionais
+│   │   ├── ml-engine/                   # Adapters de inferência/treino consumidos pelos serviços
 │   │   ├── scripts/                     # Scripts auxiliares (PowerShell)
-│   │   └── tests/                       # Projetos xUnit por serviço
+│   │   └── tests/                       # Projetos xUnit por serviço (Spotlight.<Servico>.Tests)
 │   ├── frontend/                        # App Expo / React Native em arquitetura MVVM
 │   │   ├── components/                  # Componentes visuais reutilizáveis
 │   │   ├── screens/                     # Telas (Views)
@@ -129,31 +130,46 @@ def recomendar_espetaculos(item_id, n_recomendacoes=10, verbose=True):
 matriz_preenchida = matriz_item_usuario.fillna(0)
 ```
 
-### 2.3 Padrões SQL
+### 2.3 Padrões SQL (PostgreSQL / Supabase)
 
 #### 2.3.1 Estrutura de Scripts
+Os scripts em `src/database/` usam PostgreSQL (Supabase) com `auth.users` como fonte da identidade. Cada entidade do domínio tem RLS habilitado e políticas explícitas.
+
 ```sql
 -- 01_create_database.sql
 -- Descrição: Criação da estrutura do banco de dados
 
-CREATE DATABASE IF NOT EXISTS portal_aventura;
-USE portal_aventura;
-
--- Tabelas principais
-CREATE TABLE usuarios (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TYPE tipo_usuario_enum AS ENUM (
+    'visitante', 'cadastrado', 'administrador'
 );
+
+CREATE TABLE usuario (
+    id_usuario      UUID              PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    nome            VARCHAR(150)      NOT NULL,
+    email           VARCHAR(255)      NOT NULL UNIQUE,
+    data_cadastro   TIMESTAMP         NOT NULL DEFAULT NOW(),
+    tipo_usuario    tipo_usuario_enum NOT NULL DEFAULT 'cadastrado',
+
+    CONSTRAINT chk_email_formato CHECK (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$')
+);
+
+ALTER TABLE usuario ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "usuario: leitura do próprio perfil"
+    ON usuario FOR SELECT
+    USING (auth.uid() = id_usuario);
 ```
 
 #### 2.3.2 Convenções SQL
-- **Palavras-chave**: MAIÚSCULAS (ex: `SELECT`, `WHERE`)
-- **Nomes de tabelas**: snake_case plural (ex: `usuarios`, `espetaculos`)
-- **Nomes de colunas**: snake_case singular (ex: `user_id`, `item_id`)
-- **Chaves primárias**: `id` ou `tabela_id`
-- **Chaves estrangeiras**: `tabela_referenciada_id`
+- **Palavras-chave**: MAIÚSCULAS (`SELECT`, `WHERE`, `JOIN`).
+- **Nomes de tabelas**: `snake_case` no **singular** (`usuario`, `espetaculo`, `sessao`) — alinha com a nomenclatura de entidades C#.
+- **Nomes de colunas**: `snake_case` (`nota_media`, `data_cadastro`).
+- **Chaves primárias**: `id_<entidade>` (`id_usuario`, `id_espetaculo`) — torna o JOIN auto-documentado.
+- **Chaves estrangeiras**: nome igual ao da PK referenciada (`id_usuario` em `avaliacao` referencia `usuario.id_usuario`).
+- **Tipos**: `UUID` quando vinculado a `auth.users`; `SERIAL`/`INT` para entidades sem identidade externa.
+- **Enums**: ENUMs nativos (`CREATE TYPE ..._enum`) em vez de `VARCHAR + CHECK`.
+- **Migrations**: `src/database/migrations/NN_descricao.sql` numeradas; cada migration deve ter rollback equivalente em `src/database/03_rollback.sql` ou arquivo `NN_descricao_rollback.sql`.
+- **RLS**: toda tabela com dado de usuário final tem `ENABLE ROW LEVEL SECURITY` + política nomeada (`"<tabela>: <ação descrita>"`).
 
 ### 2.4 Padrões de Documentação
 
@@ -214,6 +230,69 @@ Caso seja necessário desativar a validação automática (restaurando o comport
 ```bash
 git config --unset core.hooksPath
 ```
+
+### 2.6 Padrões Frontend (React Native / TypeScript)
+
+O app em `src/frontend/` segue arquitetura **MVVM**: a View (componente da tela) consome um ViewModel (hook) que orquestra estado e chamadas aos Repositories. Componentes visuais são puros e não tocam em rede.
+
+#### 2.6.1 Camadas e nomenclatura
+| Camada | Diretório | Convenção de arquivo | Exemplo |
+|--------|-----------|----------------------|---------|
+| View (tela) | `screens/` | `<Nome>View.tsx` ou `<Nome>Screen.tsx` | `CatalogView.tsx`, `LoadingScreen.tsx` |
+| Componente visual | `components/` | `<Nome>.tsx` (PascalCase) | `CatalogRail.tsx`, `SearchBar.tsx` |
+| ViewModel | `viewmodels/` | `use<Nome>ViewModel.ts` | `useCatalogViewModel.ts` |
+| Repository | `repositories/` | `<Nome>Repository.ts` | `CatalogRepository.ts` |
+| Model/Tipo | `models/` | `<Nome>.ts` (PascalCase) | `CatalogItem.ts`, `Usuario.ts` |
+| Configuração | `config/`, `theme/`, `hooks/` | `camelCase.ts` | `api.ts`, `catalogImages.ts` |
+
+#### 2.6.2 Convenções de Código
+- **Linguagem**: TypeScript com tipagem explícita em props e retornos de função pública. `any` é proibido fora de adaptadores de terceiros.
+- **Componentes**: `function ComponentName() {}` (sem `React.FC`). Props tipadas em `type <Componente>Props`.
+- **Hooks (ViewModels)**: sempre prefixados com `use`. Devem retornar um objeto nomeado (não tupla) para que a View desestruture por nome.
+- **Acesso a backend**: somente nos Repositories. Views e ViewModels nunca chamam `fetch`/axios diretamente.
+- **Tipos de API**: sufixo `Api` para o contrato bruto vindo do backend (`EspetaculoResumoApi`), separado dos modelos de UI.
+- **Identificadores**: `camelCase` para variáveis/funções, `PascalCase` para tipos/componentes, `UPPER_SNAKE_CASE` para constantes de módulo.
+- **Estilos**: `StyleSheet.create` no fim do arquivo da View; tokens compartilhados em `theme/`.
+- **Cleanup de efeitos**: useEffect com dado assíncrono deve usar flag local (`let ativo = true`) e cancelar setState após unmount.
+
+### 2.7 Padrões Backend (C# / .NET 9 / Clean Architecture)
+
+Cada microsserviço sob `src/backend/services/<servico>/` segue a mesma divisão em quatro camadas. Dependências apontam **sempre para dentro** (presentation → application → domain; infrastructure implementa contratos de domain/application).
+
+#### 2.7.1 Camadas e nomenclatura
+| Camada | Diretório | Responsabilidade | Sufixo |
+|--------|-----------|------------------|--------|
+| `domain/` | `entities/`, `value-objects/` | Entidades, exceções de domínio, contratos de repositório | `<Entidade>`, `I<Entidade>Repository`, `NotFoundException` |
+| `application/` | `usecases/`, `dtos/` | Casos de uso e DTOs de entrada/saída | `<Acao><Entidade>UseCase`, `<Entidade>Dto` |
+| `infrastructure/` | `persistence/`, `auth/`, ... | Implementação de repositórios (Npgsql), autenticação, integrações | `<Entidade>Repository`, `AuthSetup` |
+| `presentation/` | `controllers/`, `middleware/` | Controllers HTTP, pipeline de exceções | `<Entidade>sController`, `ErrorHandlingMiddleware` |
+
+#### 2.7.2 Convenções de Código
+- **Namespaces**: refletem a camada — `Spotlight.<Servico>.<Camada>.<Subpasta>` (ex.: `Spotlight.Catalogo.Application.UseCases`).
+- **Nomes**: `PascalCase` para classes/métodos/propriedades; `_camelCase` para campos privados; constantes em `PascalCase` (ex.: `PageSizeMaximo`).
+- **Métodos assíncronos**: sufixo `Async` e parâmetro `CancellationToken` obrigatório em todo método público que faz I/O.
+- **Use cases**: classe única por caso de uso, ponto de entrada `ExecutarAsync(...)`, validação/normalização em método `private static`.
+- **Injeção de dependência**: por **construtor primário** (C# 12) — `public class X(IDep d)`. Sem property injection, sem service locator.
+- **DTOs**: classes anêmicas com `{ get; set; }`; `record` somente quando o DTO precisa de igualdade estrutural (eventos de domínio).
+- **Acesso a dados**: SQL puro via `NpgsqlDataSource` injetado (singleton). **Não usar EF Core** — o padrão do projeto é Npgsql/ADO.NET.
+- **Exceções de domínio**: lançar `NotFoundException`/`ValidationException` próprias do serviço; o `ErrorHandlingMiddleware` traduz para `ErroDto` + status HTTP.
+- **Comentários XML**: `///` em controllers, use cases e contratos públicos (alimenta Swagger).
+
+#### 2.7.3 Convenções de API REST
+- **Idioma**: rotas e DTOs em português (`/espetaculos`, `EspetaculoResumoDto`).
+- **Rotas**: substantivos no plural em `kebab-case` (`/espetaculos/{id}/avaliacoes`). O prefixo do serviço (`/catalogo`, `/usuario`, etc.) é adicionado pelo gateway YARP e **não** aparece na rota interna do controller.
+- **Verbos HTTP**: GET (consulta), POST (criação), PUT (atualização completa), DELETE (remoção). `204 No Content` para DELETE bem-sucedido.
+- **Envelope de resposta**: listagens retornam `ListaDto<T>` (`{ data }`) ou `ListaPaginadaDto<T>` (`{ data, pagination }`). Erros retornam `ErroDto`.
+- **Autorização**: `[Authorize(Policy = AuthSetup.Policy<Papel>)]` nas rotas protegidas; rotas públicas marcadas com `<summary>` explícito.
+- **OpenAPI**: todo endpoint declara `[ProducesResponseType]` para 200/201 e cada status de erro relevante.
+
+### 2.8 Padrões de Testes
+
+- **Framework**: xUnit por serviço, em `src/backend/tests/Spotlight.<Servico>.Tests/`.
+- **Nomenclatura de teste**: `<Sujeito>_<Cenario>_<ResultadoEsperado>` — exemplo: `ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado`.
+- **Fakes**: implementações in-memory dos repositórios (`FakeEspetaculoRepository`), no mesmo arquivo do teste ou em `Fakes/` quando reutilizadas.
+- **Categorias**: testes que dependem de banco/HTTP real recebem `[Trait("Category", "Integration")]` — o pipeline CI roda apenas `Category!=Integration` na etapa `test:unit`.
+- **Cobertura**: cada use case deve ter ao menos um caminho feliz e um caminho de exceção (`NotFoundException`/`ValidationException`).
 
 ## 3. Padrões de Projeto
 
@@ -611,23 +690,57 @@ Ignorado: 0
 ## 5. Checklist de Verificação
 
 ### Antes do Commit
-- [ ] Código segue convenções de nomenclatura
-- [ ] Funções possuem docstrings completas
-- [ ] Notebooks estão organizados em seções
-- [ ] Paths usam pathlib para portabilidade
-- [ ] Seeds aleatórias estão fixadas
-- [ ] Métricas estão documentadas
-- [ ] Visualizações salvas em `documentos/img/`
+- [ ] Código segue convenções de nomenclatura da camada/linguagem
+- [ ] Mensagem de commit segue Conventional Commits + `#<issue>`
+- [ ] Notebooks: seções numeradas, paths com `pathlib`, seeds fixadas
+- [ ] Backend C#: método público assíncrono recebe `CancellationToken` e tem sufixo `Async`
+- [ ] Backend C#: novos use cases/repositórios registrados no `Program.cs`
+- [ ] Frontend TS: acesso a backend permanece no Repository (View/ViewModel não chamam `fetch`)
+- [ ] SQL: PostgreSQL puro, tabelas no singular, PK `id_<entidade>`, RLS habilitado se houver dado de usuário
 
 ### Review de Código
-- [ ] Builder Pattern usado para construções complexas
-- [ ] Strategy Pattern para algoritmos intercambiáveis
-- [ ] Separação clara de responsabilidades
-- [ ] Código reutilizável e extensível
-- [ ] Tratamento adequado de exceções
-- [ ] Performance otimizada com matrizes esparsas
+- [ ] Builder Pattern para construções complexas (modelo de ML)
+- [ ] Strategy Pattern para algoritmos intercambiáveis (KNN/ML.NET/Postgres fallback)
+- [ ] Camadas da Clean Architecture preservadas (dependências apontam para dentro)
+- [ ] MVVM no frontend: View renderiza, ViewModel orquestra, Repository acessa rede
+- [ ] DTOs separados das entidades de domínio e dos tipos `Api` do frontend
+- [ ] Tratamento de erro via `NotFoundException`/`ValidationException` + `ErrorHandlingMiddleware`
+- [ ] Cobertura mínima de testes xUnit no caminho feliz e no caminho de exceção
 
-## 6. Conclusão
+## 6. Revisão de Padrões — Lacunas e Recomendações
+
+Esta seção registra a auditoria dos padrões em uso no repositório, comparando o que estava documentado no guia com o que foi observado no código (backend C#, frontend RN/TS, SQL e testes). As lacunas marcadas como **aplicado** já estão incorporadas nas seções acima; as **pendentes** ficam como recomendações para próximas iterações.
+
+### 7.1 Resumo das Lacunas
+
+| # | Lacuna identificada | Severidade | Recomendação | Status |
+|---|---------------------|------------|--------------|--------|
+| 1 | Seção SQL exemplificava sintaxe MySQL (`AUTO_INCREMENT`, `USE`, `IF NOT EXISTS` no `CREATE DATABASE`) e tabelas no plural, divergindo do banco real (PostgreSQL/Supabase, singular, UUID, RLS). | Alta | Reescrever 2.3 com PostgreSQL e refletir a convenção `id_<entidade>` usada em `src/database/`. | Aplicado (2.3) |
+| 2 | Padrões do frontend (React Native + TypeScript) não estavam documentados, embora o Index já citasse cobertura de TS. | Alta | Adicionar seção 2.6 com camadas MVVM, nomenclatura de arquivos e regras de acesso a rede. | Aplicado (2.6) |
+| 3 | Backend C# tinha apenas os padrões de projeto descritos (3.3); faltavam as convenções gerais (camadas Clean Architecture, sufixos `UseCase`/`Dto`/`Repository`, construtor primário, `Async` + `CancellationToken`). | Alta | Adicionar seção 2.7 cobrindo camadas, código e API REST. | Aplicado (2.7) |
+| 4 | Testes xUnit por serviço não tinham convenção registrada (nome do teste, `Trait("Category", "Integration")` usado no CI). | Média | Adicionar seção 2.8 com nomenclatura e categorias. | Aplicado (2.8) |
+| 5 | Diagrama de diretórios não incluía `src/backend/ml-engine/`, que já existe e é consumido pelos serviços. | Baixa | Atualizar 2.1.1. | Aplicado (2.1.1) |
+| 6 | Não há configuração compartilhada de linter/formatter no repositório (`.editorconfig`/ESLint/Prettier). Atualmente o estilo é mantido manualmente. | Média | Adicionar `.editorconfig` na raiz (indentação, finais de linha) e ESLint + Prettier para `src/frontend/`. Para o backend, adotar `dotnet format` como passo opcional no pipeline. | Pendente |
+| 7 | Não há análise estática de C# (`dotnet format --verify-no-changes`, analyzers) no pipeline `build`/`test:unit`. | Média | Acrescentar `dotnet format --verify-no-changes` ao job `build` do `.gitlab-ci.yml`. | Pendente |
+| 8 | Não há padrão documentado para tratamento de configuração sensível (apenas `.env.example` na raiz). Variáveis novas tendem a se espalhar pelo `appsettings.json` e pelo `Program.cs`. | Baixa | Padronizar leitura via `Environment.GetEnvironmentVariable(...)` + fallback em `appsettings.json`, conforme já praticado no `catalogo/Program.cs`. | Pendente (documentar como ADR) |
+| 9 | Mensagens de log seguem formato livre — Serilog já está configurado, mas não há convenção sobre quais propriedades enriquecer (`UserId`, `RequestId`, `Servico`). | Baixa | Definir conjunto mínimo de propriedades em um documento operacional separado. | Pendente |
+
+### 7.2 Pontos Aderentes (sem ajuste necessário)
+
+- **Estrutura de diretórios** dos quatro microsserviços é homogênea (`application/`, `domain/`, `infrastructure/`, `presentation/`).
+- **Convenção de commit** (`<type>: <descrição> #<issue>`) está implementada via Git Hook e respeitada no histórico recente.
+- **Padrões de projeto** Builder/Strategy/Factory estão aplicados no código real (notebooks de ML e `Spotlight.Recomendacao`) e cobertos por testes.
+- **Separação de DTOs** entre `application/dtos` (backend) e `models/`+sufixo `Api` (frontend) está consistente.
+- **RLS no banco** está habilitado nas tabelas de usuário, em linha com a recomendação do Supabase.
+
+### 7.3 Próximos Passos Recomendados
+
+1. Adicionar `.editorconfig` na raiz e ESLint/Prettier ao frontend (item 6).
+2. Plugar `dotnet format --verify-no-changes` no job `build` do GitLab CI (item 7).
+3. Registrar como ADR a estratégia de configuração por `.env` + `appsettings.json` (item 8).
+4. Definir o vocabulário mínimo de log estruturado no documento operacional (item 9).
+
+## 7. Conclusão
 
 Este guia estabelece os padrões fundamentais para o desenvolvimento do Portal Aventura. A adoção consistente destes padrões garante:
 - **Qualidade**: Código limpo e bem estruturado
