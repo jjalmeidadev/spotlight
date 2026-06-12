@@ -103,7 +103,7 @@ Em erros de validação (400), inclui `details` por campo:
 | 401 | Não autenticado (token ausente/ inválido) |
 | 403 | Autenticado, mas sem permissão |
 | 404 | Recurso não encontrado |
-| 409 | Conflito (ex.: avaliação duplicada) |
+| 409 | Conflito de regra de negócio |
 | 500 | Erro interno |
 
 ---
@@ -343,8 +343,9 @@ Em erros de validação (400), inclui `details` por campo:
 ---
 
 ### 3.10 `POST /catalogo/espetaculos/{id}/avaliacoes`
-**Finalidade:** avaliar um espetáculo. **Requer `cadastrado`.** Um usuário só pode
-avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)`).
+**Finalidade:** salvar a avaliação de um espetáculo. **Requer `cadastrado`.** Um usuário
+mantém uma única avaliação por espetáculo (constraint `UNIQUE (id_usuario, id_espetaculo)`);
+se já existir uma avaliação para o mesmo par usuário/espetáculo, a nota e o comentário são atualizados.
 As avaliações são dados transacionais e permanecem na base relacional
 PostgreSQL/Supabase, na tabela `avaliacao`. Elas também podem alimentar o modelo
 de recomendação como feedback explícito, mas não devem ser duplicadas como nota
@@ -358,7 +359,7 @@ canônica na collection MongoDB de telemetria.
 ```
 
 **Responses**
-- `201 Created`:
+- `201 Created` — avaliação criada ou atualizada:
 ```json
 { "id": 41, "nota": 4.5, "comentario": "...", "createdAt": "2026-05-26T19:00:00Z" }
 ```
@@ -366,10 +367,6 @@ canônica na collection MongoDB de telemetria.
 - `401` — token ausente ou inválido. `Erro`.
 - `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `404` — espetáculo inexistente.
-- `409 Conflict` — usuário já avaliou este espetáculo:
-```json
-{ "error": "Você já avaliou este espetáculo.", "traceId": "00-...-00" }
-```
 - `500` — `Erro`.
 
 ---

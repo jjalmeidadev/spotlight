@@ -95,7 +95,7 @@ var metricsReport = new MetricsReport
         Metricas = RelativePath(metricsPath),
         Relatorio = RelativePath(reportPath),
         Exemplos = RelativePath(examplesPath),
-        Treinamento = "src/models/Spotlight.Recomendacao.ModelTraining"
+        Treinamento = "src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining"
     }
 };
 
@@ -373,7 +373,7 @@ static void WriteMarkdownReport(string path, MetricsReport report)
     ## Como reproduzir
 
     ```powershell
-    dotnet run --project src/models/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
+    dotnet run --project src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
     ```
     """;
 
