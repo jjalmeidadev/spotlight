@@ -4,7 +4,7 @@ import { getApiBaseUrl } from '@/frontend/config/api';
 const API_BASE_URL = getApiBaseUrl();
 const TELEMETRY_PATH = '/usuario/telemetria';
 const TELEMETRY_ENABLED = process.env.EXPO_PUBLIC_TELEMETRY_ENABLED !== 'false';
-const TELEMETRY_TIMEOUT_MS = 1200;
+const TELEMETRY_TIMEOUT_MS = 5000;
 const TELEMETRY_BACKOFF_MS = 60_000;
 const MAX_FAILURES_BEFORE_BACKOFF = 2;
 

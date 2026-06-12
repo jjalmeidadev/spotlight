@@ -7,6 +7,7 @@ import {
 	listarEspetaculosEmCartaz,
 	listarEspetaculosPertoDe,
 	listarEspetaculosPopulares,
+	obterUrlMidiaConhecida,
 	obterUrlMidia,
 } from '../repositories/CatalogRepository';
 import {
@@ -155,7 +156,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		title: item.title,
 		subtitle: item.genre ?? 'Recomendado para voce',
 		image: getRecommendationImage(item),
-		imageUri: item.imageUrl,
+		imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
 		recommendation: {
 			score: item.score,
 			algorithm: item.algorithm,
@@ -180,8 +181,14 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		() => catalogShows.find((item) => normalizarTitulo(item.title).includes('elis')) ?? popularShows[0] ?? null,
 		[catalogShows, popularShows],
 	);
-	const heroBackgroundUrl = heroShow ? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_background') : null;
-	const heroArtworkUrl = heroShow ? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_artwork') : null;
+	const heroBackgroundUrl = heroShow
+		? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_background')
+			?? obterUrlMidiaConhecida(heroShow.title, 'catalog_hero_background')
+		: null;
+	const heroArtworkUrl = heroShow
+		? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_artwork')
+			?? obterUrlMidiaConhecida(heroShow.title, 'catalog_hero_artwork')
+		: null;
 	const assets = useMemo(
 		() => ({
 			...CATALOG_IMAGE,
@@ -242,7 +249,7 @@ function toCatalogItem(item: CatalogShow) {
 		id: item.id,
 		title: item.title,
 		subtitle: item.genre ?? 'VER MAIS',
-		imageUri: item.imageUrl,
+		imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
 	};
 }
 

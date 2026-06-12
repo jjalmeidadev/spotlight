@@ -216,7 +216,7 @@ function toCatalogShow(item: CatalogListItem): CatalogShow | null {
     producer: (item as CatalogDetailItem).produtora ?? null,
     averageRating: Number(item.notaMedia ?? 0),
     popularity: Number(item.popularidade ?? 0),
-    imageUrl: item.imagemUrl ?? obterUrlMidia(item, 'catalog_card') ?? buildKnownStorageImageUrl(item.titulo, 'catalog_card') ?? buildStorageImageUrl(id),
+    imageUrl: item.imagemUrl ?? obterUrlMidia(item, 'catalog_card') ?? obterUrlMidiaConhecida(item.titulo, 'catalog_card') ?? buildStorageImageUrl(id),
     media: item.midias ?? [],
   };
 }
@@ -240,6 +240,17 @@ export function obterUrlMidia(
     .join('/');
 
   return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/${media.storageBucket}/${encodedPath}`;
+}
+
+export function obterUrlMidiaConhecida(
+  title: string | null | undefined,
+  tipoMidia: CatalogMedia['tipoMidia'],
+) {
+  if (!title) {
+    return null;
+  }
+
+  return buildKnownStorageImageUrl(title, tipoMidia);
 }
 
 function buildStorageImageUrl(id: string) {

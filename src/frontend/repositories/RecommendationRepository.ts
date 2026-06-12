@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from '@/frontend/config/api';
+import { obterUrlMidiaConhecida } from './CatalogRepository';
 
 const API_BASE_URL = getApiBaseUrl();
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
@@ -138,7 +139,9 @@ function toRecommendedShow(item: RecommendationItem): RecommendedShow | null {
     id: String(item.espetaculo.id),
     title: item.espetaculo.titulo,
     genre: item.espetaculo.genero,
-    imageUrl: item.espetaculo.imagemUrl ?? obterUrlMidia(item.espetaculo, 'catalog_card'),
+    imageUrl: item.espetaculo.imagemUrl
+      ?? obterUrlMidia(item.espetaculo, 'catalog_card')
+      ?? obterUrlMidiaConhecida(item.espetaculo.titulo, 'catalog_card'),
     status: item.espetaculo.status ?? '',
     averageRating: Number(item.espetaculo.notaMedia ?? 0),
     score: Number(item.score ?? 0),
@@ -157,7 +160,9 @@ function toSimilarShow(item: SimilarItem): SimilarShow | null {
     id: String(item.espetaculo.id),
     title: item.espetaculo.titulo,
     genre: item.espetaculo.genero,
-    imageUrl: item.espetaculo.imagemUrl ?? obterUrlMidia(item.espetaculo, 'catalog_card'),
+    imageUrl: item.espetaculo.imagemUrl
+      ?? obterUrlMidia(item.espetaculo, 'catalog_card')
+      ?? obterUrlMidiaConhecida(item.espetaculo.titulo, 'catalog_card'),
     status: item.espetaculo.status ?? '',
     averageRating: Number(item.espetaculo.notaMedia ?? 0),
     score: Number(item.score ?? 0),

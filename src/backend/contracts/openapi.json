@@ -380,8 +380,8 @@
         "tags": [
           "Catálogo"
         ],
-        "summary": "Avaliar um espetáculo (cadastrado)",
-        "description": "Cria uma avaliação. Um usuário só pode avaliar cada espetáculo uma vez (UNIQUE id_usuario, id_espetaculo).",
+        "summary": "Salvar avaliacao de um espetaculo (cadastrado)",
+        "description": "Cria ou atualiza a avaliacao do usuario para o espetaculo. A constraint UNIQUE (id_usuario, id_espetaculo) garante uma unica avaliacao ativa por usuario/espetaculo.",
         "security": [
           {
             "bearerAuth": []
@@ -399,7 +399,7 @@
         },
         "responses": {
           "201": {
-            "description": "Avaliação criada.",
+            "description": "Avaliacao criada ou atualizada.",
             "content": {
               "application/json": {
                 "schema": {
@@ -419,9 +419,6 @@
           },
           "404": {
             "$ref": "#/components/responses/Erro404"
-          },
-          "409": {
-            "$ref": "#/components/responses/Erro409"
           },
           "500": {
             "$ref": "#/components/responses/Erro500"
@@ -863,11 +860,11 @@
           "401": {
             "$ref": "#/components/responses/Erro401"
           },
-          "503": {
-            "$ref": "#/components/responses/Erro503"
-          },
           "500": {
             "$ref": "#/components/responses/Erro500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Erro503"
           }
         }
       }
@@ -1174,14 +1171,14 @@
         }
       },
       "Erro409": {
-        "description": "Conflito (ex.: avaliação duplicada).",
+        "description": "Conflito de regra de negocio.",
         "content": {
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Erro"
             },
             "example": {
-              "error": "Você já avaliou este espetáculo.",
+              "error": "Conflito de regra de negocio.",
               "traceId": "00-abc123-def456-00"
             }
           }
@@ -1394,12 +1391,12 @@
           "precoMinimo": {
             "type": "number",
             "format": "float",
-            "example": 40.0
+            "example": 40
           },
           "precoMaximo": {
             "type": "number",
             "format": "float",
-            "example": 120.0
+            "example": 120
           },
           "disponibilidade": {
             "type": "integer",
@@ -1570,7 +1567,7 @@
             "format": "float",
             "minimum": 0,
             "maximum": 5,
-            "example": 5.0
+            "example": 5
           },
           "comentario": {
             "type": "string",
@@ -1941,7 +1938,7 @@
           "faixaPrecoMax": {
             "type": "number",
             "format": "float",
-            "example": 150.0
+            "example": 150
           }
         }
       },

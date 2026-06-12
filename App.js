@@ -10,6 +10,10 @@ import LoadingScreen from './src/frontend/screens/LoadingScreen';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
 import { useTelemetrySession } from './src/frontend/hooks/useTelemetrySession';
+import {
+	obterPreferenciasUsuario,
+	preferenciasEstaoCompletas,
+} from './src/frontend/repositories/PreferenceRepository';
 
 export default function App() {
 	const [screen, setScreen] = React.useState('loading');

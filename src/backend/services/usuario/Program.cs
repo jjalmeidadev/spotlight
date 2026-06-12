@@ -73,7 +73,14 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString)
         mongoTelemetryCollectionName);
 
     builder.Services.AddSingleton(mongoOptions);
-    builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoOptions.ConnectionString));
+    builder.Services.AddSingleton<IMongoClient>(_ =>
+    {
+        var settings = MongoClientSettings.FromConnectionString(mongoOptions.ConnectionString);
+        settings.ConnectTimeout = TimeSpan.FromSeconds(2);
+        settings.ServerSelectionTimeout = TimeSpan.FromSeconds(2);
+        settings.SocketTimeout = TimeSpan.FromSeconds(3);
+        return new MongoClient(settings);
+    });
     builder.Services.AddSingleton(sp =>
         sp.GetRequiredService<IMongoClient>().GetDatabase(mongoOptions.DatabaseName));
     builder.Services.AddHostedService<MongoTelemetryIndexInitializer>();

@@ -1,4 +1,7 @@
-import { obterDetalheEspetaculoCatalogo } from '../repositories/CatalogRepository';
+import {
+  obterDetalheEspetaculoCatalogo,
+  obterUrlMidiaConhecida,
+} from '../repositories/CatalogRepository';
 import { listarEspetaculosSimilares } from '../repositories/RecommendationRepository';
 
 export type EspetaculoSemelhante = {
@@ -33,6 +36,7 @@ const MOCK_SEMELHANTES: EspetaculoSemelhante[] = [
   {
     id: '30',
     titulo: 'Mamma Mia!',
+    imagemUrl: obterUrlMidiaConhecida('Mamma Mia!', 'catalog_card') ?? undefined,
   },
 ];
 

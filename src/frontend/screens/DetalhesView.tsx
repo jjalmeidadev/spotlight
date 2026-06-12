@@ -194,6 +194,29 @@ export default function DetalhesView({
     viewModel.comprarIngresso();
   }
 
+  async function salvarAvaliacao(nota: number) {
+    try {
+      await viewModel.avaliar(nota);
+      emitTelemetryEvent(
+        {
+          eventType: 'show_card_clicked',
+          screen: 'DetalhesView',
+          entity: { type: 'espetaculo', id: detalheAtual.id },
+          properties: {
+            origin: 'rating',
+            rating: nota,
+          },
+        },
+        accessToken,
+      );
+    } catch (error) {
+      Alert.alert(
+        'Avaliacao nao salva',
+        error instanceof Error ? error.message : 'Nao foi possivel salvar sua avaliacao.',
+      );
+    }
+  }
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -270,26 +293,19 @@ export default function DetalhesView({
             <StarRating
               disabled={viewModel.avaliando}
               onChange={async (nota) => {
-                try {
-                  await viewModel.avaliar(nota);
-                  emitTelemetryEvent(
-                    {
-                      eventType: 'show_card_clicked',
-                      screen: 'DetalhesView',
-                      entity: { type: 'espetaculo', id: detalheAtual.id },
-                      properties: {
-                        origin: 'rating',
-                        rating: nota,
-                      },
-                    },
-                    accessToken,
-                  );
-                } catch (error) {
+                if (viewModel.avaliacaoUsuario !== null) {
                   Alert.alert(
-                    'Avaliacao nao salva',
-                    error instanceof Error ? error.message : 'Nao foi possivel salvar sua avaliacao.',
+                    'Alterar avaliacao?',
+                    `Voce ja avaliou este espetaculo. Deseja alterar sua nota para ${nota}?`,
+                    [
+                      { text: 'Cancelar', style: 'cancel' },
+                      { text: 'Alterar', onPress: () => void salvarAvaliacao(nota) },
+                    ],
                   );
+                  return;
                 }
+
+                await salvarAvaliacao(nota);
               }}
               value={viewModel.avaliacaoUsuario ?? espetaculo.notaMedia}
             />
