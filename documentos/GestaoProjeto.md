@@ -752,8 +752,236 @@ Além das ações específicas, a equipe deve manter as práticas consolidadas n
 
 ---
 
-## 2.5 Sprint 5  
-Nota: Insira informações sobre mudanças realizadas.
+## 2.5 Sprint 5
+
+### 2.5.1 Planejamento da Sprint 5
+
+#### Objetivo da Sprint 5
+
+A Sprint 5 tem como objetivo consolidar a versão final do Spotlight, corrigindo pendências identificadas nas sprints anteriores, finalizando documentação, testes, deploy, apresentação e evidências de funcionamento do produto. Diferentemente da Sprint 4, que concentrou a evolução funcional do MVP, a Sprint 5 deve priorizar estabilidade, acabamento, rastreabilidade, validação final e preparação da solução para entrega ao parceiro.
+
+O foco do ciclo é garantir que a aplicação esteja demonstrável de ponta a ponta, com backend e frontend integrados, recomendação funcionando, telemetria validada, testes executados e documentação final sem placeholders. A sprint também deve incorporar os feedbacks recebidos nas Sprints 1 a 4, principalmente os pontos relacionados à documentação do Escritório de Projetos, planejamento de testes, usabilidade, manual de implantação e consistência entre Kanban, branches e Merge Requests.
+
+#### Capacidade Planejada
+
+O planejamento inicial da Sprint 5 foi estruturado a partir das issues já cadastradas no Kanban no momento do planning. O recorte inicial exportado para esta documentação contém 47 itens, mas esse número não é tratado como teto nem como valor final da sprint. Como se trata da sprint de encerramento, novas issues poderão ser adicionadas conforme surgirem pendências de revisão, ajustes finais, correções de deploy, evidências adicionais ou feedbacks de professores e revisores.
+
+Para fins de planejamento, a equipe manteve a escala de t-shirt sizing utilizada nas sprints anteriores:
+
+| Tamanho | Tempo estimado |
+|---|---|
+| PP | Até 15 minutos |
+| P | Até 30 minutos |
+| M | 30 a 60 minutos |
+| G | 60 a 120 minutos |
+
+No recorte inicial, a distribuição de esforço ficou organizada da seguinte forma:
+
+| Tamanho | Quantidade no recorte inicial | Leitura para planejamento |
+|---|---:|---|
+| PP | 1 | Atividade rápida de acompanhamento e controle |
+| P | 6 | Ajustes pontuais de documentação, índice, README e scripts |
+| M | 24 | Revisões estruturais, documentação final, validações e melhorias incrementais |
+| G | 16 | Entregas críticas de testes, deploy, documentação extensa e apresentação |
+
+Essa distribuição mostra que a Sprint 5 ainda possui carga relevante de execução, não apenas tarefas administrativas. Por isso, o grupo deve evitar concentrar todo o fechamento documental no último dia e manter revisão diária entre Kanban, documentação e branches abertas.
+
+#### Estratégia de Priorização
+
+A Sprint 5 foi organizada em quatro frentes principais:
+
+| Frente | Objetivo | Risco principal tratado |
+|---|---|---|
+| Desenvolvimento | Finalizar features pendentes, validar integração final, ajustar performance, Swagger, deploy e documentação técnica. | Entregar uma versão final que funcione de ponta a ponta. |
+| Testes | Executar a rodada final de testes funcionais, integração, regras de negócio, RNFs e usabilidade. | Evitar entrega sem evidências claras de validação. |
+| Versão Final | Remover placeholders, revisar documentos, preparar manual de deploy, slides e critérios do Escritório de Projetos. | Perder pontos por documentação incompleta ou inconsistência formal. |
+| Gestão | Planejar a sprint, acompanhar Kanban, atualizar riscos, métricas, post mortem e retrospectiva final. | Repetir problemas de dependência pouco visível e concentração no fechamento. |
+
+A priorização segue três critérios:
+
+1. Primeiro, destravar documentação e organização básica, removendo placeholders e alinhando guias, índice, README e planejamento.
+2. Depois, executar validações finais de produto e testes, com evidências registradas no `Projeto.md`.
+3. Por fim, consolidar apresentação, post mortem, revisão final e entrega ao parceiro.
+
+#### Backlog Priorizado e Sequenciado
+
+O backlog abaixo representa o recorte inicial da Sprint 5 no momento do planning. Ele poderá ser expandido ao longo do ciclo, desde que novas issues sejam registradas no Kanban com DoR, DoD, tamanho e dependências.
+
+##### Bloco 1 — Desenvolvimento
+
+| Task | Descrição | Tamanho | Dia planejado | Prioridade |
+|---|---|---|---:|---|
+| T1 | Revisar e atualizar estrutura final de diretórios do projeto | M | 1 | Alta |
+| T2 | Atualizar diagrama de arquitetura de codificação para versão final | M | 1 | Alta |
+| T3 | Consolidar e atualizar `GuiaPadroesDesenvolvimento.md` para versão final | M | 1 | Alta |
+| T9 | Finalizar implementação de features pendentes da Sprint 4 | G | 2 | Alta |
+| T21 | Implementar implantação em nuvem comercial como diferencial | G | 4 | Média |
+| T22 | Validar ambiente final no servidor Inteli, dockerizado | G | 4 | Alta |
+| T23 | Atualizar Swagger com todas as rotas finais da API | M | 4 | Alta |
+| T24 | Gravar vídeo demonstrativo final da aplicação | M | 4 | Alta |
+| T38 | Atualizar `Projeto.md` com features implementadas na versão final | M | 5 | Alta |
+| T39 | Documentar TDD e cobertura de testes no `Projeto.md` | M | 5 | Alta |
+| T43 | Implementar melhorias de performance identificadas nos testes | M | 5 | Média |
+| T44 | Validar integração final frontend-backend-recomendação | M | 5 | Alta |
+| T45 | Atualizar README do banco de dados para versão final | P | 3 | Média |
+
+##### Bloco 2 — Testes
+
+| Task | Descrição | Tamanho | Dia planejado | Prioridade |
+|---|---|---|---:|---|
+| T7 | Atualizar planejamento de testes com base no feedback da Sprint 4 | M | 1 | Alta |
+| T10 | Implementar testes de funcionalidade, rodada final | G | 2 | Alta |
+| T11 | Implementar testes automatizados de integração, rodada final | G | 2 | Alta |
+| T12 | Implementar testes automatizados de regras de negócio, rodada final | G | 2 | Alta |
+| T13 | Executar testes de RNF de desempenho, rodada final | G | 2 | Média |
+| T14 | Executar testes de RNF de segurança, rodada final | G | 2 | Média |
+| T15 | Executar testes de usabilidade com usuários reais | G | 2 | Alta |
+| T25 | Organizar logs de execução e evidências dos testes | M | 4 | Alta |
+| T26 | Documentar abrangência e análise de resultados dos testes | M | 4 | Alta |
+| T27 | Consolidar seção de testes no `Projeto.md`, versão final | G | 4 | Alta |
+| T41 | Revisar scripts de teste conforme padrões de codificação | P | 5 | Média |
+
+##### Bloco 3 — Versão Final
+
+| Task | Descrição | Tamanho | Dia planejado | Prioridade |
+|---|---|---|---:|---|
+| T4 | Limpar placeholders do `Index.md` e indexar todos os documentos | P | 1 | Alta |
+| T5 | Limpar placeholders do `README.md` da raiz do projeto | P | 1 | Alta |
+| T6 | Limpar placeholders do `Manual-instalacao.md` e `Gestao_Projeto_Configuracao.md` | P | 1 | Alta |
+| T8 | Definir técnica de apresentação final e registrar no Slack | P | 1 | Alta |
+| T16 | Adicionar seção de feedback e iterações de usabilidade no `ProjetoVisual.md` | M | 2 | Alta |
+| T17 | Iniciar estrutura da apresentação final com técnica escolhida | M | 2 | Alta |
+| T18 | Atualizar `Projeto.md`, removendo "Tabela X" e placeholders `_conteúdo_` | M | 3 | Alta |
+| T19 | Revisar e ajustar RNFs para formato de user story | M | 3 | Alta |
+| T20 | Separar critérios de aceitação de procedimentos de teste nos RFs | M | 3 | Alta |
+| T32 | Criar `manual_deploy.md` para uso pelo parceiro | G | 4 | Alta |
+| T33 | Incorporar feedbacks das sprints anteriores na documentação | M | 3 | Alta |
+| T34 | Avançar conteúdo dos slides finais, seções técnicas | G | 5 | Alta |
+| T35 | Revisar documentação completa antes da entrega final | G | 6 | Alta |
+| T36 | Ensaio final da apresentação | G | 6 | Alta |
+| T37 | Finalizar apresentação final, versão de entrega | M | 7 | Alta |
+| T40 | Garantir critérios do Escritório de Projetos para entrega final | M | 6 | Alta |
+| T46 | Revisar e finalizar `Gestao_Projeto_Configuracao.md` | M | 2 | Alta |
+
+##### Bloco 4 — Gestão
+
+| Task | Descrição | Tamanho | Dia planejado | Prioridade |
+|---|---|---|---:|---|
+| T28 | Elaborar análise de evolução de métricas ao longo das sprints | G | 4 | Alta |
+| T29 | Elaborar análise post mortem completa do projeto | G | 4 | Alta |
+| T30 | Atualizar análise de riscos no `GestaoProjeto.md` | M | 3 | Alta |
+| T31 | Realizar retrospectiva da Sprint 5 e atualizar `GestaoProjeto.md` | M | 7 | Alta |
+| T42 | Documentar planejamento da Sprint 5 no `GestaoProjeto.md` | M | 1 | Alta |
+| T47 | Criar task de acompanhamento diário do Kanban e documentação | PP | 1 | Alta |
+
+#### Matriz de Dependências Críticas
+
+| Entrega dependente | Depende de | Justificativa |
+|---|---|---|
+| T9, T44 | T1, T2, T3 | A finalização de features e validação integrada dependem da estrutura final, arquitetura documentada e padrões consolidados. |
+| T10, T11, T12 | T7 | A execução dos testes finais depende do planejamento atualizado com feedback da Sprint 4. |
+| T13, T43 | T22, T44 | Melhorias de performance só devem ser aplicadas após validação do ambiente final e do fluxo integrado. |
+| T15, T16 | T17 | Testes de usabilidade e documentação de iterações dependem de roteiro e narrativa definidos. |
+| T18, T19, T20, T33 | Feedbacks das Sprints 1 a 4 | A limpeza do `Projeto.md` e revisão de RF/RNF depende da lista consolidada de feedbacks pendentes. |
+| T23, T24, T38 | T9, T22, T44 | Swagger, vídeo e seção de features precisam refletir a versão final funcional. |
+| T25, T26, T27, T39 | T10, T11, T12, T13, T14, T15 | A documentação final de testes depende da execução e coleta de evidências. |
+| T32 | T22 | O manual de deploy deve ser baseado em um processo de implantação validado. |
+| T34, T35, T36, T37 | T24, T27, T28, T29, T38 | Slides e ensaio dependem das evidências finais, métricas, testes e documentação consolidada. |
+| T31 | Encerramento do ciclo | A retrospectiva da Sprint 5 depende do fechamento real das entregas, MRs e evidências. |
+| T47 | Todas as frentes | O acompanhamento diário reduz risco de divergência entre Kanban, documentação e branches. |
+
+#### Cronograma Priorizado por Dia
+
+##### Dia 1 — Fundação e limpeza documental
+
+| Frente | Tasks planejadas |
+|---|---|
+| Desenvolvimento | T1, T2, T3 |
+| Testes | T7 |
+| Versão Final | T4, T5, T6, T8 |
+| Gestão | T42, T47 |
+
+Checkpoint do dia: planejamento registrado, placeholders críticos iniciados, padrões e arquitetura em revisão, técnica de apresentação definida e rotina de acompanhamento diário ativada.
+
+##### Dia 2 — Testes finais e retomada de pendências funcionais
+
+| Frente | Tasks planejadas |
+|---|---|
+| Desenvolvimento | T9 |
+| Testes | T10, T11, T12, T13, T14, T15 |
+| Versão Final | T16, T17, T46 |
+
+Checkpoint do dia: rodada principal de testes iniciada, pendências funcionais mapeadas e apresentação com estrutura inicial.
+
+##### Dia 3 — Correções de documentação e riscos
+
+| Frente | Tasks planejadas |
+|---|---|
+| Desenvolvimento | T45 |
+| Versão Final | T18, T19, T20, T33 |
+| Gestão | T30 |
+
+Checkpoint do dia: `Projeto.md` revisado contra placeholders, RFs/RNFs corrigidos, feedbacks incorporados e riscos atualizados.
+
+##### Dia 4 — Deploy, evidências e consolidação técnica
+
+| Frente | Tasks planejadas |
+|---|---|
+| Desenvolvimento | T21, T22, T23, T24 |
+| Testes | T25, T26, T27 |
+| Versão Final | T32 |
+| Gestão | T28, T29 |
+
+Checkpoint do dia: ambiente final validado, Swagger e vídeo em andamento, logs de testes organizados, manual de deploy iniciado e análises de gestão avançadas.
+
+##### Dia 5 — Integração final e documentação de resultados
+
+| Frente | Tasks planejadas |
+|---|---|
+| Desenvolvimento | T38, T39, T43, T44 |
+| Testes | T41 |
+| Versão Final | T34 |
+
+Checkpoint do dia: integração final validada, TDD/cobertura documentados, performance ajustada quando necessário e slides técnicos preenchidos.
+
+##### Dia 6 — Revisão final e ensaio
+
+| Frente | Tasks planejadas |
+|---|---|
+| Versão Final | T35, T36, T40 |
+
+Checkpoint do dia: documentação revisada, critérios do Escritório de Projetos checados e ensaio final realizado.
+
+##### Dia 7 — Fechamento
+
+| Frente | Tasks planejadas |
+|---|---|
+| Gestão | T31 |
+| Versão Final | T37 |
+
+Checkpoint do dia: apresentação final pronta e retrospectiva da Sprint 5 documentada.
+
+#### Alinhamento com as Ações de Melhoria da Sprint 4
+
+| Ação proposta na Sprint 4 | Como aparece no planejamento da Sprint 5 |
+|---|---|
+| Daily de retomada com checklist explícito | T47 cria acompanhamento diário entre Kanban, documentação e branches. |
+| Reequilibrar carga entre integrantes | Backlog inicial distribuído em quatro frentes, permitindo alocação por capacidade e especialidade sem concentrar todo o fechamento em uma pessoa. |
+| Registrar dependências entre branches e MRs | Matriz de dependências críticas passa a ser instrumento de acompanhamento, não apenas planejamento estático. |
+| Evitar conflitos técnicos no fechamento | Deploy, testes, documentação e slides foram distribuídos por dias, com checkpoints antes do encerramento. |
+| Evitar documentação acumulada no último dia | Placeholders, guias, README, `Projeto.md`, riscos e manual de deploy aparecem desde os três primeiros dias. |
+
+#### Alinhamento com a Gestão de Configuração
+
+Todas as tasks da Sprint 5 devem permanecer registradas no Kanban com descrição, DoR, DoD, tamanho, prioridade e dependências. Caso novas issues sejam adicionadas após este planejamento inicial, elas devem seguir o mesmo padrão de rastreabilidade e ser vinculadas ao artefato correspondente.
+
+Para esta sprint, ficam estabelecidas as seguintes diretrizes:
+
+- Nenhuma entrega crítica deve avançar para Review sem indicar se depende de outra branch ou MR.
+- O acompanhamento diário deve verificar se há divergência entre Kanban, documentação e estado real das branches.
+- Ajustes de documentação final devem ser feitos de forma incremental, evitando grandes blocos sem revisão.
+- Evidências de execução, logs, prints, links de Swagger, vídeo e resultados de testes devem ser registrados antes do fechamento da sprint.
+- O número de issues planejadas pode aumentar durante o ciclo, mas novas tasks devem preservar DoR, DoD, tamanho e vínculo com o artefato.
 
 ---
 
