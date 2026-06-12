@@ -17,6 +17,15 @@ export type EspetaculoDetalhe = {
   percentualAprovacao: number;
   notaMedia: number;
   tags: string[];
+  classificacaoIndicativa?: string | null;
+  duracao?: number | null;
+  faixaEtaria?: string | null;
+  genero?: string | null;
+  preco?: string | null;
+  proximaSessao?: string | null;
+  produtora?: string | null;
+  status?: string;
+  teatro?: string | null;
   linkCompra?: string;
 };
 
@@ -36,10 +45,11 @@ function wait(ms = 250) {
 export async function obterDetalhesEspetaculo(espetaculoId: string): Promise<EspetaculoDetalhe> {
   const detalhe = await obterDetalheEspetaculoCatalogo(espetaculoId);
   const primeiraSessaoDisponivel = detalhe.sessions.find((session) => session.purchaseLink);
+  const primeiraSessao = detalhe.sessions[0];
   const tags = [
     detalhe.genre,
-    detalhe.sessions[0]?.date ? formatDateTag(detalhe.sessions[0].date) : null,
-    detalhe.sessions[0]?.time,
+    detalhe.duration ? `${detalhe.duration}min` : null,
+    detalhe.contentRating,
   ].filter((tag): tag is string => Boolean(tag));
 
   return {
@@ -50,6 +60,15 @@ export async function obterDetalhesEspetaculo(espetaculoId: string): Promise<Esp
     percentualAprovacao: toApprovalPercent(detalhe.averageRating),
     notaMedia: detalhe.averageRating,
     tags,
+    classificacaoIndicativa: detalhe.contentRating,
+    duracao: detalhe.duration,
+    faixaEtaria: detalhe.ageRange,
+    genero: detalhe.genre,
+    preco: formatPriceRange(primeiraSessao?.minPrice, primeiraSessao?.maxPrice),
+    proximaSessao: primeiraSessao?.date ? formatSession(primeiraSessao.date, primeiraSessao.time) : null,
+    produtora: detalhe.producer,
+    status: detalhe.status,
+    teatro: primeiraSessao?.theater?.name ?? null,
     linkCompra: primeiraSessaoDisponivel?.purchaseLink ?? undefined,
   };
 }
@@ -93,4 +112,24 @@ function formatDateTag(value: string) {
   }
 
   return `${day}/${month}`;
+}
+
+function formatSession(date: string, time?: string) {
+  const dateLabel = formatDateTag(date);
+  return time ? `${dateLabel} as ${time}` : dateLabel;
+}
+
+function formatPriceRange(minPrice?: number | null, maxPrice?: number | null) {
+  if (minPrice == null && maxPrice == null) {
+    return null;
+  }
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  if (minPrice != null && maxPrice != null && minPrice !== maxPrice) {
+    return `${formatCurrency(minPrice)} a ${formatCurrency(maxPrice)}`;
+  }
+
+  return formatCurrency(minPrice ?? maxPrice ?? 0);
 }

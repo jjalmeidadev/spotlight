@@ -1,7 +1,9 @@
 import React from 'react';
-import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, typography } from '@/frontend/theme';
 import { HeroProfileCircle } from './HeroProfileCircle';
+
+export const CATALOG_HERO_HEIGHT = 352;
 
 type CatalogHeroProps = {
 	title: string;
@@ -23,13 +25,9 @@ export function CatalogHero({
 	profileLabel,
 	profileSource,
 }: CatalogHeroProps) {
-	const { width } = useWindowDimensions();
-	const heroAsset = Image.resolveAssetSource(heroSource);
-	const heroImageHeight = Math.round((width * heroAsset.height) / heroAsset.width);
-
 	return (
 		<View style={styles.hero}>
-			<Image source={heroSource} style={[styles.heroImage, { height: heroImageHeight }]} />
+			<Image source={heroSource} style={styles.heroImage} />
 			<View style={styles.overlay} />
 			<View style={styles.headerRow}>
 				<View style={styles.headerSpacer} />
@@ -58,14 +56,16 @@ export function CatalogHero({
 
 const styles = StyleSheet.create({
 	hero: {
-		height: 252,
+		height: CATALOG_HERO_HEIGHT,
 		position: 'relative',
 		overflow: 'visible',
 		width: '100%',
 		zIndex: 6,
-		elevation: 6,
+		elevation: 5,
 	},
 	heroImage: {
+		bottom: 50,
+		height: CATALOG_HERO_HEIGHT,
 		position: 'absolute',
 		top: 0,
 		left: 0,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
 	},
 	overlay: {
 		...StyleSheet.absoluteFillObject,
-		backgroundColor: 'rgba(17, 20, 18, 0.04)',
+		backgroundColor: 'rgba(248, 250, 249, 0.04)',
 	},
 	headerRow: {
 		alignItems: 'center',

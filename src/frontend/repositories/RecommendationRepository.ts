@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
 
 export type RecommendedShow = {
   id: string;
@@ -38,6 +39,7 @@ type RecommendationItem = {
     titulo?: string;
     genero?: string | null;
     imagemUrl?: string | null;
+    midias?: RecommendationMedia[];
     status?: string;
     notaMedia?: number | string;
   };
@@ -53,11 +55,20 @@ type SimilarItem = {
     titulo?: string;
     genero?: string | null;
     imagemUrl?: string | null;
+    midias?: RecommendationMedia[];
     status?: string;
     notaMedia?: number | string;
   };
   score?: number | string;
   tipoAlgoritmo?: string;
+};
+
+type RecommendationMedia = {
+  tipoMidia: 'catalog_card' | 'catalog_hero_background' | 'catalog_hero_artwork' | 'detail_image';
+  storageBucket: string;
+  storagePath: string;
+  altText?: string | null;
+  ordemExibicao: number;
 };
 
 export async function listarRecomendacoesUsuario(
@@ -125,7 +136,7 @@ function toRecommendedShow(item: RecommendationItem): RecommendedShow | null {
     id: String(item.espetaculo.id),
     title: item.espetaculo.titulo,
     genre: item.espetaculo.genero,
-    imageUrl: item.espetaculo.imagemUrl,
+    imageUrl: item.espetaculo.imagemUrl ?? obterUrlMidia(item.espetaculo, 'catalog_card'),
     status: item.espetaculo.status ?? '',
     averageRating: Number(item.espetaculo.notaMedia ?? 0),
     score: Number(item.score ?? 0),
@@ -144,12 +155,33 @@ function toSimilarShow(item: SimilarItem): SimilarShow | null {
     id: String(item.espetaculo.id),
     title: item.espetaculo.titulo,
     genre: item.espetaculo.genero,
-    imageUrl: item.espetaculo.imagemUrl,
+    imageUrl: item.espetaculo.imagemUrl ?? obterUrlMidia(item.espetaculo, 'catalog_card'),
     status: item.espetaculo.status ?? '',
     averageRating: Number(item.espetaculo.notaMedia ?? 0),
     score: Number(item.score ?? 0),
     algorithm: item.tipoAlgoritmo ?? 'similaridade_item',
   };
+}
+
+function obterUrlMidia(
+  item: { midias?: RecommendationMedia[] },
+  tipoMidia: RecommendationMedia['tipoMidia'],
+) {
+  const media = item.midias
+    ?.filter((entry) => entry.tipoMidia === tipoMidia)
+    .sort((a, b) => a.ordemExibicao - b.ordemExibicao)[0];
+
+  if (!media) {
+    return null;
+  }
+
+  const encodedPath = media.storagePath
+    .trim()
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+
+  return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/${media.storageBucket}/${encodedPath}`;
 }
 
 function getApiErrorMessage(payload: any, fallback: string) {

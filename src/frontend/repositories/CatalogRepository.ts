@@ -1,14 +1,20 @@
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
 const CATALOG_IMAGE_BASE_URL = process.env.EXPO_PUBLIC_CATALOG_IMAGE_BASE_URL;
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
 
 export type CatalogShow = {
   id: string;
   title: string;
   genre?: string | null;
   status: string;
+  ageRange?: string | null;
+  contentRating?: string | null;
+  duration?: number | null;
+  producer?: string | null;
   averageRating: number;
   popularity: number;
   imageUrl?: string | null;
+  media?: CatalogMedia[];
 };
 
 export type ListCatalogShowsOptions = {
@@ -22,6 +28,14 @@ export type ListCatalogShowsOptions = {
 export type CatalogShowDetail = CatalogShow & {
   description?: string | null;
   sessions: CatalogSession[];
+};
+
+export type CatalogMedia = {
+  tipoMidia: 'catalog_card' | 'catalog_hero_background' | 'catalog_hero_artwork' | 'detail_image';
+  storageBucket: string;
+  storagePath: string;
+  altText?: string | null;
+  ordemExibicao: number;
 };
 
 export type CatalogSession = {
@@ -51,11 +65,16 @@ type CatalogListItem = {
   status?: string;
   notaMedia?: number | string;
   popularidade?: number | string;
+  faixaEtaria?: string | null;
+  classificacaoIndicativa?: string | null;
+  duracao?: number | string | null;
   imagemUrl?: string | null;
+  midias?: CatalogMedia[];
 };
 
 type CatalogDetailItem = CatalogListItem & {
   descricao?: string | null;
+  produtora?: string | null;
   sessoes?: Array<{
     id?: number;
     data?: string;
@@ -114,7 +133,8 @@ export async function listarCatalogoCompleto(limite = 20): Promise<CatalogShow[]
 }
 
 export async function listarEspetaculosPopulares(limite = 10): Promise<CatalogShow[]> {
-  return listarEspetaculos({ limit: limite, sortBy: 'popularidade', status: 'em_cartaz' });
+  const itens = await listarEspetaculos({ limit: Math.max(limite * 2, 20), sortBy: 'popularidade' });
+  return itens.slice(0, limite);
 }
 
 export async function listarEspetaculosPertoDe(
@@ -154,6 +174,7 @@ export async function obterDetalheEspetaculoCatalogo(id: string): Promise<Catalo
 
   return {
     ...show,
+    imageUrl: obterUrlMidia(payload, 'detail_image') ?? buildKnownStorageImageUrl(payload.titulo ?? show.title, 'detail_image') ?? show.imageUrl,
     description: payload.descricao,
     sessions: (payload.sessoes ?? []).map((session) => ({
       id: Number(session.id ?? 0),
@@ -187,10 +208,36 @@ function toCatalogShow(item: CatalogListItem): CatalogShow | null {
     title: item.titulo,
     genre: item.genero,
     status: item.status ?? '',
+    ageRange: item.faixaEtaria,
+    contentRating: item.classificacaoIndicativa,
+    duration: item.duracao == null ? null : Number(item.duracao),
+    producer: (item as CatalogDetailItem).produtora ?? null,
     averageRating: Number(item.notaMedia ?? 0),
     popularity: Number(item.popularidade ?? 0),
-    imageUrl: item.imagemUrl ?? buildStorageImageUrl(id),
+    imageUrl: item.imagemUrl ?? obterUrlMidia(item, 'catalog_card') ?? buildKnownStorageImageUrl(item.titulo, 'catalog_card') ?? buildStorageImageUrl(id),
+    media: item.midias ?? [],
   };
+}
+
+export function obterUrlMidia(
+  item: { midias?: CatalogMedia[] },
+  tipoMidia: CatalogMedia['tipoMidia'],
+) {
+  const media = item.midias
+    ?.filter((entry) => entry.tipoMidia === tipoMidia)
+    .sort((a, b) => a.ordemExibicao - b.ordemExibicao)[0];
+
+  if (!media) {
+    return null;
+  }
+
+  const encodedPath = media.storagePath
+    .trim()
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+
+  return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/${media.storageBucket}/${encodedPath}`;
 }
 
 function buildStorageImageUrl(id: string) {
@@ -200,6 +247,58 @@ function buildStorageImageUrl(id: string) {
 
   return `${CATALOG_IMAGE_BASE_URL.replace(/\/$/, '')}/${encodeURIComponent(id)}.png`;
 }
+
+function buildKnownStorageImageUrl(
+  title: string,
+  tipoMidia: CatalogMedia['tipoMidia'],
+) {
+  const slug = TITLE_IMAGE_SLUGS[normalizeTitle(title)];
+  if (!slug) {
+    return null;
+  }
+
+  const fileNameByType: Record<CatalogMedia['tipoMidia'], string> = {
+    catalog_card: `${slug}_catalog_card.png`,
+    catalog_hero_background: `${slug}_catalog_hero_background.png`,
+    catalog_hero_artwork: `${slug}_catalog_hero_artwork.png`,
+    detail_image: `${slug}_detail_image.png`,
+  };
+
+  const encodedPath = `${tipoMidia}/${fileNameByType[tipoMidia]}`
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+
+  return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/espetaculos/${encodedPath}`;
+}
+
+function normalizeTitle(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, 'e')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+const TITLE_IMAGE_SLUGS: Record<string, string> = {
+  'elis a musical': 'elis',
+  'a novica rebelde': 'rebelde',
+  'mamma mia': 'mamma',
+  zaquim: 'zaquim',
+  'pixar in concert': 'pixar',
+  'ayrton senna o musical': 'ayrton',
+  'romeu julieta ao som de marisa monte': 'romeu',
+  'musical hairspray': 'hairspray',
+  'clube da esquina os sonhos nao envelhecem': 'clube',
+  'nossa historia com chico buarque': 'nossa',
+  'prima facie com debora falabella': 'prima',
+  'a cor purpura o musical': 'purpura',
+  'bibi uma vida em musical': 'bibi',
+  hair: 'hair',
+  'chacrinha o musical': 'chacrinha',
+};
 
 function isSessionNearAddress(session: CatalogSession, address: string) {
   const city = normalizeText(session.theater?.city);

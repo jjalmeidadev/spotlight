@@ -63,6 +63,16 @@ public class ListarEspetaculosUseCase(IEspetaculoRepository repositorio)
         ClassificacaoIndicativa = e.ClassificacaoIndicativa,
         Duracao = e.Duracao,
         NotaMedia = e.NotaMedia,
-        Popularidade = e.Popularidade
+        Popularidade = e.Popularidade,
+        Midias = e.Midias.Select(MapearMidia).ToList()
+    };
+
+    internal static EspetaculoMidiaDto MapearMidia(EspetaculoMidia midia) => new()
+    {
+        TipoMidia = midia.TipoMidia,
+        StorageBucket = midia.StorageBucket,
+        StoragePath = midia.StoragePath,
+        AltText = midia.AltText,
+        OrdemExibicao = midia.OrdemExibicao
     };
 }

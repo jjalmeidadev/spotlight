@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { colors } from '@/frontend/theme';
-import { CatalogContentShell } from '../components/CatalogContentShell';
-import { CatalogHero } from '../components/CatalogHero';
+import { CATALOG_WHITE_PLANE_TOP, CatalogContentShell } from '../components/CatalogContentShell';
+import { CATALOG_HERO_HEIGHT, CatalogHero } from '../components/CatalogHero';
 import { HeroFloatingArtwork } from '../components/HeroFloatingArtwork';
 import { CatalogRail } from '../components/CatalogRail';
 import { FilterDropdown } from '../components/FilterDropdown';
@@ -18,12 +18,22 @@ type CatalogViewProps = {
 	onItemPress?: (item: CatalogItem) => void;
 };
 
+const HERO_HEIGHT = CATALOG_HERO_HEIGHT;
+const CONTENT_SHELL_MARGIN_TOP = 80;
+const HERO_ARTWORK_BASELINE_OFFSET = -152;
+const SECTION_VERTICAL_GAP = 56;
+
 export default function CatalogView({ accessToken, profileName, userLocationAddress, onItemPress }: CatalogViewProps) {
 	const { width } = useWindowDimensions();
 	const vm = useCatalogViewModel({ accessToken, userLocationAddress });
 	const horizontalPadding = Math.max(16, Math.round(width * 0.044));
 	const firstSection = vm.sections[0];
 	const remainingSections = vm.sections.slice(1);
+	const heroArtworkWidth = Math.round(width * 0.30);
+	const heroArtworkHeight = Math.round(width * 0.60);
+	const heroArtworkRight = Math.max(8, horizontalPadding - 8);
+	const heroArtworkBaseline = HERO_HEIGHT + CONTENT_SHELL_MARGIN_TOP + CATALOG_WHITE_PLANE_TOP + HERO_ARTWORK_BASELINE_OFFSET;
+	const heroArtworkTop = heroArtworkBaseline - heroArtworkHeight;
 
 	function handleSearchSubmit() {
 		const query = vm.query.trim();
@@ -134,7 +144,18 @@ export default function CatalogView({ accessToken, profileName, userLocationAddr
 						</View>
 					</CatalogContentShell>
 
-					<HeroFloatingArtwork source={vm.assets.heroArtwork} style={styles.heroArtworkOverlay} />
+					<HeroFloatingArtwork
+						source={vm.assets.heroArtwork}
+						style={[
+							styles.heroArtworkOverlay,
+							{
+								height: heroArtworkHeight,
+								right: heroArtworkRight,
+								top: heroArtworkTop,
+								width: heroArtworkWidth,
+							},
+						]}
+					/>
 				</View>
 			</ScrollView>
 		</View>
@@ -179,22 +200,18 @@ const styles = StyleSheet.create({
 	},
 	preExpansiveArea: {
 		backgroundColor: '#FFFFFF',
-		paddingTop: 26,
+		paddingTop: SECTION_VERTICAL_GAP,
 	},
 	expansiveWhiteArea: {
 		backgroundColor: '#FFFFFF',
 		paddingBottom: 18,
-		paddingTop: 26,
+		paddingTop: SECTION_VERTICAL_GAP,
 		minHeight: 420,
 	},
 	sectionGap: {
-		marginTop: 0,
+		marginTop: SECTION_VERTICAL_GAP,
 	},
 	heroArtworkOverlay: {
-		height: 400,
-		right: -88,
-		top: 127.5,
-		width: 384,
 		zIndex: 50,
 		elevation: 50,
 	},

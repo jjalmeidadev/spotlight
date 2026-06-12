@@ -29,10 +29,11 @@ export async function avaliarEspetaculo(
     },
   );
 
-  const payload = await parseJsonResponse<RatingResponse & { error?: string; message?: string }>(response);
+  const payload = await parseJsonResponse<RatingResponse & { error?: string; message?: string; details?: string }>(response);
 
   if (!response.ok) {
-    throw new Error(payload.error ?? payload.message ?? 'Nao foi possivel registrar sua avaliacao.');
+    const details = payload.details ? ` (${payload.details})` : '';
+    throw new Error(`${payload.error ?? payload.message ?? 'Nao foi possivel registrar sua avaliacao.'}${details}`);
   }
 
   return payload;

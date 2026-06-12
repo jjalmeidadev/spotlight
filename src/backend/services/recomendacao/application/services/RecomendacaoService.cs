@@ -125,7 +125,17 @@ public sealed class ModeloMlNetRecomendacaoStrategy(
         Titulo = espetaculo.Titulo,
         Genero = espetaculo.Genero,
         Status = espetaculo.Status,
-        NotaMedia = espetaculo.NotaMedia
+        NotaMedia = espetaculo.NotaMedia,
+        Midias = espetaculo.Midias.Select(MapearMidia).ToList()
+    };
+
+    private static EspetaculoMidiaDto MapearMidia(Domain.Entities.EspetaculoMidia midia) => new()
+    {
+        TipoMidia = midia.TipoMidia,
+        StorageBucket = midia.StorageBucket,
+        StoragePath = midia.StoragePath,
+        AltText = midia.AltText,
+        OrdemExibicao = midia.OrdemExibicao
     };
 }
 
@@ -148,13 +158,23 @@ public sealed class PostgresPreProcessadoRecomendacaoStrategy(
         Motivo = recomendacao.Motivo,
         DataGeracao = recomendacao.DataGeracao,
         Espetaculo = new EspetaculoRecomendadoDto
-        {
-            Id = recomendacao.Espetaculo.Id,
-            Titulo = recomendacao.Espetaculo.Titulo,
-            Genero = recomendacao.Espetaculo.Genero,
-            Status = recomendacao.Espetaculo.Status,
-            NotaMedia = recomendacao.Espetaculo.NotaMedia
-        }
+            {
+                Id = recomendacao.Espetaculo.Id,
+                Titulo = recomendacao.Espetaculo.Titulo,
+                Genero = recomendacao.Espetaculo.Genero,
+                Status = recomendacao.Espetaculo.Status,
+                NotaMedia = recomendacao.Espetaculo.NotaMedia,
+                Midias = recomendacao.Espetaculo.Midias.Select(MapearMidia).ToList()
+            }
+        };
+
+    private static EspetaculoMidiaDto MapearMidia(Domain.Entities.EspetaculoMidia midia) => new()
+    {
+        TipoMidia = midia.TipoMidia,
+        StorageBucket = midia.StorageBucket,
+        StoragePath = midia.StoragePath,
+        AltText = midia.AltText,
+        OrdemExibicao = midia.OrdemExibicao
     };
 }
 

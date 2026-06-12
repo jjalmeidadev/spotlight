@@ -44,7 +44,15 @@ public class ListarSimilaresUseCase(ISimilaridadeRepository repositorio)
                     Titulo = s.Espetaculo.Titulo,
                     Genero = s.Espetaculo.Genero,
                     Status = s.Espetaculo.Status,
-                    NotaMedia = s.Espetaculo.NotaMedia
+                    NotaMedia = s.Espetaculo.NotaMedia,
+                    Midias = s.Espetaculo.Midias.Select(m => new EspetaculoMidiaDto
+                    {
+                        TipoMidia = m.TipoMidia,
+                        StorageBucket = m.StorageBucket,
+                        StoragePath = m.StoragePath,
+                        AltText = m.AltText,
+                        OrdemExibicao = m.OrdemExibicao
+                    }).ToList()
                 }
             }).ToList()
         };

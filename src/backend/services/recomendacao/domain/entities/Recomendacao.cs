@@ -21,4 +21,15 @@ public class EspetaculoRecomendado
     public string? Genero { get; init; }
     public string Status { get; init; } = string.Empty;
     public decimal NotaMedia { get; init; }
+    public IReadOnlyList<EspetaculoMidia> Midias { get; init; } = [];
+}
+
+/// <summary>Metadado de arquivo no Supabase Storage associado ao espetáculo.</summary>
+public class EspetaculoMidia
+{
+    public string TipoMidia { get; init; } = string.Empty;
+    public string StorageBucket { get; init; } = string.Empty;
+    public string StoragePath { get; init; } = string.Empty;
+    public string? AltText { get; init; }
+    public int OrdemExibicao { get; init; }
 }

@@ -7,6 +7,7 @@ import {
 	listarEspetaculosEmCartaz,
 	listarEspetaculosPertoDe,
 	listarEspetaculosPopulares,
+	obterUrlMidia,
 } from '../repositories/CatalogRepository';
 import {
 	listarRecomendacoesUsuario,
@@ -189,10 +190,28 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	}));
 	const emCartazItems = emCartazShows.map(toCatalogItem);
 	const catalogItems = catalogShows.map(toCatalogItem);
+	const watchedItems = catalogShows
+		.filter((item) => !popularShows.some((popular) => popular.id === item.id))
+		.slice(0, 10)
+		.map(toCatalogItem);
+	const heroShow = useMemo(
+		() => catalogShows.find((item) => normalizeTitle(item.title).includes('elis')) ?? popularShows[0] ?? null,
+		[catalogShows, popularShows],
+	);
+	const heroBackgroundUrl = heroShow ? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_background') : null;
+	const heroArtworkUrl = heroShow ? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_artwork') : null;
+	const assets = useMemo(
+		() => ({
+			...CATALOG_IMAGE,
+			hero: heroBackgroundUrl ? { uri: heroBackgroundUrl } : CATALOG_IMAGE.hero,
+			heroArtwork: heroArtworkUrl ? { uri: heroArtworkUrl } : CATALOG_IMAGE.heroArtwork,
+		}),
+		[heroBackgroundUrl, heroArtworkUrl],
+	);
 
 	const heroItem = useMemo<CatalogItem | null>(
-		() => recommendationItems[0] ?? popularItems[0] ?? emCartazItems[0] ?? null,
-		[recommendationItems, popularItems, emCartazItems],
+		() => (heroShow ? toCatalogItem(heroShow) : recommendationItems[0] ?? popularItems[0] ?? emCartazItems[0] ?? null),
+		[heroShow, recommendationItems, popularItems, emCartazItems],
 	);
 
 	const sections: CatalogRail[] = [
@@ -210,6 +229,9 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 			title: 'Os mais populares do momento:',
 			items: popularItems.length > 0 ? popularItems : FALLBACK_POPULAR_ITEMS,
 		},
+		...(watchedItems.length > 0
+			? [{ id: 'watched', title: 'Outras pessoas tambem assistiram:', items: watchedItems }]
+			: []),
 		...(emCartazItems.length > 0
 			? [{ id: 'em-cartaz', title: 'Em cartaz:', items: emCartazItems }]
 			: []),
@@ -219,7 +241,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	];
 
 	return {
-		assets: CATALOG_IMAGE,
+		assets,
 		filterOptions: FILTER_OPTIONS,
 		heroItem,
 		query,
@@ -231,6 +253,13 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		setSelectedFilter,
 		userName: 'Leonardo',
 	};
+}
+
+function normalizeTitle(value: string) {
+	return value
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase();
 }
 
 function toCatalogItem(item: CatalogShow) {

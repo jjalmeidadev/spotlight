@@ -1,39 +1,35 @@
 import React from 'react';
-import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typography } from '@/frontend/theme';
+import { ImageBackground, ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
+import { colors } from '@/frontend/theme';
+
+const SHOWCASE_CARD_ASPECT_RATIO = 368 / 416;
 
 type ShowcaseCardProps = {
   title: string;
   subtitle?: string;
   imageUri?: string;
+  imageSource?: ImageSourcePropType;
   onPress?: () => void;
 };
 
-export function ShowcaseCard({ title, subtitle, imageUri, onPress }: ShowcaseCardProps) {
+export function ShowcaseCard({ title, subtitle, imageUri, imageSource, onPress }: ShowcaseCardProps) {
+  void title;
+  void subtitle;
+
+  const source = imageSource ?? (imageUri ? { uri: imageUri } : undefined);
+
   return (
     <Pressable onPress={onPress} style={styles.pressable}>
-      <ImageBackground
-        source={imageUri ? { uri: imageUri } : undefined}
-        resizeMode="cover"
-        imageStyle={styles.image}
-        style={styles.card}
-      >
-        <View style={styles.overlay} />
-        <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={2}>
-            {title}
-          </Text>
-          {subtitle ? (
-            <Text style={styles.subtitle} numberOfLines={1}>
-              {subtitle}
-            </Text>
-          ) : null}
-          <View style={styles.ctaRow}>
-            <Text style={styles.cta}>VER MAIS</Text>
-            <View style={styles.ctaLine} />
-          </View>
-        </View>
-      </ImageBackground>
+      {source ? (
+        <ImageBackground
+          source={source}
+          resizeMode="cover"
+          imageStyle={styles.image}
+          style={styles.card}
+        />
+      ) : (
+        <View style={[styles.card, styles.placeholder]} />
+      )}
     </Pressable>
   );
 }
@@ -43,8 +39,8 @@ const styles = StyleSheet.create({
     width: 160,
   },
   card: {
+    aspectRatio: SHOWCASE_CARD_ASPECT_RATIO,
     width: '100%',
-    minHeight: 220,
     borderRadius: 18,
     overflow: 'hidden',
     justifyContent: 'flex-end',
@@ -53,44 +49,7 @@ const styles = StyleSheet.create({
   image: {
     borderRadius: 18,
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(17, 20, 18, 0.28)',
-  },
-  content: {
-    position: 'relative',
-    padding: spacing.md,
-    gap: 4,
-  },
-  title: {
-    color: colors.background,
-    ...typography.label,
-    fontSize: 16,
-    lineHeight: 18,
-    textShadowColor: 'rgba(0, 0, 0, 0.35)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
-  },
-  subtitle: {
-    color: colors.background,
-    ...typography.caption,
-    textShadowColor: 'rgba(0, 0, 0, 0.35)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
-  },
-  ctaRow: {
-    marginTop: spacing.xs,
-    gap: spacing.xxs,
-  },
-  cta: {
-    color: colors.primarySoft,
-    ...typography.caption,
-    textTransform: 'uppercase',
-  },
-  ctaLine: {
-    height: 2,
-    width: '100%',
-    borderRadius: 999,
-    backgroundColor: colors.primary,
+  placeholder: {
+    backgroundColor: '#17211D',
   },
 });

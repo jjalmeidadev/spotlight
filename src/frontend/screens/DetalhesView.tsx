@@ -172,23 +172,6 @@ export default function DetalhesView({
   const usaCapaLocal = espetaculo.titulo === 'A Noviça Rebelde';
 
 
-  function handleFavoritePress() {
-    const active = !viewModel.favorito;
-
-
-    viewModel.alternarFavorito();
-    emitTelemetryEvent(
-      {
-        eventType: 'favorite_toggled',
-        screen: 'DetalhesView',
-        entity: { type: 'espetaculo', id: detalheAtual.id },
-        properties: { active },
-      },
-      accessToken,
-    );
-  }
-
-
   function handleBuyPress() {
     if (!detalheAtual.linkCompra) {
       return;
@@ -314,26 +297,6 @@ export default function DetalhesView({
 
             <View style={styles.actionsRight}>
               <Pressable
-                accessibilityLabel={
-                  viewModel.favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'
-                }
-                accessibilityRole="button"
-                hitSlop={8}
-                onPress={handleFavoritePress}
-                style={({ pressed }: { pressed: boolean }) => [
-                  styles.favoriteButton,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text
-                  style={[styles.favoriteIcon, viewModel.favorito && styles.favoriteIconActive]}
-                >
-                  ♥
-                </Text>
-              </Pressable>
-
-
-              <Pressable
                 accessibilityRole="button"
                 onPress={handleBuyPress}
                 style={({ pressed }: { pressed: boolean }) => [
@@ -350,6 +313,16 @@ export default function DetalhesView({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Descrição</Text>
             <Text style={styles.description}>{espetaculo.descricao}</Text>
+            <View style={styles.infoGrid}>
+              <InfoPill label="Classificação" value={espetaculo.classificacaoIndicativa ?? espetaculo.faixaEtaria} />
+              <InfoPill label="Duração" value={espetaculo.duracao ? `${espetaculo.duracao} min` : null} />
+              <InfoPill label="Gênero" value={espetaculo.genero} />
+              <InfoPill label="Status" value={formatStatus(espetaculo.status)} />
+              <InfoPill label="Próxima sessão" value={espetaculo.proximaSessao} />
+              <InfoPill label="Teatro" value={espetaculo.teatro} />
+              <InfoPill label="Preço" value={espetaculo.preco} />
+              <InfoPill label="Produtora" value={espetaculo.produtora} />
+            </View>
           </View>
 
 
@@ -378,6 +351,27 @@ function getPurchaseProvider(linkCompra: string) {
   } catch {
     return 'unknown';
   }
+}
+
+function formatStatus(status?: string) {
+  if (!status) return null;
+
+  return status
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function InfoPill({ label, value }: { label: string; value?: string | null }) {
+  if (!value) {
+    return null;
+  }
+
+  return (
+    <View style={styles.infoPill}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
 }
 
 
@@ -576,20 +570,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     flexShrink: 1,
   },
-  favoriteButton: {
-    minWidth: spacing.touchMin,
-    minHeight: spacing.touchMin,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  favoriteIcon: {
-    color: colors.primary,
-    fontSize: 22,
-    lineHeight: 24,
-  },
-  favoriteIconActive: {
-    opacity: 1,
-  },
   buyButton: {
     minHeight: 36,
     borderRadius: 999,
@@ -618,6 +598,34 @@ const styles = StyleSheet.create({
     ...typography.body,
     fontSize: 14,
     lineHeight: 21,
+  },
+  infoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  infoPill: {
+    borderColor: 'rgba(255, 255, 255, 0.42)',
+    borderRadius: 12,
+    borderWidth: 1,
+    maxWidth: '100%',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
+  infoLabel: {
+    color: colors.textSubtle,
+    ...typography.caption,
+    fontSize: 9,
+    lineHeight: 11,
+    textTransform: 'uppercase',
+  },
+  infoValue: {
+    color: colors.textStrong,
+    ...typography.caption,
+    fontSize: 11,
+    lineHeight: 14,
+    marginTop: 2,
   },
   similarSection: {
     marginTop: spacing.xs,

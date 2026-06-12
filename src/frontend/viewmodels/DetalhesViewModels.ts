@@ -24,7 +24,6 @@ export function useDetalhesViewModel(
   const [error, setError] = useState<string | null>(null);
   const [detalhe, setDetalhe] = useState<EspetaculoDetalhe | null>(null);
   const [espetaculosSemelhantes, setEspetaculosSemelhantes] = useState<EspetaculoSemelhante[]>([]);
-  const [favorito, setFavorito] = useState(false);
   const [avaliacaoUsuario, setAvaliacaoUsuario] = useState<number | null>(null);
   const [avaliando, setAvaliando] = useState(false);
 
@@ -58,10 +57,6 @@ export function useDetalhesViewModel(
   }, [recarregar]);
 
 
-  function alternarFavorito() {
-    setFavorito((atual: boolean) => !atual);
-  }
-
   async function avaliar(nota: number) {
     try {
       setAvaliando(true);
@@ -89,14 +84,11 @@ export function useDetalhesViewModel(
     error,
     detalhe,
     espetaculosSemelhantes,
-    favorito,
     avaliacaoUsuario,
     avaliando,
-    alternarFavorito,
     avaliar,
     recarregar,
     comprarIngresso,
   };
 }
-
 
