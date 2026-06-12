@@ -61,7 +61,9 @@ src/database/
 │   ├── 09_rastreabilidade_transacoes.sql              — tabela auditoria + trigger genérica de auditoria nas tabelas transacionais
 │   ├── 09_rastreabilidade_transacoes_rollback.sql
 │   ├── 10_supabase_storage_buckets.sql                 — bucket privado ml-artifacts no Supabase Storage
-│   └── 10_supabase_storage_buckets_rollback.sql
+│   ├── 10_supabase_storage_buckets_rollback.sql
+│   ├── 12_controle_acesso_administrativo_catalogo.sql — escrita no catálogo restrita a administradores
+│   └── 12_controle_acesso_administrativo_catalogo_rollback.sql
 ├── load_test/               — massa sintética e teste de carga (pgbench)
 │   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
 │   ├── massa_carga_rollback.sql                       — remove apenas os dados de carga
@@ -391,11 +393,11 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 |---|---:|
 | Tabelas | 12 |
 | Tipos enumerados | 2 |
-| Funções | 4 |
+| Funções | 5 |
 | Triggers | 10 |
 | Índices explícitos | 20 |
 
-> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `09`). As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08) e `public.registrar_auditoria()` (09). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04) e os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional.
+> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `12`). As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08), `public.registrar_auditoria()` (09) e `public.is_admin()` (12). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04) e os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional.
 
 #### Tabelas do Modelo
 
@@ -544,6 +546,7 @@ Não há índices explícitos além dos índices automáticos criados pela chave
 | Objeto | Tipo | Descrição |
 |---|---|---|
 | `public.handle_new_user()` | Function | Insere automaticamente um perfil em `usuario` após a criação de um registro em `auth.users`. |
+| `public.is_admin()` | Function | Retorna se `auth.uid()` pertence a um usuário com `tipo_usuario = 'administrador'`; usada pelas policies administrativas do catálogo. |
 | `on_auth_user_created` | Trigger | Executada `AFTER INSERT ON auth.users`, chama `public.handle_new_user()`. |
 
 ### 3. Tabela `categoria`
@@ -1239,6 +1242,7 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-36 | Toda escrita (`INSERT`/`UPDATE`/`DELETE`) nas tabelas transacionais deve ser registrada em uma trilha de auditoria com estado anterior e novo. | Função de trigger genérica `SECURITY DEFINER` + 8 triggers `AFTER INSERT/UPDATE/DELETE`, gravando em `auditoria`. | `09_rastreabilidade_transacoes.sql` — `public.registrar_auditoria()`, `trg_auditoria_*` |
 | RN-BD-37 | As operações de uma mesma transação devem ser correlacionáveis na trilha. | Coluna `auditoria.id_transacao` preenchida com `txid_current()` — compartilhada por todas as operações do mesmo `COMMIT`. | `09_rastreabilidade_transacoes.sql` — `auditoria.id_transacao` |
 | RN-BD-38 | A trilha de auditoria só pode ser lida por administradores. | Política de Row Level Security restrita a `tipo_usuario = 'administrador'`; inserções via trigger `SECURITY DEFINER`. | `09_rastreabilidade_transacoes.sql` — política `auditoria: leitura por administradores` |
+| RN-BD-39 | Somente administradores podem inserir, atualizar ou excluir dados do catálogo e da agenda; a leitura pública existente deve ser preservada. | Função `public.is_admin()` e policies RLS separadas para `INSERT`, `UPDATE` e `DELETE` nas sete tabelas do catálogo. | `12_controle_acesso_administrativo_catalogo.sql` — `espetaculo`, `teatro`, `ator`, `categoria`, `espetaculo_categoria`, `espetaculo_ator` e `sessao` |
 
 > **Sobre a decisão `VARCHAR + CHECK + função` no lugar de `ENUM` para `tipo_algoritmo`:** ENUMs nativos do PostgreSQL exigem `ALTER TYPE ... ADD VALUE` para incluir novos valores, operação que adquire lock na tabela. O time optou por `VARCHAR(50)` + constraint `CHECK` que chama a função `public.is_tipo_algoritmo_valido()`. Adicionar um algoritmo passa a ser um `CREATE OR REPLACE FUNCTION`, sem reescrita de constraint em duas tabelas e sem impacto operacional.
 
@@ -1305,7 +1309,7 @@ A pasta [`src/database/migrations/`](migrations/) contém alterações increment
 
 1. **`01_create_database.sql` é imutável para alterações incrementais.** Qualquer mudança de schema posterior ao bootstrap deve ser feita via migration nova em `migrations/`. O arquivo original só é editado em cenários de reset completo (ambiente de desenvolvimento).
 2. **Cada migration tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação).
-3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `09` depende de todas as tabelas transacionais para registrar a auditoria).
+3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`, `10_`, `11_`, `12_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `12` depende de `usuario` e das tabelas públicas do catálogo).
 4. **Aplicação manual.** As migrations **não** são executadas automaticamente pelo Docker — apenas `01` e `02` rodam na inicialização do volume. Migrations em `migrations/` precisam ser aplicadas explicitamente via SQL Editor do Supabase ou via `psql`.
 
 ### Como aplicar uma migration
