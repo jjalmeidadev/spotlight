@@ -315,8 +315,6 @@ export default function DetalhesView({
             <Text style={styles.description}>{espetaculo.descricao}</Text>
             <View style={styles.infoGrid}>
               <InfoPill label="Classificação" value={espetaculo.classificacaoIndicativa ?? espetaculo.faixaEtaria} />
-              <InfoPill label="Duração" value={espetaculo.duracao ? `${espetaculo.duracao} min` : null} />
-              <InfoPill label="Gênero" value={espetaculo.genero} />
               <InfoPill label="Status" value={formatStatus(espetaculo.status)} />
               <InfoPill label="Próxima sessão" value={espetaculo.proximaSessao} />
               <InfoPill label="Teatro" value={espetaculo.teatro} />

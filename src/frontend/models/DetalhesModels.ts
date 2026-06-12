@@ -49,7 +49,6 @@ export async function obterDetalhesEspetaculo(espetaculoId: string): Promise<Esp
   const tags = [
     detalhe.genre,
     detalhe.duration ? `${detalhe.duration}min` : null,
-    detalhe.contentRating,
   ].filter((tag): tag is string => Boolean(tag));
 
   return {
