@@ -3554,116 +3554,220 @@ _conteúdo_
 
 ## 8.1 Arquitetura de Codificação e Estrutura de Diretórios
 
-&emsp;A solução foi organizada para separar a aplicação Expo do restante do ecossistema do projeto. A raiz concentra os arquivos de configuração do app e os ativos estáticos, enquanto `src/` reúne as camadas de código-fonte. Essa divisão segue dois objetivos principais: manter o frontend em uma estrutura MVVM clara e manter o backend como uma composição SOA explícita, com contratos, serviços e integração externa separados por responsabilidade.
+&emsp;A solução foi organizada para separar a aplicação Expo do restante do ecossistema do projeto. A raiz concentra os arquivos de configuração do app móvel, a orquestração de containers e os ativos estáticos, enquanto `src/` reúne as camadas de código-fonte. Essa divisão atende a três objetivos: manter o frontend em uma estrutura MVVM clara; manter o backend como uma composição SOA explícita com contratos, serviços, motor de ML e testes separados por responsabilidade; e manter o ciclo de dados (datasets, scripts SQL, migrações, artefatos de modelo) isolado da aplicação que o consome.
 
 ### Estrutura de diretórios
 
+&emsp;A árvore abaixo reflete o estado atual do repositório. Para manter a leitura objetiva, arquivos de build do .NET (`bin/`, `obj/`, `Properties/`) e dependências (`node_modules/`) não foram listados; nas pastas dos serviços, `Program.cs`, `*.csproj`, `Dockerfile` e `appsettings*.json` aparecem agrupados em comentários de linha.
+
 ```text
 g04/
-├─ app.json
-├─ babel.config.js
-├─ expo-env.d.ts
-├─ package.json
-├─ tsconfig.json
-├─ README.md
-├─ assets/
-├─ documentos/
+├─ App.js                       # entry-point do app Expo
+├─ app.json                     # config do Expo
+├─ babel.config.js              # transpiler
+├─ tsconfig.json                # config TypeScript do frontend
+├─ package.json                 # deps e scripts do frontend Expo
+├─ docker-compose.yml           # orquestração local dos serviços backend
+├─ .env.example                 # variáveis de ambiente de referência
+├─ .gitlab-ci.yml               # pipeline de CI (lint, build, testes)
+├─ README.md                    # visão geral do repositório
+├─ assets/                      # imagens, ícones e fontes do app
+├─ documentos/                  # documentação do produto e do projeto
+│  ├─ img/                      # imagens, diagramas, mockups e wireframes
 │  ├─ Projeto.md
 │  ├─ ProjetoVisual.md
 │  ├─ GestaoProjeto.md
-│  └─ Manual-instalacao.md
+│  ├─ Gestao_Projeto_Configuracao.md
+│  ├─ GuiaPadroesDesenvolvimento.md
+│  ├─ Documentacao_soa.md
+│  ├─ Manual-instalacao.md
+│  └─ Index.md
+├─ colab_csv_utf8/              # datasets originais em CSV bruto (pré-AAD)
 └─ src/
-  ├─ backend/
-  │  ├─ api-gateway/
-  │  ├─ contracts/
-  │  │  ├─ dtos/
-  │  │  └─ events/
-  │  ├─ services/
-  │  │  ├─ catalogo/
-  │  │  ├─ recomendacao/
-  │  │  └─ usuario/
-  │  └─ ml-engine/
-  │     ├─ data-preparation/
-  │     ├─ inference/
-  │     └─ training/
-  ├─ frontend/
-  │  ├─ components/
-  │  ├─ screens/
-  │  ├─ viewmodels/
-  │  ├─ models/
-  │  ├─ repositories/
-  │  ├─ theme/
-  │  └─ types/
-  ├─ aad/
-  ├─ database/
-  ├─ dataset/
-  └─ models/
+   ├─ frontend/                 # app React Native + TypeScript (MVVM)
+   │  ├─ screens/               # Views (telas) — *.tsx
+   │  ├─ viewmodels/            # hooks de apresentação — use*ViewModel.ts
+   │  ├─ models/                # entidades e tipos do domínio do app
+   │  ├─ components/            # UI reutilizável (cards, hero, search...)
+   │  ├─ repositories/          # acesso a APIs do backend
+   │  ├─ hooks/                 # hooks transversais (ex.: telemetria)
+   │  ├─ config/                # endpoints e mocks de assets
+   │  └─ theme/                 # tokens (cores, tipografia, espaçamento)
+   ├─ backend/                  # ecossistema SOA em .NET 9 / ASP.NET Core
+   │  ├─ Spotlight.sln          # solution agrupando gateway + 4 serviços + 5 projetos de teste
+   │  ├─ api-gateway/           # Spotlight.Gateway — YARP gateway (porta 5000)
+   │  │  ├─ Controllers/        # endpoints expostos do gateway
+   │  │  ├─ Middleware/         # auth JWT, rate limit, logging
+   │  │  └─ *                   # Program.cs, .csproj, appsettings*.json
+   │  ├─ contracts/             # contratos compartilhados entre serviços
+   │  │  ├─ dtos/               # DTOs de fronteira
+   │  │  ├─ events/             # esquemas de eventos
+   │  │  ├─ openapi.json        # contrato OpenAPI consolidado
+   │  │  ├─ api-contracts.md    # descrição dos contratos REST
+   │  │  ├─ telemetria.md       # contrato dos eventos de telemetria
+   │  │  └─ supabase-storage.md # contrato de armazenamento de mídia
+   │  ├─ services/              # microsserviços de negócio (SOA)
+   │  │  ├─ catalogo/           # Spotlight.Catalogo (5001) — ICatalog
+   │  │  ├─ usuario/            # Spotlight.Usuario (5002) — IUserPrefs + telemetria Mongo
+   │  │  ├─ recomendacao/       # Spotlight.Recomendacao (5003) — IRecommendation (ML.NET)
+   │  │  └─ geolocalizacao/     # Spotlight.Geolocalizacao (5004) — IGeolocation (Nominatim)
+   │  ├─ ml-engine/             # placeholder do motor de ML (treino real em src/models/)
+   │  │  ├─ data-preparation/
+   │  │  ├─ training/
+   │  │  └─ inference/
+   │  ├─ scripts/               # scripts utilitários (ex.: E2E telemetria)
+   │  └─ tests/                 # projetos de testes por serviço
+   │     ├─ Spotlight.Catalogo.Tests/
+   │     ├─ Spotlight.Recomendacao.Tests/
+   │     ├─ Spotlight.Usuario.Tests/
+   │     ├─ Spotlight.Geolocalizacao.Tests/
+   │     └─ Spotlight.Gateway.Tests/
+   ├─ database/                 # provisão e evolução do banco
+   │  ├─ 00_supabase_compat.sql
+   │  ├─ 01_create_database.sql
+   │  ├─ 02_initial_data.sql
+   │  ├─ 03_rollback.sql
+   │  ├─ migrations/            # migrações incrementais + rollbacks
+   │  ├─ load_test/pgbench/     # queries do teste de carga (pgbench)
+   │  └─ README.md
+   ├─ dataset/                  # dados de apoio e amostras
+   │  ├─ itens_metadata.csv
+   │  ├─ recomendacao.csv
+   │  ├─ recomendacao_balanceado.csv
+   │  └─ interacoes_mongo_exemplo.jsonl
+   ├─ models/                   # experimentos e artefatos de ML
+   │  ├─ Spotlight.Recomendacao.ModelTraining/  # projeto C# de treino ML.NET
+   │  ├─ artifacts/             # modelo serializado (.zip) e similaridades
+   │  ├─ reports/               # métricas e exemplos do modelo
+   │  ├─ sistema_recomendacao_knn.ipynb
+   │  ├─ sistema_recomendacao_svd.ipynb
+   │  └─ svd_model.pkl
+   └─ aad/                      # análise exploratória de dados (notebooks)
+      └─ tratamento-dados.ipynb
+```
+
+&emsp;Cada microsserviço em `src/backend/services/<dominio>/` segue a mesma decomposição em quatro camadas, que materializa os princípios de arquitetura limpa adotados pelo projeto:
+
+```text
+services/<dominio>/
+├─ presentation/                # adapta entrada HTTP em casos de uso
+│  ├─ controllers/              # endpoints REST do serviço
+│  └─ middleware/               # auth, logging, tratamento de erro
+├─ application/                 # orquestra casos de uso
+│  ├─ usecases/                 # uma classe por operação do serviço
+│  ├─ dtos/                     # objetos de entrada/saída dos casos de uso
+│  └─ services/                 # serviços de aplicação (quando aplicável)
+├─ domain/                      # núcleo do negócio
+│  ├─ entities/                 # entidades e regras de domínio
+│  └─ value-objects/            # valores imutáveis e validados
+├─ infrastructure/              # adaptadores para o mundo externo
+│  ├─ persistence/              # acesso ao Supabase/Postgres via Npgsql (SQL puro)
+│  ├─ auth/                     # validação do JWT do Supabase
+│  └─ ...                       # integrações específicas do domínio
+├─ Program.cs                   # bootstrap do serviço ASP.NET Core
+├─ Dockerfile                   # imagem do serviço
+└─ appsettings*.json            # configuração por ambiente
 ```
 
 ### Representação visual da arquitetura
 
 ```mermaid
 flowchart TB
-  Root[Raiz do repositório] --> Expo[Configs do Expo\napp.json + babel.config.js + tsconfig.json]
-  Root --> Assets[assets/\nrecursos estáticos]
-  Root --> Docs[documentos/\nDocumentação do projeto]
+  Root[Raiz do repositório] --> Expo[Configs do Expo<br/>App.js · app.json · babel.config.js · tsconfig.json · package.json]
+  Root --> Infra[Infra local<br/>docker-compose.yml · .env.example · .gitlab-ci.yml]
+  Root --> Assets[assets/<br/>recursos estáticos]
+  Root --> Docs[documentos/<br/>documentação + img/]
+  Root --> Colab[colab_csv_utf8/<br/>datasets originais CSV]
   Root --> Src[src/]
 
-  Src --> Backend[backend/\nAPI, contratos, serviços e ML]
-  Src --> Frontend[frontend/\nUI em MVVM]
-  Src --> Data[database/\ndatasets e scripts SQL]
-  Src --> Aad[aad/\nnotebooks de análise]
-  Src --> ProjectModels[models/\nmodelos e artefatos]
+  Src --> Frontend[frontend/<br/>App React Native em MVVM]
+  Src --> Backend[backend/<br/>SOA · contratos · ML · testes]
+  Src --> DB[database/<br/>scripts SQL, migrações e teste de carga]
+  Src --> Dataset[dataset/<br/>amostras e dados de apoio]
+  Src --> MLModels[models/<br/>treino ML.NET, notebooks e artefatos]
+  Src --> Aad[aad/<br/>notebooks de análise exploratória]
 
-  Backend --> Gateway[api-gateway/\nporta de entrada do backend]
-  Backend --> Contracts[contracts/\nDTOs e eventos]
-  Backend --> Services[services/\nregras de negócio]
-  Backend --> MLEngine[ml-engine/\npreparação, treino e inferência]
+  Frontend --> Screens[screens/<br/>Views]
+  Frontend --> ViewModels[viewmodels/<br/>regra de apresentação]
+  Frontend --> FrontendModels[models/<br/>entidades do app]
+  Frontend --> Components[components/<br/>UI reutilizável]
+  Frontend --> Repos[repositories/<br/>acesso ao backend]
+  Frontend --> Hooks[hooks/<br/>comportamentos transversais]
+  Frontend --> Config[config/<br/>endpoints e assets mockados]
+  Frontend --> Theme[theme/<br/>tokens visuais]
 
-  Contracts --> DTOs[dtos/\nmodelos de troca de dados]
-  Contracts --> Events[events/\neventos de integração]
+  Backend --> Sln[Spotlight.sln<br/>solution .NET]
+  Backend --> Gateway[api-gateway/<br/>YARP · porta única]
+  Backend --> Contracts[contracts/<br/>DTOs, eventos e OpenAPI]
+  Backend --> Services[services/<br/>microsserviços de negócio]
+  Backend --> MLEngine[ml-engine/<br/>placeholder · treino em src/models/]
+  Backend --> Scripts[scripts/<br/>utilitários operacionais]
+  Backend --> Tests[tests/<br/>um projeto xUnit por serviço]
 
-  Services --> Catalogo[catalogo/\noperações do catálogo]
-  Services --> Recomendacao[recomendacao/\nregras da recomendação]
-  Services --> Usuario[usuario/\nfluxos de usuário]
+  Services --> Catalogo[catalogo/<br/>ICatalog]
+  Services --> Recomendacao[recomendacao/<br/>IRecommendation]
+  Services --> Usuario[usuario/<br/>IUserPrefs · telemetria]
+  Services --> Geo[geolocalizacao/<br/>IGeolocation]
 
-  MLEngine --> Prep[data-preparation/\ntratamento de dados]
-  MLEngine --> Training[training/\nmodelagem e treino]
-  MLEngine --> Inference[inference/\nexecução de predição]
-
-  Frontend --> Screens[screens/\ntelas]
-  Frontend --> Components[components/\ncomponentes reutilizáveis]
-  Frontend --> ViewModels[viewmodels/\nregras de apresentação]
-  Frontend --> Repos[repositories/\nacesso a dados]
-  Frontend --> Theme[theme/\ncores e estilos]
-  Frontend --> FrontendModels[models/\nentidades e mocks]
-  Frontend --> Types[types/\ntipos compartilhados]
+  Catalogo --> Layers[presentation · application · domain · infrastructure]
+  Recomendacao --> Layers
+  Usuario --> Layers
+  Geo --> Layers
 ```
 
 ### Critérios de organização
 
-- `assets/` guarda imagens e recursos estáticos consumidos pelo app; isso evita misturar conteúdo visual com código e facilita manutenção do pacote do Expo.
-- `documentos/` reúne a documentação do artefato e das entregas do projeto; centralizar isso melhora rastreabilidade e revisão.
-- `src/aad/` concentra notebooks e análises exploratórias; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
-- `src/database/` contém scripts SQL de criação e carga inicial; isso torna o banco reproduzível.
-- `src/dataset/` armazena dados de apoio e amostras do projeto; separar os dados do código facilita reprocessamento e versionamento.
-- `src/models/` guarda notebooks e artefatos de modelagem; isso isola experimentos de ML do restante da aplicação.
-- `src/frontend/` concentra a interface e segue o padrão MVVM. `screens/` representam a visão, `viewmodels/` concentram a lógica de apresentação, `repositories/` isolam o acesso a dados, `components/` reaproveitam UI, `models/` guardam entidades e mocks de apoio, `types/` concentram contratos compartilhados e `theme/` padroniza cores, tipografia e estilos.
-- `src/backend/` é organizado segundo SOA. `api-gateway/` funciona como porta de entrada das requisições, `contracts/` define os contratos compartilhados, `services/` contém a regra de negócio por domínio e `ml-engine/` isola o ciclo de dados e modelo.
-- `src/backend/contracts/dtos/` define os objetos de transferência usados nas fronteiras dos serviços; `events/` registra mensagens e eventos de integração entre módulos. Essa separação evita acoplamento entre emissores e consumidores.
-- `src/backend/services/catalogo/`, `recomendacao/` e `usuario/` separam responsabilidades por domínio, reduzindo acoplamento e facilitando testes e manutenção. Em cada serviço, `application/` orquestra casos de uso, `domain/` guarda entidades e value objects, `infrastructure/` implementa persistência e integrações, e `presentation/` expõe controllers ou adaptadores de entrada.
-- `src/backend/services/*/application/dtos/` reúne os dados de entrada e saída dos casos de uso; isso protege o domínio de formatos externos.
-- `src/backend/services/*/application/usecases/` concentra as regras de aplicação; aqui fica a coordenação das operações do domínio.
-- `src/backend/services/*/domain/entities/` guarda as entidades centrais do negócio; `value-objects/` mantém valores imutáveis e validados. Essa camada é importante porque preserva as regras críticas do domínio independentemente da interface ou da persistência.
-- `src/backend/services/*/infrastructure/persistence/` implementa o acesso a dados; separar isso permite trocar a tecnologia de armazenamento sem alterar o domínio.
-- `src/backend/services/*/presentation/controllers/` expõe os pontos de entrada de cada serviço; essa camada adapta requisições externas para os casos de uso internos.
-- `src/backend/ml-engine/data-preparation/`, `training/` e `inference/` organizam o ciclo de dados e modelo de forma independente, permitindo evoluir o motor de recomendação sem misturar preparo, treino e predição.
+**Raiz do repositório**
 
-As pastas vazias preservadas com `.gitkeep` existem para manter essa estrutura visível no Git até que os arquivos reais sejam implementados.
+- Os arquivos `App.js`, `app.json`, `babel.config.js`, `tsconfig.json` e `package.json` na raiz são exigidos pelo Expo e mantidos junto à raiz para que o app móvel seja executável sem configuração adicional.
+- `docker-compose.yml` orquestra os serviços do backend, banco e Mongo em ambiente local, mantendo a infraestrutura de execução fora do código de aplicação.
+- `.env.example` documenta o conjunto mínimo de variáveis de ambiente; `.gitlab-ci.yml` define o pipeline de CI (lint, build, testes e publicação de artefatos).
+- `assets/` guarda imagens e ícones do app, separando conteúdo visual do código-fonte.
+- `documentos/` centraliza a documentação do produto e do projeto, com `img/` para diagramas, mockups e wireframes referenciados pelos `.md`.
+- `colab_csv_utf8/` preserva os datasets originais em CSV bruto que alimentam os notebooks em `src/aad/`; manter o dado bruto separado do dado tratado e do código facilita reprocessamento.
+
+**`src/frontend/` — padrão MVVM**
+
+- `screens/` contém as Views (telas) com a renderização declarativa em React Native; cada arquivo é um componente final usado pelo navegador de telas.
+- `viewmodels/` reúne hooks `use*ViewModel.ts` que concentram o estado e a regra de apresentação de cada tela, mantendo as Views simples e testáveis.
+- `models/` define as entidades e tipos consumidos pelas Views e ViewModels (`CatalogItem`, `Preference`, `Usuario`, etc.).
+- `components/` agrupa peças visuais reutilizáveis (`CatalogPosterCard`, `CatalogHero`, `SearchBar`, `Carousel`...), evitando duplicação entre telas.
+- `repositories/` isola as chamadas HTTP ao backend; trocar endpoint ou adicionar mock não afeta a View.
+- `hooks/` mantém comportamentos transversais — por exemplo, `useTelemetrySession.ts`, que dispara eventos de uso para o backend.
+- `config/` concentra endpoints (`api.ts`) e mocks de assets (`catalogImages.ts`), o que evita constantes espalhadas pelo código.
+- `theme/` agrupa tokens de design (cores, tipografia, espaçamento) para padronizar a identidade visual.
+
+**`src/backend/` — composição SOA**
+
+- `Spotlight.sln` na raiz do backend agrupa o Gateway, os quatro serviços e os cinco projetos de teste em uma única solution, facilitando build e debug pelo Visual Studio/Rider.
+- `api-gateway/` é a porta única de entrada (`Spotlight.Gateway`, porta 5000): implementado com YARP, valida o JWT do Supabase, faz roteamento e expõe Swagger. `Controllers/` e `Middleware/` ficam internos ao próprio Gateway.
+- `contracts/` materializa os contratos do backend. `dtos/` e `events/` ficam versionados como código; `openapi.json` consolida o contrato REST do sistema; `api-contracts.md`, `telemetria.md` e `supabase-storage.md` descrevem o uso dos contratos em prosa. Manter os contratos fora dos serviços evita acoplamento entre emissores e consumidores.
+- `services/` contém quatro microsserviços, um por domínio, cada um expondo sua própria API ASP.NET Core com `Dockerfile` e `appsettings*.json` próprios: `catalogo/` (`Spotlight.Catalogo`, 5001), `usuario/` (`Spotlight.Usuario`, 5002, com telemetria no MongoDB), `recomendacao/` (`Spotlight.Recomendacao`, 5003, com strategy ML.NET) e `geolocalizacao/` (`Spotlight.Geolocalizacao`, 5004, integrando OpenStreetMap/Nominatim). Todos seguem a mesma estrutura em quatro camadas (`presentation`, `application`, `domain`, `infrastructure`).
+- `ml-engine/` é um placeholder com as três fases canônicas (`data-preparation/`, `training/`, `inference/`) reservadas para quando o motor de ML for migrado para dentro do backend. Hoje o treino e os artefatos do modelo vivem em `src/models/`, que é o que o `Serviço de Recomendação` consome.
+- `scripts/` guarda utilitários operacionais auxiliares (por exemplo, `Test-TelemetriaAtlasE2E.ps1` para validar o fluxo de telemetria fim a fim).
+- `tests/` mantém um projeto xUnit por serviço (`Spotlight.<Dominio>.Tests`), espelhando a fronteira de cada microsserviço; isso garante que cada serviço seja testado de forma isolada.
+
+**Camadas internas de cada serviço**
+
+- `presentation/controllers/` expõe os endpoints REST do serviço e adapta a requisição em chamadas a casos de uso. `presentation/middleware/` cuida de autenticação, logging e tratamento de erro.
+- `application/usecases/` concentra a regra de aplicação — uma classe por operação do serviço — coordenando o domínio e a infraestrutura. `application/dtos/` define os formatos de entrada e saída dos casos de uso, protegendo o domínio de formatos externos.
+- `domain/entities/` guarda as entidades e as regras críticas do negócio; `domain/value-objects/` mantém valores imutáveis e validados (ex.: identificadores, faixas de preço, coordenadas). Essa camada é independente de framework, banco ou interface.
+- `infrastructure/persistence/` implementa o acesso a dados em Supabase/PostgreSQL via Npgsql (SQL puro, sem ORM). `infrastructure/auth/` valida o JWT do Supabase. Integrações específicas do domínio ficam em subpastas dedicadas (por exemplo, `usuario/infrastructure/geolocalizacao/` quando o serviço de usuário consome `IGeolocation`). Trocar tecnologia de armazenamento ou provedor de identidade fica restrito a essa camada.
+
+**Dados e modelos**
+
+- `src/database/` torna o banco reproduzível: os scripts `00_*` a `03_*` na raiz fazem provisão inicial e rollback; `migrations/` versiona as mudanças incrementais com seus respectivos `*_rollback.sql`; `load_test/pgbench/` reúne as queries usadas no teste de carga descrito mais adiante.
+- `src/dataset/` armazena amostras de dados (`itens_metadata.csv`, `recomendacao*.csv`, `interacoes_mongo_exemplo.jsonl`) que alimentam o ciclo de ML e demonstrações. Separar dado de código facilita versionamento e reprocessamento.
+- `src/models/` é hoje onde o ciclo de modelagem efetivamente acontece, e por isso fica fora de `src/backend/`. `Spotlight.Recomendacao.ModelTraining/` é o projeto C# que treina o modelo ML.NET consumido pelo `Serviço de Recomendação`; `artifacts/` guarda o modelo serializado (`recomendacao_incrementada_mlnet.zip`) e as similaridades pré-calculadas (`item_similarities.json`); `reports/` traz métricas e exemplos de saída. Os notebooks `sistema_recomendacao_knn.ipynb` e `sistema_recomendacao_svd.ipynb` e o `svd_model.pkl` preservam os experimentos exploratórios que precederam o modelo final.
+- `src/aad/` mantém os notebooks de Análise e Apoio a Decisão; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
+
+### Relação com a solução
+
+&emsp;A estrutura espelha diretamente as decisões arquiteturais detalhadas em [5.2 Diagrama de Componentes UML](#52-diagrama-de-componentes-uml) e em [8.1.2 Arquitetura de Codificação — Spotlight](#812-arquitetura-de-codificação--spotlight): cada componente lógico do diagrama tem um diretório correspondente no código. O `Spotlight App` está em `src/frontend/`; o `API Gateway` em `src/backend/api-gateway/`; os serviços SOA `IUserPrefs`, `ICatalog`, `IRecommendation` e `IGeolocation` ficam em `src/backend/services/usuario/`, `catalogo/`, `recomendacao/` e `geolocalizacao/`; o `ML Engine` em `src/backend/ml-engine/` (execução) e em `src/models/` (treino e artefatos); a camada de dados é provisionada por `src/database/`. Os contratos de comunicação descritos nas interfaces (`ISpotlightAPI`, `IUserPrefs`, `ICatalog`, `IRecommendation`, `IGeolocation`) são materializados em `src/backend/contracts/` e consumidos pelos `repositories/` do frontend.
 
 ### Justificativa da arquitetura
 
-&emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o MVVM facilita a separação entre interface e regra de apresentação, deixando as telas mais simples e os comportamentos reutilizáveis em ViewModels. No backend, a abordagem SOA permite expor serviços com fronteiras claras, usar contratos estáveis entre componentes e isolar o motor de recomendação em uma camada própria de ML. Isso reduz acoplamento, melhora a testabilidade e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
+&emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o padrão MVVM separa interface de regra de apresentação: as Views ficam declarativas, os ViewModels concentram comportamento e os Repositories isolam o acesso a dados — assim cada camada pode ser alterada sem afetar as demais. No backend, a abordagem SOA expõe serviços com fronteiras claras, contratos estáveis em `contracts/` e um motor de recomendação isolado em `ml-engine/`, permitindo que cada domínio (catálogo, usuário, recomendação, geolocalização) evolua de forma independente. A divisão em quatro camadas dentro de cada serviço impede que regra de negócio, regra de aplicação e detalhe de infraestrutura se misturem, o que reduz acoplamento, melhora a testabilidade — refletida no espelhamento da pasta `tests/` — e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
 
 ### 8.1.2 Arquitetura de Codificação — Spotlight
 
