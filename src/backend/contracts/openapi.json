@@ -2095,6 +2095,40 @@
             "format": "float",
             "nullable": true,
             "example": 4.7
+          },
+          "midias": {
+            "type": "array",
+            "description": "Mídias do espetáculo (capas, banners) ordenadas por ordemExibicao.",
+            "items": {
+              "$ref": "#/components/schemas/EspetaculoMidia"
+            }
+          }
+        }
+      },
+      "EspetaculoMidia": {
+        "type": "object",
+        "description": "Arquivo associado ao espetáculo no Supabase Storage.",
+        "properties": {
+          "tipoMidia": {
+            "type": "string",
+            "example": "capa"
+          },
+          "storageBucket": {
+            "type": "string",
+            "example": "espetaculos"
+          },
+          "storagePath": {
+            "type": "string",
+            "example": "12/capa.jpg"
+          },
+          "altText": {
+            "type": "string",
+            "nullable": true,
+            "example": "Cartaz de O Auto da Compadecida"
+          },
+          "ordemExibicao": {
+            "type": "integer",
+            "example": 1
           }
         }
       },
