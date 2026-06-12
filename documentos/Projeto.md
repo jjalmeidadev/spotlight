@@ -4971,7 +4971,110 @@ cd src/admin-web && npx playwright test --grep "RF16"
 | Roteiro exploratório consome tempo manual | Limitado a 1 sessão por sprint, focado nos RFs com critério subjetivo (RF12, RF14, RF15, RF08); automatização adicional planejada conforme maturidade de bibliotecas de testes visuais |
 
 ## 9.1.2 Resultados
-_conteúdo_
+
+&emsp;Esta seção registra a execução real da bateria descrita em 9.1.1 sobre o código atualmente versionado em `src/backend/Spotlight.sln`. O recorte privilegia a camada **backend automatizada** (xUnit + `Microsoft.AspNetCore.Mvc.Testing` + `Testcontainers.MongoDb`), que é o que já está implementado. As camadas **mobile (Detox)** e **admin web (Playwright)** previstas em 9.1.1 ainda não possuem projetos versionados; entram aqui como lacuna consciente ao final da seção. O recorte adotado evita misturar planejamento e execução: nada nesta seção 9.1.2 descreve teste que **não tenha sido efetivamente rodado** nesta data.
+
+### Ambiente de execução
+
+| Item | Valor |
+|---|---|
+| Data/hora da execução | 2026-06-12, 18:48–19:15 BRT |
+| Plataforma | Windows 11 + WSL2 (Ubuntu) chamando o SDK do host |
+| Runtime | .NET SDK 9.0.314, xUnit 2.x via `Microsoft.NET.Test.Sdk` 17.x |
+| Banco/serviços auxiliares | Postgres não exigido (use cases isolados com fakes); Mongo provisionado em container efêmero pelo `Testcontainers.MongoDb` durante `TelemetriaMongoIntegrationTests` |
+| Docker Engine | Docker Desktop 4.77.0 (engine `29.5.3`), contexto `desktop-linux` |
+| Comando consolidado | `dotnet test src/backend/Spotlight.sln -e RUN_MONGO_INTEGRATION_TESTS=true --logger "trx;LogFileName=tf-solution.trx"` |
+| Comando por serviço | `dotnet test src/backend/tests/Spotlight.<Servico>.Tests/Spotlight.<Servico>.Tests.csproj -e RUN_MONGO_INTEGRATION_TESTS=true` |
+| Scripts de reprodução | `documentos/evidencias/testes-funcionais/run-tests.bat` (solution) e `run-per-project.bat` (um trx por projeto) |
+
+&emsp;A variável `RUN_MONGO_INTEGRATION_TESTS=true` é necessária para que o atributo `MongoIntegrationFactAttribute` libere os 5 testes de integração com Mongo; sem ela, esses casos ficam marcados como `Ignorado` para evitar falsos negativos em estações sem Docker. Nesta execução, o flag foi passado explicitamente via `-e` do `dotnet test`, que injeta a variável no processo do `vstest` (a forma "exportar no shell" não funcionou porque o runner roda em sessão Windows com bloco de environment próprio — comportamento registrado para consulta futura).
+
+### Síntese quantitativa
+
+<sub>Tabela X - Resultado consolidado por projeto de teste</sub>
+
+| Projeto | Total | Aprovados | Ignorados | Reprovados | Tempo |
+|---|---:|---:|---:|---:|---:|
+| Spotlight.Catalogo.Tests | 20 | 20 | 0 | 0 | 1,0 s |
+| Spotlight.Gateway.Tests | 2 | 2 | 0 | 0 | 1,0 s |
+| Spotlight.Geolocalizacao.Tests | 7 | 7 | 0 | 0 | 0,1 s |
+| Spotlight.Recomendacao.Tests | 16 | 16 | 0 | 0 | 0,9 s |
+| Spotlight.Usuario.Tests | 38 | 38 | 0 | 0 | 35 s |
+| **Total** | **83** | **83** | **0** | **0** | **≈ 38 s** |
+
+&emsp;A taxa de aprovação foi de **100 % (83 / 83)**, sem teste reprovado e sem teste ignorado. Os 35 s do projeto `Spotlight.Usuario.Tests` concentram o ciclo de provisionamento do container MongoDB efêmero (`mongo:7.0`) consumido pelos cinco testes de `TelemetriaMongoIntegrationTests`; os demais projetos rodam em < 2 s cada.
+
+### Rastreabilidade RF ↔ Testes automatizados
+
+&emsp;A tabela abaixo cita o **nome exato do método xUnit** que cobre cada RF e marca de forma explícita quais sub-cenários do plano (P/N de 9.1.1) ainda dependem da camada E2E mobile/web. A intenção é não inflar cobertura.
+
+<sub>Tabela X - Cobertura automatizada por requisito funcional</sub>
+
+| RF | Sub-cenários cobertos nesta execução | Sub-cenários ainda dependentes de E2E ou ambiente externo | Métodos xUnit que rodaram |
+|---|---|---|---|
+| RF01 — Cadastro | Garantia de perfil pós-`auth.signup` no schema `public.usuario` (caminho do trigger `on_auth_user_created`) e contrato do DTO de update | TF-RF01-P01..P03 e N01..N05 — todos validam UI/Supabase Auth (Detox + provisionamento Supabase) | `ObterUsuarioMe_QuandoExiste_MapeiaPerfil`, `ObterUsuarioMe_QuandoNaoExiste_LancaNotFound`, `UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo` |
+| RF02 — Login | Nenhuma cobertura backend direta nesta execução. O API Gateway sobe via `WebApplicationFactory` e responde smoke checks (`/health` e `/api/ping`), o que confirma a pré-condição de o serviço estar acessível para receber um JWT, mas o fluxo de autenticação em si vive no Supabase Auth | TF-RF02-P01..P03 e N01..N04: dependem do Supabase Auth e do app mobile (token em SecureStore, restauro de sessão, bloqueio após 5 tentativas) — todos planejados para Detox + contract test contra `auth/v1/token` | `Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Health_Returns_200`, `Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Ping_Returns_200` |
+| RF03 — Preferências e localização | TF-RF03-P01 (gravar múltiplos gêneros), TF-RF03-P02 (editar preferência existente), TF-RF03-N01 (faixa de preço inválida no equivalente backend = preço negativo), TF-RF03-N02 (DTO ignora `localizacao` por canal incorreto), atualização de localização com validação de endereço e coordenadas | TF-RF03-P03 (botão "Pular" na UI) e N03 (categoria inexistente vinda da UI) | `ObterPreferencias_QuandoExiste_MapeiaPreferencias`, `AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias`, `AtualizarPreferencias_ComPrecoNegativo_LancaValidation`, `AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound`, `UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco`, `UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation`, `UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict` |
+| RF04 — Recomendações na home | TF-RF04-P01 no contrato backend: lista ranqueada de itens, mapeamento dos campos do card e respeito ao limite. TF-RF04-N02 (cold start sem histórico) atendido pela rota de fallback Postgres pré-processado | TF-RF04-P02 (label "Baseado nas suas preferências"), P03 (interseção < 80 % entre usuários), N01 (ML Engine fora do ar — banner de degradação), N03 (resposta vazia → CTA) — todos dependem da UI | `ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado` (Theory com 5 inlines: `null`, `0`, `-5`, `20`, `999`) |
+| RF05 — Pesquisa | Normalização do filtro de pesquisa, paginação (`page=0` → 1, `pageSize=500` → 100) e ordenação | TF-RF05-P02 (case-insensitive), P04 (debounce de 300 ms na UI), N03 (SQL injection no termo — depende do repositório PostgreSQL real) | `ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado` |
+| RF06 — Filtros (categoria, data, preço, localização) | Filtros aplicados na listagem com mapeamento e paginação; geocodificação para o filtro por cidade/região (cache, validação de endereço vazio, coordenadas fora do intervalo, falha de upstream do Nominatim) | TF-RF06-P02 (combinação UI), N01 (mensagem "Nenhum resultado"), N02/N03 (limites do slider e date picker na UI) | `ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado`, `ListarCategoriasETeatros_MapeiamListasSimples`, `ObterTeatro_QuandoNaoExiste_LancaNotFound`, mais os 7 testes de `NominatimGeocodingServiceTests` |
+| RF07 — Detalhes do espetáculo | TF-RF07-P01 (detalhe completo: título, sinopse, categoria, sessões com horário, teatro e link), TF-RF07-P02 (carrossel via lista de sessões), TF-RF07-N02 (id inexistente → `NotFoundException`) | TF-RF07-P03 (sheet de compartilhamento do SO), N01 (descrição nula com layout intacto), N03 (sem sessões futuras → CTA "Avisar") | `ObterEspetaculo_QuandoExiste_MapeiaDetalheCompleto`, `ObterEspetaculo_QuandoNaoExiste_LancaNotFound`, `ListarSessoes_QuandoEspetaculoExiste_MapeiaSessoes` |
+| RF08 — Avaliações de outros usuários | TF-RF08-P01/P02 (lista com nota, comentário, autor e ordenação por data via paginação normalizada) e validação de espetáculo inexistente | TF-RF08-N02 (avaliação moderada some da lista), N03 (autor anônimo quando `perfil_publico=false`) — regras de visibilidade ainda não estão em código | `ListarAvaliacoes_NormalizaPaginacaoEMapeiaUsuario`, `ListarAvaliacoes_QuandoEspetaculoNaoExiste_LancaNotFound` |
+| RF09 — Avaliar espetáculo | TF-RF09-P01 (submeter nota válida), TF-RF09-N01 (`null`, `-0,1`, `5,1` rejeitados pelo `ValidationException`), histórico de avaliações por usuário com paginação | TF-RF09-P02 (editar avaliação), P03 (média recalculada em ≤ 2 s — RNF02), N02 (sem auth → 401), N03 (espetáculo 404) | `CriarAvaliacao_ComNotaValida_RetornaAvaliacaoCriada`, `CriarAvaliacao_ComNotaInvalida_LancaValidation` (Theory 3 inlines), `ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado` |
+| RF10 — Comentar espetáculo | TF-RF10-P01/P02 cobertos pelo mesmo DTO da avaliação (campo `comentario` chega ao repositório com `usuario_id` e `espetaculo_id` corretos) | TF-RF10-P03 (editar próprio comentário), N02 (limite de 500 caracteres na UI), N03 (sanitização de XSS pela camada de apresentação), N04 (`DELETE` por outro usuário → 403) | `CriarAvaliacao_ComNotaValida_RetornaAvaliacaoCriada` (campo `Comentario="Excelente"`) |
+| RF11 — Telemetria | TF-RF11-P01..P04 cobertos fim-a-fim pelo `TelemetriaService` + `TelemetriaController` + persistência real no Mongo (5 testes em container), incluindo indexação `event_id` único e `received_at` TTL; TF-RF11-N01 (Mongo fora do ar → 202 best-effort) e N02/N03 (payload inválido rejeitado) | TF-RF11-P05 (latência percebida no app mobile — depende do dispositivo) | 9 testes `TelemetriaService_*` e 3 `TelemetriaController_*` (todos em `UsuarioUseCasesTests`), 2 de `MongoTelemetryIndexesTests`, 5 de `TelemetriaMongoIntegrationTests` (incluindo `PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo`, `Startup_ComMongoConfigurado_CriaIndicesOperacionais`, `PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento`, `PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento`, `PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort`) |
+| RF12 — Recomendação personalizada | TF-RF12-P01 (lista ranqueada respeita limite e mapeia campos), TF-RF12-N02 (modelo ML.NET desabilitado → fallback Postgres pré-processado) | TF-RF12-P02 (predominância "infantil" para perfil declarado), P03 (diversidade ≥ 2 categorias), N01 (catálogo insuficiente com mensagem CTA), N03 (timeout do ML Engine — exige perf real) | `ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado`, `ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres`, `RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet` |
+| RF13 — Atualização contínua | TF-RF13 indireto: a `RecomendacaoStrategyFactory` consulta o estado do modelo a cada chamada e o teste prova que, com o flag habilitado, a próxima resposta vem do ranking ML.NET e não da rota de fallback | TF-RF13-P01 (avaliação 5★ ajusta lista observada), P02 (volta de longo prazo), N01..N03 (sinais reais em telemetria com janela temporal) | `RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet`, `ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres` |
+| RF14 — Filtragem colaborativa | TF-RF14-P01 (origem existe → lista de similares vinda do k-NN é mapeada e respeita limite) e TF-RF14-N01 indireto (a `RecomendacaoStrategyFactory` escolhe a `PostgresPreProcessadoRecomendacaoStrategy` como fallback quando o motor k-NN/SVD não está disponível) | TF-RF14-P02 (≥ 2 vizinhos distintos no trace) e N02 (item já consumido pelo alvo — exige filtro explícito sobre a base de interações) | `ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado` (Theory 4 inlines), `ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista` (defensiva contra id inválido) |
+| RF15 — Cold start (popularidade) | TF-RF15-P01 (estratégia padrão é a `PostgresPreProcessadoRecomendacaoStrategy` quando o modelo ML.NET não está habilitado) | TF-RF15-P02 (preferência declarada filtra cold start), P03 (refresh semanal do ranking), N01 (catálogo vazio com mensagem), N02 (job de popularidade atrasado → alerta SRE) | `ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado` com `PostgresPreProcessadoRecomendacaoStrategy` (variante sem flag ML.NET) |
+| RF16 — Administração de conteúdo | TF-RF16-P01 (criar com payload válido), TF-RF16-P02 (atualizar — `NotFoundException` quando id inexistente), TF-RF16-P03 (excluir — `NotFoundException` quando id inexistente), TF-RF16-N03 (criar com campos faltando acumula erros), validação de título acima do limite | TF-RF16-P04 (criar categoria), P05 (moderar avaliação), N01 (usuário comum → 403), N02 (espetáculo com sessões futuras → 409), N04 (duplicidade de categoria → 422) — exigem painel admin ou rota dedicada ainda não implementada | `CriarEspetaculo_ComDadosValidos_CriaEBuscaDetalhe`, `CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao`, `AtualizarEspetaculo_QuandoRepositorioNaoAtualiza_LancaNotFound`, `AtualizarEspetaculo_ComTituloMuitoLongo_NaoChamaRepositorio`, `ExcluirEspetaculo_QuandoNaoExiste_LancaNotFound` |
+
+&emsp;Como ancoragem transversal, as suítes `HealthEndpointsTests` de Catálogo, Recomendação e Usuário (3 testes cada) e do Gateway (2 testes) sobem cada serviço via `WebApplicationFactory` e validam `/health` (liveness), `/api/ping` (smoke) e, nos serviços com banco, `/health/ready` (readiness, retornando **HTTP 503** sem connection string — pré-condição transversal para o RNF03 e para qualquer dos 16 RFs).
+
+### Cenários negativos validados em destaque
+
+&emsp;A bateria preserva a premissa de "sistemas reais falham mais do que sucedem" descrita em 9.1.1. Os cenários negativos abaixo passaram nesta execução e merecem destaque:
+
+- **Validação acumulando erros em um único retorno** (`CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao`): título em branco, duração zero, status inválido e ator sem `Papel` retornam um único `ValidationException` com todas as chaves preenchidas — evita o anti-padrão "uma chamada por erro".
+- **Sanitização defensiva do pipeline de telemetria**: 6 testes (`TelemetriaService_ComPayloadInvalido_*`, `…ComEnumsInvalidos_*`, `…ComRegrasDoEventoInvalidas_*`, `…ComMetadadosAcimaDoLimite_*`, `…ComDataForaDaJanela_*`, `…ComDataFutura_*`) rejeitam payloads antes mesmo do repositório, atendendo a TF-RF11-N02/N03.
+- **Falha não-blocante na persistência**: `TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro` reproduz TF-RF11-N01 (MongoDB indisponível) — a API responde **202 Accepted** e a navegação do usuário não é bloqueada; já com Mongo disponível, `PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort` confirma o mesmo contrato no controller.
+- **Erro precoce em recomendação inexistente** (`ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista`): o `NotFoundException` é lançado **antes** de tocar o repositório de similaridades, evitando varredura desnecessária (TF-RF14-N01 / N02).
+- **Readiness honesto sem banco**: `Get_HealthReady_Returns_503_SemBanco` em Catálogo, Usuário e Recomendação confirma que o serviço não se declara pronto enquanto o Postgres não responder — comportamento esperado pelo orquestrador para evitar tráfego prematuro (RNF03/RNF12).
+- **DTO ignora campo desconhecido sem efeito colateral** (`UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo`): documenta que `PUT /me` com `{"localizacao":"São Paulo"}` desserializa sem erro mas não toca a coluna `localizacao` — atualizar localização exige o endpoint dedicado `PUT /me/localizacao` (TF-RF03-N02).
+- **Idempotência em telemetria** (`PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento`): demonstra que reenvios do app com mesmo `event_id` não duplicam documentos no Mongo — pré-condição para retentativas seguras em redes móveis instáveis.
+
+### Evidências e artefatos
+
+&emsp;Todos os artefatos da execução estão versionados em [`documentos/evidencias/testes-funcionais/`](./evidencias/testes-funcionais/):
+
+| Arquivo | Conteúdo |
+|---|---|
+| `README.md` | Comando único, comando por projeto, tabela-resumo e descrição dos demais arquivos |
+| `run-tests.bat` | Script de reprodução da bateria consolidada (`Spotlight.sln`) — invoca o `dotnet test` com a env `RUN_MONGO_INTEGRATION_TESTS=true` |
+| `run-per-project.bat` | Script de reprodução por projeto, gerando uma `*.trx` distinta para cada serviço |
+| `saida-completa.txt` | Log integral do `dotnet test` da solution, com nome, duração e status de cada um dos 83 testes |
+| `saida-por-projeto.txt` | Log do `dotnet test` em modo por projeto (linha-resumo `Aprovado!  – Com falha: 0…` por serviço) |
+| `Spotlight.Catalogo.Tests.trx` | Resultado TRX (Visual Studio Test Results) — 20 testes |
+| `Spotlight.Gateway.Tests.trx` | Resultado TRX — 2 testes |
+| `Spotlight.Geolocalizacao.Tests.trx` | Resultado TRX — 7 testes |
+| `Spotlight.Recomendacao.Tests.trx` | Resultado TRX — 16 testes |
+| `Spotlight.Usuario.Tests.trx` | Resultado TRX — 38 testes (inclui os 5 de integração Mongo) |
+
+&emsp;Cada TRX preserva `executionId`, `outcome`, `duration` e `startTime` de cada caso, viabilizando importação em ReportGenerator, Azure Test Plans e equivalentes sem reexecução. Conferência rápida: `grep -oE 'outcome="[^"]+"' *.trx | sort | uniq -c` totaliza **83 `Passed`** e nenhum outro estado.
+
+### Lacunas conscientes e plano de cobertura
+
+&emsp;A execução **não produziu nenhum teste reprovado e nenhum teste ignorado**. As lacunas abaixo são deliberadas — referem-se a cenários previstos em 9.1.1 que dependem de camadas (UI mobile, painel admin web, ambiente Supabase real) ainda não automatizadas e que, por isso, **não foram exercitadas nesta rodada**:
+
+| Lacuna | Onde se manifesta | Caminho previsto |
+|---|---|---|
+| Camada E2E mobile (Detox) ainda não versionada | TF-RF01 e TF-RF02 (cadastro/login no app), TF-RF04-P02 (cabeçalho "Baseado nas suas preferências"), TF-RF05-P04 (debounce), TF-RF07-P03 (compartilhamento via sheet do SO), TF-RF09-P02 (edição de avaliação), TF-RF10-N03 (XSS no campo de comentário) | Subir esqueleto `src/frontend/e2e` (Detox + RNTL) com pelo menos um cenário por persona priorizada |
+| Painel administrativo web (Playwright) ainda não versionado | TF-RF16-P04 (criar categoria), TF-RF16-P05 (moderar), TF-RF16-N01 (403 para usuário comum), N02 (409 com sessões futuras), N04 (422 duplicidade) | Subir `src/admin-web/tests` na sprint dedicada ao painel |
+| Login real (TF-RF02) só foi validado por smoke do gateway | Login com credenciais válidas/erradas, rate limiting (TF-RF02-N04), restauração de sessão (TF-RF02-P02) | Adicionar contract test contra `auth/v1/token` em ambiente de homologação e cobertura Detox no fluxo "Entrar" |
+| Cenários subjetivos de relevância de recomendação (RF12-P02/P03, RF14-P02) | Predominância por gênero declarado, diversidade ≥ 2 categorias, ≥ 2 vizinhos distintos | Sessão exploratória dupla (dois avaliadores independentes) prevista em 9.1.1 + métrica NDCG@5 offline |
+| Latência percebida no mobile (RF11-P05, RF12-P01/N03) | Tempo card → detalhe, timeout de 3 s no Gateway | Será coberto pela bateria de RNFs (seção 9.2) com Lighthouse mobile e simulação de timeout no ML Engine |
+
+&emsp;Em resumo: dos 16 RFs catalogados em 3.1, **14 têm pelo menos um sub-cenário validado nesta execução** (RF03 a RF16), **2 (RF01, RF02)** só foram exercitados nos contratos adjacentes (perfil/JWT) por não haver Detox versionado; nenhum teste planejado para esta rodada falhou. Os achados negativos da bateria são, por desenho, validações de mensagens de erro e códigos HTTP, e todos seguiram o contrato.
 
 ## 9.2 Testes de RNFs
 

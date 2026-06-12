@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="d1e8ac6f-be8c-4fbb-ad47-730ea6920013" name="Inteli@NOTEBOOK-0479 2026-06-12 19:14:31" runUser="NOTEBOOK-0479\Inteli" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-12T19:14:31.7772280-03:00" queuing="2026-06-12T19:14:31.7772287-03:00" start="2026-06-12T19:14:29.6811989-03:00" finish="2026-06-12T19:14:32.7911311-03:00" />
+  <TestSettings name="default" id="da596fca-bcc0-41c4-ba47-68f880805a9d">
+    <Deployment runDeploymentRoot="Inteli_NOTEBOOK-0479_2026-06-12_19_14_31" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a09ba95c-1b4e-4e04-b6e0-6aed47df2b59" testId="7a4d6852-ffe3-0ad0-d24f-838d18081433" testName="Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Health_Returns_200" computerName="NOTEBOOK-0479" duration="00:00:00.9824637" startTime="2026-06-12T19:14:32.6169310-03:00" endTime="2026-06-12T19:14:32.6169318-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a09ba95c-1b4e-4e04-b6e0-6aed47df2b59" />
+    <UnitTestResult executionId="2d55f568-71e5-44dc-a133-5ac16e1e836e" testId="df48420e-6158-6aa6-a6ef-6c9053a20651" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 51, limiteEsperado: 50)" computerName="NOTEBOOK-0479" duration="00:00:00.0046299" startTime="2026-06-12T19:14:31.6738175-03:00" endTime="2026-06-12T19:14:31.6738176-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d55f568-71e5-44dc-a133-5ac16e1e836e" />
+    <UnitTestResult executionId="2e4d0ff8-16cd-4cb1-b887-7d2818667861" testId="3c7b0440-e251-6e8b-eaca-e6ac511819e1" testName="Spotlight.Recomendacao.Tests.RecomendacaoBaseControllerTests.Obter_DeveRetornarContratoBaseDaApiDeRecomendacao" computerName="NOTEBOOK-0479" duration="00:00:00.0319305" startTime="2026-06-12T19:14:31.6718616-03:00" endTime="2026-06-12T19:14:31.6718618-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2e4d0ff8-16cd-4cb1-b887-7d2818667861" />
+    <UnitTestResult executionId="74e7db8e-d1a7-4cc1-b0d4-9ed0a7dfceae" testId="8a3872e6-3d72-f765-4de8-4f94bae64aab" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: -5, limiteEsperado: 10)" computerName="NOTEBOOK-0479" duration="00:00:00.0000098" startTime="2026-06-12T19:14:31.6737297-03:00" endTime="2026-06-12T19:14:31.6737298-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="74e7db8e-d1a7-4cc1-b0d4-9ed0a7dfceae" />
+    <UnitTestResult executionId="214b3c1b-a76c-474d-80f5-175a715c35e6" testId="2eb3059d-7240-d981-d6f5-e6ee9c576a83" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 999, limiteEsperado: 50)" computerName="NOTEBOOK-0479" duration="00:00:00.0000124" startTime="2026-06-12T19:14:31.6736953-03:00" endTime="2026-06-12T19:14:31.6736953-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="214b3c1b-a76c-474d-80f5-175a715c35e6" />
+    <UnitTestResult executionId="e8b73337-6bae-480f-99e2-51d75129ade5" testId="40338cc2-75b9-bd9a-d1e8-5b6799a05d48" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet" computerName="NOTEBOOK-0479" duration="00:00:00.0023409" startTime="2026-06-12T19:14:31.7183573-03:00" endTime="2026-06-12T19:14:31.7183574-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e8b73337-6bae-480f-99e2-51d75129ade5" />
+    <UnitTestResult executionId="edc82713-551a-4175-8073-4636360243d3" testId="0520df96-fd5b-ed82-2363-4c155cfc9feb" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10)" computerName="NOTEBOOK-0479" duration="00:00:00.0003935" startTime="2026-06-12T19:14:31.6738536-03:00" endTime="2026-06-12T19:14:31.6738537-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="edc82713-551a-4175-8073-4636360243d3" />
+    <UnitTestResult executionId="36f32306-8e3c-4715-967a-9e1ee6180916" testId="e6c57af0-0938-8b67-de79-43f2a4958e78" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10)" computerName="NOTEBOOK-0479" duration="00:00:00.0333141" startTime="2026-06-12T19:14:31.6680017-03:00" endTime="2026-06-12T19:14:31.6680606-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="36f32306-8e3c-4715-967a-9e1ee6180916" />
+    <UnitTestResult executionId="80b4b9d1-0a91-4b19-b162-d6abc9d5c7db" testId="dbf144d1-a5f6-5b33-56e3-9c06d18cd410" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista" computerName="NOTEBOOK-0479" duration="00:00:00.0045876" startTime="2026-06-12T19:14:31.7182812-03:00" endTime="2026-06-12T19:14:31.7182813-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="80b4b9d1-0a91-4b19-b162-d6abc9d5c7db" />
+    <UnitTestResult executionId="1eb3a917-82ba-4602-a7f6-8a2cf6771163" testId="f253ddd4-1dbc-b833-89ff-73a45d259980" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres" computerName="NOTEBOOK-0479" duration="00:00:00.0146719" startTime="2026-06-12T19:14:31.7182048-03:00" endTime="2026-06-12T19:14:31.7182050-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1eb3a917-82ba-4602-a7f6-8a2cf6771163" />
+    <UnitTestResult executionId="e5ff1d64-2a7b-4b2c-91d1-3e39ae2f1366" testId="4cd05aa9-f701-c85c-34b0-0a7a57d286be" testName="Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco" computerName="NOTEBOOK-0479" duration="00:00:00.0241076" startTime="2026-06-12T19:14:32.6431577-03:00" endTime="2026-06-12T19:14:32.6431584-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5ff1d64-2a7b-4b2c-91d1-3e39ae2f1366" />
+    <UnitTestResult executionId="d57e3f6a-45b7-4778-a54b-2082114eb0ea" testId="2625783f-b1bb-7ca0-89bc-405e1b34b91a" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10)" computerName="NOTEBOOK-0479" duration="00:00:00.0000178" startTime="2026-06-12T19:14:31.7176965-03:00" endTime="2026-06-12T19:14:31.7176969-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d57e3f6a-45b7-4778-a54b-2082114eb0ea" />
+    <UnitTestResult executionId="261e593c-a49a-4fd6-8e67-2aac86948598" testId="610a4189-c90f-5974-54c8-57b06f6311d3" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 25, limiteEsperado: 25)" computerName="NOTEBOOK-0479" duration="00:00:00.0000169" startTime="2026-06-12T19:14:31.7181158-03:00" endTime="2026-06-12T19:14:31.7181160-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="261e593c-a49a-4fd6-8e67-2aac86948598" />
+    <UnitTestResult executionId="7fe10c3c-2b48-49cc-a3ca-86bf006b8c3a" testId="26b43571-8c9e-7286-a2c0-8236bf550182" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10)" computerName="NOTEBOOK-0479" duration="00:00:00.0006110" startTime="2026-06-12T19:14:31.6736081-03:00" endTime="2026-06-12T19:14:31.6736082-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7fe10c3c-2b48-49cc-a3ca-86bf006b8c3a" />
+    <UnitTestResult executionId="6f6e80d1-d475-40ce-b841-03501d16e192" testId="ca94d364-1c98-984c-a0bf-2467f0b26341" testName="Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Ping_Returns_200" computerName="NOTEBOOK-0479" duration="00:00:00.0405456" startTime="2026-06-12T19:14:32.6846835-03:00" endTime="2026-06-12T19:14:32.6846841-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6f6e80d1-d475-40ce-b841-03501d16e192" />
+    <UnitTestResult executionId="d76a63a7-45a3-4f22-aaf0-f1884822478e" testId="9bdcf65b-6c46-f21b-fa16-8edc1327bc83" testName="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 20, limiteEsperado: 20)" computerName="NOTEBOOK-0479" duration="00:00:00.0000388" startTime="2026-06-12T19:14:31.6736584-03:00" endTime="2026-06-12T19:14:31.6736585-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d76a63a7-45a3-4f22-aaf0-f1884822478e" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 25, limiteEsperado: 25)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="610a4189-c90f-5974-54c8-57b06f6311d3">
+      <Execution id="261e593c-a49a-4fd6-8e67-2aac86948598" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="40338cc2-75b9-bd9a-d1e8-5b6799a05d48">
+      <Execution id="e8b73337-6bae-480f-99e2-51d75129ade5" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 20, limiteEsperado: 20)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="9bdcf65b-6c46-f21b-fa16-8edc1327bc83">
+      <Execution id="d76a63a7-45a3-4f22-aaf0-f1884822478e" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="2625783f-b1bb-7ca0-89bc-405e1b34b91a">
+      <Execution id="d57e3f6a-45b7-4778-a54b-2082114eb0ea" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="0520df96-fd5b-ed82-2363-4c155cfc9feb">
+      <Execution id="edc82713-551a-4175-8073-4636360243d3" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoBaseControllerTests.Obter_DeveRetornarContratoBaseDaApiDeRecomendacao" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="3c7b0440-e251-6e8b-eaca-e6ac511819e1">
+      <Execution id="2e4d0ff8-16cd-4cb1-b887-7d2818667861" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoBaseControllerTests" name="Obter_DeveRetornarContratoBaseDaApiDeRecomendacao" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Ping_Returns_200" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="ca94d364-1c98-984c-a0bf-2467f0b26341">
+      <Execution id="6f6e80d1-d475-40ce-b841-03501d16e192" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.HealthEndpointsTests" name="Get_Ping_Returns_200" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="f253ddd4-1dbc-b833-89ff-73a45d259980">
+      <Execution id="1eb3a917-82ba-4602-a7f6-8a2cf6771163" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Health_Returns_200" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="7a4d6852-ffe3-0ad0-d24f-838d18081433">
+      <Execution id="a09ba95c-1b4e-4e04-b6e0-6aed47df2b59" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.HealthEndpointsTests" name="Get_Health_Returns_200" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="4cd05aa9-f701-c85c-34b0-0a7a57d286be">
+      <Execution id="e5ff1d64-2a7b-4b2c-91d1-3e39ae2f1366" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.HealthEndpointsTests" name="Get_HealthReady_Returns_503_SemBanco" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="dbf144d1-a5f6-5b33-56e3-9c06d18cd410">
+      <Execution id="80b4b9d1-0a91-4b19-b162-d6abc9d5c7db" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 999, limiteEsperado: 50)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="2eb3059d-7240-d981-d6f5-e6ee9c576a83">
+      <Execution id="214b3c1b-a76c-474d-80f5-175a715c35e6" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="e6c57af0-0938-8b67-de79-43f2a4958e78">
+      <Execution id="36f32306-8e3c-4715-967a-9e1ee6180916" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: -5, limiteEsperado: 10)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="8a3872e6-3d72-f765-4de8-4f94bae64aab">
+      <Execution id="74e7db8e-d1a7-4cc1-b0d4-9ed0a7dfceae" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 51, limiteEsperado: 50)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="df48420e-6158-6aa6-a6ef-6c9053a20651">
+      <Execution id="2d55f568-71e5-44dc-a133-5ac16e1e836e" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.recomendacao.tests\bin\debug\net9.0\spotlight.recomendacao.tests.dll" id="26b43571-8c9e-7286-a2c0-8236bf550182">
+      <Execution id="7fe10c3c-2b48-49cc-a3ca-86bf006b8c3a" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests" name="ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="7a4d6852-ffe3-0ad0-d24f-838d18081433" executionId="a09ba95c-1b4e-4e04-b6e0-6aed47df2b59" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="df48420e-6158-6aa6-a6ef-6c9053a20651" executionId="2d55f568-71e5-44dc-a133-5ac16e1e836e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c7b0440-e251-6e8b-eaca-e6ac511819e1" executionId="2e4d0ff8-16cd-4cb1-b887-7d2818667861" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8a3872e6-3d72-f765-4de8-4f94bae64aab" executionId="74e7db8e-d1a7-4cc1-b0d4-9ed0a7dfceae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2eb3059d-7240-d981-d6f5-e6ee9c576a83" executionId="214b3c1b-a76c-474d-80f5-175a715c35e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="40338cc2-75b9-bd9a-d1e8-5b6799a05d48" executionId="e8b73337-6bae-480f-99e2-51d75129ade5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0520df96-fd5b-ed82-2363-4c155cfc9feb" executionId="edc82713-551a-4175-8073-4636360243d3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e6c57af0-0938-8b67-de79-43f2a4958e78" executionId="36f32306-8e3c-4715-967a-9e1ee6180916" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dbf144d1-a5f6-5b33-56e3-9c06d18cd410" executionId="80b4b9d1-0a91-4b19-b162-d6abc9d5c7db" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f253ddd4-1dbc-b833-89ff-73a45d259980" executionId="1eb3a917-82ba-4602-a7f6-8a2cf6771163" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4cd05aa9-f701-c85c-34b0-0a7a57d286be" executionId="e5ff1d64-2a7b-4b2c-91d1-3e39ae2f1366" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2625783f-b1bb-7ca0-89bc-405e1b34b91a" executionId="d57e3f6a-45b7-4778-a54b-2082114eb0ea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="610a4189-c90f-5974-54c8-57b06f6311d3" executionId="261e593c-a49a-4fd6-8e67-2aac86948598" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="26b43571-8c9e-7286-a2c0-8236bf550182" executionId="7fe10c3c-2b48-49cc-a3ca-86bf006b8c3a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ca94d364-1c98-984c-a0bf-2467f0b26341" executionId="6f6e80d1-d475-40ce-b841-03501d16e192" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9bdcf65b-6c46-f21b-fa16-8edc1327bc83" executionId="d76a63a7-45a3-4f22-aaf0-f1884822478e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados que não estão em uma lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos os resultados carregados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="16" executed="16" passed="16" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)&#xD;
+[xUnit.net 00:00:00.16]   Discovering: Spotlight.Recomendacao.Tests&#xD;
+[xUnit.net 00:00:00.26]   Discovered:  Spotlight.Recomendacao.Tests&#xD;
+[xUnit.net 00:00:00.27]   Starting:    Spotlight.Recomendacao.Tests&#xD;
+[19:14:32 DBG] Hosting starting&#xD;
+[19:14:32 INF] Sincronizacao de artefatos do Supabase Storage desabilitada.&#xD;
+[19:14:32 DBG] Hosting started&#xD;
+[19:14:32 INF] Request starting HTTP/1.1 GET http://localhost/health - null null&#xD;
+[19:14:32 INF] Executing endpoint 'Health checks'&#xD;
+[19:14:32 DBG] Running health checks&#xD;
+[19:14:32 DBG] Health check processing with combined status Healthy completed after 3.1373ms&#xD;
+[19:14:32 INF] Executed endpoint 'Health checks'&#xD;
+[19:14:32 INF] HTTP GET /health responded 200 in 49.8257 ms&#xD;
+[19:14:32 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 76.3615ms&#xD;
+[19:14:32 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null&#xD;
+[19:14:32 INF] Executing endpoint 'Health checks'&#xD;
+[19:14:32 DBG] Running health checks&#xD;
+[19:14:32 DBG] Running health check postgres&#xD;
+[19:14:32 ERR] Health check postgres with status Unhealthy completed after 1.6338ms with message 'Connection string do banco n�o configurada.'&#xD;
+[19:14:32 DBG] Health check processing with combined status Unhealthy completed after 9.2791ms&#xD;
+[19:14:32 INF] Executed endpoint 'Health checks'&#xD;
+[19:14:32 ERR] HTTP GET /health/ready responded 503 in 15.1047 ms&#xD;
+[19:14:32 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 19.0593ms&#xD;
+[19:14:32 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null&#xD;
+[19:14:32 INF] Executing endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recomendacao)'&#xD;
+[19:14:32 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Recomendacao.Presentation.Controllers.PingController (Spotlight.Recomendacao).&#xD;
+[19:14:32 INF] Executing OkObjectResult, writing value of type '&lt;&gt;f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.&#xD;
+[19:14:32 INF] Executed action Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recomendacao) in 24.548ms&#xD;
+[19:14:32 INF] Executed endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recomendacao)'&#xD;
+[19:14:32 INF] HTTP GET /api/ping responded 200 in 36.1641 ms&#xD;
+[19:14:32 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 36.8876ms&#xD;
+[19:14:32 DBG] Hosting stopping&#xD;
+[19:14:32 DBG] Hosting stopping&#xD;
+[19:14:32 DBG] Hosting stopped&#xD;
+[19:14:32 DBG] Hosting stopped&#xD;
+[xUnit.net 00:00:01.40]   Finished:    Spotlight.Recomendacao.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

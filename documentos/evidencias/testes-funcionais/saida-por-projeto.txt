@@ -1,0 +1,55 @@
+=== Spotlight.Catalogo.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Catalogo -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\catalogo\bin\Debug\net9.0\Spotlight.Catalogo.dll
+  Spotlight.Catalogo.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Catalogo.Tests\bin\Debug\net9.0\Spotlight.Catalogo.Tests.dll
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Catalogo.Tests\bin\Debug\net9.0\Spotlight.Catalogo.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Catalogo.Tests.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Catalogo.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:    20, Ignorado:     0, Total:    20, Duração: 1 s - Spotlight.Catalogo.Tests.dll (net9.0)
+=== Spotlight.Gateway.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Gateway -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\api-gateway\bin\Debug\net9.0\Spotlight.Gateway.dll
+  Spotlight.Gateway.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Gateway.Tests.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Gateway.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:     2, Ignorado:     0, Total:     2, Duração: 997 ms - Spotlight.Gateway.Tests.dll (net9.0)
+=== Spotlight.Geolocalizacao.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Geolocalizacao -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\geolocalizacao\bin\Debug\net9.0\Spotlight.Geolocalizacao.dll
+  Spotlight.Geolocalizacao.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Geolocalizacao.Tests.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Geolocalizacao.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:     7, Ignorado:     0, Total:     7, Duração: 136 ms - Spotlight.Geolocalizacao.Tests.dll (net9.0)
+=== Spotlight.Recomendacao.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Recomendacao -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\recomendacao\bin\Debug\net9.0\Spotlight.Recomendacao.dll
+  Spotlight.Recomendacao.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Recomendacao.Tests.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Recomendacao.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:    16, Ignorado:     0, Total:    16, Duração: 1 s - Spotlight.Recomendacao.Tests.dll (net9.0)
+=== Spotlight.Usuario.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Usuario -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\bin\Debug\net9.0\Spotlight.Usuario.dll
+  Spotlight.Usuario.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Usuario.Tests\bin\Debug\net9.0\Spotlight.Usuario.Tests.dll
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Usuario.Tests\bin\Debug\net9.0\Spotlight.Usuario.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Usuario.Tests.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\Spotlight.Usuario.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:    38, Ignorado:     0, Total:    38, Duração: 35 s - Spotlight.Usuario.Tests.dll (net9.0)
