@@ -63,7 +63,9 @@ src/database/
 │   ├── 10_supabase_storage_buckets.sql                 — bucket privado ml-artifacts no Supabase Storage
 │   ├── 10_supabase_storage_buckets_rollback.sql
 │   ├── 12_controle_acesso_administrativo_catalogo.sql — escrita no catálogo restrita a administradores
-│   └── 12_controle_acesso_administrativo_catalogo_rollback.sql
+│   ├── 12_controle_acesso_administrativo_catalogo_rollback.sql
+│   ├── 13_rls_similaridade_item_avaliacao.sql          — escrita administrativa em similaridade_item e UPDATE próprio em avaliacao
+│   └── 13_rls_similaridade_item_avaliacao_rollback.sql
 ├── load_test/               — massa sintética e teste de carga (pgbench)
 │   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
 │   ├── massa_carga_rollback.sql                       — remove apenas os dados de carga
@@ -397,7 +399,7 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 | Triggers | 10 |
 | Índices explícitos | 20 |
 
-> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `12`). As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08), `public.registrar_auditoria()` (09) e `public.is_admin()` (12). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04) e os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional.
+> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `13`). As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08), `public.registrar_auditoria()` (09) e `public.is_admin()` (12). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04) e os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional.
 
 #### Tabelas do Modelo
 
@@ -934,6 +936,7 @@ Entidade transacional / associativa com atributos.
 |---|---|---|
 | `avaliacao: leitura pública` | `SELECT` | Permite leitura pública: `USING (true)`. |
 | `avaliacao: inserção pelo próprio usuário` | `INSERT` | Usuário só pode inserir avaliação para si mesmo: `auth.uid() = id_usuario`. |
+| `avaliacao: atualizacao pelo proprio usuario` | `UPDATE` | Autor só pode atualizar a própria avaliação e não pode alterar sua titularidade: `USING (auth.uid() = id_usuario)` e `WITH CHECK (auth.uid() = id_usuario)`. |
 | `avaliacao: exclusão pelo próprio usuário` | `DELETE` | Usuário só pode excluir sua própria avaliação: `auth.uid() = id_usuario`. |
 
 #### Colunas
@@ -1050,6 +1053,9 @@ Entidade transacional / saída global de algoritmo de recomendação item-item.
 | Política | Operação | Regra |
 |---|---|---|
 | `similaridade_item: leitura pública` | `SELECT` | Permite leitura pública: `USING (true)`. |
+| `similaridade_item: insercao por administradores` | `INSERT` | Restringe inserções a administradores: `WITH CHECK (public.is_admin())`. |
+| `similaridade_item: atualizacao por administradores` | `UPDATE` | Restringe atualizações a administradores: `USING (public.is_admin())` e `WITH CHECK (public.is_admin())`. |
+| `similaridade_item: remocao por administradores` | `DELETE` | Restringe exclusões a administradores: `USING (public.is_admin())`. |
 
 #### Colunas
 
@@ -1227,7 +1233,7 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-21 | A disponibilidade de uma sessão não pode ser negativa. | Constraint `CHECK` e valor padrão. | `sessao.disponibilidade DEFAULT 0 CHECK (disponibilidade >= 0)` |
 | RN-BD-22 | Cada usuário pode avaliar um mesmo espetáculo apenas uma vez. | Constraint `UNIQUE`. | `avaliacao(id_usuario, id_espetaculo)` |
 | RN-BD-23 | A nota de uma avaliação deve estar entre 0 e 5. | Constraint `CHECK`. | `avaliacao.nota CHECK (nota BETWEEN 0 AND 5)` |
-| RN-BD-24 | Usuários só podem inserir ou excluir avaliações próprias. | Políticas de Row Level Security com `auth.uid() = id_usuario`. | Políticas `avaliacao: inserção pelo próprio usuário` e `avaliacao: exclusão pelo próprio usuário` |
+| RN-BD-24 | Usuários só podem inserir, atualizar ou excluir avaliações próprias; a atualização não pode alterar a titularidade. | Políticas de Row Level Security com `auth.uid() = id_usuario` e `USING` + `WITH CHECK` no `UPDATE`. | Políticas `avaliacao: inserção pelo próprio usuário`, `avaliacao: atualizacao pelo proprio usuario` e `avaliacao: exclusão pelo próprio usuário` |
 | RN-BD-25 | Avaliações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `avaliacao.id_usuario`, `avaliacao.id_espetaculo` |
 | RN-BD-26 | Usuários só podem consultar recomendações destinadas a eles. | Política de Row Level Security com `auth.uid() = id_usuario`. | Política `recomendacao: leitura pelo próprio usuário` |
 | RN-BD-27 | O algoritmo de recomendação deve pertencer à lista de algoritmos aceitos. | Constraint `CHECK`. | `chk_tipo_algoritmo` |
@@ -1243,6 +1249,7 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-37 | As operações de uma mesma transação devem ser correlacionáveis na trilha. | Coluna `auditoria.id_transacao` preenchida com `txid_current()` — compartilhada por todas as operações do mesmo `COMMIT`. | `09_rastreabilidade_transacoes.sql` — `auditoria.id_transacao` |
 | RN-BD-38 | A trilha de auditoria só pode ser lida por administradores. | Política de Row Level Security restrita a `tipo_usuario = 'administrador'`; inserções via trigger `SECURITY DEFINER`. | `09_rastreabilidade_transacoes.sql` — política `auditoria: leitura por administradores` |
 | RN-BD-39 | Somente administradores podem inserir, atualizar ou excluir dados do catálogo e da agenda; a leitura pública existente deve ser preservada. | Função `public.is_admin()` e policies RLS separadas para `INSERT`, `UPDATE` e `DELETE` nas sete tabelas do catálogo. | `12_controle_acesso_administrativo_catalogo.sql` — `espetaculo`, `teatro`, `ator`, `categoria`, `espetaculo_categoria`, `espetaculo_ator` e `sessao` |
+| RN-BD-40 | Somente administradores podem inserir, atualizar ou excluir similaridades item-item; autores podem atualizar apenas as próprias avaliações sem alterar a titularidade. | Policies RLS com `public.is_admin()` em `similaridade_item` e `auth.uid() = id_usuario` em `USING` e `WITH CHECK` de `avaliacao`. | `13_rls_similaridade_item_avaliacao.sql` |
 
 > **Sobre a decisão `VARCHAR + CHECK + função` no lugar de `ENUM` para `tipo_algoritmo`:** ENUMs nativos do PostgreSQL exigem `ALTER TYPE ... ADD VALUE` para incluir novos valores, operação que adquire lock na tabela. O time optou por `VARCHAR(50)` + constraint `CHECK` que chama a função `public.is_tipo_algoritmo_valido()`. Adicionar um algoritmo passa a ser um `CREATE OR REPLACE FUNCTION`, sem reescrita de constraint em duas tabelas e sem impacto operacional.
 
@@ -1309,7 +1316,7 @@ A pasta [`src/database/migrations/`](migrations/) contém alterações increment
 
 1. **`01_create_database.sql` é imutável para alterações incrementais.** Qualquer mudança de schema posterior ao bootstrap deve ser feita via migration nova em `migrations/`. O arquivo original só é editado em cenários de reset completo (ambiente de desenvolvimento).
 2. **Cada migration tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação).
-3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`, `10_`, `11_`, `12_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `12` depende de `usuario` e das tabelas públicas do catálogo).
+3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`, `10_`, `11_`, `12_`, `13_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `12` depende de `usuario` e das tabelas públicas do catálogo; a `13` depende de `public.is_admin()` criada ou validada pela `12`).
 4. **Aplicação manual.** As migrations **não** são executadas automaticamente pelo Docker — apenas `01` e `02` rodam na inicialização do volume. Migrations em `migrations/` precisam ser aplicadas explicitamente via SQL Editor do Supabase ou via `psql`.
 
 ### Como aplicar uma migration
