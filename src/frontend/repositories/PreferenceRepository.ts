@@ -56,7 +56,7 @@ export async function salvarPreferenciasUsuario(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(requestPayload),
-  });
+  }, 'salvar preferencias');
 
   const responsePayload = await parseJsonResponse(response);
 
@@ -81,7 +81,7 @@ export async function obterPreferenciasUsuario(accessToken: string | null | unde
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
-  });
+  }, 'verificar preferencias');
 
   const responsePayload = await parseJsonResponse(response);
 
@@ -144,7 +144,7 @@ async function parseJsonResponse(response: Response) {
   return JSON.parse(text);
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit) {
+async function fetchWithTimeout(url: string, init: RequestInit, operation: string) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
@@ -155,7 +155,7 @@ async function fetchWithTimeout(url: string, init: RequestInit) {
     });
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Tempo esgotado ao salvar preferencias. Verifique se o app esta na mesma rede do backend.');
+      throw new Error(`Tempo esgotado ao ${operation}. Verifique se o app esta na mesma rede do backend.`);
     }
 
     throw error;

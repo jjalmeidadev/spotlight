@@ -182,6 +182,19 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	}));
 	const emCartazItems = emCartazShows.map(toCatalogItem);
 	const catalogItems = catalogShows.map(toCatalogItem);
+	const recommendationFallbackItems = deduplicarCatalogItems([
+		...popularItems,
+		...emCartazItems,
+		...catalogItems,
+	])
+		.slice(0, 8)
+		.map((item) => ({
+			...item,
+			subtitle: item.subtitle ?? 'Sugestao inicial',
+		}));
+	const recommendedSectionItems = recommendationItems.length > 0
+		? recommendationItems
+		: recommendationFallbackItems;
 	const watchedItems = catalogShows
 		.filter((item) => !popularShows.some((popular) => popular.id === item.id))
 		.slice(0, 10)
@@ -216,8 +229,8 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		...(filteredItems.length > 0
 			? [{ id: 'search-results', title: 'Resultados encontrados:', items: filteredItems }]
 			: []),
-		...(recommendationItems.length > 0
-			? [{ id: 'recommended', title: 'Recomendados para voce:', items: recommendationItems }]
+		...(recommendedSectionItems.length > 0
+			? [{ id: 'recommended', title: 'Recomendados para voce:', items: recommendedSectionItems }]
 			: []),
 		...(nearbyItems.length > 0
 			? [{ id: 'nearby', title: 'Perto de voce:', items: nearbyItems }]
@@ -261,6 +274,19 @@ function toCatalogItem(item: CatalogShow) {
 		subtitle: item.genre ?? 'VER MAIS',
 		imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
 	};
+}
+
+function deduplicarCatalogItems(items: CatalogItem[]) {
+	const vistos = new Set<string>();
+
+	return items.filter((item) => {
+		if (vistos.has(item.id)) {
+			return false;
+		}
+
+		vistos.add(item.id);
+		return true;
+	});
 }
 
 function getRecommendationImage(item: RecommendedShow) {

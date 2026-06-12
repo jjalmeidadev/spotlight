@@ -72,7 +72,7 @@ export default function App() {
 			setScreen(preferenciasEstaoCompletas(preferencias) ? 'catalogo' : 'preferencias');
 		} catch (error) {
 			console.log('Nao foi possivel verificar preferencias salvas:', error);
-			setScreen('preferencias');
+			setScreen('catalogo');
 		}
 	}
 
