@@ -131,6 +131,15 @@
   - [2.6 Matriz de Risco do Projeto](#26-matriz-de-risco-do-projeto)
   - [2.7 Brainstorm de Features](#27-brainstorm-de-features)
   - [2.8 Business Model Canvas](#28-business-model-canvas)
+  - [2.9 Análise Ética com IA4People](#29-análise-ética-com-ia4people)
+    - [2.9.1 Visão Geral do Framework IA4People](#291-visão-geral-do-framework-ia4people)
+    - [2.9.2 Aplicação dos Princípios ao Spotlight](#292-aplicação-dos-princípios-ao-spotlight)
+    - [2.9.3 Matriz de Stakeholders × Princípios](#293-matriz-de-stakeholders--princípios)
+    - [2.9.4 Riscos, Cuidados e Ações Mitigadoras](#294-riscos-cuidados-e-ações-mitigadoras)
+    - [2.9.5 Plano de Ações Éticas por Sprint](#295-plano-de-ações-éticas-por-sprint)
+    - [2.9.6 Síntese](#296-síntese)
+    - [2.9.7 Nota Metodológica e Limites da Análise](#297-nota-metodológica-e-limites-da-análise)
+    - [2.9.8 Referências](#298-referências)
 - [3. Requisitos do Projeto](#3-requisitos-do-projeto)
   - [3.1 Requisitos Funcionais (RFs)](#31-requisitos-funcionais-rfs)
   - [3.2 Requisitos Não Funcionais (RNFs)](#32-requisitos-não-funcionais-rnfs)
@@ -1167,6 +1176,191 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 - **Aumento de conversão em venda de ingressos**: O impacto direto das recomendações personalizadas na jornada, diminuindo a taxa de abandono do carrinho.
 - **Maior ticket médio por sessão**: Consequência de cross-sell e up-sell bem-sucedidos.
 - **Campanhas pagas eficientes**: Redução do Custo de Aquisição de Clientes e aumento do Retorno sobre Investimento em mídias pagas, utilizando os dados de segmentação para criar públicos personalizados e mais assertivos.
+
+--
+
+## 2.9 Análise Ética com IA4People
+
+&emsp;O Spotlight é, em essência, uma camada de inteligência que decide o que cada usuário do Portal Aventura vê primeiro. Essa decisão é tomada a partir de preferências declaradas no onboarding e de telemetria comportamental (cliques, visualizações, avaliações, localização consentida), processadas por um motor de filtragem colaborativa item-based (k-NN + SVD via ML.NET). Como toda recomendação algorítmica, ela tem o poder de ampliar a descoberta cultural, mas também de moldar a oferta percebida, reforçar vieses e influenciar escolhas. Por isso, a análise ética não é um anexo: ela é parte da especificação do produto.
+
+&emsp;Esta seção aplica o framework **IA4People** — proposto por Floridi e colaboradores (Floridi et al., 2018) e adotado como referência pela Comissão Europeia para IA confiável — para conectar os cinco princípios éticos (Beneficência, Não-Maleficência, Autonomia, Justiça e Explicabilidade) ao uso real do sistema, com foco na funcionalidade de recomendação. Para cada princípio, descreve-se como ele se manifesta no Spotlight, quais riscos existem e quais ações mitigadoras estão previstas ou implementadas.
+
+### 2.9.1 Visão Geral do Framework IA4People
+
+&emsp;O IA4People parte da observação de que os quatro princípios clássicos da bioética (Beneficência, Não-Maleficência, Autonomia e Justiça) não bastam para sistemas de IA, porque IA opera em escala, com decisões automatizadas que afetam pessoas que não estão na sala. O framework adiciona um quinto princípio — **Explicabilidade** — que funciona como condição habilitadora dos outros quatro: sem entender por que o sistema decide o que decide, é impossível avaliar se ele é benéfico, seguro, respeita autonomia ou é justo.
+
+<div align="center">
+
+<sub>Tabela X - Resumo dos cinco princípios do IA4People</sub>
+
+| Princípio | Pergunta orientadora | Foco no Spotlight |
+|---|---|---|
+| Beneficência | Como o sistema promove bem-estar e valor? | Descoberta cultural, ampliação do repertório, conexão público-espetáculo |
+| Não-Maleficência | Quais danos o sistema pode causar e como evitá-los? | Vazamento de dados sensíveis, manipulação, dependência algorítmica, perfilamento abusivo |
+| Autonomia | Como o usuário mantém controle sobre suas escolhas? | Consentimento, edição de preferências, possibilidade de não receber recomendações |
+| Justiça | Como evitar discriminação e garantir acesso equânime? | Cold start, viés de popularidade, representatividade do catálogo, acessibilidade |
+| Explicabilidade | O sistema é compreensível e auditável? | Justificativa da recomendação, logs de decisão, rastreabilidade do modelo |
+
+<sup>Fonte: Adaptado de Floridi et al. (2018) pelos autores, 2026.</sup>
+
+</div>
+
+&emsp;No Brasil, o IA4People não opera no vácuo: ele encontra correspondência — não equivalência — na **Lei Geral de Proteção de Dados Pessoais (LGPD — Lei nº 13.709/2018)**, no **Marco Civil da Internet (Lei nº 12.965/2014)** e na **Estratégia Brasileira de Inteligência Artificial (EBIA)**. Por isso, esta análise trata o IA4People como camada ética e a LGPD como camada normativa: a LGPD traduz parte desses princípios em obrigações verificáveis, mas as duas camadas não se sobrepõem perfeitamente. A tabela abaixo explicita o paralelo possível e ancora cada princípio em um artigo concreto, transformando boas intenções em obrigações observáveis no Spotlight.
+
+<div align="center">
+
+<sub>Tabela X - Correspondência IA4People × LGPD no contexto do Spotlight</sub>
+
+| Princípio IA4People | Princípio / Direito LGPD | Implicação prática no Spotlight |
+|---|---|---|
+| Beneficência | Finalidade (Art. 6º, I) | Coleta limitada à recomendação cultural; telemetria não é revendida nem usada para fins não declarados |
+| Não-Maleficência | Necessidade, Segurança e Prevenção (Art. 6º, III, VII e VIII) | Telemetria com identificadores técnicos (pseudônimos quando autenticado, anônimos quando não); RLS no PostgreSQL para escrita/edição de dados privados; validação de JWT no serviço de usuário (validação centralizada no Gateway está planejada); minimização da coleta |
+| Autonomia | Direitos do titular (Art. 18) | Edição de preferências; futuro endpoint de exclusão de conta; consentimento explícito de localização |
+| Justiça | Não discriminação (Art. 6º, IX) | Camada de serendipidade, fallback cold start por popularidade global, persona idosa no escopo de testes |
+| Explicabilidade | Transparência (Art. 6º, VI) e revisão de decisões automatizadas (Art. 20) | Campo `motivo` exposto pela API de recomendação; exibição no card planejada para o frontend; logs estruturados auditáveis |
+
+<sup>Fonte: Material produzido pelos autores, 2026, com base em Floridi et al. (2018) e Lei nº 13.709/2018.</sup>
+
+</div>
+
+### 2.9.2 Aplicação dos Princípios ao Spotlight
+
+#### 2.9.2.1 Beneficência — promover o bem-estar do usuário e o valor cultural
+
+&emsp;A proposta de valor do Spotlight é, antes de tudo, **beneficente**: a recomendação existe para reduzir o esforço do usuário na descoberta de espetáculos relevantes, ampliar o repertório cultural acessado e fortalecer o vínculo do público com a produção teatral. O ganho é simétrico — o usuário descobre conteúdos que combinam com seu gosto sem precisar formular consultas complexas; a Aventura amplia a visibilidade de produções menos buscadas; e o ecossistema cultural ganha novas portas de entrada — e converge com o princípio da **finalidade** da LGPD (Art. 6º, I), que exige que o tratamento de dados pessoais sirva a propósitos legítimos, específicos e informados ao titular.
+
+&emsp;No produto, esse princípio se traduz em decisões concretas:
+
+- **Recomendação para descoberta, não para retenção compulsiva**: o objetivo declarado nos objetivos estratégicos (seção 2.3.4) é descoberta de conteúdo e engajamento qualificado, não tempo de tela. Métricas de sucesso priorizam diversidade de espetáculos visualizados (cobertura do catálogo, *intra-list diversity*), não volume de impressões. Essa escolha de KPI desincentiva padrões manipulativos como infinite scroll otimizado para retenção.
+- **Conteúdos populares como fallback (Cold Start, RF15)**: usuários sem histórico recebem produções ordenadas por popularidade global do catálogo, evitando que a ausência de dados se traduza em ausência de valor — e em desigualdade de experiência. O refinamento por segmento (faixa etária, gênero declarado) e por região consentida está no roadmap, ainda não implementado.
+- **Reforço da identidade cultural da Aventura**: a curadoria algorítmica amplifica todo o portfólio, não só os títulos de maior bilheteria, alinhada ao reposicionamento de rebranding da empresa (seção 2.2). O ganho cultural é tratado como métrica de sucesso, não como externalidade.
+- **Acessibilidade desde o desenho**: a inclusão da persona Carlos Nóbrega (idoso, seção 2.4.1.6) força a equipe a tratar contraste, tamanho de fonte e clareza de navegação como requisitos beneficentes, não como ajustes posteriores.
+
+#### 2.9.2.2 Não-Maleficência — evitar danos previsíveis
+
+&emsp;Sistemas de recomendação podem causar danos por **vazamento de dados**, por **manipulação de escolha**, por **perfilamento sensível** (deduzir orientação política, religiosa ou sexual a partir do consumo cultural) e por **fechamento da bolha** (filter bubble), em que o usuário deixa de ver conteúdos que ampliariam seu horizonte. O Spotlight enfrenta cada um desses vetores:
+
+- **Privacidade dos dados comportamentais**: a telemetria é armazenada no MongoDB Atlas em coleção `interacoes` com identificadores técnicos — `user_id` (pseudônimo) quando o evento chega com JWT válido, ou `anonymous_id` (anônimo de cliente) quando não há autenticação. A validação do JWT é feita no serviço de usuário quando o token é enviado (`TelemetriaController`); a validação centralizada no API Gateway está prevista no roadmap — hoje o gateway só faz roteamento via YARP. Dados estruturados sensíveis (perfil, preferências) ficam no PostgreSQL com **Row Level Security** ativa, garantindo que cada usuário só leia/edite o que é seu. Já as **avaliações** têm leitura pública por design (catálogo aberto: nota e comentário aparecem para qualquer visitante), enquanto inserção e exclusão ficam restritas ao próprio autor via `auth.uid()` — esse é um trade-off explícito de transparência do catálogo, não uma falha de privacidade (seção 4.4.3, "Row Level Security (RLS)").
+- **Não inferência de atributos sensíveis**: o modelo opera sobre interações item-usuário e features explícitas do catálogo (categoria, atores, teatro). Não há classificação latente que produza rótulos como orientação política ou religiosa. Não se faz cruzamento com bases externas de perfilamento.
+- **Diversidade na recomendação para mitigar bolhas**: a estratégia priorizada na seção 2.7.2 inclui camadas de contexto, heurísticas e **serendipidade** (média prioridade) para inserir espetáculos fora da zona de conforto do usuário, evitando reforço puro de afinidade.
+- **Localização como recurso opcional**: o consentimento de localização é tratado como opt-in (rota `PUT /usuario/me/localizacao`); falhas ou recusas não interrompem o fluxo (seção 10.2.2).
+- **Modo dev de demonstração**: explicitamente sinalizado e desativado em produção, para evitar uso indevido como porta de bypass (seção 10.2.1).
+
+#### 2.9.2.3 Autonomia — manter o usuário no controle
+
+&emsp;Autonomia é o princípio mais delicado em sistemas de recomendação, porque a personalização, levada ao extremo, pode reduzir a sensação de escolha — o usuário deixa de decidir e passa a aceitar. O Spotlight preserva autonomia em três frentes:
+
+- **Consentimento explícito no onboarding**: as preferências são **declaradas** pelo próprio usuário (RF03) antes de qualquer recomendação personalizada ser exibida. O modelo não infere preferências sem o ato deliberado do usuário de informá-las.
+- **Edição contínua das preferências**: a rota `PUT /usuario/me/preferencias` permite ao usuário ajustar a qualquer momento as categorias de interesse. A recomendação se reorganiza após nova interação (RF13), respondendo à mudança de gosto.
+- **Liberdade de não personalizar**: a navegação por catálogo, busca e filtros (RF05, RF06) funciona sem depender da camada de recomendação. O usuário pode ignorar o "para você" e navegar pelo portfólio inteiro.
+- **Recomendações como sugestão, não imposição**: a interface posiciona as sugestões como uma carrossel/seção entre várias, não como única forma de navegar — preservando a estrutura editorial do portal (seção 2.7.1).
+- **Direitos do titular (Art. 18 da LGPD)**: o usuário tem direito a confirmação, acesso, correção, anonimização, portabilidade e eliminação dos seus dados. Esses direitos são contemplados, hoje, pela edição livre de preferências e, no roadmap, por endpoints específicos de exportação e exclusão de conta (planejados para pós-MVP, ver Tabela RE em 2.9.4).
+
+#### 2.9.2.4 Justiça — distribuição equânime de oportunidades
+
+&emsp;O princípio de justiça se desdobra em **justiça para o usuário** (todos têm acesso a recomendações relevantes, independentemente de perfil) e **justiça para o catálogo** (produções menos populares têm chance real de serem descobertas). O Spotlight enfrenta dois vieses estruturais típicos de recomendadores:
+
+- **Viés de popularidade**: filtragem colaborativa tende a recomendar o que já é muito interagido, criando feedback loop que sufoca a cauda longa. A estratégia priorizada em 2.7.2 reserva camadas explícitas para serendipidade e contexto, e o catálogo da Aventura é tratado como bem cultural a ser distribuído amplamente — incluindo produções premiadas mas pouco buscadas, citadas no problema da seção 2.2.
+- **Cold start de usuário (RF15)**: usuários novos ou sem histórico recebem recomendações baseadas em popularidade global do catálogo (ordenação `popularidade DESC` no `EspetaculoRepository`), evitando a tela vazia. Fallbacks segmentados por persona ou região ainda não estão implementados — são item de refino.
+- **Heterogeneidade do público**: as personas (seção 2.4.1) cobrem perfis amplos — estudante, mãe, turista, universitário iniciante, idoso — e os testes funcionais (seção 9.1) e de usabilidade (seção 9.3) validam o sistema em múltiplos contextos. A persona de **Carlos Nóbrega (idoso interessado em teatro)** força a equipe a tratar acessibilidade não como exceção, mas como requisito.
+- **Justiça regional**: o uso de geocoding via OpenStreetMap/Nominatim (seção 5.2) é gratuito e sem billing proprietário, reduzindo dependência de provedores que possam viesar oferta por região.
+
+#### 2.9.2.5 Explicabilidade — recomendar com transparência
+
+&emsp;Explicabilidade é o princípio sem o qual os outros não podem ser auditados. Ela também é exigência normativa: o **Art. 20 da LGPD** garante ao titular o direito de solicitar revisão de decisões tomadas unicamente com base em tratamento automatizado que afetem seus interesses. Recomendação cultural não é decisão judicial, mas a obrigação de transparência aplica-se por princípio de boa-fé. No Spotlight, a explicabilidade tem três níveis:
+
+- **Explicabilidade ao usuário (parcial)**: o backend já produz e expõe um campo `motivo` para cada recomendação no endpoint `GET /recomendacao/me` (`RecomendacaoDto.Motivo`), contendo um contexto curto e legível (ex.: "porque você gostou de musicais clássicos"). A exibição desse texto no card de recomendação ainda **não** está implementada no frontend — hoje o `CatalogPosterCard` renderiza apenas a imagem e a tela do catálogo opera sobre dados estáticos. O consumo do campo pelo app está planejado para a Sprint 4, fechando o ciclo de explicabilidade ao usuário final.
+- **Explicabilidade técnica e auditabilidade**: o motor de ML é treinado em pipeline reprodutível (k-NN para similaridade item-item, SVD para fatoração latente — seção 5.2.4). O pipeline de treinamento é versionado e publica artefatos do modelo no storage do projeto após bateria de testes obrigatória (referência: histórico recente da branch `develop`). Logs estruturados (RNF07) permitem rastrear cada recomendação até o snapshot do modelo que a gerou.
+- **Explicabilidade institucional**: a documentação (seção 8.2 e este capítulo) explicita os algoritmos, suas limitações, os dados usados e as decisões éticas tomadas. Qualquer auditor externo — interno à Aventura, acadêmico ou regulatório — encontra na documentação como o sistema decide.
+
+### 2.9.3 Matriz de Stakeholders × Princípios
+
+&emsp;Os impactos éticos não são uniformes: variam conforme o stakeholder. A matriz a seguir cruza os principais grupos afetados pelo Spotlight com os cinco princípios, indicando para cada cruzamento o ponto de atenção dominante.
+
+<div align="center">
+
+<sub>Tabela X - Matriz de stakeholders × princípios IA4People</sub>
+
+| Stakeholder | Beneficência | Não-Maleficência | Autonomia | Justiça | Explicabilidade |
+|---|---|---|---|---|---|
+| Usuário cadastrado | Descoberta cultural ampliada | Privacidade da telemetria comportamental | Edição de preferências e opt-out | Recomendações relevantes mesmo com pouco histórico | Justificativa visível da sugestão |
+| Visitante (não cadastrado) | Acesso a recomendações populares (Cold Start) | Coleta mínima de dados; sem perfilamento | Navegação livre sem login obrigatório | Mesma qualidade de catálogo independente de cadastro | Aviso sobre uso de cookies e dados anônimos |
+| Administrador / curador Aventura | Insights sobre demanda e descoberta | Não usar dados para discriminação comercial | Capacidade de pinar / despinar conteúdos | Equilíbrio entre venda e diversidade do catálogo | Painel com métricas do modelo e A/B test |
+| Produtores e elenco | Maior exposição da produção | Não esconder espetáculos por viés de popularidade | Direito de imagem e contrato respeitado | Distribuição justa entre títulos do portfólio | Critério público de promoção / ranqueamento |
+| Sociedade (público amplo) | Democratização do acesso à cultura | Mitigação de bolha cultural | Pluralidade de oferta | Representatividade do catálogo (gênero, faixa etária, região) | Documentação pública dos algoritmos |
+| Equipe de desenvolvimento | Aprendizado e impacto profissional | Não comprometer dados em ambiente de demonstração | Responsabilidade compartilhada por decisões do modelo | Decisões técnicas auditáveis em CR e PR | Logs, métricas e doc viva |
+
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### 2.9.4 Riscos, Cuidados e Ações Mitigadoras
+
+&emsp;A tabela abaixo consolida os principais riscos éticos identificados, o princípio IA4People mais afetado por cada um, o cuidado adotado e a ação mitigadora concreta — implementada, planejada ou recomendada — com o responsável associado.
+
+<div align="center">
+
+<sub>Tabela X - Riscos éticos, cuidados e ações mitigadoras</sub>
+
+| ID | Risco | Princípio impactado | Cuidado | Ação mitigadora | Status | Responsável |
+|---|---|---|---|---|---|---|
+| RE01 | Vazamento de dados pessoais e comportamentais | Não-Maleficência | Pseudonimização da telemetria, RLS no PostgreSQL para dados privados, validação de JWT no serviço de usuário | Centralizar validação de JWT no API Gateway; auditoria periódica das policies RLS e revisão de logs de acesso | Parcial (RLS ativa, JWT validado por serviço) / Planejado (JWT no Gateway + auditoria) | Time de Backend |
+| RE02 | Perfilamento sensível (orientação política, religiosa, sexual) | Não-Maleficência / Justiça | Modelo restrito a interações item-usuário, sem rótulos sensíveis | Code review obrigatório de novas features do modelo para barrar variáveis proxy | Implementado | Time de Dados |
+| RE03 | Bolha de filtro (filter bubble) | Autonomia / Justiça | Camada de serendipidade e contexto na recomendação (2.7.2) | Métrica de diversidade de gênero teatral por usuário em painel de monitoramento | Planejado (Sprint 5) | Time de Dados |
+| RE04 | Viés de popularidade que sufoca cauda longa | Justiça | Reserva de slots para conteúdo menos popular | Re-ranking com penalização de popularidade no top-N | Planejado (Sprint 5) | Time de Dados |
+| RE05 | Cold start gerando experiência ruim | Beneficência / Justiça | Fallback por popularidade global do catálogo (RF15) | Evoluir fallback para considerar segmento (faixa etária, gênero declarado) e região consentida; revisar critérios de "popular" por persona | Parcial (popularidade global ativa; segmentação pendente) | Time de Dados |
+| RE06 | Recomendação opaca, sem justificativa | Explicabilidade | Campo `motivo` no DTO de recomendação exposto pela API | Consumir e exibir `motivo` no card no frontend; padronizar copy de explicação (Sprint 4) | Parcial (API expõe; UI pendente) | Time de Frontend |
+| RE07 | Manipulação comercial (promoção disfarçada de recomendação) | Não-Maleficência / Autonomia | Distinção visual entre "para você", "patrocinado" e "destaque editorial" | Definir guideline visual e revisar interface | Planejado | Produto + Design |
+| RE08 | Acessibilidade insuficiente para idosos e PCDs | Justiça | Persona Carlos Nóbrega no escopo desde 2.4.1 | Teste de usabilidade SUS com participantes representativos (9.3) | Em execução | UX + QA |
+| RE09 | Modelo degradado em produção sem detecção | Beneficência / Explicabilidade | Pipeline reprodutível e publicação de artefatos versionados | Métricas de drift e re-treino agendado; alerta em queda de qualidade | Planejado | Time de Dados / DevOps |
+| RE10 | Modo dev usado por engano em produção | Não-Maleficência | Modo dev sinalizado, desligável por flag | Garantir que build de produção desabilite o modo dev por padrão | Planejado | DevOps |
+| RE11 | Falta de canal para o usuário contestar uma recomendação | Autonomia / Explicabilidade | Edição livre de preferências (RF03/RF13) | Adicionar ação "não me mostre mais este tipo" no card de recomendação | Recomendado | Produto |
+| RE12 | Telemetria perdida em falha do MongoDB compromete justiça do modelo | Justiça / Explicabilidade | Best-effort declarado e fila planejada | Implementar RabbitMQ entre serviço de usuário e MongoDB (RNF09) | Planejado (Sprint 5) | Time de Backend |
+| RE13 | Ausência de endpoints de portabilidade e exclusão de conta exigidos pelo Art. 18 da LGPD | Autonomia / Não-Maleficência | Edição livre já cobre correção parcial | Endpoint `DELETE /usuario/me` com hard delete em PostgreSQL e MongoDB e endpoint de exportação dos dados do titular | Recomendado (pós-MVP) | Time de Backend + Jurídico |
+| RE14 | Ausência de um responsável formal pelo tratamento de dados (Encarregado / DPO) | Não-Maleficência / Explicabilidade | Documentação ética assumida pela equipe | Definir Encarregado de Dados conforme Art. 41 da LGPD ao operacionalizar com a Aventura | Recomendado | Produto + Jurídico |
+
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### 2.9.5 Plano de Ações Éticas por Sprint
+
+&emsp;Para não tratar a ética como capítulo separado da execução, as ações mitigadoras foram distribuídas ao longo das sprints, em paralelo às entregas técnicas. Sprints anteriores já endereçaram a base (RLS para dados privados, RF15 com fallback por popularidade global, pseudonimização da telemetria); as sprints seguintes consolidam explicabilidade na UI, diversidade, centralização de JWT no Gateway e governança.
+
+<div align="center">
+
+<sub>Tabela X - Ações éticas por sprint</sub>
+
+| Sprint | Ações éticas previstas | Princípios reforçados |
+|---|---|---|
+| Sprint 3 (concluída) | RLS ativa no PostgreSQL para dados privados, validação de JWT no serviço de usuário, RF15 (cold start por popularidade global), persona idosa incluída no escopo | Não-Maleficência, Justiça |
+| Sprint 4 | Exibição do campo `motivo` no card de recomendação (consumo no frontend) e copy padronizado da explicação; testes de usabilidade SUS com participantes representativos; documentação ética (esta seção) | Explicabilidade, Justiça, Autonomia |
+| Sprint 5 | Centralização da validação de JWT no API Gateway; re-ranking com penalização de popularidade; métricas de diversidade de gênero teatral; fila RabbitMQ para telemetria; ação "não me mostre mais" no card; revisão de guideline visual entre patrocinado e personalizado | Justiça, Autonomia, Não-Maleficência |
+| Pós-MVP | Painel de monitoramento de drift do modelo; auditoria periódica de RLS; re-treino agendado; relatório semestral de impacto ético publicado junto à doc | Explicabilidade, Beneficência |
+
+<sup>Fonte: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### 2.9.6 Síntese
+
+&emsp;O Spotlight não é eticamente neutro: ele decide, em escala, o que cada usuário do Portal Aventura encontra primeiro. Aplicar o IA4People à arquitetura desde o entendimento do negócio — e ancorá-lo na LGPD — força a equipe a tratar **Beneficência** (descoberta cultural), **Não-Maleficência** (privacidade e ausência de perfilamento sensível), **Autonomia** (consentimento, edição de preferências, direitos do titular), **Justiça** (cold start, viés de popularidade, acessibilidade) e **Explicabilidade** (justificativa visível, logs, doc viva) como restrições de projeto, não como verniz a posteriori.
+
+&emsp;Boa parte das ações já está incorporada à arquitetura entregue até a Sprint 3 — RLS para dados privados, pseudonimização da telemetria, fallback de cold start por popularidade global, persona idosa, documentação aberta e campo `motivo` exposto pela API de recomendação. Permanecem lacunas honestas para as próximas sprints: exibir o `motivo` no card (a explicabilidade está disponível na API, ainda não na UI), centralizar a validação de JWT no API Gateway, evoluir o fallback de cold start para considerar segmento e região, re-ranking contra viés de popularidade, métrica de diversidade, fila resiliente de telemetria, ação de contestação no card e governança de drift. No pós-MVP, ficam endereçados os direitos do titular pela LGPD (portabilidade, exclusão) e a definição formal de Encarregado de Dados. O compromisso é tratar essas ações como entregas auditáveis, com responsável e status, e revisitar esta seção ao final de cada sprint para refletir o estado real do sistema.
+
+### 2.9.7 Nota Metodológica e Limites da Análise
+
+&emsp;Esta análise é uma **avaliação ética orientada a projeto**, baseada em revisão crítica do produto, da arquitetura e dos requisitos, com aplicação dos cinco princípios do IA4People e correspondência com a LGPD. Não substitui uma **Avaliação de Impacto à Proteção de Dados (DPIA / RIPD)** formal, a ser conduzida com o Encarregado de Dados da Aventura antes da operação comercial. Também não substitui auditoria algorítmica independente, recomendada quando o modelo entrar em produção com dados reais.
+
+&emsp;Limitações conhecidas: (a) métricas de viés (diversidade, exposição da cauda longa, paridade demográfica) ainda não foram medidas, pois dependem de telemetria em volume — serão avaliadas na Sprint 5; (b) os testes de usabilidade (seção 9.3) cobrem perfis das personas, mas não constituem amostra estatisticamente representativa do público da Aventura; (c) a explicabilidade do modelo SVD é intrinsecamente limitada por features latentes — por isso, prioriza-se explicação contextual ("porque você viu X") em vez de explicação técnica do peso de cada fator latente.
+
+### 2.9.8 Referências
+
+- Floridi, L., Cowls, J., Beltrametti, M., Chatila, R., Chazerand, P., Dignum, V., Luetge, C., Madelin, R., Pagallo, U., Rossi, F., Schafer, B., Valcke, P., & Vayena, E. (2018). *AI4People — An Ethical Framework for a Good AI Society: Opportunities, Risks, Principles, and Recommendations.* Minds and Machines, 28(4), 689–707. DOI: 10.1007/s11023-018-9482-5.
+- Brasil. *Lei nº 13.709, de 14 de agosto de 2018.* Lei Geral de Proteção de Dados Pessoais (LGPD). Disponível em planalto.gov.br.
+- Brasil. *Lei nº 12.965, de 23 de abril de 2014.* Marco Civil da Internet.
+- Ministério da Ciência, Tecnologia e Inovações (MCTI). *Estratégia Brasileira de Inteligência Artificial — EBIA.* Brasília, 2021.
+- High-Level Expert Group on Artificial Intelligence (AI HLEG). *Ethics Guidelines for Trustworthy AI.* European Commission, 2019.
 
 --
 

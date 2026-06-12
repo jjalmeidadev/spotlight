@@ -19,39 +19,43 @@ O guia serve como referência rápida para novas implementações e como ponto d
 
 ```text
 g04/
-├── App.js                      # Bootstrap do app Expo (delegado para src/frontend)
-├── app.json, package.json      # Configuração do Expo / Node
-├── docker-compose.yml          # Orquestração local dos serviços backend
-├── colab_csv_utf8/             # Datasets originais (read-only)
-├── documentos/                 # Documentação do projeto (este guia, ADRs, diagramas)
-│   └── img/                    # Imagens e diagramas
-└── src/
-    ├── aad/                    # Notebooks de análise e tratamento de dados
-    ├── backend/                # Solução .NET (Spotlight.sln)
-    │   ├── api-gateway/        # Gateway HTTP (YARP) + agregador Swagger
-    │   ├── contracts/          # DTOs/contratos compartilhados (quando aplicável)
-    │   ├── ml-engine/          # Bindings / wrappers para o motor de ML
-    │   ├── services/
-    │   │   ├── catalogo/       # Microsserviço de catálogo
-    │   │   ├── geolocalizacao/ # Microsserviço de geolocalização
-    │   │   ├── recomendacao/   # Microsserviço de recomendação
-    │   │   └── usuario/        # Microsserviço de usuário/telemetria
-    │   └── tests/              # Projetos xUnit por microsserviço
-    ├── database/               # Scripts SQL (DDL/seed) + migrations versionadas
-    ├── dataset/                # Datasets processados consumidos pelo backend/ML
-    ├── frontend/               # App React Native + Expo (MVVM)
-    │   ├── components/
-    │   ├── config/
-    │   ├── hooks/
-    │   ├── models/             # Tipos e modelos de domínio do app
-    │   ├── repositories/       # Acesso a APIs e fontes externas
-    │   ├── screens/            # Views (telas)
-    │   ├── theme/
-    │   └── viewmodels/         # Hooks-ViewModel que orquestram a View
-    └── models/                 # Notebooks e artefatos de ML
-        ├── artifacts/          # Modelos serializados (.zip, .pkl, .onnx)
-        ├── reports/            # Métricas e relatórios de treino
-        └── Spotlight.Recomendacao.ModelTraining/ # Projeto .NET de treino ML.NET
+├── App.js                                # Bootstrap do app Expo (delegado para src/frontend)
+├── app.json, package.json                # Configuração do Expo / Node
+├── docker-compose.yml                    # Orquestração local dos serviços backend
+├── documentos/                           # Documentação do projeto (markdowns + imagens)
+│   ├── img/                              # Imagens, diagramas, mockups, wireframes
+│   └── *.md                              # Projeto, Manual de instalação, padrões, SOA, etc.
+├── src/
+│   ├── aad/                              # Notebooks de análise e tratamento de dados
+│   ├── backend/                          # Backend SOA em ASP.NET Core (.NET 9)
+│   │   ├── Spotlight.sln                 # Solution: gateway + 4 serviços + projetos de teste
+│   │   ├── api-gateway/                  # Spotlight.Gateway (porta 5000) — YARP
+│   │   ├── services/
+│   │   │   ├── catalogo/                 # Spotlight.Catalogo        (5001)
+│   │   │   ├── usuario/                  # Spotlight.Usuario         (5002) + telemetria Mongo
+│   │   │   ├── recomendacao/             # Spotlight.Recomendacao    (5003) + ML.NET strategy
+│   │   │   └── geolocalizacao/           # Spotlight.Geolocalizacao  (5004) — Nominatim
+│   │   ├── contracts/                    # Contratos de API/eventos e docs operacionais
+│   │   ├── ml-engine/                    # Bindings / wrappers para o motor de ML
+│   │   ├── scripts/                      # Scripts auxiliares (PowerShell)
+│   │   └── tests/                        # Projetos xUnit por serviço
+│   ├── frontend/                         # App Expo / React Native em arquitetura MVVM
+│   │   ├── components/                   # Componentes visuais reutilizáveis
+│   │   ├── screens/                      # Telas (Views)
+│   │   ├── viewmodels/                   # ViewModels (hooks de tela)
+│   │   ├── repositories/                 # Acesso aos serviços backend
+│   │   ├── models/                       # Tipos/entidades de UI
+│   │   ├── hooks/, theme/, config/       # Suporte (sessão, paleta, endpoints)
+│   ├── database/                         # Scripts SQL (PostgreSQL/Supabase)
+│   │   ├── 0X_*.sql                      # Bootstrap (criação, seed, rollback)
+│   │   ├── migrations/                   # Migrations numeradas (04+) com rollback
+│   │   └── load_test/{,pgbench/}         # Massa sintética e cenários de carga
+│   ├── dataset/                          # Datasets processados (input do training)
+│   └── models/                           # Notebooks + treino ML.NET + artefatos publicados
+│       ├── Spotlight.Recomendacao.ModelTraining/   # Projeto .NET de treino
+│       ├── artifacts/                              # Modelo .zip e similaridades
+│       └── reports/                                # Métricas e exemplos do modelo
+└── colab_csv_utf8/                       # Datasets originais (CSV bruto, read-only)
 ```
 
 #### 2.1.2 Nomenclatura de Arquivos
