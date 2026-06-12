@@ -114,10 +114,10 @@
 - [1. Introdução](#1-introdução)
 - [2. Avaliação das Sprints](#2-avaliação-das-sprints)
   - [2.1 Sprint 1](#21-sprint-1)
-  - [2.2 Sprint 2](#21-sprint-2)
-  - [2.3 Sprint 3](#21-sprint-3)
-  - [2.4 Sprint 4](#21-sprint-4)
-  - [2.5 Sprint 5](#21-sprint-5)
+  - [2.2 Sprint 2](#22-sprint-2)
+  - [2.3 Sprint 3](#23-sprint-3)
+  - [2.4 Sprint 4](#24-sprint-4)
+  - [2.5 Sprint 5](#25-sprint-5)
 - [3. Análise de Riscos](#3-análise-de-riscos)
   - [3.1 Riscos identificados](#31-riscos-identificados)
   - [3.2 Mitigação de Riscos](#32-mitigação-de-riscos)
@@ -679,8 +679,76 @@ Para esta sprint, ficam estabelecidas as seguintes diretrizes adicionais:
 - O `Projeto.md`, o `GuiaPadroesDesenvolvimento.md`, o README do banco e o `GestaoProjeto.md` devem ser atualizados em paralelo ao desenvolvimento, evitando concentração documental no fechamento da sprint.
 - Evidências de testes, Swagger, vídeo demonstrativo, scripts SQL e logs de execução devem ser versionados ou referenciados antes da entrega final.
 
-## 2.4 Sprint 4  
-Nota: Insira informações sobre mudanças realizadas.
+## 2.4 Sprint 4
+
+### 2.4.1 Retrospectiva da Sprint 4
+
+Ao final da Sprint 4, a equipe conduziu a retrospectiva do ciclo com foco em avaliar a consolidação das ações de melhoria pactuadas na Sprint 3 e identificar os pontos de atenção para o encerramento do projeto na Sprint 5. Esta sprint marcou a entrega do primeiro MVP funcional do Spotlight, com sistema de recomendação integrado entre backend e frontend, aprimoramento completo do banco de dados e execução dos testes planejados na sprint anterior.
+
+De forma geral, a Sprint 4 foi o ciclo de maior densidade técnica do projeto. A equipe fechou 72 issues e abriu 48 MRs ao longo do ciclo, com 100% de conclusão das issues, mesmo com capacidade reduzida a 5 dias úteis efetivos por conta de um feriado. As métricas numéricas desta seção foram consolidadas em 12/06 às 12h; valores finais podem diferir ligeiramente em função de issues e MRs abertos ou fechados após esse corte. A principal fragilidade do ciclo foi o atraso no início da produção após a pausa, o que concentrou volume de trabalho na segunda semana e elevou o risco de conflito técnico entre membros que atuavam simultaneamente em partes críticas do projeto. Além disso, embora a matriz de dependências existisse no planejamento, sua aplicação prática não foi tão clara durante a execução; em alguns momentos a equipe ficou sem visibilidade precisa sobre quais entregas deveriam esperar outras branches ou MRs.
+
+---
+
+### 2.4.2 Análise dos Pontos Identificados
+
+#### Pontos Fortes
+
+| Ponto forte | Evidência observada na Sprint 4 | Impacto no processo |
+|---|---|---|
+| Entrega do primeiro MVP funcional | Sistema de recomendação integrado entre backend e frontend, disponível e funcional no ambiente do projeto, com 9 MRs autorais de Mariana Reis cobrindo contrato, service, endpoint, modelo incrementado e integração frontend. | Valida a arquitetura end-to-end e demonstra maturidade técnica da equipe no momento mais crítico do projeto. |
+| 100% de conclusão das issues com 48 MRs | 72 issues fechadas por 7 integrantes e 48 MRs abertos, todos dentro do prazo da Sprint 4, com apenas 5 dias úteis efetivos. | Demonstra resiliência do time a imprevistos e capacidade de manter ritmo de entrega mesmo sob pressão de prazo. |
+| Melhora significativa nas revisões de PR | Celso atuou como reviewer em 6 MRs; Mariana Reis em 3; Jaime em 2; Rafael em 1, com revisões distribuídas ao longo do ciclo, não concentradas no final. | Eliminou o principal gargalo recorrente das Sprints 2 e 3, com revisões ocorrendo de forma contínua e não apenas nos dias de entrega. |
+| Distribuição de trabalho por frentes técnicas | Rafael (15 issues, banco e CI), Leonardo (14, telemetria e MongoDB), Mariana Reis (15, recomendação e integração), Vitor (10, documentação e testes), Jaime (7, docker e frontend), Mariana Pereira (6, policies e usabilidade), Celso (5, testes de RNF). | Cada frente técnica teve responsável claro, reduzindo sobreposição e facilitando o sequenciamento das entregas. |
+| Slides prontos com antecedência | Issues #251, #252 e #253 (task inicial, roteiro e versão preliminar) criadas e fechadas com antecedência; estrutura completa pronta na quinta-feira antes da entrega. | Ação de melhoria da Sprint 3 cumprida pela segunda vez consecutiva, indicando consolidação da prática. |
+| Matriz de dependências mantida | Leonardo concluiu as issues de MongoDB (#274-#287) antes de Mariana Reis abrir os MRs de integração frontend-backend (!122, !133); banco aprimorado por Rafael concluído antes dos testes de carga. | Sequenciamento técnico respeitado sem bloqueios entre frentes, mantendo fluxo de desenvolvimento desobstruído. |
+
+A Sprint 4 confirmou que as ações de melhoria pactuadas na Sprint 3 foram absorvidas pela equipe como práticas efetivas. A distribuição de revisões ao longo do ciclo, com Celso sendo o reviewer mais ativo (6 MRs) e três outros membros também revisando, representa uma mudança estrutural em relação às Sprints 2 e 3, quando as revisões se concentravam nos últimos dias. O MVP entregue representa a consolidação de quatro sprints de evolução técnica e processual.
+
+#### Pontos Fracos
+
+| Ponto fraco | Evidência observada na Sprint 4 | Consequência |
+|---|---|---|
+| Atraso no início da produção após o feriado | Na metade da segunda semana, volume elevado de issues críticas ainda em aberto, com entregas de integração, testes e documentação pendentes simultaneamente. | Concentração de trabalho nos últimos 2 dias do ciclo, com 19 MRs abertos por Leonardo e 9 por Mariana Reis em menos de uma semana. |
+| Desbalanceamento residual de volume | Diferença de 3:1 entre os membros com mais issues (Mariana Reis e Rafael, 15 cada) e o com menos (Celso, 5). Média do grupo: 10,3 issues/membro; desvio de Celso e Mariana Pereira representa 48% e 58% abaixo da média, respectivamente. | Persiste padrão de concentração nas mesmas pessoas em entregas críticas, com risco de sobrecarga na Sprint 5, sprint de encerramento e com mais demandas de documentação final. |
+| Dependências pouco claras durante a execução | A matriz de dependências foi planejada, mas em alguns momentos não houve comunicação suficiente sobre quais branches, MRs ou entregas precisavam ser concluídas antes de outras avançarem. | Parte da equipe ficou momentaneamente perdida sobre a ordem segura de integração, aumentando o risco de retrabalho e conflitos de merge. |
+| Risco de conflito técnico por atuação simultânea | Branches de integração (Mariana Reis), banco (Rafael) e telemetria (Leonardo) em desenvolvimento paralelo nos dias finais, com 13 MRs abertos nos últimos 3 dias do ciclo. | Potencial de conflito de merge elevado no fechamento; gerenciável nesta sprint, mas indica necessidade de ritual de retomada mais estruturado para a Sprint 5. |
+
+O principal risco da Sprint 4 foi estrutural: sem um ritual explícito de retomada pós-feriado, a produção só ganhou ritmo na segunda semana, o que se reflete na concentração de MRs nos dias finais. Leonardo abriu 19 MRs ao longo da sprint, Mariana Reis abriu 9, e Rafael 6, enquanto Celso, Jaime e Mariana Pereira somaram 3 cada. Essa assimetria de volume é natural em frentes com granularidade técnica diferente, mas o planning da Sprint 5 precisa considerar explicitamente a capacidade individual antes da alocação, priorizando reequilíbrio para Celso e Mariana Pereira. Também será necessário transformar a matriz de dependências em um instrumento mais operacional, revisado nas dailys, para que o time não dependa apenas do planejamento inicial para entender a ordem de integração.
+
+---
+
+### 2.4.3 Resultado das Ações de Melhoria da Sprint 3
+
+| Ação de melhoria | Status | Evidência | Observação |
+|---|---|---|---|
+| Nenhum integrante concentra entrega crítica sem dupla de apoio | Cumprida | Rafael (banco, 15 issues), Mariana Reis e Mariana Pereira (recomendação e integração, 15 issues), Jaime (docker e frontend, 7 issues), Celso como reviewer em 6 MRs da frente de telemetria. | Sempre houve responsável principal com apoio designado nas tasks M e G. |
+| Tasks M e G com ao menos um apoio indicado | Cumprida | 14 das 72 issues eram SIZE_G, distribuídas entre 5 membros distintos; MRs G revisados por pelo menos 1 reviewer em todos os casos. | Redução do desbalanceamento em relação à Sprint 3. |
+| Slides prontos pelo menos dois dias antes da entrega | Cumprida | Issues #251, #252 e #253 fechadas com antecedência; estrutura completa pronta na quinta-feira. | Segunda sprint consecutiva com slides antecipados, prática consolidada. |
+| Ensaio interno antes da entrega | Cumprida | Treinamento realizado na quinta-feira; issue #294 (finalização da apresentação) acompanhada por Jaime. | Treinamento ocorreu conforme pactuado. |
+| Revisões contínuas de PR com SLA de 24h | Melhorou significativamente | 48 MRs abertos com revisores designados ao longo do ciclo: Celso (6 MRs revisados), Mariana Reis (3), Jaime (2), Rafael (1). Revisões distribuídas, não concentradas no final. | Maior evolução percebida no ciclo, ponto que era crítico nas Sprints 2 e 3. |
+| Matriz de dependências mantida | Parcialmente mantida | Algumas dependências críticas foram respeitadas, como MongoDB (#274-#291, Leonardo) antes da integração frontend-backend (!122, !133, Mariana Reis) e banco (Rafael) antes dos testes de carga (!110). Porém, no fechamento da sprint, a relação entre branches simultâneas e ordem de merge nem sempre ficou clara para todos. | A prática continuou útil, mas precisa deixar de ser apenas documento de planejamento e passar a ser revisada operacionalmente nas dailys da Sprint 5. |
+
+Das seis ações de melhoria propostas na Sprint 3, cinco foram cumpridas ou melhoraram de forma mensurável, com evidências diretas no board. A matriz de dependências foi mantida parcialmente: ajudou no planejamento e em algumas frentes críticas, mas não funcionou tão bem como instrumento de acompanhamento diário. Esse resultado ainda representa avanço relevante em relação às sprints anteriores, mas indica que a Sprint 5 precisa transformar dependências em um controle mais ativo durante as dailys e revisões de MR.
+
+---
+
+### 2.4.4 Ações de Melhoria Propostas para a Sprint 5
+
+| Problema endereçado | Ação de melhoria | Responsável | Prazo de aplicação | Critério de sucesso | Task vinculada |
+|---|---|---|---|---|---|
+| Atraso no início da produção após interrupção | Realizar daily de retomada no primeiro dia útil da sprint com checklist explícito: cada membro sai da daily com ao menos uma task em Doing. | Scrum Master | Primeiro dia útil da Sprint 5 | 100% dos membros com ao menos uma task em Doing até o fim do primeiro dia. | A definir no planning |
+| Desbalanceamento residual, com 2 membros abaixo da média de contribuição do grupo | Alocar issues adicionais a Celso e Mariana Pereira no planning da Sprint 5, priorizando tasks de documentação final e validação. | Scrum Master | Planning da Sprint 5 | Nenhum membro com volume abaixo de 70% da média do grupo; diferença máxima entre o mais e o menos ativo de 2:1. | A definir no planning |
+| Dependências pouco claras durante a execução | Revisar, em cada daily, quais MRs estão bloqueando outras entregas e registrar explicitamente dependências entre branches abertas. | Tech Lead + Scrum Master | Ao longo da Sprint 5 | Todas as branches críticas devem ter dependência registrada antes de entrar em Review; nenhum integrante deve avançar integração sem saber a branch base esperada. | A definir no planning |
+| Risco de conflito técnico por branches simultâneas | Mapear na matriz de dependências quais branches não devem estar em desenvolvimento paralelo; comunicar ativamente no início de cada dia de trabalho. | Tech Lead | Antes do início do desenvolvimento | Zero conflitos de merge críticos que atrasem entrega final. | A definir no planning |
+| Documentação acumulada no fechamento | Distribuir tasks de documentação final (post mortem, retrospectiva, atualização de artefatos) ao longo dos dias úteis desde o primeiro dia. | Equipe | Ao longo da Sprint 5 | Nenhum documento obrigatório iniciado no último dia útil da sprint. | A definir no planning |
+
+Além das ações específicas, a equipe deve manter as práticas consolidadas nas Sprints 3 e 4: revisões contínuas de PR com SLA de 24h, matriz de dependências críticas, dailys objetivas com foco em impedimentos e ritual de fechamento com checagem cruzada entre Kanban e documentação. A coluna "Task vinculada" será preenchida com os números de issue correspondentes após o planning da Sprint 5.
+
+---
+
+### 2.4.5 Planejamento da Sprint 5
+
+> O planejamento detalhado da Sprint 5, com backlog completo de tasks, capacidade planejada, estratégia de priorização por dia e matriz de dependências críticas, será incluído em task própria após o planning do ciclo, conforme as políticas de gestão de configuração do projeto.
 
 ---
 
