@@ -3950,9 +3950,10 @@ excessivamente enviesado para uma única classe.
 ### 8.2.2 Pipeline do Modelo Incrementado
 
 &emsp;O treinamento foi implementado em C# no projeto
-`src/models/Spotlight.Recomendacao.ModelTraining`. Essa escolha reduz a
-distância entre experimentação e produção, porque o mesmo ecossistema .NET
-usado pelos microsserviços também passa a gerar o artefato do modelo.
+`src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining`. Essa
+escolha reduz a distância entre experimentação e produção, porque o mesmo
+ecossistema .NET usado pelos microsserviços também passa a gerar o artefato do
+modelo.
 
 &emsp;O fluxo de treinamento segue as etapas abaixo:
 
@@ -3982,11 +3983,12 @@ ajudam a reforçar sinais recentes de interesse.
 | Exemplos | `src/models/reports/recomendacao_mlnet_exemplos.csv` | Amostras de predição para validação funcional |
 | Relatório técnico | `src/models/reports/README_modelo_classificacao_recomendacao.md` | Descrição curta do incremento e limitações |
 
-&emsp;Embora a arquitetura documente o ciclo de ML em `src/backend/ml-engine`, o
-executável de treinamento da Sprint 4 ficou em `src/models/` para manter a
-separação entre artefatos de modelo e microsserviços de API. O serviço de
-recomendação consome os arquivos resultantes por configuração, sem depender do
-notebook em tempo de execução.
+&emsp;O executável de treinamento fica em `src/backend/ml-engine/training`,
+alinhado à separação arquitetural do ciclo de ML. Os artefatos gerados continuam
+versionados/publicados em `src/models/artifacts` e `src/models/reports`, pois
+esses diretórios funcionam como saída do pipeline e são consumidos pela API e
+pela CI. O serviço de recomendação consome os arquivos resultantes por
+configuração, sem depender do notebook em tempo de execução.
 
 ### 8.2.4 Métricas Obtidas
 

@@ -43,10 +43,10 @@ train:model-artifacts:
   script:
     - >-
       dotnet restore
-      src/models/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
+      src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
     - >-
       dotnet run
-      --project src/models/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
+      --project src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
       --configuration Release
       --
       --postgres-csv src/dataset/recomendacao_balanceado.csv
