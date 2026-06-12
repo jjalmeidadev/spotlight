@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing } from '@/frontend/theme';
 import {
   SessionStatus,
+  SessionUser,
   useLoadingScreenViewModel,
 } from '@/frontend/viewmodels/useLoadingScreenViewModel';
 
@@ -61,7 +62,7 @@ type Fase = 'checking' | 'opening' | 'revealing' | 'done';
 
 interface LoadingScreenProps {
   /** Chamado uma única vez no fim da coreografia; o root decide a navegação. */
-  onFinish?: (status: SessionStatus) => void;
+  onFinish?: (status: SessionStatus, usuario?: SessionUser | null) => void;
 }
 
 /**
@@ -133,8 +134,8 @@ export default function LoadingScreen({ onFinish }: LoadingScreenProps) {
   }, [fase, logoEntrada]);
 
   useEffect(() => {
-    if (fase === 'done') onFinish?.(viewModel.status);
-  }, [fase, onFinish, viewModel.status]);
+    if (fase === 'done') onFinish?.(viewModel.status, viewModel.usuario);
+  }, [fase, onFinish, viewModel.status, viewModel.usuario]);
 
   // Cada cortina cobre metade da tela e desliza pra fora (esquerda → -W/2, direita → +W/2).
   const metade = larguraTela / 2;

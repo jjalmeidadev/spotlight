@@ -9,8 +9,18 @@ namespace Spotlight.Recomendacao.Presentation.Controllers;
 /// </summary>
 [ApiController]
 [Route("")]
+[Produces("application/json")]
 public class RecomendacaoBaseController : ControllerBase
 {
+    /// <summary>
+    /// Retorna o catálogo de endpoints públicos da API de recomendação (descoberta).
+    /// </summary>
+    /// <remarks>
+    /// Contrato público: <c>GET /recomendacao</c>. Útil para clientes
+    /// descobrirem dinamicamente as rotas e seus requisitos de autenticação,
+    /// sem precisar consultar o Swagger.
+    /// </remarks>
+    /// <response code="200">Metadados do serviço e lista de endpoints expostos.</response>
     [HttpGet]
     [ProducesResponseType(typeof(RecomendacaoBaseDto), StatusCodes.Status200OK)]
     public IActionResult Obter()

@@ -6,7 +6,7 @@ type FilterDropdownProps = {
 	iconSource: ImageSourcePropType;
 	options: readonly string[];
 	value: string | null;
-	onChange: (value: string) => void;
+	onChange: (value: string | null) => void;
 };
 
 export function FilterDropdown<TOption extends string>({
@@ -18,7 +18,7 @@ export function FilterDropdown<TOption extends string>({
 	iconSource: ImageSourcePropType;
 	options: readonly TOption[];
 	value: TOption | null;
-	onChange: (value: TOption) => void;
+	onChange: (value: TOption | null) => void;
 }) {
 	const [open, setOpen] = useState(false);
 	const label = useMemo(() => value ?? 'Filtrar por', [value]);
@@ -37,7 +37,7 @@ export function FilterDropdown<TOption extends string>({
 						<Pressable
 							key={option}
 							onPress={() => {
-								onChange(option);
+								onChange(value === option ? null : option);
 								setOpen(false);
 							}}
 							style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}

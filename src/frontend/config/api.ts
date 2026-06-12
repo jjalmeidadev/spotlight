@@ -4,13 +4,18 @@ const GATEWAY_PORT = '5000';
 const LOCAL_API_BASE_URL = `http://localhost:${GATEWAY_PORT}`;
 
 export function getApiBaseUrl() {
+  const configuredUrl = firstNotBlank(process.env.EXPO_PUBLIC_API_BASE_URL);
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
   const expoDevUrl = getExpoDevelopmentApiBaseUrl();
 
   if (expoDevUrl) {
     return expoDevUrl;
   }
 
-  return firstNotBlank(process.env.EXPO_PUBLIC_API_BASE_URL) ?? LOCAL_API_BASE_URL;
+  return LOCAL_API_BASE_URL;
 }
 
 function getExpoDevelopmentApiBaseUrl() {

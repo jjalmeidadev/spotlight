@@ -77,7 +77,6 @@ public class EspetaculosController : ControllerBase
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErroDto), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CriarAvaliacao(
         [FromRoute] int id,
         [FromBody] AvaliacaoCreateDto body,

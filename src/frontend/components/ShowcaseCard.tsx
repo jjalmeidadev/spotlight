@@ -12,7 +12,10 @@ type ShowcaseCardProps = {
   onPress?: () => void;
 };
 
-export function ShowcaseCard({ imageUri, imageSource, onPress }: ShowcaseCardProps) {
+export function ShowcaseCard({ title, subtitle, imageUri, imageSource, onPress }: ShowcaseCardProps) {
+  void title;
+  void subtitle;
+
   const source = imageSource ?? (imageUri ? { uri: imageUri } : undefined);
 
   return (

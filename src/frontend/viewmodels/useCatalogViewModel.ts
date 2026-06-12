@@ -1,141 +1,295 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CatalogRail } from '../models/CatalogItem';
+import { CatalogItem, CatalogRail } from '../models/CatalogItem';
 import {
-	EspetaculoResumoApi,
-	listarEspetaculosCatalogo,
-	listarRecomendacoesUsuario,
+	CatalogShow,
+	listarCatalogoCompleto,
+	listarEspetaculos,
+	listarEspetaculosEmCartaz,
+	listarEspetaculosPertoDe,
+	listarEspetaculosPopulares,
+	obterUrlMidiaConhecida,
 	obterUrlMidia,
 } from '../repositories/CatalogRepository';
+import {
+	listarRecomendacoesUsuario,
+	RecommendedShow,
+} from '../repositories/RecommendationRepository';
 import { CATALOG_IMAGE, normalizarTitulo } from '../config/catalogImages';
 
-const FILTER_OPTIONS = ['Musical', 'Stand-up', 'Show', 'Espetaculo', 'Palestra', 'Meet-up'] as const;
+const FILTER_OPTIONS = [
+	'Teatro Musical',
+	'Dramaturgia',
+	'Show Musical',
+	'Concerto e Show',
+	'Teatro Infantil',
+] as const;
 
-export function useCatalogViewModel(accessToken?: string | null) {
+type UseCatalogViewModelOptions = {
+	accessToken?: string | null;
+	userLocationAddress?: string | null;
+};
+
+export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const [query, setQuery] = useState('');
 	const [selectedFilter, setSelectedFilter] = useState<(typeof FILTER_OPTIONS)[number] | null>(null);
-	const [espetaculos, setEspetaculos] = useState<EspetaculoResumoApi[]>([]);
-	const [recomendacoes, setRecomendacoes] = useState<EspetaculoResumoApi[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	const [recommendations, setRecommendations] = useState<RecommendedShow[]>([]);
+	const [popularShows, setPopularShows] = useState<CatalogShow[]>([]);
+	const [nearbyShows, setNearbyShows] = useState<CatalogShow[]>([]);
+	const [emCartazShows, setEmCartazShows] = useState<CatalogShow[]>([]);
+	const [catalogShows, setCatalogShows] = useState<CatalogShow[]>([]);
+	const [filteredShows, setFilteredShows] = useState<CatalogShow[]>([]);
+	const [catalogLoading, setCatalogLoading] = useState(false);
+	const [catalogError, setCatalogError] = useState<string | null>(null);
+	const [catalogReloadKey, setCatalogReloadKey] = useState(0);
+	const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+	const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
 	useEffect(() => {
-		let ativo = true;
+		let active = true;
 
-		async function carregar() {
+		async function loadRecommendations() {
+			if (!options?.accessToken) {
+				setRecommendations([]);
+				setRecommendationsError(null);
+				return;
+			}
+
 			try {
-				setLoading(true);
-				setError(null);
+				setRecommendationsLoading(true);
+				setRecommendationsError(null);
 
-				const dados = await listarEspetaculosCatalogo();
-				if (!ativo) return;
-				setEspetaculos(dados);
-
-				if (!accessToken) {
-					setRecomendacoes([]);
-					return;
+				const data = await listarRecomendacoesUsuario(options.accessToken, 8);
+				if (active) {
+					setRecommendations(data);
 				}
-
-				try {
-					const recomendacoesUsuario = await listarRecomendacoesUsuario(accessToken);
-					if (ativo) setRecomendacoes(recomendacoesUsuario.map((item) => item.espetaculo));
-				} catch (err) {
-					console.log('Nao foi possivel carregar recomendacoes personalizadas:', err);
-					if (ativo) setRecomendacoes([]);
-				}
-			} catch (err) {
-				if (ativo) {
-					setError(err instanceof Error ? err.message : 'Nao foi possivel carregar o catalogo.');
-					setEspetaculos([]);
-					setRecomendacoes([]);
+			} catch (error) {
+				if (active) {
+					setRecommendations([]);
+					setRecommendationsError(
+						error instanceof Error ? error.message : 'Nao foi possivel carregar recomendacoes.',
+					);
 				}
 			} finally {
-				if (ativo) setLoading(false);
+				if (active) {
+					setRecommendationsLoading(false);
+				}
 			}
 		}
 
-		carregar();
+		loadRecommendations();
 
 		return () => {
-			ativo = false;
+			active = false;
 		};
-	}, [accessToken]);
+	}, [options?.accessToken]);
 
-	const filtrados = useMemo(() => {
-		const termo = query.trim().toLocaleLowerCase('pt-BR');
-		return filtrarEspetaculos(espetaculos, termo, selectedFilter);
-	}, [espetaculos, query, selectedFilter]);
+	useEffect(() => {
+		let active = true;
 
-	const recomendacoesFiltradas = useMemo(() => {
-		const termo = query.trim().toLocaleLowerCase('pt-BR');
-		return filtrarEspetaculos(recomendacoes, termo, selectedFilter);
-	}, [recomendacoes, query, selectedFilter]);
+		async function loadCatalogSections() {
+			try {
+				setCatalogLoading(true);
+				setCatalogError(null);
 
-	const heroEspetaculo =
-		espetaculos.find((item) => normalizarTitulo(item.titulo).includes('elis')) ?? espetaculos[0];
-	const heroBackgroundUrl = heroEspetaculo
-		? obterUrlMidia(heroEspetaculo, 'catalog_hero_background')
-		: undefined;
-	const heroArtworkUrl = heroEspetaculo
-		? obterUrlMidia(heroEspetaculo, 'catalog_hero_artwork')
-		: undefined;
+				const [popular, emCartaz, catalogo] = await Promise.all([
+					listarEspetaculosPopulares(10),
+					listarEspetaculosEmCartaz(20),
+					listarCatalogoCompleto(20),
+				]);
 
-	const assets = {
-		...CATALOG_IMAGE,
-		hero: heroBackgroundUrl ? { uri: heroBackgroundUrl } : undefined,
-		heroArtwork: heroArtworkUrl ? { uri: heroArtworkUrl } : undefined,
-	};
+				if (active) {
+					setPopularShows(popular);
+					setEmCartazShows(emCartaz);
+					setCatalogShows(catalogo);
+				}
 
-	const categoriaMaiorScore = recomendacoes[0]?.genero?.trim();
-	const affinityItems = recomendacoesFiltradas.length > 0
-		? recomendacoesFiltradas
-		: filtrados.slice(10, 20);
-	const affinityTitle = categoriaMaiorScore
-		? `Porque voce gostou de ${categoriaMaiorScore}:`
-		: 'Porque voce gostou de musicais:';
+				const nearby = await listarEspetaculosPertoDe(options?.userLocationAddress, 8);
+				if (active) {
+					setNearbyShows(nearby);
+				}
+			} catch (error) {
+				if (active) {
+					setCatalogError(
+						error instanceof Error ? error.message : 'Nao foi possivel carregar o catalogo.',
+					);
+				}
+			} finally {
+				if (active) {
+					setCatalogLoading(false);
+				}
+			}
+		}
+
+		loadCatalogSections();
+
+		return () => {
+			active = false;
+		};
+	}, [options?.userLocationAddress, catalogReloadKey]);
+
+	useEffect(() => {
+		let active = true;
+		const timeout = setTimeout(async () => {
+			const trimmedQuery = query.trim();
+			if (!trimmedQuery && !selectedFilter) {
+				setFilteredShows([]);
+				return;
+			}
+
+			try {
+				const data = await listarEspetaculos({
+					genre: selectedFilter,
+					limit: 20,
+					query: trimmedQuery,
+					sortBy: 'popularidade',
+				});
+
+				if (active) {
+					setFilteredShows(data);
+				}
+			} catch {
+				if (active) {
+					setFilteredShows([]);
+				}
+			}
+		}, 260);
+
+		return () => {
+			active = false;
+			clearTimeout(timeout);
+		};
+	}, [query, selectedFilter]);
+
+	const recommendationItems = recommendations.map((item) => ({
+		id: item.id,
+		title: item.title,
+		subtitle: item.genre ?? 'Recomendado para voce',
+		image: getRecommendationImage(item),
+		imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
+		recommendation: {
+			score: item.score,
+			algorithm: item.algorithm,
+			reason: item.reason,
+			generatedAt: item.generatedAt,
+		},
+	}));
+
+	const filteredItems = filteredShows.map(toCatalogItem);
+	const popularItems = popularShows.map(toCatalogItem);
+	const nearbyItems = nearbyShows.map((item) => ({
+		...toCatalogItem(item),
+		subtitle: item.genre ?? 'Perto de voce',
+	}));
+	const emCartazItems = emCartazShows.map(toCatalogItem);
+	const catalogItems = catalogShows.map(toCatalogItem);
+	const recommendationFallbackItems = deduplicarCatalogItems([
+		...popularItems,
+		...emCartazItems,
+		...catalogItems,
+	])
+		.slice(0, 8)
+		.map((item) => ({
+			...item,
+			subtitle: item.subtitle ?? 'Sugestao inicial',
+		}));
+	const recommendedSectionItems = recommendationItems.length > 0
+		? recommendationItems
+		: recommendationFallbackItems;
+	const watchedItems = catalogShows
+		.filter((item) => !popularShows.some((popular) => popular.id === item.id))
+		.slice(0, 10)
+		.map(toCatalogItem);
+	const heroShow = useMemo(
+		() => catalogShows.find((item) => normalizarTitulo(item.title).includes('elis')) ?? popularShows[0] ?? null,
+		[catalogShows, popularShows],
+	);
+	const heroBackgroundUrl = heroShow
+		? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_background')
+			?? obterUrlMidiaConhecida(heroShow.title, 'catalog_hero_background')
+		: null;
+	const heroArtworkUrl = heroShow
+		? obterUrlMidia({ midias: heroShow.media }, 'catalog_hero_artwork')
+			?? obterUrlMidiaConhecida(heroShow.title, 'catalog_hero_artwork')
+		: null;
+	const assets = useMemo(
+		() => ({
+			...CATALOG_IMAGE,
+			hero: heroBackgroundUrl ? { uri: heroBackgroundUrl } : undefined,
+			heroArtwork: heroArtworkUrl ? { uri: heroArtworkUrl } : undefined,
+		}),
+		[heroBackgroundUrl, heroArtworkUrl],
+	);
+
+	const heroItem = useMemo<CatalogItem | null>(
+		() => (heroShow ? toCatalogItem(heroShow) : recommendationItems[0] ?? popularItems[0] ?? emCartazItems[0] ?? null),
+		[heroShow, recommendationItems, popularItems, emCartazItems],
+	);
 
 	const sections: CatalogRail[] = [
-		{ id: 'popular', title: 'Os mais populares do momento:', items: filtrados.slice(0, 10).map(mapCatalogItem) },
-		{ id: 'watched', title: 'Outras pessoas tambem assistiram:', items: filtrados.slice(5, 15).map(mapCatalogItem) },
-		{ id: 'affinity', title: affinityTitle, items: affinityItems.map(mapCatalogItem) },
+		...(filteredItems.length > 0
+			? [{ id: 'search-results', title: 'Resultados encontrados:', items: filteredItems }]
+			: []),
+		...(recommendedSectionItems.length > 0
+			? [{ id: 'recommended', title: 'Recomendados para voce:', items: recommendedSectionItems }]
+			: []),
+		...(nearbyItems.length > 0
+			? [{ id: 'nearby', title: 'Perto de voce:', items: nearbyItems }]
+			: []),
+		...(popularItems.length > 0
+			? [{ id: 'popular', title: 'Os mais populares do momento:', items: popularItems }]
+			: []),
+		...(watchedItems.length > 0
+			? [{ id: 'watched', title: 'Outras pessoas tambem assistiram:', items: watchedItems }]
+			: []),
+		...(emCartazItems.length > 0
+			? [{ id: 'em-cartaz', title: 'Em cartaz:', items: emCartazItems }]
+			: []),
+		...(catalogItems.length > 0
+			? [{ id: 'catalogo-completo', title: 'Catalogo completo:', items: catalogItems }]
+			: []),
 	];
 
 	return {
 		assets,
-		error,
+		catalogError,
+		catalogLoading,
 		filterOptions: FILTER_OPTIONS,
-		heroEspetaculo,
-		loading,
+		heroItem,
 		query,
+		recommendationsError,
+		recommendationsLoading,
 		selectedFilter,
-		sections: sections.filter((section) => section.items.length > 0),
+		sections,
+		recarregarCatalogo: () => setCatalogReloadKey((value) => value + 1),
 		setQuery,
 		setSelectedFilter,
 		userName: 'Leonardo',
 	};
 }
 
-function filtrarEspetaculos(
-	espetaculos: EspetaculoResumoApi[],
-	termo: string,
-	selectedFilter: (typeof FILTER_OPTIONS)[number] | null,
-) {
-	return espetaculos.filter((item) => {
-		const combinaBusca = !termo || item.titulo.toLocaleLowerCase('pt-BR').includes(termo);
-		const combinaFiltro =
-			!selectedFilter ||
-			item.genero?.toLocaleLowerCase('pt-BR').includes(selectedFilter.toLocaleLowerCase('pt-BR'));
+function toCatalogItem(item: CatalogShow) {
+	return {
+		id: item.id,
+		title: item.title,
+		subtitle: item.genre ?? 'VER MAIS',
+		imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
+	};
+}
 
-		return combinaBusca && combinaFiltro;
+function deduplicarCatalogItems(items: CatalogItem[]) {
+	const vistos = new Set<string>();
+
+	return items.filter((item) => {
+		if (vistos.has(item.id)) {
+			return false;
+		}
+
+		vistos.add(item.id);
+		return true;
 	});
 }
 
-function mapCatalogItem(espetaculo: EspetaculoResumoApi) {
-	const imageUrl = obterUrlMidia(espetaculo, 'catalog_card');
-
-	return {
-		id: String(espetaculo.id),
-		title: espetaculo.titulo,
-		subtitle: 'VER MAIS',
-		image: imageUrl ? { uri: imageUrl } : undefined,
-	};
+function getRecommendationImage(item: RecommendedShow) {
+	void item;
+	return undefined;
 }

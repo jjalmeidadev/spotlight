@@ -260,31 +260,31 @@ WITH midias(titulo, tipo_midia, storage_bucket, storage_path, alt_text, ordem_ex
         -- Elis, a Musical
         ('Elis, a Musical', 'catalog_card', 'espetaculos', 'catalog_card/elis_catalog_card.png', 'Card de Elis, a Musical', 1),
         ('Elis, a Musical', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/elis_catalog_hero_background.png', 'Fundo do hero de Elis, a Musical', 1),
-        ('Elis, a Musical', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/elis_catalog_hero_artwork .png', 'Imagem destacada do hero de Elis, a Musical', 1),
-        ('Elis, a Musical', 'detail_image', 'espetaculos', 'detail_image/elis__detail_image.png', 'Imagem de detalhe de Elis, a Musical', 1),
+        ('Elis, a Musical', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/elis_catalog_hero_artwork.png', 'Imagem destacada do hero de Elis, a Musical', 1),
+        ('Elis, a Musical', 'detail_image', 'espetaculos', 'detail_image/elis_detail_image.png', 'Imagem de detalhe de Elis, a Musical', 1),
 
         -- A Novica Rebelde
         ('A Novica Rebelde', 'catalog_card', 'espetaculos', 'catalog_card/rebelde_catalog_card.png', 'Card de A Novica Rebelde', 1),
         ('A Novica Rebelde', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/rebelde_catalog_hero_background.png', 'Fundo do hero de A Novica Rebelde', 1),
         ('A Novica Rebelde', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/rebelde_catalog_hero_artwork.png', 'Imagem destacada do hero de A Novica Rebelde', 1),
-        ('A Novica Rebelde', 'detail_image', 'espetaculos', 'detail_image/rebelde__detail_image.png', 'Imagem de detalhe de A Novica Rebelde', 1),
+        ('A Novica Rebelde', 'detail_image', 'espetaculos', 'detail_image/rebelde_detail_image.png', 'Imagem de detalhe de A Novica Rebelde', 1),
 
         -- Mamma Mia!
         ('Mamma Mia!', 'catalog_card', 'espetaculos', 'catalog_card/mamma_catalog_card.png', 'Card de Mamma Mia!', 1),
         ('Mamma Mia!', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/mamma_catalog_hero_background.png', 'Fundo do hero de Mamma Mia!', 1),
-        ('Mamma Mia!', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/mamma_catalog_hero_artwork .png', 'Imagem destacada do hero de Mamma Mia!', 1),
-        ('Mamma Mia!', 'detail_image', 'espetaculos', 'detail_image/mamma__detail_image.png', 'Imagem de detalhe de Mamma Mia!', 1),
+        ('Mamma Mia!', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/mamma_catalog_hero_artwork.png', 'Imagem destacada do hero de Mamma Mia!', 1),
+        ('Mamma Mia!', 'detail_image', 'espetaculos', 'detail_image/mamma_detail_image.png', 'Imagem de detalhe de Mamma Mia!', 1),
 
         -- Zaquim
         ('Zaquim', 'catalog_card', 'espetaculos', 'catalog_card/zaquim_catalog_card.png', 'Card de Zaquim', 1),
         ('Zaquim', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/zaquim_catalog_hero_background.png', 'Fundo do hero de Zaquim', 1),
-        ('Zaquim', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/zaquim_catalog_hero_artwork .png', 'Imagem destacada do hero de Zaquim', 1),
-        ('Zaquim', 'detail_image', 'espetaculos', 'detail_image/zaquim__detail_image.png', 'Imagem de detalhe de Zaquim', 1),
+        ('Zaquim', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/zaquim_catalog_hero_artwork.png', 'Imagem destacada do hero de Zaquim', 1),
+        ('Zaquim', 'detail_image', 'espetaculos', 'detail_image/zaquim_detail_image.png', 'Imagem de detalhe de Zaquim', 1),
 
         -- Pixar in Concert
         ('Pixar in Concert', 'catalog_card', 'espetaculos', 'catalog_card/pixar_catalog_card.png', 'Card de Pixar in Concert', 1),
         ('Pixar in Concert', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/pixar_catalog_hero_background.png', 'Fundo do hero de Pixar in Concert', 1),
-        ('Pixar in Concert', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/pixar_catalog_hero_artwork .png', 'Imagem destacada do hero de Pixar in Concert', 1),
+        ('Pixar in Concert', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/pixar_catalog_hero_artwork.png', 'Imagem destacada do hero de Pixar in Concert', 1),
         ('Pixar in Concert', 'detail_image', 'espetaculos', 'detail_image/pixar_detail_image.png', 'Imagem de detalhe de Pixar in Concert', 1),
 
         -- Ayrton Senna - O Musical
@@ -296,56 +296,56 @@ WITH midias(titulo, tipo_midia, storage_bucket, storage_path, alt_text, ordem_ex
         -- Romeu & Julieta, ao som de Marisa Monte
         ('Romeu & Julieta, ao som de Marisa Monte', 'catalog_card', 'espetaculos', 'catalog_card/romeu_catalog_card.png', 'Card de Romeu & Julieta, ao som de Marisa Monte', 1),
         ('Romeu & Julieta, ao som de Marisa Monte', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/romeu_catalog_hero_background.png', 'Fundo do hero de Romeu & Julieta, ao som de Marisa Monte', 1),
-        ('Romeu & Julieta, ao som de Marisa Monte', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/romeu_catalog_hero_artwork .png', 'Imagem destacada do hero de Romeu & Julieta, ao som de Marisa Monte', 1),
-        ('Romeu & Julieta, ao som de Marisa Monte', 'detail_image', 'espetaculos', 'detail_image/romeu__detail_image.png', 'Imagem de detalhe de Romeu & Julieta, ao som de Marisa Monte', 1),
+        ('Romeu & Julieta, ao som de Marisa Monte', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/romeu_catalog_hero_artwork.png', 'Imagem destacada do hero de Romeu & Julieta, ao som de Marisa Monte', 1),
+        ('Romeu & Julieta, ao som de Marisa Monte', 'detail_image', 'espetaculos', 'detail_image/romeu_detail_image.png', 'Imagem de detalhe de Romeu & Julieta, ao som de Marisa Monte', 1),
 
         -- Musical Hairspray
         ('Musical Hairspray', 'catalog_card', 'espetaculos', 'catalog_card/hairspray_catalog_card.png', 'Card de Musical Hairspray', 1),
         ('Musical Hairspray', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/hairspray_catalog_hero_background.png', 'Fundo do hero de Musical Hairspray', 1),
         ('Musical Hairspray', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/hairspray_catalog_hero_artwork.png', 'Imagem destacada do hero de Musical Hairspray', 1),
-        ('Musical Hairspray', 'detail_image', 'espetaculos', 'detail_image/hairspray__detail_image.png', 'Imagem de detalhe de Musical Hairspray', 1),
+        ('Musical Hairspray', 'detail_image', 'espetaculos', 'detail_image/hairspray_detail_image.png', 'Imagem de detalhe de Musical Hairspray', 1),
 
         -- Clube da Esquina - Os Sonhos Nao Envelhecem
         ('Clube da Esquina - Os Sonhos Nao Envelhecem', 'catalog_card', 'espetaculos', 'catalog_card/clube_catalog_card.png', 'Card de Clube da Esquina - Os Sonhos Nao Envelhecem', 1),
         ('Clube da Esquina - Os Sonhos Nao Envelhecem', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/clube_catalog_hero_background.png', 'Fundo do hero de Clube da Esquina - Os Sonhos Nao Envelhecem', 1),
-        ('Clube da Esquina - Os Sonhos Nao Envelhecem', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/clube_catalog_hero_artwork .png', 'Imagem destacada do hero de Clube da Esquina - Os Sonhos Nao Envelhecem', 1),
-        ('Clube da Esquina - Os Sonhos Nao Envelhecem', 'detail_image', 'espetaculos', 'detail_image/clube__detail_image.png', 'Imagem de detalhe de Clube da Esquina - Os Sonhos Nao Envelhecem', 1),
+        ('Clube da Esquina - Os Sonhos Nao Envelhecem', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/clube_catalog_hero_artwork.png', 'Imagem destacada do hero de Clube da Esquina - Os Sonhos Nao Envelhecem', 1),
+        ('Clube da Esquina - Os Sonhos Nao Envelhecem', 'detail_image', 'espetaculos', 'detail_image/clube_detail_image.png', 'Imagem de detalhe de Clube da Esquina - Os Sonhos Nao Envelhecem', 1),
 
         -- Nossa Historia com Chico Buarque
         ('Nossa Historia com Chico Buarque', 'catalog_card', 'espetaculos', 'catalog_card/nossa_catalog_card.png', 'Card de Nossa Historia com Chico Buarque', 1),
         ('Nossa Historia com Chico Buarque', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/nossa_catalog_hero_background.png', 'Fundo do hero de Nossa Historia com Chico Buarque', 1),
-        ('Nossa Historia com Chico Buarque', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/nossa_catalog_hero_artwork .png', 'Imagem destacada do hero de Nossa Historia com Chico Buarque', 1),
-        ('Nossa Historia com Chico Buarque', 'detail_image', 'espetaculos', 'detail_image/nossa__detail_image.png', 'Imagem de detalhe de Nossa Historia com Chico Buarque', 1),
+        ('Nossa Historia com Chico Buarque', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/nossa_catalog_hero_artwork.png', 'Imagem destacada do hero de Nossa Historia com Chico Buarque', 1),
+        ('Nossa Historia com Chico Buarque', 'detail_image', 'espetaculos', 'detail_image/nossa_detail_image.png', 'Imagem de detalhe de Nossa Historia com Chico Buarque', 1),
 
         -- Prima Facie com Debora Falabella
         ('Prima Facie com Debora Falabella', 'catalog_card', 'espetaculos', 'catalog_card/prima_catalog_card.png', 'Card de Prima Facie com Debora Falabella', 1),
         ('Prima Facie com Debora Falabella', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/prima_catalog_hero_background.png', 'Fundo do hero de Prima Facie com Debora Falabella', 1),
-        ('Prima Facie com Debora Falabella', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/prima_catalog_hero_artwork .png', 'Imagem destacada do hero de Prima Facie com Debora Falabella', 1),
-        ('Prima Facie com Debora Falabella', 'detail_image', 'espetaculos', 'detail_image/prima__detail_image.png', 'Imagem de detalhe de Prima Facie com Debora Falabella', 1),
+        ('Prima Facie com Debora Falabella', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/prima_catalog_hero_artwork.png', 'Imagem destacada do hero de Prima Facie com Debora Falabella', 1),
+        ('Prima Facie com Debora Falabella', 'detail_image', 'espetaculos', 'detail_image/prima_detail_image.png', 'Imagem de detalhe de Prima Facie com Debora Falabella', 1),
 
         -- A Cor Purpura, O Musical
         ('A Cor Purpura, O Musical', 'catalog_card', 'espetaculos', 'catalog_card/purpura_catalog_card.png', 'Card de A Cor Purpura, O Musical', 1),
         ('A Cor Purpura, O Musical', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/purpura_catalog_hero_background.png', 'Fundo do hero de A Cor Purpura, O Musical', 1),
-        ('A Cor Purpura, O Musical', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/purpura_catalog_hero_artwork .png', 'Imagem destacada do hero de A Cor Purpura, O Musical', 1),
-        ('A Cor Purpura, O Musical', 'detail_image', 'espetaculos', 'detail_image/purpura__detail_image.png', 'Imagem de detalhe de A Cor Purpura, O Musical', 1),
+        ('A Cor Purpura, O Musical', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/purpura_catalog_hero_artwork.png', 'Imagem destacada do hero de A Cor Purpura, O Musical', 1),
+        ('A Cor Purpura, O Musical', 'detail_image', 'espetaculos', 'detail_image/purpura_detail_image.png', 'Imagem de detalhe de A Cor Purpura, O Musical', 1),
 
         -- Bibi - Uma Vida em Musical
         ('Bibi - Uma Vida em Musical', 'catalog_card', 'espetaculos', 'catalog_card/bibi_catalog_card.png', 'Card de Bibi - Uma Vida em Musical', 1),
         ('Bibi - Uma Vida em Musical', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/bibi_catalog_hero_background.png', 'Fundo do hero de Bibi - Uma Vida em Musical', 1),
-        ('Bibi - Uma Vida em Musical', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/bibi_catalog_hero_artwork .png', 'Imagem destacada do hero de Bibi - Uma Vida em Musical', 1),
-        ('Bibi - Uma Vida em Musical', 'detail_image', 'espetaculos', 'detail_image/bibi__detail_image.png', 'Imagem de detalhe de Bibi - Uma Vida em Musical', 1),
+        ('Bibi - Uma Vida em Musical', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/bibi_catalog_hero_artwork.png', 'Imagem destacada do hero de Bibi - Uma Vida em Musical', 1),
+        ('Bibi - Uma Vida em Musical', 'detail_image', 'espetaculos', 'detail_image/bibi_detail_image.png', 'Imagem de detalhe de Bibi - Uma Vida em Musical', 1),
 
         -- Hair
         ('Hair', 'catalog_card', 'espetaculos', 'catalog_card/hair_catalog_card.png', 'Card de Hair', 1),
         ('Hair', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/hair_catalog_hero_background.png', 'Fundo do hero de Hair', 1),
-        ('Hair', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/hair_catalog_hero_artwork .png', 'Imagem destacada do hero de Hair', 1),
+        ('Hair', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/hair_catalog_hero_artwork.png', 'Imagem destacada do hero de Hair', 1),
         ('Hair', 'detail_image', 'espetaculos', 'detail_image/hair_detail_image.png', 'Imagem de detalhe de Hair', 1),
 
         -- Chacrinha, o Musical
         ('Chacrinha, o Musical', 'catalog_card', 'espetaculos', 'catalog_card/chacrinha_catalog_card.png', 'Card de Chacrinha, o Musical', 1),
         ('Chacrinha, o Musical', 'catalog_hero_background', 'espetaculos', 'catalog_hero_background/chacrinha_catalog_hero_background.png', 'Fundo do hero de Chacrinha, o Musical', 1),
         ('Chacrinha, o Musical', 'catalog_hero_artwork', 'espetaculos', 'catalog_hero_artwork/chacrinha_catalog_hero_artwork.png', 'Imagem destacada do hero de Chacrinha, o Musical', 1),
-        ('Chacrinha, o Musical', 'detail_image', 'espetaculos', 'detail_image/chacrinha__detail_image.png', 'Imagem de detalhe de Chacrinha, o Musical', 1)
+        ('Chacrinha, o Musical', 'detail_image', 'espetaculos', 'detail_image/chacrinha_detail_image.png', 'Imagem de detalhe de Chacrinha, o Musical', 1)
 )
 INSERT INTO public.espetaculo_midia (
     id_espetaculo, tipo_midia, storage_bucket, storage_path, alt_text, ordem_exibicao

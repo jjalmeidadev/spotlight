@@ -3323,10 +3323,115 @@ _conteúdo_
 _conteúdo_
 
 ## 6.1 Diagrama de Implantação da UML
-_conteúdo_
+
+O diagrama de implantação (*deployment diagram*) é um modelo da UML que representa a topologia física da solução: os nós de execução (dispositivos e ambientes de servidor), os artefatos implantados em cada nó e os caminhos de comunicação entre eles. Para o Spotlight, ele é importante porque evidencia como o **frontend**, o **backend**, o **servidor de aplicação**, os **contêineres Docker**, os **bancos de dados** e as **integrações externas** se distribuem na infraestrutura real do projeto, deixando claras as fronteiras de rede, os protocolos utilizados e as dependências de nuvem.
+
+A solução é organizada em quatro grandes blocos de implantação:
+
+- **Dispositivo Móvel (Android / iOS):** executa o artefato do **App Spotlight**, construído em Expo SDK 54 / React Native 0.81, que consome as APIs por HTTPS/REST.
+- **Servidor de Aplicação (Host Linux + Docker Engine):** hospeda os quatro microsserviços do backend (.NET 9) em contêineres isolados, todos conectados à rede Docker `spotlight_network`.
+- **Supabase (Cloud):** provê o banco relacional **PostgreSQL** (catálogo, usuários e recomendações) e o serviço de **Auth/JWT** para autenticação e validação de tokens.
+- **Serviços externos de nuvem:** **MongoDB Atlas**, que armazena a telemetria de uso, e **OpenStreetMap/Nominatim**, utilizado para *geocoding* pelo serviço de geolocalização.
+
+<div align="center">
+
+<sub>Figura X - Diagrama de Implantação UML</sub><br>
+
+  <img src="./img/diagrama-implementacao.png" width="100%" alt="Diagrama de implantação da solução Spotlight"><br>
+
+  <sup>Source: Material produzido pelos autores, 2026.</sup>
+
+</div>
+
+### Nós, artefatos e integrações
+
+| Nó / Ambiente | Artefato / Componente | Tecnologia | Comunicação |
+|---|---|---|---|
+| **Dispositivo Móvel** | App Spotlight | Expo SDK 54 / React Native 0.81 | HTTPS/REST com as APIs; login via JWT no Supabase Auth |
+| **Container: catalogo** | API de Catálogo | .NET 9 API | PostgreSQL (connection string); valida JWT no Supabase Auth |
+| **Container: recomendacao** | API de Recomendação | .NET 9 API | PostgreSQL (connection string); valida JWT no Supabase Auth |
+| **Container: geolocalizacao** | API de Geolocalização | .NET 9 API | HTTPS para Nominatim (geocoding) |
+| **Container: usuario** | API de Usuário | .NET 9 API | PostgreSQL; telemetria no MongoDB Atlas; valida JWT no Supabase Auth |
+| **Supabase (Cloud)** | PostgreSQL + Auth/JWT | Supabase | Persistência relacional e provedor de identidade |
+| **MongoDB Atlas (Cloud)** | MongoDB | MongoDB | Persistência de telemetria de uso |
+| **OpenStreetMap** | Nominatim API | OpenStreetMap | Geocodificação de endereços |
+
+Os quatro contêineres do backend são orquestrados no mesmo host pela rede Docker `spotlight_network`, o que permite isolamento de processos, padronização do ambiente de execução e comunicação interna entre serviços, enquanto a exposição externa ocorre por HTTPS para o aplicativo móvel.
+
+### Código-fonte do diagrama (PlantUML)
+
+O diagrama acima foi gerado a partir do seguinte código PlantUML, mantido versionado para permitir futuras atualizações da topologia:
+
+```plantuml
+@startuml
+title Diagrama de Implantação - Spotlight (g04)
+
+skinparam shadowing false
+skinparam monochrome true
+skinparam defaultFontName "Helvetica"
+
+node "Dispositivo Móvel\n(Android / iOS)" as Device {
+  artifact "App Spotlight\n(Expo SDK 54 / React Native 0.81)" as App
+}
+
+cloud "Servidor de Aplicação\n(Host Linux + Docker Engine)" as Servidor {
+  node "Rede Docker: spotlight_network" as DockerNet {
+    node "Container: catalogo" as Catalogo {
+      artifact ".NET 9 API" as ApiCat
+    }
+    node "Container: recomendacao" as Recomendacao {
+      artifact ".NET 9 API" as ApiRec
+    }
+    node "Container: geolocalizacao" as Geo {
+      artifact ".NET 9 API" as ApiGeo
+    }
+    node "Container: usuario" as Usuario {
+      artifact ".NET 9 API" as ApiUsr
+    }
+  }
+}
+
+cloud "Supabase (Cloud)" as Supabase {
+  database "PostgreSQL\n(catálogo, usuários,\nrecomendações)" as Postgres
+  component "Auth / JWT" as Auth
+}
+
+cloud "MongoDB Atlas (Cloud)" as MongoCloud {
+  database "MongoDB\n(telemetria de uso)" as Mongo
+}
+
+cloud "OpenStreetMap" as OSM {
+  component "Nominatim API\n(geocoding)" as Nominatim
+}
+
+App -down-> Catalogo : HTTPS / REST
+App -down-> Recomendacao : HTTPS / REST
+App -down-> Geo : HTTPS / REST
+App -down-> Usuario : HTTPS / REST
+App ..> Auth : Login (JWT)
+
+Catalogo --> Postgres : connection string
+Recomendacao --> Postgres
+Usuario --> Postgres
+Usuario --> Mongo : telemetria
+
+Catalogo ..> Auth : valida JWT
+Recomendacao ..> Auth : valida JWT
+Usuario ..> Auth : valida JWT
+
+Geo --> Nominatim : HTTPS
+@enduml
+```
 
 ## 6.2 Justificativa das Escolhas de Implantação
-_conteúdo_
+
+As escolhas de implantação priorizam **padronização do ambiente**, **baixo custo operacional no MVP** e **clareza das fronteiras entre serviços**:
+
+- **Contêineres Docker no host Linux:** cada microsserviço .NET 9 roda em um contêiner próprio na rede `spotlight_network`, garantindo isolamento, paridade entre ambientes de desenvolvimento e produção e facilidade de orquestração via `docker-compose`. Isso reduz o atrito de configuração e mantém a arquitetura SOA com fronteiras bem definidas.
+- **Supabase (PostgreSQL + Auth):** concentra persistência relacional e identidade em uma plataforma gerenciada, eliminando a necessidade de manter servidores de banco e de autenticação próprios. O PostgreSQL padrão evita *vendor lock-in* e o Auth/JWT integra-se nativamente ao banco (ver Seção 6.3).
+- **MongoDB Atlas para telemetria:** a telemetria de uso, de alto volume e escrita intensa, é segregada em um banco documental gerenciado na nuvem, preservando o desempenho do banco transacional e seguindo o princípio de persistência poliglota.
+- **OpenStreetMap/Nominatim:** atende ao *geocoding* do serviço de geolocalização sem dependência de billing proprietário, adequando-se ao escopo e ao orçamento do MVP.
+- **App móvel desacoplado:** o aplicativo comunica-se exclusivamente por HTTPS/REST com o backend e por JWT com o Supabase Auth, mantendo o cliente independente da infraestrutura interna e permitindo evolução dos serviços sem impacto na camada de apresentação.
 
 ## 6.3 Autenticação e Segurança
 
@@ -3556,116 +3661,220 @@ _conteúdo_
 
 ## 8.1 Arquitetura de Codificação e Estrutura de Diretórios
 
-&emsp;A solução foi organizada para separar a aplicação Expo do restante do ecossistema do projeto. A raiz concentra os arquivos de configuração do app e os ativos estáticos, enquanto `src/` reúne as camadas de código-fonte. Essa divisão segue dois objetivos principais: manter o frontend em uma estrutura MVVM clara e manter o backend como uma composição SOA explícita, com contratos, serviços e integração externa separados por responsabilidade.
+&emsp;A solução foi organizada para separar a aplicação Expo do restante do ecossistema do projeto. A raiz concentra os arquivos de configuração do app móvel, a orquestração de containers e os ativos estáticos, enquanto `src/` reúne as camadas de código-fonte. Essa divisão atende a três objetivos: manter o frontend em uma estrutura MVVM clara; manter o backend como uma composição SOA explícita com contratos, serviços, motor de ML e testes separados por responsabilidade; e manter o ciclo de dados (datasets, scripts SQL, migrações, artefatos de modelo) isolado da aplicação que o consome.
 
 ### Estrutura de diretórios
 
+&emsp;A árvore abaixo reflete o estado atual do repositório. Para manter a leitura objetiva, arquivos de build do .NET (`bin/`, `obj/`, `Properties/`) e dependências (`node_modules/`) não foram listados; nas pastas dos serviços, `Program.cs`, `*.csproj`, `Dockerfile` e `appsettings*.json` aparecem agrupados em comentários de linha.
+
 ```text
 g04/
-├─ app.json
-├─ babel.config.js
-├─ expo-env.d.ts
-├─ package.json
-├─ tsconfig.json
-├─ README.md
-├─ assets/
-├─ documentos/
+├─ App.js                       # entry-point do app Expo
+├─ app.json                     # config do Expo
+├─ babel.config.js              # transpiler
+├─ tsconfig.json                # config TypeScript do frontend
+├─ package.json                 # deps e scripts do frontend Expo
+├─ docker-compose.yml           # orquestração local dos serviços backend
+├─ .env.example                 # variáveis de ambiente de referência
+├─ .gitlab-ci.yml               # pipeline de CI (lint, build, testes)
+├─ README.md                    # visão geral do repositório
+├─ assets/                      # imagens, ícones e fontes do app
+├─ documentos/                  # documentação do produto e do projeto
+│  ├─ img/                      # imagens, diagramas, mockups e wireframes
 │  ├─ Projeto.md
 │  ├─ ProjetoVisual.md
 │  ├─ GestaoProjeto.md
-│  └─ Manual-instalacao.md
+│  ├─ Gestao_Projeto_Configuracao.md
+│  ├─ GuiaPadroesDesenvolvimento.md
+│  ├─ Documentacao_soa.md
+│  ├─ Manual-instalacao.md
+│  └─ Index.md
+├─ colab_csv_utf8/              # datasets originais em CSV bruto (pré-AAD)
 └─ src/
-  ├─ backend/
-  │  ├─ api-gateway/
-  │  ├─ contracts/
-  │  │  ├─ dtos/
-  │  │  └─ events/
-  │  ├─ services/
-  │  │  ├─ catalogo/
-  │  │  ├─ recomendacao/
-  │  │  └─ usuario/
-  │  └─ ml-engine/
-  │     ├─ data-preparation/
-  │     ├─ inference/
-  │     └─ training/
-  ├─ frontend/
-  │  ├─ components/
-  │  ├─ screens/
-  │  ├─ viewmodels/
-  │  ├─ models/
-  │  ├─ repositories/
-  │  ├─ theme/
-  │  └─ types/
-  ├─ aad/
-  ├─ database/
-  ├─ dataset/
-  └─ models/
+   ├─ frontend/                 # app React Native + TypeScript (MVVM)
+   │  ├─ screens/               # Views (telas) — *.tsx
+   │  ├─ viewmodels/            # hooks de apresentação — use*ViewModel.ts
+   │  ├─ models/                # entidades e tipos do domínio do app
+   │  ├─ components/            # UI reutilizável (cards, hero, search...)
+   │  ├─ repositories/          # acesso a APIs do backend
+   │  ├─ hooks/                 # hooks transversais (ex.: telemetria)
+   │  ├─ config/                # endpoints e mocks de assets
+   │  └─ theme/                 # tokens (cores, tipografia, espaçamento)
+   ├─ backend/                  # ecossistema SOA em .NET 9 / ASP.NET Core
+   │  ├─ Spotlight.sln          # solution agrupando gateway + 4 serviços + 5 projetos de teste
+   │  ├─ api-gateway/           # Spotlight.Gateway — YARP gateway (porta 5000)
+   │  │  ├─ Controllers/        # endpoints expostos do gateway
+   │  │  ├─ Middleware/         # auth JWT, rate limit, logging
+   │  │  └─ *                   # Program.cs, .csproj, appsettings*.json
+   │  ├─ contracts/             # contratos compartilhados entre serviços
+   │  │  ├─ dtos/               # DTOs de fronteira
+   │  │  ├─ events/             # esquemas de eventos
+   │  │  ├─ openapi.json        # contrato OpenAPI consolidado
+   │  │  ├─ api-contracts.md    # descrição dos contratos REST
+   │  │  ├─ telemetria.md       # contrato dos eventos de telemetria
+   │  │  └─ supabase-storage.md # contrato de armazenamento de mídia
+   │  ├─ services/              # microsserviços de negócio (SOA)
+   │  │  ├─ catalogo/           # Spotlight.Catalogo (5001) — ICatalog
+   │  │  ├─ usuario/            # Spotlight.Usuario (5002) — IUserPrefs + telemetria Mongo
+   │  │  ├─ recomendacao/       # Spotlight.Recomendacao (5003) — IRecommendation (ML.NET)
+   │  │  └─ geolocalizacao/     # Spotlight.Geolocalizacao (5004) — IGeolocation (Nominatim)
+   │  ├─ ml-engine/             # placeholder do motor de ML (treino real em src/models/)
+   │  │  ├─ data-preparation/
+   │  │  ├─ training/
+   │  │  └─ inference/
+   │  ├─ scripts/               # scripts utilitários (ex.: E2E telemetria)
+   │  └─ tests/                 # projetos de testes por serviço
+   │     ├─ Spotlight.Catalogo.Tests/
+   │     ├─ Spotlight.Recomendacao.Tests/
+   │     ├─ Spotlight.Usuario.Tests/
+   │     ├─ Spotlight.Geolocalizacao.Tests/
+   │     └─ Spotlight.Gateway.Tests/
+   ├─ database/                 # provisão e evolução do banco
+   │  ├─ 00_supabase_compat.sql
+   │  ├─ 01_create_database.sql
+   │  ├─ 02_initial_data.sql
+   │  ├─ 03_rollback.sql
+   │  ├─ migrations/            # migrações incrementais + rollbacks
+   │  ├─ load_test/pgbench/     # queries do teste de carga (pgbench)
+   │  └─ README.md
+   ├─ dataset/                  # dados de apoio e amostras
+   │  ├─ itens_metadata.csv
+   │  ├─ recomendacao.csv
+   │  ├─ recomendacao_balanceado.csv
+   │  └─ interacoes_mongo_exemplo.jsonl
+   ├─ models/                   # experimentos e artefatos de ML
+   │  ├─ Spotlight.Recomendacao.ModelTraining/  # projeto C# de treino ML.NET
+   │  ├─ artifacts/             # modelo serializado (.zip) e similaridades
+   │  ├─ reports/               # métricas e exemplos do modelo
+   │  ├─ sistema_recomendacao_knn.ipynb
+   │  ├─ sistema_recomendacao_svd.ipynb
+   │  └─ svd_model.pkl
+   └─ aad/                      # análise exploratória de dados (notebooks)
+      └─ tratamento-dados.ipynb
+```
+
+&emsp;Cada microsserviço em `src/backend/services/<dominio>/` segue a mesma decomposição em quatro camadas, que materializa os princípios de arquitetura limpa adotados pelo projeto:
+
+```text
+services/<dominio>/
+├─ presentation/                # adapta entrada HTTP em casos de uso
+│  ├─ controllers/              # endpoints REST do serviço
+│  └─ middleware/               # auth, logging, tratamento de erro
+├─ application/                 # orquestra casos de uso
+│  ├─ usecases/                 # uma classe por operação do serviço
+│  ├─ dtos/                     # objetos de entrada/saída dos casos de uso
+│  └─ services/                 # serviços de aplicação (quando aplicável)
+├─ domain/                      # núcleo do negócio
+│  ├─ entities/                 # entidades e regras de domínio
+│  └─ value-objects/            # valores imutáveis e validados
+├─ infrastructure/              # adaptadores para o mundo externo
+│  ├─ persistence/              # acesso ao Supabase/Postgres via Npgsql (SQL puro)
+│  ├─ auth/                     # validação do JWT do Supabase
+│  └─ ...                       # integrações específicas do domínio
+├─ Program.cs                   # bootstrap do serviço ASP.NET Core
+├─ Dockerfile                   # imagem do serviço
+└─ appsettings*.json            # configuração por ambiente
 ```
 
 ### Representação visual da arquitetura
 
 ```mermaid
 flowchart TB
-  Root[Raiz do repositório] --> Expo[Configs do Expo\napp.json + babel.config.js + tsconfig.json]
-  Root --> Assets[assets/\nrecursos estáticos]
-  Root --> Docs[documentos/\nDocumentação do projeto]
+  Root[Raiz do repositório] --> Expo[Configs do Expo<br/>App.js · app.json · babel.config.js · tsconfig.json · package.json]
+  Root --> Infra[Infra local<br/>docker-compose.yml · .env.example · .gitlab-ci.yml]
+  Root --> Assets[assets/<br/>recursos estáticos]
+  Root --> Docs[documentos/<br/>documentação + img/]
+  Root --> Colab[colab_csv_utf8/<br/>datasets originais CSV]
   Root --> Src[src/]
 
-  Src --> Backend[backend/\nAPI, contratos, serviços e ML]
-  Src --> Frontend[frontend/\nUI em MVVM]
-  Src --> Data[database/\ndatasets e scripts SQL]
-  Src --> Aad[aad/\nnotebooks de análise]
-  Src --> ProjectModels[models/\nmodelos e artefatos]
+  Src --> Frontend[frontend/<br/>App React Native em MVVM]
+  Src --> Backend[backend/<br/>SOA · contratos · ML · testes]
+  Src --> DB[database/<br/>scripts SQL, migrações e teste de carga]
+  Src --> Dataset[dataset/<br/>amostras e dados de apoio]
+  Src --> MLModels[models/<br/>treino ML.NET, notebooks e artefatos]
+  Src --> Aad[aad/<br/>notebooks de análise exploratória]
 
-  Backend --> Gateway[api-gateway/\nporta de entrada do backend]
-  Backend --> Contracts[contracts/\nDTOs e eventos]
-  Backend --> Services[services/\nregras de negócio]
-  Backend --> MLEngine[ml-engine/\npreparação, treino e inferência]
+  Frontend --> Screens[screens/<br/>Views]
+  Frontend --> ViewModels[viewmodels/<br/>regra de apresentação]
+  Frontend --> FrontendModels[models/<br/>entidades do app]
+  Frontend --> Components[components/<br/>UI reutilizável]
+  Frontend --> Repos[repositories/<br/>acesso ao backend]
+  Frontend --> Hooks[hooks/<br/>comportamentos transversais]
+  Frontend --> Config[config/<br/>endpoints e assets mockados]
+  Frontend --> Theme[theme/<br/>tokens visuais]
 
-  Contracts --> DTOs[dtos/\nmodelos de troca de dados]
-  Contracts --> Events[events/\neventos de integração]
+  Backend --> Sln[Spotlight.sln<br/>solution .NET]
+  Backend --> Gateway[api-gateway/<br/>YARP · porta única]
+  Backend --> Contracts[contracts/<br/>DTOs, eventos e OpenAPI]
+  Backend --> Services[services/<br/>microsserviços de negócio]
+  Backend --> MLEngine[ml-engine/<br/>placeholder · treino em src/models/]
+  Backend --> Scripts[scripts/<br/>utilitários operacionais]
+  Backend --> Tests[tests/<br/>um projeto xUnit por serviço]
 
-  Services --> Catalogo[catalogo/\noperações do catálogo]
-  Services --> Recomendacao[recomendacao/\nregras da recomendação]
-  Services --> Usuario[usuario/\nfluxos de usuário]
+  Services --> Catalogo[catalogo/<br/>ICatalog]
+  Services --> Recomendacao[recomendacao/<br/>IRecommendation]
+  Services --> Usuario[usuario/<br/>IUserPrefs · telemetria]
+  Services --> Geo[geolocalizacao/<br/>IGeolocation]
 
-  MLEngine --> Prep[data-preparation/\ntratamento de dados]
-  MLEngine --> Training[training/\nmodelagem e treino]
-  MLEngine --> Inference[inference/\nexecução de predição]
-
-  Frontend --> Screens[screens/\ntelas]
-  Frontend --> Components[components/\ncomponentes reutilizáveis]
-  Frontend --> ViewModels[viewmodels/\nregras de apresentação]
-  Frontend --> Repos[repositories/\nacesso a dados]
-  Frontend --> Theme[theme/\ncores e estilos]
-  Frontend --> FrontendModels[models/\nentidades e mocks]
-  Frontend --> Types[types/\ntipos compartilhados]
+  Catalogo --> Layers[presentation · application · domain · infrastructure]
+  Recomendacao --> Layers
+  Usuario --> Layers
+  Geo --> Layers
 ```
 
 ### Critérios de organização
 
-- `assets/` guarda imagens e recursos estáticos consumidos pelo app; isso evita misturar conteúdo visual com código e facilita manutenção do pacote do Expo.
-- `documentos/` reúne a documentação do artefato e das entregas do projeto; centralizar isso melhora rastreabilidade e revisão.
-- `src/aad/` concentra notebooks e análises exploratórias; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
-- `src/database/` contém scripts SQL de criação e carga inicial; isso torna o banco reproduzível.
-- `src/dataset/` armazena dados de apoio e amostras do projeto; separar os dados do código facilita reprocessamento e versionamento.
-- `src/models/` guarda notebooks e artefatos de modelagem; isso isola experimentos de ML do restante da aplicação.
-- `src/frontend/` concentra a interface e segue o padrão MVVM. `screens/` representam a visão, `viewmodels/` concentram a lógica de apresentação, `repositories/` isolam o acesso a dados, `components/` reaproveitam UI, `models/` guardam entidades e mocks de apoio, `types/` concentram contratos compartilhados e `theme/` padroniza cores, tipografia e estilos.
-- `src/backend/` é organizado segundo SOA. `api-gateway/` funciona como porta de entrada das requisições, `contracts/` define os contratos compartilhados, `services/` contém a regra de negócio por domínio e `ml-engine/` isola o ciclo de dados e modelo.
-- `src/backend/contracts/dtos/` define os objetos de transferência usados nas fronteiras dos serviços; `events/` registra mensagens e eventos de integração entre módulos. Essa separação evita acoplamento entre emissores e consumidores.
-- `src/backend/services/catalogo/`, `recomendacao/` e `usuario/` separam responsabilidades por domínio, reduzindo acoplamento e facilitando testes e manutenção. Em cada serviço, `application/` orquestra casos de uso, `domain/` guarda entidades e value objects, `infrastructure/` implementa persistência e integrações, e `presentation/` expõe controllers ou adaptadores de entrada.
-- `src/backend/services/*/application/dtos/` reúne os dados de entrada e saída dos casos de uso; isso protege o domínio de formatos externos.
-- `src/backend/services/*/application/usecases/` concentra as regras de aplicação; aqui fica a coordenação das operações do domínio.
-- `src/backend/services/*/domain/entities/` guarda as entidades centrais do negócio; `value-objects/` mantém valores imutáveis e validados. Essa camada é importante porque preserva as regras críticas do domínio independentemente da interface ou da persistência.
-- `src/backend/services/*/infrastructure/persistence/` implementa o acesso a dados; separar isso permite trocar a tecnologia de armazenamento sem alterar o domínio.
-- `src/backend/services/*/presentation/controllers/` expõe os pontos de entrada de cada serviço; essa camada adapta requisições externas para os casos de uso internos.
-- `src/backend/ml-engine/data-preparation/`, `training/` e `inference/` organizam o ciclo de dados e modelo de forma independente, permitindo evoluir o motor de recomendação sem misturar preparo, treino e predição.
+**Raiz do repositório**
 
-As pastas vazias preservadas com `.gitkeep` existem para manter essa estrutura visível no Git até que os arquivos reais sejam implementados.
+- Os arquivos `App.js`, `app.json`, `babel.config.js`, `tsconfig.json` e `package.json` na raiz são exigidos pelo Expo e mantidos junto à raiz para que o app móvel seja executável sem configuração adicional.
+- `docker-compose.yml` orquestra os serviços do backend, banco e Mongo em ambiente local, mantendo a infraestrutura de execução fora do código de aplicação.
+- `.env.example` documenta o conjunto mínimo de variáveis de ambiente; `.gitlab-ci.yml` define o pipeline de CI (lint, build, testes e publicação de artefatos).
+- `assets/` guarda imagens e ícones do app, separando conteúdo visual do código-fonte.
+- `documentos/` centraliza a documentação do produto e do projeto, com `img/` para diagramas, mockups e wireframes referenciados pelos `.md`.
+- `colab_csv_utf8/` preserva os datasets originais em CSV bruto que alimentam os notebooks em `src/aad/`; manter o dado bruto separado do dado tratado e do código facilita reprocessamento.
+
+**`src/frontend/` — padrão MVVM**
+
+- `screens/` contém as Views (telas) com a renderização declarativa em React Native; cada arquivo é um componente final usado pelo navegador de telas.
+- `viewmodels/` reúne hooks `use*ViewModel.ts` que concentram o estado e a regra de apresentação de cada tela, mantendo as Views simples e testáveis.
+- `models/` define as entidades e tipos consumidos pelas Views e ViewModels (`CatalogItem`, `Preference`, `Usuario`, etc.).
+- `components/` agrupa peças visuais reutilizáveis (`CatalogPosterCard`, `CatalogHero`, `SearchBar`, `Carousel`...), evitando duplicação entre telas.
+- `repositories/` isola as chamadas HTTP ao backend; trocar endpoint ou adicionar mock não afeta a View.
+- `hooks/` mantém comportamentos transversais — por exemplo, `useTelemetrySession.ts`, que dispara eventos de uso para o backend.
+- `config/` concentra endpoints (`api.ts`) e mocks de assets (`catalogImages.ts`), o que evita constantes espalhadas pelo código.
+- `theme/` agrupa tokens de design (cores, tipografia, espaçamento) para padronizar a identidade visual.
+
+**`src/backend/` — composição SOA**
+
+- `Spotlight.sln` na raiz do backend agrupa o Gateway, os quatro serviços e os cinco projetos de teste em uma única solution, facilitando build e debug pelo Visual Studio/Rider.
+- `api-gateway/` é a porta única de entrada (`Spotlight.Gateway`, porta 5000): implementado com YARP, valida o JWT do Supabase, faz roteamento e expõe Swagger. `Controllers/` e `Middleware/` ficam internos ao próprio Gateway.
+- `contracts/` materializa os contratos do backend. `dtos/` e `events/` ficam versionados como código; `openapi.json` consolida o contrato REST do sistema; `api-contracts.md`, `telemetria.md` e `supabase-storage.md` descrevem o uso dos contratos em prosa. Manter os contratos fora dos serviços evita acoplamento entre emissores e consumidores.
+- `services/` contém quatro microsserviços, um por domínio, cada um expondo sua própria API ASP.NET Core com `Dockerfile` e `appsettings*.json` próprios: `catalogo/` (`Spotlight.Catalogo`, 5001), `usuario/` (`Spotlight.Usuario`, 5002, com telemetria no MongoDB), `recomendacao/` (`Spotlight.Recomendacao`, 5003, com strategy ML.NET) e `geolocalizacao/` (`Spotlight.Geolocalizacao`, 5004, integrando OpenStreetMap/Nominatim). Todos seguem a mesma estrutura em quatro camadas (`presentation`, `application`, `domain`, `infrastructure`).
+- `ml-engine/` é um placeholder com as três fases canônicas (`data-preparation/`, `training/`, `inference/`) reservadas para quando o motor de ML for migrado para dentro do backend. Hoje o treino e os artefatos do modelo vivem em `src/models/`, que é o que o `Serviço de Recomendação` consome.
+- `scripts/` guarda utilitários operacionais auxiliares (por exemplo, `Test-TelemetriaAtlasE2E.ps1` para validar o fluxo de telemetria fim a fim).
+- `tests/` mantém um projeto xUnit por serviço (`Spotlight.<Dominio>.Tests`), espelhando a fronteira de cada microsserviço; isso garante que cada serviço seja testado de forma isolada.
+
+**Camadas internas de cada serviço**
+
+- `presentation/controllers/` expõe os endpoints REST do serviço e adapta a requisição em chamadas a casos de uso. `presentation/middleware/` cuida de autenticação, logging e tratamento de erro.
+- `application/usecases/` concentra a regra de aplicação — uma classe por operação do serviço — coordenando o domínio e a infraestrutura. `application/dtos/` define os formatos de entrada e saída dos casos de uso, protegendo o domínio de formatos externos.
+- `domain/entities/` guarda as entidades e as regras críticas do negócio; `domain/value-objects/` mantém valores imutáveis e validados (ex.: identificadores, faixas de preço, coordenadas). Essa camada é independente de framework, banco ou interface.
+- `infrastructure/persistence/` implementa o acesso a dados em Supabase/PostgreSQL via Npgsql (SQL puro, sem ORM). `infrastructure/auth/` valida o JWT do Supabase. Integrações específicas do domínio ficam em subpastas dedicadas (por exemplo, `usuario/infrastructure/geolocalizacao/` quando o serviço de usuário consome `IGeolocation`). Trocar tecnologia de armazenamento ou provedor de identidade fica restrito a essa camada.
+
+**Dados e modelos**
+
+- `src/database/` torna o banco reproduzível: os scripts `00_*` a `03_*` na raiz fazem provisão inicial e rollback; `migrations/` versiona as mudanças incrementais com seus respectivos `*_rollback.sql`; `load_test/pgbench/` reúne as queries usadas no teste de carga descrito mais adiante.
+- `src/dataset/` armazena amostras de dados (`itens_metadata.csv`, `recomendacao*.csv`, `interacoes_mongo_exemplo.jsonl`) que alimentam o ciclo de ML e demonstrações. Separar dado de código facilita versionamento e reprocessamento.
+- `src/models/` é hoje onde o ciclo de modelagem efetivamente acontece, e por isso fica fora de `src/backend/`. `Spotlight.Recomendacao.ModelTraining/` é o projeto C# que treina o modelo ML.NET consumido pelo `Serviço de Recomendação`; `artifacts/` guarda o modelo serializado (`recomendacao_incrementada_mlnet.zip`) e as similaridades pré-calculadas (`item_similarities.json`); `reports/` traz métricas e exemplos de saída. Os notebooks `sistema_recomendacao_knn.ipynb` e `sistema_recomendacao_svd.ipynb` e o `svd_model.pkl` preservam os experimentos exploratórios que precederam o modelo final.
+- `src/aad/` mantém os notebooks de Análise e Apoio a Decisão; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
+
+### Relação com a solução
+
+&emsp;A estrutura espelha diretamente as decisões arquiteturais detalhadas em [5.2 Diagrama de Componentes UML](#52-diagrama-de-componentes-uml) e em [8.1.2 Arquitetura de Codificação — Spotlight](#812-arquitetura-de-codificação--spotlight): cada componente lógico do diagrama tem um diretório correspondente no código. O `Spotlight App` está em `src/frontend/`; o `API Gateway` em `src/backend/api-gateway/`; os serviços SOA `IUserPrefs`, `ICatalog`, `IRecommendation` e `IGeolocation` ficam em `src/backend/services/usuario/`, `catalogo/`, `recomendacao/` e `geolocalizacao/`; o `ML Engine` em `src/backend/ml-engine/` (execução) e em `src/models/` (treino e artefatos); a camada de dados é provisionada por `src/database/`. Os contratos de comunicação descritos nas interfaces (`ISpotlightAPI`, `IUserPrefs`, `ICatalog`, `IRecommendation`, `IGeolocation`) são materializados em `src/backend/contracts/` e consumidos pelos `repositories/` do frontend.
 
 ### Justificativa da arquitetura
 
-&emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o MVVM facilita a separação entre interface e regra de apresentação, deixando as telas mais simples e os comportamentos reutilizáveis em ViewModels. No backend, a abordagem SOA permite expor serviços com fronteiras claras, usar contratos estáveis entre componentes e isolar o motor de recomendação em uma camada própria de ML. Isso reduz acoplamento, melhora a testabilidade e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
+&emsp;A organização adotada favorece a evolução incremental da solução. No frontend, o padrão MVVM separa interface de regra de apresentação: as Views ficam declarativas, os ViewModels concentram comportamento e os Repositories isolam o acesso a dados — assim cada camada pode ser alterada sem afetar as demais. No backend, a abordagem SOA expõe serviços com fronteiras claras, contratos estáveis em `contracts/` e um motor de recomendação isolado em `ml-engine/`, permitindo que cada domínio (catálogo, usuário, recomendação, geolocalização) evolua de forma independente. A divisão em quatro camadas dentro de cada serviço impede que regra de negócio, regra de aplicação e detalhe de infraestrutura se misturem, o que reduz acoplamento, melhora a testabilidade — refletida no espelhamento da pasta `tests/` — e facilita a manutenção por sprint, pois cada parte do sistema pode evoluir sem exigir alterações em toda a base.
 
 ### 8.1.2 Arquitetura de Codificação — Spotlight
 
@@ -3915,12 +4124,184 @@ flowchart TB
 &emsp;Essa composição mantém a tela aderente ao padrão MVVM adotado no frontend: a View apenas orquestra componentes, o ViewModel fornece dados e a camada de apresentação mantém a lógica de exibição separada da origem das informações. Na Sprint 3, a implementação foi integrada com dados mockados, o que permitiu validar a experiência visual antes da integração definitiva com o backend.
 
 ## 8.2 Modelo de Recomendação
-_conteúdo_
+
+&emsp;Na Sprint 4, o modelo de recomendação evoluiu de uma prova de conceito em
+notebooks para um pipeline executável e consumível pela API .NET. Na Sprint 3,
+o grupo já havia validado abordagens de filtragem colaborativa com k-NN e Funk
+SVD, usando o notebook `src/models/sistema_recomendacao_svd.ipynb` como
+referência principal para lidar com matriz esparsa de usuários e espetáculos. A
+evolução desta sprint foi transformar essa lógica em um artefato operacional:
+um modelo ML.NET exportado em `.zip`, acompanhado de um arquivo auxiliar de
+similaridade item-item em JSON.
+
+&emsp;O objetivo do incremento não foi descartar o Funk SVD anterior, mas
+complementá-lo com um classificador capaz de ser carregado diretamente pelo
+backend C#. O Funk SVD continua documentado como referência histórica para
+predição de rating em dados esparsos, com RMSE aproximado de `1,18` e MAE
+aproximado de `0,97`. O modelo incrementado passa a responder a uma pergunta
+mais próxima do fluxo da API: dado um par usuário-espetáculo, esse item deve
+ser priorizado como recomendação?
+
+### 8.2.1 Fontes de Dados Utilizadas
+
+&emsp;O pipeline combina dados relacionais e comportamentais, refletindo a
+arquitetura de persistência poliglota do projeto:
+
+| Fonte | Arquivo de entrada | Papel no modelo |
+|---|---|---|
+| PostgreSQL | `src/dataset/recomendacao_balanceado.csv` | Base estruturada com usuários, itens, ratings e sinais derivados do catálogo |
+| MongoDB | `src/dataset/interacoes_mongo_exemplo.jsonl` | Eventos comportamentais de telemetria usados como reforço de interesse |
+| Notebook SVD | `src/models/sistema_recomendacao_svd.ipynb` | Referência técnica do modelo anterior baseado em Funk SVD |
+
+&emsp;A execução registrada em `src/models/reports/recomendacao_mlnet_metrics.json`
+utilizou `40.848` registros, com `32.678` exemplos para treino e `8.170` para
+teste. A taxa positiva ficou em aproximadamente `40%`, o que evita um conjunto
+excessivamente enviesado para uma única classe.
+
+### 8.2.2 Pipeline do Modelo Incrementado
+
+&emsp;O treinamento foi implementado em C# no projeto
+`src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining`. Essa
+escolha reduz a distância entre experimentação e produção, porque o mesmo
+ecossistema .NET usado pelos microsserviços também passa a gerar o artefato do
+modelo.
+
+&emsp;O fluxo de treinamento segue as etapas abaixo:
+
+1. Leitura do CSV exportado do PostgreSQL.
+2. Leitura do JSONL de interações vindo do MongoDB.
+3. Agregação de sinais por usuário e por espetáculo.
+4. Cálculo de similaridade item-item para apoiar recomendações do tipo k-NN.
+5. Montagem de features como `score_implicito`, `mongo_interaction_score`,
+   `user_rating_mean`, `item_rating_mean`, `user_interactions`,
+   `item_interactions` e `item_similarity_score`.
+6. Treinamento de um classificador binário ML.NET para priorizar itens
+   recomendáveis.
+7. Exportação dos artefatos consumidos pelo backend.
+
+&emsp;A recomendação final usa uma abordagem híbrida: o histórico colaborativo
+continua orientando a afinidade usuário-item, a similaridade item-item apoia a
+descoberta de espetáculos semelhantes, e os eventos de telemetria do MongoDB
+ajudam a reforçar sinais recentes de interesse.
+
+### 8.2.3 Artefatos Gerados
+
+| Artefato | Caminho | Finalidade |
+|---|---|---|
+| Modelo ML.NET | `src/models/artifacts/recomendacao_incrementada_mlnet.zip` | Modelo carregado pela API para ranquear candidatos |
+| Similaridade item-item | `src/models/artifacts/item_similarities.json` | Apoio a recomendações similares/k-NN |
+| Métricas | `src/models/reports/recomendacao_mlnet_metrics.json` | Evidência quantitativa do treinamento |
+| Exemplos | `src/models/reports/recomendacao_mlnet_exemplos.csv` | Amostras de predição para validação funcional |
+| Relatório técnico | `src/models/reports/README_modelo_classificacao_recomendacao.md` | Descrição curta do incremento e limitações |
+
+&emsp;O executável de treinamento fica em `src/backend/ml-engine/training`,
+alinhado à separação arquitetural do ciclo de ML. Os artefatos gerados continuam
+versionados/publicados em `src/models/artifacts` e `src/models/reports`, pois
+esses diretórios funcionam como saída do pipeline e são consumidos pela API e
+pela CI. O serviço de recomendação consome os arquivos resultantes por
+configuração, sem depender do notebook em tempo de execução.
+
+### 8.2.4 Métricas Obtidas
+
+&emsp;Como o incremento transforma o problema em classificação de itens
+recomendáveis, as métricas principais passam a ser acurácia, precisão,
+revocação, F1 e AUC. O resultado registrado foi:
+
+| Modelo | Accuracy | Precision | Recall | F1 | ROC AUC |
+|---|---:|---:|---:|---:|---:|
+| ML.NET incrementado | 65,76% | 53,78% | 92,25% | 67,95% | 77,52% |
+
+&emsp;Também foram calculadas métricas Top-K, mais aderentes ao uso real do
+produto, pois o usuário recebe uma lista curta de espetáculos recomendados:
+
+| Métrica | Valor |
+|---|---:|
+| Precision@10 | 80,89% |
+| Recall@10 | 100,00% |
+| Hit Rate@10 | 100,00% |
+
+&emsp;Esses números indicam que o modelo tem boa capacidade de recuperar itens
+relevantes no topo da lista. A precisão geral ainda pode evoluir com mais dados
+reais de avaliação e telemetria, mas o pipeline já demonstra melhora funcional
+em relação à Sprint 3: o modelo deixa de ser apenas exploratório e passa a
+produzir artefatos integráveis ao backend.
+
+### 8.2.5 Integração com a API de Recomendação
+
+&emsp;No backend, o serviço `Spotlight.Recomendacao` carrega o modelo por meio do
+cliente `MlNetModeloRecomendacaoClient`. A seleção do algoritmo foi desacoplada
+com os padrões Strategy e Factory:
+
+| Componente | Responsabilidade |
+|---|---|
+| `ModeloMlNetRecomendacaoStrategy` | Usa o modelo incrementado ML.NET e enriquece o resultado com dados do PostgreSQL |
+| `PostgresPreProcessadoRecomendacaoStrategy` | Usa recomendações já persistidas nas tabelas relacionais como fallback |
+| `RecomendacaoStrategyFactory` | Escolhe a estratégia ativa conforme `RecommendationModel:Enabled` e disponibilidade do modelo |
+
+&emsp;Com isso, o fluxo de recomendação em produção fica:
+
+1. O aplicativo chama o Gateway em `/recomendacao/me` ou rotas derivadas.
+2. O Gateway encaminha a requisição ao serviço `Spotlight.Recomendacao`.
+3. O use case chama `RecomendacaoService`.
+4. A factory escolhe a estratégia ML.NET quando o modelo está habilitado.
+5. O modelo ranqueia candidatos.
+6. O repositório busca os dados completos dos espetáculos no PostgreSQL.
+7. A API retorna JSON com espetáculo, score, algoritmo e motivo da recomendação.
+
+&emsp;Caso o modelo esteja desabilitado, sem artefato local ou retorne uma lista
+vazia, o serviço cai para a estratégia PostgreSQL. Esse fallback evita que uma
+falha no artefato de ML quebre a experiência do usuário.
+
+### 8.2.6 Persistência e Atualização dos Resultados
+
+&emsp;As tabelas `recomendacao` e `similaridade_item` continuam sendo o ponto de
+serving persistido do sistema. A migration
+`src/database/migrations/11_seed_recomendacao_incremental.sql` popula
+recomendações e similaridades iniciais com `UPSERT`, permitindo que o backend
+sirva recomendações mesmo quando o modelo não estiver ativo.
+
+&emsp;A pipeline de CI também executa o treinamento por meio do job
+`train:model-artifacts` e publica os artefatos no bucket privado
+`ml-artifacts` do Supabase Storage no job `publish:model-artifacts`, restrito à
+branch `develop`. Assim, o caminho previsto para evolução é:
+
+```text
+PostgreSQL + MongoDB -> treino ML.NET -> artefatos .zip/.json -> Supabase Storage -> API de recomendação -> Frontend
+```
+
+### 8.2.7 Limitações Conhecidas
+
+- O treinamento ainda usa exports offline do PostgreSQL e MongoDB; a coleta
+  direta de dados vivos deve evoluir em uma etapa posterior de MLOps.
+- O dataset histórico usa usuários numéricos, enquanto a API trabalha com UUID
+  do Supabase; por isso, a integração precisa manter mapeamento consistente de
+  usuário.
+- A amostra de eventos MongoDB usada no treinamento ainda é pequena, então a
+  telemetria deve ganhar peso conforme a aplicação acumular uso real.
+- O `score_implicito` segue correlacionado com `rating`; as métricas de
+  classificação validam o pipeline funcional, mas não substituem uma avaliação
+  futura com dados reais de conversão.
+- A similaridade item-item atual é uma aproximação baseada em agregados e pode
+  ser substituída por k-NN sobre embeddings ou representações mais ricas dos
+  espetáculos.
 
 ## 8.3 Desenvolvimento de Features
-_conteúdo_
 
-**Nota:** Insira uma explicação de entregas em cada Sprint.
+&emsp;O desenvolvimento das features foi conduzido de forma incremental, partindo
+da arquitetura SOA entregue na Sprint 3 e avançando, na Sprint 4, para um fluxo
+mais próximo do uso real pelo usuário final. A evolução concentrou-se em quatro
+frentes: tornar o catálogo alimentado por dados reais, integrar recomendação ao
+backend e ao frontend, registrar sinais comportamentais para retroalimentar o
+modelo e consolidar a documentação técnica dos contratos e componentes.
+
+&emsp;A organização por microsserviços permitiu evoluir cada domínio sem concentrar
+responsabilidades em um único backend. O serviço de Catálogo ficou responsável
+por espetáculos, mídias, sessões, avaliações e metadados; o serviço de Usuário
+concentrou perfil, preferências, localização e telemetria; o serviço de
+Recomendação passou a expor recomendações personalizadas e similares; e o
+serviço de Geolocalização manteve a integração com OpenStreetMap/Nominatim.
+Todas as chamadas do aplicativo passam pelo API Gateway, preservando uma
+entrada única para o frontend.
 
 ## 8.3.1 Sprint 3
 
@@ -4075,7 +4456,110 @@ Durante a gravação, o backend foi executado localmente por meio do script `src
 **Link do vídeo demonstrativo:** [https://drive.google.com/file/d/1M51U2qHbm24WcHvc9Xm5Hm_YnLadphNw/view?usp=sharing]
 
 ## 8.3.2 Sprint 4
-_conteúdo_
+
+&emsp;A Sprint 4 teve como foco transformar os fluxos validados com dados mockados
+em features integradas com backend, banco de dados e modelo de recomendação. O
+incremento mais importante foi fechar o caminho entre preferências, catálogo,
+telemetria e recomendações, permitindo que o aplicativo apresente seções
+personalizadas em vez de depender apenas de conteúdo estático.
+
+### Features Implementadas ou Incrementadas
+
+| Domínio | Feature | Evolução realizada |
+|---|---|---|
+| Catálogo | Listagem real de espetáculos | O frontend passou a consumir dados do backend, incluindo imagens, categorias, destaques e trilhas de navegação |
+| Catálogo | Detalhes do espetáculo | A tela de detalhes passou a usar dados do espetáculo selecionado, com metadados, descrição, mídias e eventos semelhantes |
+| Catálogo | Avaliação de espetáculo | O usuário autenticado pode registrar ou atualizar nota de 1 a 5, alimentando o banco relacional e o ciclo futuro de recomendação |
+| Usuário | Preferências | O onboarding salva gêneros, categorias e faixa de preço no backend, evitando que usuários com preferências já registradas refaçam a etapa |
+| Usuário | Localização consentida | A localização resolvida por geocoding pode ser persistida e usada para compor a seção "Perto de você" |
+| Usuário | Telemetria | Cliques, visualizações e interações são enviados ao serviço de usuário e gravados no MongoDB Atlas |
+| Recomendação | Recomendações personalizadas | O serviço de recomendação passou a integrar o modelo ML.NET e fallback PostgreSQL para montar a seção "Recomendados para você" |
+| Recomendação | Similaridade item-item | O backend mantém `similaridade_item` para retornar eventos semelhantes ao espetáculo visualizado |
+| Frontend | Tela inicial integrada | A home do app passou a montar trilhas como recomendados, populares, próximos e catálogo em cartaz a partir das respostas da API |
+
+### Fluxo Principal Entregue
+
+&emsp;O fluxo principal da Sprint 4 pode ser descrito em etapas:
+
+1. O usuário realiza login ou cadastro via Supabase Auth.
+2. O aplicativo verifica se já existem preferências salvas.
+3. Se necessário, o usuário escolhe tags e faixa de preço no onboarding.
+4. O serviço de usuário persiste as preferências no PostgreSQL.
+5. O app consulta catálogo, recomendações e localização por meio do Gateway.
+6. O serviço de recomendação usa o modelo ML.NET quando habilitado ou recomendações persistidas como fallback.
+7. O usuário interage com cards, abre detalhes e registra avaliações.
+8. Eventos de navegação são enviados para telemetria no MongoDB.
+9. Os dados relacionais e comportamentais passam a compor o ciclo de melhoria do modelo.
+
+&emsp;Esse caminho atende ao objetivo do artefato de demonstrar progresso
+incremental em relação à Sprint 3: a aplicação deixa de mostrar apenas telas
+visuais com dados simulados e passa a operar com autenticação, serviços,
+persistência, telemetria e recomendação integradas.
+
+### API de Recomendação
+
+&emsp;A API de recomendação foi formalizada nos contratos JSON e exposta pelo
+serviço `Spotlight.Recomendacao`. A rota principal `GET /recomendacao/me`
+retorna uma lista de espetáculos recomendados para o usuário autenticado,
+incluindo score, algoritmo utilizado e motivo da recomendação. A rota
+`GET /recomendacao/espetaculos/{id}/similares` retorna espetáculos similares a
+partir de um item de origem, apoiando a seção de eventos semelhantes na tela de
+detalhes.
+
+&emsp;A integração com o modelo incrementado foi implementada com Strategy e
+Factory. Quando `RecommendationModel:Enabled` está ativo e os artefatos estão
+disponíveis, a API usa o modelo ML.NET. Caso contrário, retorna recomendações
+pré-processadas no PostgreSQL. Essa decisão evita indisponibilidade da feature
+quando o modelo ainda não foi sincronizado ou quando o ambiente local não tem os
+artefatos publicados.
+
+### Catálogo e Experiência no Frontend
+
+&emsp;A tela inicial do aplicativo foi reorganizada para consumir seções reais do
+backend. A experiência passou a incluir:
+
+- destaque principal com chamada para compra;
+- busca por texto;
+- filtro por categoria;
+- seção "Recomendados para você";
+- seção "Perto de você";
+- seção de populares;
+- seção de catálogo em cartaz;
+- navegação para detalhes do espetáculo;
+- envio de eventos de telemetria durante a interação.
+
+&emsp;A camada de frontend mantém o padrão MVVM: telas renderizam estado,
+ViewModels coordenam carregamento e repositórios isolam chamadas HTTP. Essa
+separação facilita evoluir a origem dos dados sem acoplar regra de negócio aos
+componentes visuais.
+
+### Dados e Persistência
+
+&emsp;A Sprint 4 reforçou o uso de persistência poliglota:
+
+| Banco | Uso na Sprint 4 |
+|---|---|
+| PostgreSQL/Supabase | Catálogo, usuários, preferências, localização, avaliações, recomendações e similaridades |
+| MongoDB Atlas | Eventos de telemetria e interações comportamentais |
+| Supabase Storage | Artefatos privados do modelo de recomendação e arquivos de mídia |
+
+&emsp;As recomendações persistidas em `recomendacao` e `similaridade_item`
+garantem que a API continue respondendo mesmo em ambientes nos quais o modelo
+ML.NET esteja desabilitado. Já os eventos do MongoDB servem como base para
+melhorar o treinamento nas próximas iterações.
+
+### Limitações da Sprint 4
+
+- A seção "Perto de você" ainda depende da qualidade dos dados de localização e
+  da disponibilidade de coordenadas nos espetáculos.
+- A telemetria já é capturada, mas o retreinamento contínuo com dados vivos
+  ainda não é automático.
+- A publicação dos artefatos do modelo depende do bucket privado `ml-artifacts`
+  e das variáveis seguras de CI/CD.
+- Alguns dados de catálogo ainda dependem da qualidade do seed e da
+  padronização de mídias no banco.
+- O fluxo completo está funcional localmente, mas a evidência em ambiente
+  publicado no servidor Inteli deve ser registrada separadamente.
 
 ## 8.3.3 Sprint 5
 _conteúdo_

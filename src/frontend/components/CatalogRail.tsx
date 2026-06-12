@@ -28,6 +28,7 @@ export function CatalogRail({ id, title, items, onItemPress }: CatalogRailProps)
 						title={item.title}
 						subtitle={item.subtitle}
 						imageSource={item.image}
+						imageUri={item.imageUri}
 						onPress={() => onItemPress?.(item, { railId: id, railTitle: title, position: index })}
 					/>
 				)}
