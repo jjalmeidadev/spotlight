@@ -3913,12 +3913,182 @@ flowchart TB
 &emsp;Essa composição mantém a tela aderente ao padrão MVVM adotado no frontend: a View apenas orquestra componentes, o ViewModel fornece dados e a camada de apresentação mantém a lógica de exibição separada da origem das informações. Na Sprint 3, a implementação foi integrada com dados mockados, o que permitiu validar a experiência visual antes da integração definitiva com o backend.
 
 ## 8.2 Modelo de Recomendação
-_conteúdo_
+
+&emsp;Na Sprint 4, o modelo de recomendação evoluiu de uma prova de conceito em
+notebooks para um pipeline executável e consumível pela API .NET. Na Sprint 3,
+o grupo já havia validado abordagens de filtragem colaborativa com k-NN e Funk
+SVD, usando o notebook `src/models/sistema_recomendacao_svd.ipynb` como
+referência principal para lidar com matriz esparsa de usuários e espetáculos. A
+evolução desta sprint foi transformar essa lógica em um artefato operacional:
+um modelo ML.NET exportado em `.zip`, acompanhado de um arquivo auxiliar de
+similaridade item-item em JSON.
+
+&emsp;O objetivo do incremento não foi descartar o Funk SVD anterior, mas
+complementá-lo com um classificador capaz de ser carregado diretamente pelo
+backend C#. O Funk SVD continua documentado como referência histórica para
+predição de rating em dados esparsos, com RMSE aproximado de `1,18` e MAE
+aproximado de `0,97`. O modelo incrementado passa a responder a uma pergunta
+mais próxima do fluxo da API: dado um par usuário-espetáculo, esse item deve
+ser priorizado como recomendação?
+
+### 8.2.1 Fontes de Dados Utilizadas
+
+&emsp;O pipeline combina dados relacionais e comportamentais, refletindo a
+arquitetura de persistência poliglota do projeto:
+
+| Fonte | Arquivo de entrada | Papel no modelo |
+|---|---|---|
+| PostgreSQL | `src/dataset/recomendacao_balanceado.csv` | Base estruturada com usuários, itens, ratings e sinais derivados do catálogo |
+| MongoDB | `src/dataset/interacoes_mongo_exemplo.jsonl` | Eventos comportamentais de telemetria usados como reforço de interesse |
+| Notebook SVD | `src/models/sistema_recomendacao_svd.ipynb` | Referência técnica do modelo anterior baseado em Funk SVD |
+
+&emsp;A execução registrada em `src/models/reports/recomendacao_mlnet_metrics.json`
+utilizou `40.848` registros, com `32.678` exemplos para treino e `8.170` para
+teste. A taxa positiva ficou em aproximadamente `40%`, o que evita um conjunto
+excessivamente enviesado para uma única classe.
+
+### 8.2.2 Pipeline do Modelo Incrementado
+
+&emsp;O treinamento foi implementado em C# no projeto
+`src/models/Spotlight.Recomendacao.ModelTraining`. Essa escolha reduz a
+distância entre experimentação e produção, porque o mesmo ecossistema .NET
+usado pelos microsserviços também passa a gerar o artefato do modelo.
+
+&emsp;O fluxo de treinamento segue as etapas abaixo:
+
+1. Leitura do CSV exportado do PostgreSQL.
+2. Leitura do JSONL de interações vindo do MongoDB.
+3. Agregação de sinais por usuário e por espetáculo.
+4. Cálculo de similaridade item-item para apoiar recomendações do tipo k-NN.
+5. Montagem de features como `score_implicito`, `mongo_interaction_score`,
+   `user_rating_mean`, `item_rating_mean`, `user_interactions`,
+   `item_interactions` e `item_similarity_score`.
+6. Treinamento de um classificador binário ML.NET para priorizar itens
+   recomendáveis.
+7. Exportação dos artefatos consumidos pelo backend.
+
+&emsp;A recomendação final usa uma abordagem híbrida: o histórico colaborativo
+continua orientando a afinidade usuário-item, a similaridade item-item apoia a
+descoberta de espetáculos semelhantes, e os eventos de telemetria do MongoDB
+ajudam a reforçar sinais recentes de interesse.
+
+### 8.2.3 Artefatos Gerados
+
+| Artefato | Caminho | Finalidade |
+|---|---|---|
+| Modelo ML.NET | `src/models/artifacts/recomendacao_incrementada_mlnet.zip` | Modelo carregado pela API para ranquear candidatos |
+| Similaridade item-item | `src/models/artifacts/item_similarities.json` | Apoio a recomendações similares/k-NN |
+| Métricas | `src/models/reports/recomendacao_mlnet_metrics.json` | Evidência quantitativa do treinamento |
+| Exemplos | `src/models/reports/recomendacao_mlnet_exemplos.csv` | Amostras de predição para validação funcional |
+| Relatório técnico | `src/models/reports/README_modelo_classificacao_recomendacao.md` | Descrição curta do incremento e limitações |
+
+&emsp;Embora a arquitetura documente o ciclo de ML em `src/backend/ml-engine`, o
+executável de treinamento da Sprint 4 ficou em `src/models/` para manter a
+separação entre artefatos de modelo e microsserviços de API. O serviço de
+recomendação consome os arquivos resultantes por configuração, sem depender do
+notebook em tempo de execução.
+
+### 8.2.4 Métricas Obtidas
+
+&emsp;Como o incremento transforma o problema em classificação de itens
+recomendáveis, as métricas principais passam a ser acurácia, precisão,
+revocação, F1 e AUC. O resultado registrado foi:
+
+| Modelo | Accuracy | Precision | Recall | F1 | ROC AUC |
+|---|---:|---:|---:|---:|---:|
+| ML.NET incrementado | 65,76% | 53,78% | 92,25% | 67,95% | 77,52% |
+
+&emsp;Também foram calculadas métricas Top-K, mais aderentes ao uso real do
+produto, pois o usuário recebe uma lista curta de espetáculos recomendados:
+
+| Métrica | Valor |
+|---|---:|
+| Precision@10 | 80,89% |
+| Recall@10 | 100,00% |
+| Hit Rate@10 | 100,00% |
+
+&emsp;Esses números indicam que o modelo tem boa capacidade de recuperar itens
+relevantes no topo da lista. A precisão geral ainda pode evoluir com mais dados
+reais de avaliação e telemetria, mas o pipeline já demonstra melhora funcional
+em relação à Sprint 3: o modelo deixa de ser apenas exploratório e passa a
+produzir artefatos integráveis ao backend.
+
+### 8.2.5 Integração com a API de Recomendação
+
+&emsp;No backend, o serviço `Spotlight.Recomendacao` carrega o modelo por meio do
+cliente `MlNetModeloRecomendacaoClient`. A seleção do algoritmo foi desacoplada
+com os padrões Strategy e Factory:
+
+| Componente | Responsabilidade |
+|---|---|
+| `ModeloMlNetRecomendacaoStrategy` | Usa o modelo incrementado ML.NET e enriquece o resultado com dados do PostgreSQL |
+| `PostgresPreProcessadoRecomendacaoStrategy` | Usa recomendações já persistidas nas tabelas relacionais como fallback |
+| `RecomendacaoStrategyFactory` | Escolhe a estratégia ativa conforme `RecommendationModel:Enabled` e disponibilidade do modelo |
+
+&emsp;Com isso, o fluxo de recomendação em produção fica:
+
+1. O aplicativo chama o Gateway em `/recomendacao/me` ou rotas derivadas.
+2. O Gateway encaminha a requisição ao serviço `Spotlight.Recomendacao`.
+3. O use case chama `RecomendacaoService`.
+4. A factory escolhe a estratégia ML.NET quando o modelo está habilitado.
+5. O modelo ranqueia candidatos.
+6. O repositório busca os dados completos dos espetáculos no PostgreSQL.
+7. A API retorna JSON com espetáculo, score, algoritmo e motivo da recomendação.
+
+&emsp;Caso o modelo esteja desabilitado, sem artefato local ou retorne uma lista
+vazia, o serviço cai para a estratégia PostgreSQL. Esse fallback evita que uma
+falha no artefato de ML quebre a experiência do usuário.
+
+### 8.2.6 Persistência e Atualização dos Resultados
+
+&emsp;As tabelas `recomendacao` e `similaridade_item` continuam sendo o ponto de
+serving persistido do sistema. A migration
+`src/database/migrations/11_seed_recomendacao_incremental.sql` popula
+recomendações e similaridades iniciais com `UPSERT`, permitindo que o backend
+sirva recomendações mesmo quando o modelo não estiver ativo.
+
+&emsp;A pipeline de CI também executa o treinamento por meio do job
+`train:model-artifacts` e publica os artefatos no bucket privado
+`ml-artifacts` do Supabase Storage no job `publish:model-artifacts`, restrito à
+branch `develop`. Assim, o caminho previsto para evolução é:
+
+```text
+PostgreSQL + MongoDB -> treino ML.NET -> artefatos .zip/.json -> Supabase Storage -> API de recomendação -> Frontend
+```
+
+### 8.2.7 Limitações Conhecidas
+
+- O treinamento ainda usa exports offline do PostgreSQL e MongoDB; a coleta
+  direta de dados vivos deve evoluir em uma etapa posterior de MLOps.
+- O dataset histórico usa usuários numéricos, enquanto a API trabalha com UUID
+  do Supabase; por isso, a integração precisa manter mapeamento consistente de
+  usuário.
+- A amostra de eventos MongoDB usada no treinamento ainda é pequena, então a
+  telemetria deve ganhar peso conforme a aplicação acumular uso real.
+- O `score_implicito` segue correlacionado com `rating`; as métricas de
+  classificação validam o pipeline funcional, mas não substituem uma avaliação
+  futura com dados reais de conversão.
+- A similaridade item-item atual é uma aproximação baseada em agregados e pode
+  ser substituída por k-NN sobre embeddings ou representações mais ricas dos
+  espetáculos.
 
 ## 8.3 Desenvolvimento de Features
-_conteúdo_
 
-**Nota:** Insira uma explicação de entregas em cada Sprint.
+&emsp;O desenvolvimento das features foi conduzido de forma incremental, partindo
+da arquitetura SOA entregue na Sprint 3 e avançando, na Sprint 4, para um fluxo
+mais próximo do uso real pelo usuário final. A evolução concentrou-se em quatro
+frentes: tornar o catálogo alimentado por dados reais, integrar recomendação ao
+backend e ao frontend, registrar sinais comportamentais para retroalimentar o
+modelo e consolidar a documentação técnica dos contratos e componentes.
+
+&emsp;A organização por microsserviços permitiu evoluir cada domínio sem concentrar
+responsabilidades em um único backend. O serviço de Catálogo ficou responsável
+por espetáculos, mídias, sessões, avaliações e metadados; o serviço de Usuário
+concentrou perfil, preferências, localização e telemetria; o serviço de
+Recomendação passou a expor recomendações personalizadas e similares; e o
+serviço de Geolocalização manteve a integração com OpenStreetMap/Nominatim.
+Todas as chamadas do aplicativo passam pelo API Gateway, preservando uma
+entrada única para o frontend.
 
 ## 8.3.1 Sprint 3
 
@@ -4073,7 +4243,110 @@ Durante a gravação, o backend foi executado localmente por meio do script `src
 **Link do vídeo demonstrativo:** [https://drive.google.com/file/d/1M51U2qHbm24WcHvc9Xm5Hm_YnLadphNw/view?usp=sharing]
 
 ## 8.3.2 Sprint 4
-_conteúdo_
+
+&emsp;A Sprint 4 teve como foco transformar os fluxos validados com dados mockados
+em features integradas com backend, banco de dados e modelo de recomendação. O
+incremento mais importante foi fechar o caminho entre preferências, catálogo,
+telemetria e recomendações, permitindo que o aplicativo apresente seções
+personalizadas em vez de depender apenas de conteúdo estático.
+
+### Features Implementadas ou Incrementadas
+
+| Domínio | Feature | Evolução realizada |
+|---|---|---|
+| Catálogo | Listagem real de espetáculos | O frontend passou a consumir dados do backend, incluindo imagens, categorias, destaques e trilhas de navegação |
+| Catálogo | Detalhes do espetáculo | A tela de detalhes passou a usar dados do espetáculo selecionado, com metadados, descrição, mídias e eventos semelhantes |
+| Catálogo | Avaliação de espetáculo | O usuário autenticado pode registrar ou atualizar nota de 1 a 5, alimentando o banco relacional e o ciclo futuro de recomendação |
+| Usuário | Preferências | O onboarding salva gêneros, categorias e faixa de preço no backend, evitando que usuários com preferências já registradas refaçam a etapa |
+| Usuário | Localização consentida | A localização resolvida por geocoding pode ser persistida e usada para compor a seção "Perto de você" |
+| Usuário | Telemetria | Cliques, visualizações e interações são enviados ao serviço de usuário e gravados no MongoDB Atlas |
+| Recomendação | Recomendações personalizadas | O serviço de recomendação passou a integrar o modelo ML.NET e fallback PostgreSQL para montar a seção "Recomendados para você" |
+| Recomendação | Similaridade item-item | O backend mantém `similaridade_item` para retornar eventos semelhantes ao espetáculo visualizado |
+| Frontend | Tela inicial integrada | A home do app passou a montar trilhas como recomendados, populares, próximos e catálogo em cartaz a partir das respostas da API |
+
+### Fluxo Principal Entregue
+
+&emsp;O fluxo principal da Sprint 4 pode ser descrito em etapas:
+
+1. O usuário realiza login ou cadastro via Supabase Auth.
+2. O aplicativo verifica se já existem preferências salvas.
+3. Se necessário, o usuário escolhe tags e faixa de preço no onboarding.
+4. O serviço de usuário persiste as preferências no PostgreSQL.
+5. O app consulta catálogo, recomendações e localização por meio do Gateway.
+6. O serviço de recomendação usa o modelo ML.NET quando habilitado ou recomendações persistidas como fallback.
+7. O usuário interage com cards, abre detalhes e registra avaliações.
+8. Eventos de navegação são enviados para telemetria no MongoDB.
+9. Os dados relacionais e comportamentais passam a compor o ciclo de melhoria do modelo.
+
+&emsp;Esse caminho atende ao objetivo do artefato de demonstrar progresso
+incremental em relação à Sprint 3: a aplicação deixa de mostrar apenas telas
+visuais com dados simulados e passa a operar com autenticação, serviços,
+persistência, telemetria e recomendação integradas.
+
+### API de Recomendação
+
+&emsp;A API de recomendação foi formalizada nos contratos JSON e exposta pelo
+serviço `Spotlight.Recomendacao`. A rota principal `GET /recomendacao/me`
+retorna uma lista de espetáculos recomendados para o usuário autenticado,
+incluindo score, algoritmo utilizado e motivo da recomendação. A rota
+`GET /recomendacao/espetaculos/{id}/similares` retorna espetáculos similares a
+partir de um item de origem, apoiando a seção de eventos semelhantes na tela de
+detalhes.
+
+&emsp;A integração com o modelo incrementado foi implementada com Strategy e
+Factory. Quando `RecommendationModel:Enabled` está ativo e os artefatos estão
+disponíveis, a API usa o modelo ML.NET. Caso contrário, retorna recomendações
+pré-processadas no PostgreSQL. Essa decisão evita indisponibilidade da feature
+quando o modelo ainda não foi sincronizado ou quando o ambiente local não tem os
+artefatos publicados.
+
+### Catálogo e Experiência no Frontend
+
+&emsp;A tela inicial do aplicativo foi reorganizada para consumir seções reais do
+backend. A experiência passou a incluir:
+
+- destaque principal com chamada para compra;
+- busca por texto;
+- filtro por categoria;
+- seção "Recomendados para você";
+- seção "Perto de você";
+- seção de populares;
+- seção de catálogo em cartaz;
+- navegação para detalhes do espetáculo;
+- envio de eventos de telemetria durante a interação.
+
+&emsp;A camada de frontend mantém o padrão MVVM: telas renderizam estado,
+ViewModels coordenam carregamento e repositórios isolam chamadas HTTP. Essa
+separação facilita evoluir a origem dos dados sem acoplar regra de negócio aos
+componentes visuais.
+
+### Dados e Persistência
+
+&emsp;A Sprint 4 reforçou o uso de persistência poliglota:
+
+| Banco | Uso na Sprint 4 |
+|---|---|
+| PostgreSQL/Supabase | Catálogo, usuários, preferências, localização, avaliações, recomendações e similaridades |
+| MongoDB Atlas | Eventos de telemetria e interações comportamentais |
+| Supabase Storage | Artefatos privados do modelo de recomendação e arquivos de mídia |
+
+&emsp;As recomendações persistidas em `recomendacao` e `similaridade_item`
+garantem que a API continue respondendo mesmo em ambientes nos quais o modelo
+ML.NET esteja desabilitado. Já os eventos do MongoDB servem como base para
+melhorar o treinamento nas próximas iterações.
+
+### Limitações da Sprint 4
+
+- A seção "Perto de você" ainda depende da qualidade dos dados de localização e
+  da disponibilidade de coordenadas nos espetáculos.
+- A telemetria já é capturada, mas o retreinamento contínuo com dados vivos
+  ainda não é automático.
+- A publicação dos artefatos do modelo depende do bucket privado `ml-artifacts`
+  e das variáveis seguras de CI/CD.
+- Alguns dados de catálogo ainda dependem da qualidade do seed e da
+  padronização de mídias no banco.
+- O fluxo completo está funcional localmente, mas a evidência em ambiente
+  publicado no servidor Inteli deve ser registrada separadamente.
 
 ## 8.3.3 Sprint 5
 _conteúdo_
