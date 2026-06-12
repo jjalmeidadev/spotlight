@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { colors } from '@/frontend/theme';
 import { CATALOG_WHITE_PLANE_TOP, CatalogContentShell } from '../components/CatalogContentShell';
 import { CATALOG_HERO_HEIGHT, CatalogHero } from '../components/CatalogHero';
@@ -120,28 +120,50 @@ export default function CatalogView({ accessToken, profileName, userLocationAddr
 						</View>
 
 						<View style={[styles.preExpansiveArea, { paddingHorizontal: horizontalPadding }]}>
-							{firstSection ? (
+							{vm.catalogLoading ? (
+								<View style={styles.stateBox}>
+									<ActivityIndicator color={colors.textStrong} />
+									<Text style={styles.stateText}>Carregando espetaculos...</Text>
+								</View>
+							) : vm.catalogError ? (
+								<View style={styles.stateBox}>
+									<Text style={styles.stateText}>{vm.catalogError}</Text>
+									<Pressable
+										accessibilityRole="button"
+										onPress={vm.recarregarCatalogo}
+										style={({ pressed }) => [styles.retryButton, pressed && styles.pressed]}
+									>
+										<Text style={styles.retryLabel}>Tentar novamente</Text>
+									</Pressable>
+								</View>
+							) : firstSection ? (
 								<CatalogRail
 									id={firstSection.id}
 									items={firstSection.items}
 									title={firstSection.title}
 									onItemPress={handleItemPress}
 								/>
-							) : null}
+							) : (
+								<View style={styles.stateBox}>
+									<Text style={styles.stateText}>Nenhum espetaculo encontrado no momento.</Text>
+								</View>
+							)}
 						</View>
 
-						<View style={[styles.expansiveWhiteArea, { paddingHorizontal: horizontalPadding }]}>
-							{remainingSections.map((section) => (
-								<View key={section.id} style={styles.sectionGap}>
-									<CatalogRail
-										id={section.id}
-										items={section.items}
-										title={section.title}
-										onItemPress={handleItemPress}
-									/>
-								</View>
-							))}
-						</View>
+						{!vm.catalogLoading && !vm.catalogError ? (
+							<View style={[styles.expansiveWhiteArea, { paddingHorizontal: horizontalPadding }]}>
+								{remainingSections.map((section) => (
+									<View key={section.id} style={styles.sectionGap}>
+										<CatalogRail
+											id={section.id}
+											items={section.items}
+											title={section.title}
+											onItemPress={handleItemPress}
+										/>
+									</View>
+								))}
+							</View>
+						) : null}
 					</CatalogContentShell>
 
 					{vm.assets.heroArtwork ? (
@@ -212,6 +234,32 @@ const styles = StyleSheet.create({
 	},
 	sectionGap: {
 		marginTop: SECTION_VERTICAL_GAP,
+	},
+	stateBox: {
+		alignItems: 'flex-start',
+		gap: 12,
+		minHeight: 150,
+		justifyContent: 'center',
+	},
+	stateText: {
+		color: colors.text,
+		fontFamily: 'Gotham-Medium',
+		fontSize: 16,
+		lineHeight: 22,
+	},
+	retryButton: {
+		backgroundColor: colors.surface,
+		borderRadius: 24,
+		paddingHorizontal: 22,
+		paddingVertical: 12,
+	},
+	retryLabel: {
+		color: colors.textStrong,
+		fontFamily: 'Gotham-Bold',
+		fontSize: 14,
+	},
+	pressed: {
+		opacity: 0.72,
 	},
 	heroArtworkOverlay: {
 		zIndex: 50,

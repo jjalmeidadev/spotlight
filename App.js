@@ -79,8 +79,13 @@ export default function App() {
 	if (screen === 'loading') {
 		return (
 			<LoadingScreen
-				onFinish={(status) => {
-					setScreen(status === 'authenticated' ? 'catalogo' : 'login');
+				onFinish={async (status, usuario) => {
+					if (status === 'authenticated' && usuario) {
+						await handleLogin(usuario);
+						return;
+					}
+
+					setScreen('login');
 				}}
 			/>
 		);

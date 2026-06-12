@@ -233,13 +233,19 @@ export function obterUrlMidia(
     return null;
   }
 
-  const encodedPath = media.storagePath
-    .trim()
+  const encodedPath = normalizeStoragePath(media.storagePath)
     .split('/')
     .map((segment) => encodeURIComponent(segment))
     .join('/');
 
   return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/${media.storageBucket}/${encodedPath}`;
+}
+
+function normalizeStoragePath(path: string) {
+  return path
+    .trim()
+    .replace(/\s+(\.[a-z0-9]+)$/i, '$1')
+    .replace(/__+/g, '_');
 }
 
 export function obterUrlMidiaConhecida(

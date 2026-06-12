@@ -38,6 +38,9 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const [emCartazShows, setEmCartazShows] = useState<CatalogShow[]>([]);
 	const [catalogShows, setCatalogShows] = useState<CatalogShow[]>([]);
 	const [filteredShows, setFilteredShows] = useState<CatalogShow[]>([]);
+	const [catalogLoading, setCatalogLoading] = useState(false);
+	const [catalogError, setCatalogError] = useState<string | null>(null);
+	const [catalogReloadKey, setCatalogReloadKey] = useState(0);
 	const [recommendationsLoading, setRecommendationsLoading] = useState(false);
 	const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
@@ -85,6 +88,9 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 
 		async function loadCatalogSections() {
 			try {
+				setCatalogLoading(true);
+				setCatalogError(null);
+
 				const [popular, emCartaz, catalogo] = await Promise.all([
 					listarEspetaculosPopulares(10),
 					listarEspetaculosEmCartaz(20),
@@ -101,12 +107,15 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 				if (active) {
 					setNearbyShows(nearby);
 				}
-			} catch {
+			} catch (error) {
 				if (active) {
-					setPopularShows([]);
-					setEmCartazShows([]);
-					setCatalogShows([]);
-					setNearbyShows([]);
+					setCatalogError(
+						error instanceof Error ? error.message : 'Nao foi possivel carregar o catalogo.',
+					);
+				}
+			} finally {
+				if (active) {
+					setCatalogLoading(false);
 				}
 			}
 		}
@@ -116,7 +125,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		return () => {
 			active = false;
 		};
-	}, [options?.userLocationAddress]);
+	}, [options?.userLocationAddress, catalogReloadKey]);
 
 	useEffect(() => {
 		let active = true;
@@ -213,11 +222,9 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		...(nearbyItems.length > 0
 			? [{ id: 'nearby', title: 'Perto de voce:', items: nearbyItems }]
 			: []),
-		{
-			id: 'popular',
-			title: 'Os mais populares do momento:',
-			items: popularItems,
-		},
+		...(popularItems.length > 0
+			? [{ id: 'popular', title: 'Os mais populares do momento:', items: popularItems }]
+			: []),
 		...(watchedItems.length > 0
 			? [{ id: 'watched', title: 'Outras pessoas tambem assistiram:', items: watchedItems }]
 			: []),
@@ -231,6 +238,8 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 
 	return {
 		assets,
+		catalogError,
+		catalogLoading,
 		filterOptions: FILTER_OPTIONS,
 		heroItem,
 		query,
@@ -238,6 +247,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		recommendationsLoading,
 		selectedFilter,
 		sections,
+		recarregarCatalogo: () => setCatalogReloadKey((value) => value + 1),
 		setQuery,
 		setSelectedFilter,
 		userName: 'Leonardo',
