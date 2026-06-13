@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using Npgsql;
 using Serilog;
 using Spotlight.Usuario.Application.UseCases;
@@ -10,7 +11,7 @@ using Spotlight.Usuario.Infrastructure.Auth;
 using Spotlight.Usuario.Infrastructure.Persistence;
 using Spotlight.Usuario.Presentation.Middleware;
 
-Env.TraversePath().Load();
+Env.NoClobber().TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,21 @@ var connectionString =
     ?? builder.Configuration.GetConnectionString("Default")
     ?? string.Empty;
 
+var mongoConnectionString =
+    Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("MongoDB")
+    ?? string.Empty;
+
+var mongoDatabaseName =
+    Environment.GetEnvironmentVariable("MONGODB_DATABASE")
+    ?? builder.Configuration["MongoDB:Database"]
+    ?? string.Empty;
+
+var mongoTelemetryCollectionName =
+    Environment.GetEnvironmentVariable("MONGODB_TELEMETRY_COLLECTION")
+    ?? builder.Configuration["MongoDB:TelemetryCollection"]
+    ?? string.Empty;
+
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
     builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
@@ -45,6 +61,31 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     builder.Services.AddScoped<ObterPreferenciasUseCase>();
     builder.Services.AddScoped<AtualizarPreferenciasUseCase>();
     builder.Services.AddScoped<ListarAvaliacoesUsuarioUseCase>();
+}
+
+if (!string.IsNullOrWhiteSpace(mongoConnectionString)
+    && !string.IsNullOrWhiteSpace(mongoDatabaseName)
+    && !string.IsNullOrWhiteSpace(mongoTelemetryCollectionName))
+{
+    var mongoOptions = new MongoTelemetryOptions(
+        mongoConnectionString,
+        mongoDatabaseName,
+        mongoTelemetryCollectionName);
+
+    builder.Services.AddSingleton(mongoOptions);
+    builder.Services.AddSingleton<IMongoClient>(_ =>
+    {
+        var settings = MongoClientSettings.FromConnectionString(mongoOptions.ConnectionString);
+        settings.ConnectTimeout = TimeSpan.FromSeconds(2);
+        settings.ServerSelectionTimeout = TimeSpan.FromSeconds(2);
+        settings.SocketTimeout = TimeSpan.FromSeconds(3);
+        return new MongoClient(settings);
+    });
+    builder.Services.AddSingleton(sp =>
+        sp.GetRequiredService<IMongoClient>().GetDatabase(mongoOptions.DatabaseName));
+    builder.Services.AddHostedService<MongoTelemetryIndexInitializer>();
+    builder.Services.AddScoped<ITelemetriaRepository, MongoTelemetriaRepository>();
+    builder.Services.AddScoped<ITelemetriaService, TelemetriaService>();
 }
 
 builder.Services.AddScoped<IUsuarioLocalizacaoService, UsuarioLocalizacaoService>();
@@ -68,6 +109,13 @@ else
     healthChecks.AddCheck("postgres", () =>
         HealthCheckResult.Unhealthy("Connection string do banco nao configurada."),
         tags: ["ready"]);
+}
+
+if (!string.IsNullOrWhiteSpace(mongoConnectionString)
+    && !string.IsNullOrWhiteSpace(mongoDatabaseName)
+    && !string.IsNullOrWhiteSpace(mongoTelemetryCollectionName))
+{
+    healthChecks.AddCheck<MongoDbHealthCheck>("mongodb", tags: ["ready"]);
 }
 
 const string CorsPolicy = "SpotlightCors";

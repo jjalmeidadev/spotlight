@@ -1,0 +1,46 @@
+﻿{
+  "Dataset": {
+    "PostgresCsv": "src/dataset/recomendacao_balanceado.csv",
+    "MongoJson": "src/dataset/interacoes_mongo_exemplo.jsonl",
+    "Registros": 40848,
+    "EventosMongoAproveitados": 5,
+    "TaxaPositiva": 0.39999510379945163,
+    "Train": 32678,
+    "Test": 8170
+  },
+  "ReferenciaFunkSvdNotebook": {
+    "RmseAproximado": 1.18,
+    "MaeAproximado": 0.97,
+    "Fonte": "src/models/sistema_recomendacao_svd.ipynb"
+  },
+  "ModeloIncrementadoMlNet": {
+    "Accuracy": 0.6575960951799878,
+    "Precision": 0.5377938517179024,
+    "Recall": 0.9224565756823822,
+    "F1": 0.6794608179118118,
+    "RocAuc": 0.7752222193935745
+  },
+  "TopK": {
+    "PrecisionAt10": 0.8089178785286566,
+    "RecallAt10": 0.9999600798403194,
+    "HitRateAt10": 1
+  },
+  "Features": [
+    "score_implicito",
+    "mongo_interaction_score",
+    "mongo_interaction_count",
+    "user_rating_mean",
+    "user_interactions",
+    "item_rating_mean",
+    "item_interactions",
+    "item_similarity_score"
+  ],
+  "Artefatos": {
+    "Modelo": "src/models/artifacts/recomendacao_incrementada_mlnet.zip",
+    "Similaridades": "src/models/artifacts/item_similarities.json",
+    "Metricas": "src/models/reports/recomendacao_mlnet_metrics.json",
+    "Relatorio": "src/models/reports/README_modelo_classificacao_recomendacao.md",
+    "Exemplos": "src/models/reports/recomendacao_mlnet_exemplos.csv",
+    "Treinamento": "src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining"
+  }
+}

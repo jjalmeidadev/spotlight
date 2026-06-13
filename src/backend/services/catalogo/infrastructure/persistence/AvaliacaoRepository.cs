@@ -6,9 +6,6 @@ namespace Spotlight.Catalogo.Infrastructure.Persistence;
 
 public class AvaliacaoRepository(NpgsqlDataSource dataSource) : IAvaliacaoRepository
 {
-    /// <summary>SQLSTATE 23505 = unique_violation. Usado para detectar a constraint UNIQUE (id_usuario, id_espetaculo).</summary>
-    private const string SqlStateUniqueViolation = "23505";
-
     public async Task<(IReadOnlyList<Avaliacao> Itens, int Total)> ListarPorEspetaculoAsync(
         int espetaculoId, int page, int pageSize, CancellationToken cancellationToken)
     {
@@ -69,6 +66,11 @@ public class AvaliacaoRepository(NpgsqlDataSource dataSource) : IAvaliacaoReposi
             WITH nova AS (
                 INSERT INTO avaliacao (id_usuario, id_espetaculo, nota, comentario)
                 VALUES (@usuario, @espetaculo, @nota, @comentario)
+                ON CONFLICT (id_usuario, id_espetaculo)
+                DO UPDATE SET
+                    nota = EXCLUDED.nota,
+                    comentario = EXCLUDED.comentario,
+                    created_at = NOW()
                 RETURNING id_avaliacao, nota, comentario, created_at, id_usuario
             )
             SELECT n.id_avaliacao, n.nota, n.comentario, n.created_at, u.id_usuario, u.nome
@@ -79,22 +81,15 @@ public class AvaliacaoRepository(NpgsqlDataSource dataSource) : IAvaliacaoReposi
         cmd.Parameters.AddWithValue("nota", nota);
         cmd.Parameters.AddWithValue("comentario", (object?)comentario ?? DBNull.Value);
 
-        try
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
+        await reader.ReadAsync(cancellationToken);
+        return new Avaliacao
         {
-            await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
-            await reader.ReadAsync(cancellationToken);
-            return new Avaliacao
-            {
-                Id = reader.GetInt32(0),
-                Nota = reader.GetDecimal(1),
-                Comentario = reader.IsDBNull(2) ? null : reader.GetString(2),
-                CreatedAt = reader.GetDateTime(3),
-                Usuario = new UsuarioResumo { Id = reader.GetGuid(4), Nome = reader.GetString(5) }
-            };
-        }
-        catch (PostgresException ex) when (ex.SqlState == SqlStateUniqueViolation)
-        {
-            throw new ConflictException("Você já avaliou este espetáculo.");
-        }
+            Id = reader.GetInt32(0),
+            Nota = reader.GetDecimal(1),
+            Comentario = reader.IsDBNull(2) ? null : reader.GetString(2),
+            CreatedAt = reader.GetDateTime(3),
+            Usuario = new UsuarioResumo { Id = reader.GetGuid(4), Nome = reader.GetString(5) }
+        };
     }
 }

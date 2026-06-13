@@ -106,11 +106,32 @@
   <img src="./img/bottom.png" alt="bottom">
 </p>
 
-# Spotlight <nome do projeto>
+# Spotlight
 
-## GESTÃO DE PROJETO E CONFIGURAÇÃO <nome do arquivo>
+## Gestão de Projeto e Configuração
 
 # Sumário
+
+- [1. Introdução](#1-introdução)
+  - [1.1 Objetivo do Documento](#11-objetivo-do-documento)
+- [2. Visão Geral do GitFlow](#2-visão-geral-do-gitflow)
+- [3. Fluxo Gitflow e Políticas de Código](#3-fluxo-gitflow-e-políticas-de-código)
+  - [3.1 Estrutura e Regras de Branches](#31-estrutura-e-regras-de-branches)
+  - [3.2 Controle de versão e etiquetagem](#32-controle-de-versão-e-etiquetagem)
+  - [3.3 Política de Criação de Branch](#33-política-de-criação-de-branch)
+  - [3.4 Política de Merge Request](#34-política-de-merge-request)
+  - [3.5 Políticas de Pull Requests (PR)](#35-políticas-de-pull-requests-pr)
+  - [3.6 Políticas de Commits](#36-políticas-de-commits)
+  - [3.7 Exemplo ponta a ponta de ciclo de feature](#37-exemplo-ponta-a-ponta-de-ciclo-de-feature)
+- [4. Políticas de Kanban e Fluxo de Trabalho](#4-políticas-de-kanban-e-fluxo-de-trabalho)
+  - [4.1 Regras de Movimentação e Organização](#41-regras-de-movimentação-e-organização)
+  - [4.2 Gestão de Impedimentos](#42-gestão-de-impedimentos)
+- [5. Estrutura de Cards](#5-estrutura-de-cards)
+  - [5.1 A Descrição](#51-a-descrição)
+  - [5.2 Definition of Ready (DoR) e Definition of Done (DoD)](#52-definition-of-ready-dor-e-definition-of-done-dod)
+- [6. Cerimônias e Melhoria Contínua](#6-cerimônias-e-melhoria-contínua)
+- [7. Métricas de Desempenho do Processo](#7-métricas-de-desempenho-do-processo)
+- [8. Alinhamento com PMO e Gestão de Riscos](#8-alinhamento-com-pmo-e-gestão-de-riscos)
 
 # Políticas de Versionamento, Gestão de Tarefas e Alinhamento com o PMO
 
@@ -280,12 +301,14 @@ Utilizamos o padrão **Conventional Commits**, complementado com a referência a
 
 ### Tipos Recomendados
 
-| Tipo       | | Descrição                                              |
-|------------|-------|--------------------------------------------------------|
-| `feat`     |  | Nova funcionalidade ou recurso de negócio              |
-| `fix`      |  | Correção de um bug ou falha                            |
-| `docs`     | | Alterações, atualizações ou criação de documentação    |
-| `refactor` | | Refatoração de código sem alterar o comportamento      |
+| Tipo | Descrição |
+|---|---|
+| `feat` | Nova funcionalidade ou recurso de negócio |
+| `fix` | Correção de um bug ou falha |
+| `docs` | Alterações, atualizações ou criação de documentação |
+| `refactor` | Refatoração de código sem alterar o comportamento |
+| `test` | Criação, ajuste ou padronização de testes |
+| `chore` | Tarefas de manutenção que não alteram comportamento de produto, como ajustes de configuração, limpeza de arquivos e organização de dependências |
 
 ### Exemplos
 
@@ -294,6 +317,32 @@ feat: adiciona endpoint de processamento de fila #23
 fix: corrige falha na validação do formulário de login #47
 docs: atualiza diagrama de arquitetura do banco de dados #62
 refactor: melhora estrutura do serviço de autenticação #19
+test: adiciona testes de regras de negócio para avaliação #45
+chore: atualiza configuração do pipeline de testes #52
+```
+
+### 3.7 Exemplo ponta a ponta de ciclo de feature
+
+O ciclo completo de uma feature deve seguir o fluxo abaixo, garantindo rastreabilidade entre Kanban, branch, commit, Merge Request e documentação:
+
+| Etapa | Ação esperada | Evidência |
+|---|---|---|
+| 1. Criação do card | Criar issue no Kanban com título no infinitivo, descrição, DoR, DoD, labels de tipo e tamanho. | Issue com labels `CODE`, `DOCUMENTATION`, `DESIGN` ou `MEET`, além de `SIZE_PP`, `SIZE_P`, `SIZE_M` ou `SIZE_G`. |
+| 2. Preparação da branch | Atualizar `develop` e criar branch seguindo o padrão definido. | Branch como `feat/recomendacao-home`, `fix/token-avaliacao` ou `docs/gestao-sprint-5`. |
+| 3. Desenvolvimento | Implementar a mudança mantendo escopo coerente com o card. | Commits pequenos, atômicos e vinculados ao número da issue. |
+| 4. Validação local | Rodar build, testes ou validação manual adequada ao tipo da entrega. | Log de execução, print, resumo no MR ou evidência no documento correspondente. |
+| 5. Abertura do MR | Abrir Merge Request para `develop`, associando a issue e descrevendo escopo, validação e riscos. | MR com `Closes #N`, checklist e reviewer designado. |
+| 6. Revisão | Reviewer analisa código/documentação, solicita ajustes se necessário e aprova quando os critérios forem atendidos. | Comentários resolvidos, aprovação registrada e pipeline verde quando aplicável. |
+| 7. Merge e fechamento | Realizar merge na `develop`, fechar issue e remover branch se aplicável. | Issue em `Closed`, MR merged e histórico rastreável no GitLab. |
+
+Exemplo aplicado:
+
+```text
+Issue: #293 - Validar integração final frontend-backend-recomendação
+Branch: feat/integra-frontend-recomendacao-fluxo
+Commit: fix: estabiliza onboarding e recomendacoes iniciais #293
+MR: Closes #293, com validação do fluxo de cadastro, preferências, recomendação e telemetria.
+Resultado: funcionalidade integrada na develop após revisão.
 ```
 
 ## 4. Políticas de Kanban e Fluxo de Trabalho

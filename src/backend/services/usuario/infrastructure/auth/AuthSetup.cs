@@ -32,8 +32,9 @@ public static class AuthSetup
         var jwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET");
         var jwksUrl =
             Environment.GetEnvironmentVariable("SUPABASE_AUTH_JWKS_URL")
-            ?? BuildJwksUrl(Environment.GetEnvironmentVariable("SUPABASE_URL")
-                ?? Environment.GetEnvironmentVariable("EXPO_PUBLIC_SUPABASE_URL"));
+            ?? BuildJwksUrl(FirstNotBlank(
+                Environment.GetEnvironmentVariable("SUPABASE_URL"),
+                Environment.GetEnvironmentVariable("EXPO_PUBLIC_SUPABASE_URL")));
 
         void AddPolicies(AuthorizationOptions options)
         {
@@ -63,6 +64,7 @@ public static class AuthSetup
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKeys = chaves,
+                    IssuerSigningKeyResolver = (_, _, _, _) => chaves,
                     ValidateLifetime = true,
                     ValidateIssuer = false,
                     ValidateAudience = false,
@@ -148,6 +150,10 @@ public static class AuthSetup
             {
                 // Mesmo motivo acima, mas alguns bloqueios chegam como erro de socket.
             }
+            catch (UriFormatException)
+            {
+                // jwksUrl mal formada (ex.: env sem schema) — segue sem chaves JWKS.
+            }
         }
 
         return keys;
@@ -161,5 +167,10 @@ public static class AuthSetup
         }
 
         return $"{supabaseUrl.TrimEnd('/')}/auth/v1/.well-known/jwks.json";
+    }
+
+    private static string? FirstNotBlank(params string?[] values)
+    {
+        return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
     }
 }

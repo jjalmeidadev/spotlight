@@ -4,8 +4,8 @@ using Spotlight.Catalogo.Domain.Entities;
 namespace Spotlight.Catalogo.Application.UseCases;
 
 /// <summary>
-/// Cria uma avaliação de espetáculo. Valida a nota (0–5), confere se o espetáculo
-/// existe (404) e deixa o repositório lidar com a violação de UNIQUE (409).
+/// Salva uma avaliacao de espetaculo. Valida a nota (0-5), confere se o espetaculo
+/// existe (404) e atualiza a avaliacao anterior quando o usuario ja avaliou.
 /// </summary>
 public class CriarAvaliacaoUseCase(
     IAvaliacaoRepository avaliacaoRepositorio, IEspetaculoRepository espetaculoRepositorio)
@@ -17,7 +17,7 @@ public class CriarAvaliacaoUseCase(
 
         if (!await espetaculoRepositorio.ExisteAsync(espetaculoId, cancellationToken))
         {
-            throw new NotFoundException($"Espetáculo {espetaculoId} não encontrado.");
+            throw new NotFoundException($"Espetaculo {espetaculoId} nao encontrado.");
         }
 
         var avaliacao = await avaliacaoRepositorio.CriarAsync(
@@ -38,7 +38,7 @@ public class CriarAvaliacaoUseCase(
 
         if (dados.Nota is null)
         {
-            erros["nota"] = ["A nota é obrigatória."];
+            erros["nota"] = ["A nota e obrigatoria."];
         }
         else if (dados.Nota < 0 || dados.Nota > 5)
         {

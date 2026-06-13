@@ -9,17 +9,26 @@ import DetalhesView from './src/frontend/screens/DetalhesView';
 import LoadingScreen from './src/frontend/screens/LoadingScreen';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
+import { useTelemetrySession } from './src/frontend/hooks/useTelemetrySession';
+import {
+	obterPreferenciasUsuario,
+	preferenciasEstaoCompletas,
+} from './src/frontend/repositories/PreferenceRepository';
 
 export default function App() {
 	const [screen, setScreen] = React.useState('loading');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
 	const [userName, setUserName] = React.useState('Leonardo');
+	const [accessToken, setAccessToken] = React.useState(null);
+	const [userLocationAddress, setUserLocationAddress] = React.useState(null);
 
 	const [fontsLoaded] = useFonts({
 		'Gotham-Bold': require('./assets/fonts/Gotham Bold.otf'),
 		'Gotham-Medium': require('./assets/fonts/Gotham Medium.otf'),
 		'Gotham-Book': require('./assets/fonts/Gotham Book.otf'),
 	});
+
+	useTelemetrySession({ screen: getTelemetryScreenName(screen), accessToken });
 
 	React.useEffect(() => {
 		function handleUrl(url) {
@@ -38,16 +47,45 @@ export default function App() {
 		return () => subscription.remove();
 	}, []);
 
-	function handleLogin(usuario) {
+	async function handleLogin(usuario) {
 		setUserName(usuario.nome);
-		setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
+		setAccessToken(usuario.accessToken ?? null);
+		setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
+		await direcionarAposAutenticacao(usuario);
+	}
+
+	async function direcionarAposAutenticacao(usuario) {
+		if (usuario.tipoUsuario === 'administrador') {
+			setScreen('dashboard');
+			return;
+		}
+
+		if (!usuario.accessToken) {
+			setScreen('preferencias');
+			return;
+		}
+
+		setScreen('verificando-preferencias');
+
+		try {
+			const preferencias = await obterPreferenciasUsuario(usuario.accessToken);
+			setScreen(preferenciasEstaoCompletas(preferencias) ? 'catalogo' : 'preferencias');
+		} catch (error) {
+			console.log('Nao foi possivel verificar preferencias salvas:', error);
+			setScreen('catalogo');
+		}
 	}
 
 	if (screen === 'loading') {
 		return (
 			<LoadingScreen
-				onFinish={(status) => {
-					setScreen(status === 'authenticated' ? 'preferencias' : 'login');
+				onFinish={async (status, usuario) => {
+					if (status === 'authenticated' && usuario) {
+						await handleLogin(usuario);
+						return;
+					}
+
+					setScreen('login');
 				}}
 			/>
 		);
@@ -65,7 +103,7 @@ export default function App() {
 		return (
 			<CadastroView
 				onBackPress={() => setScreen('login')}
-				onCadastro={(usuario) => {
+				onCadastro={async (usuario) => {
 					if (usuario.requerConfirmacaoEmail) {
 						setScreen('login');
 						Alert.alert(
@@ -75,20 +113,33 @@ export default function App() {
 						return;
 					}
 
-					setScreen('preferencias');
+					setUserName(usuario.nome);
+					setAccessToken(usuario.accessToken ?? null);
+					setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
+					await direcionarAposAutenticacao(usuario);
 				}}
 			/>
 		);
 	}
 
 	if (screen === 'preferencias') {
-		return <PreferenceSelectionScreen onComplete={() => setScreen('catalogo')} />;
+		return <PreferenceSelectionScreen accessToken={accessToken} onComplete={() => setScreen('catalogo')} />;
+	}
+
+	if (screen === 'verificando-preferencias') {
+		return (
+			<View style={styles.loading}>
+				<ActivityIndicator color="#111412" />
+			</View>
+		);
 	}
 
 	if (screen === 'catalogo') {
 		return (
 			<CatalogView
+				accessToken={accessToken}
 				profileName={userName}
+				userLocationAddress={userLocationAddress}
 				onItemPress={(item) => {
 					setEspetaculoId(item.id);
 					setScreen('detalhes');
@@ -100,6 +151,7 @@ export default function App() {
 	if (screen === 'detalhes') {
 		return (
 			<DetalhesView
+				accessToken={accessToken}
 				espetaculoId={espetaculoId}
 				onClose={() => setScreen('catalogo')}
 				onEspetaculoSemelhantePress={(id) => setEspetaculoId(id)}
@@ -138,6 +190,22 @@ export default function App() {
 			onLogin={handleLogin}
 		/>
 	);
+}
+
+function getTelemetryScreenName(screen) {
+	const screenNames = {
+		cadastro: 'CadastroView',
+		catalogo: 'CatalogView',
+		dashboard: 'AdminDashboardScreen',
+		detalhes: 'DetalhesView',
+		'email-confirmado': 'EmailConfirmedView',
+		loading: 'LoadingScreen',
+		login: 'LoginView',
+		preferencias: 'PreferenceSelectionScreen',
+		'verificando-preferencias': 'PreferenceCheckView',
+	};
+
+	return screenNames[screen] ?? screen;
 }
 
 const styles = StyleSheet.create({

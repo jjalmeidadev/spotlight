@@ -1,0 +1,170 @@
+name: spotlight-dev
+
+x-dotnet-dev: &dotnet-dev
+  restart: unless-stopped
+  networks:
+    - spotlight_dev
+  volumes:
+    - nuget_packages:/root/.nuget/packages
+
+x-health-ready-dev: &health-ready-dev
+  test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health/ready || exit 1"]
+  interval: 15s
+  timeout: 5s
+  retries: 10
+  start_period: 30s
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: dev
+    environment:
+      EXPO_PUBLIC_SUPABASE_URL: ${EXPO_PUBLIC_SUPABASE_URL:-}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${EXPO_PUBLIC_SUPABASE_ANON_KEY:-}
+      EXPO_PUBLIC_API_BASE_URL: ${EXPO_PUBLIC_API_BASE_URL:-http://localhost:5000}
+      EXPO_PUBLIC_AUTH_REDIRECT_URL: ${EXPO_PUBLIC_AUTH_REDIRECT_URL:-spotlightmobile://email-confirmado}
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "${EXPO_DEV_SERVER_PORT:-8081}:8081"
+      - "${FRONTEND_WEB_PORT:-19006}:19006"
+      - "19000:19000"
+      - "19001:19001"
+      - "19002:19002"
+    volumes:
+      - .:/app
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      gateway:
+        condition: service_started
+    networks:
+      - spotlight_dev
+
+  gateway:
+    <<: *dotnet-dev
+    build:
+      context: ./src/backend/api-gateway
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: DockerDevelopment
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "${GATEWAY_PORT:-5000}:8080"
+    volumes:
+      - ./src/backend/api-gateway:/src
+      - nuget_packages:/root/.nuget/packages
+    depends_on:
+      catalogo:
+        condition: service_started
+      usuario:
+        condition: service_started
+      recomendacao:
+        condition: service_started
+      geolocalizacao:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  catalogo:
+    <<: *dotnet-dev
+    build:
+      context: ./src/backend/services/catalogo
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING:-}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-}
+      SUPABASE_AUTH_JWKS_URL: ${SUPABASE_AUTH_JWKS_URL:-}
+    ports:
+      - "${CATALOGO_PORT:-5001}:8080"
+    volumes:
+      - ./src/backend/services/catalogo:/src
+      - nuget_packages:/root/.nuget/packages
+    healthcheck: *health-ready-dev
+
+  usuario:
+    <<: *dotnet-dev
+    build:
+      context: ./src/backend/services/usuario
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING:-}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-}
+      SUPABASE_AUTH_JWKS_URL: ${SUPABASE_AUTH_JWKS_URL:-}
+      MONGODB_CONNECTION_STRING: ${MONGODB_CONNECTION_STRING:-}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-spotlight_telemetry}
+      MONGODB_TELEMETRY_COLLECTION: ${MONGODB_TELEMETRY_COLLECTION:-interacoes}
+    ports:
+      - "${USUARIO_PORT:-5002}:8080"
+    volumes:
+      - ./src/backend/services/usuario:/src
+      - nuget_packages:/root/.nuget/packages
+    healthcheck: *health-ready-dev
+
+  recomendacao:
+    <<: *dotnet-dev
+    build:
+      context: ./src/backend/services/recomendacao
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING:-}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-}
+      SUPABASE_AUTH_JWKS_URL: ${SUPABASE_AUTH_JWKS_URL:-}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      RecommendationModel__Enabled: ${RECOMMENDATION_MODEL_ENABLED:-false}
+      RecommendationModel__ModelPath: /app/model-artifacts/recomendacao_incrementada_mlnet.zip
+      RecommendationModel__CandidateCsvPath: /app/model-artifacts/recomendacao_balanceado.csv
+      RecommendationModel__SimilaritiesPath: /app/model-artifacts/item_similarities.json
+      SupabaseModelArtifacts__Enabled: ${SUPABASE_MODEL_ARTIFACTS_ENABLED:-false}
+      SupabaseModelArtifacts__Bucket: ${SUPABASE_MODEL_BUCKET:-ml-artifacts}
+      SupabaseModelArtifacts__TargetDirectory: /app/model-artifacts
+    ports:
+      - "${RECOMENDACAO_PORT:-5003}:8080"
+    volumes:
+      - ./src/backend/services/recomendacao:/src
+      - recomendacao_model_artifacts_dev:/app/model-artifacts
+      - nuget_packages:/root/.nuget/packages
+    healthcheck: *health-ready-dev
+
+  geolocalizacao:
+    <<: *dotnet-dev
+    build:
+      context: ./src/backend/services/geolocalizacao
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      NOMINATIM_BASE_URL: ${NOMINATIM_BASE_URL:-https://nominatim.openstreetmap.org}
+      NOMINATIM_USER_AGENT: ${NOMINATIM_USER_AGENT:-spotlight-inteli-g04/1.0}
+    ports:
+      - "${GEOLOCALIZACAO_PORT:-5004}:8080"
+    volumes:
+      - ./src/backend/services/geolocalizacao:/src
+      - nuget_packages:/root/.nuget/packages
+    healthcheck: *health-ready-dev
+
+networks:
+  spotlight_dev:
+    driver: bridge
+
+volumes:
+  frontend_node_modules:
+  nuget_packages:
+  recomendacao_model_artifacts_dev:

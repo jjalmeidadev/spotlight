@@ -1,4 +1,5 @@
 using Npgsql;
+using NpgsqlTypes;
 using Spotlight.Recomendacao.Application.UseCases;
 using Spotlight.Recomendacao.Domain.Entities;
 
@@ -17,9 +18,18 @@ public class RecomendacaoRepository(NpgsqlDataSource dataSource) : IRecomendacao
         await using var cmd = conexao.CreateCommand();
         cmd.CommandText = """
             SELECT r.score_recomendacao, r.tipo_algoritmo, r.motivo_recomendacao, r.data_geracao,
-                   e.id_espetaculo, e.titulo, e.genero, e.status::text AS status, e.nota_media
+                   e.id_espetaculo, e.titulo, e.genero, e.status::text AS status, e.nota_media,
+                   m.storage_bucket, m.storage_path, m.alt_text, m.ordem_exibicao
             FROM recomendacao r
             JOIN espetaculo e ON e.id_espetaculo = r.id_espetaculo
+            LEFT JOIN LATERAL (
+                SELECT storage_bucket, storage_path, alt_text, ordem_exibicao
+                FROM espetaculo_midia
+                WHERE id_espetaculo = e.id_espetaculo
+                  AND tipo_midia = 'catalog_card'
+                ORDER BY ordem_exibicao
+                LIMIT 1
+            ) m ON true
             WHERE r.id_usuario = @usuario
             ORDER BY r.score_recomendacao DESC
             LIMIT @limite;
@@ -43,10 +53,80 @@ public class RecomendacaoRepository(NpgsqlDataSource dataSource) : IRecomendacao
                     Titulo = reader.GetString(5),
                     Genero = reader.IsDBNull(6) ? null : reader.GetString(6),
                     Status = reader.GetString(7),
-                    NotaMedia = reader.GetDecimal(8)
+                    NotaMedia = reader.GetDecimal(8),
+                    Midias = reader.IsDBNull(9)
+                        ? []
+                        : [
+                            new EspetaculoMidia
+                            {
+                                TipoMidia = "catalog_card",
+                                StorageBucket = reader.GetString(9),
+                                StoragePath = reader.GetString(10),
+                                AltText = reader.IsDBNull(11) ? null : reader.GetString(11),
+                                OrdemExibicao = reader.GetInt32(12)
+                            }
+                        ]
                 }
             });
         }
+        return itens;
+    }
+
+    public async Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(
+        IEnumerable<int> espetaculoIds,
+        CancellationToken cancellationToken)
+    {
+        var ids = espetaculoIds.Distinct().ToArray();
+        if (ids.Length == 0)
+        {
+            return new Dictionary<int, EspetaculoRecomendado>();
+        }
+
+        await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
+        await using var cmd = conexao.CreateCommand();
+        cmd.CommandText = """
+            SELECT e.id_espetaculo, e.titulo, e.genero, e.status::text AS status, e.nota_media,
+                   m.storage_bucket, m.storage_path, m.alt_text, m.ordem_exibicao
+            FROM espetaculo e
+            LEFT JOIN LATERAL (
+                SELECT storage_bucket, storage_path, alt_text, ordem_exibicao
+                FROM espetaculo_midia
+                WHERE id_espetaculo = e.id_espetaculo
+                  AND tipo_midia = 'catalog_card'
+                ORDER BY ordem_exibicao
+                LIMIT 1
+            ) m ON true
+            WHERE e.id_espetaculo = ANY(@ids);
+            """;
+        cmd.Parameters.AddWithValue("ids", NpgsqlDbType.Array | NpgsqlDbType.Integer, ids);
+
+        var itens = new Dictionary<int, EspetaculoRecomendado>();
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var id = reader.GetInt32(0);
+            itens[id] = new EspetaculoRecomendado
+            {
+                Id = id,
+                Titulo = reader.GetString(1),
+                Genero = reader.IsDBNull(2) ? null : reader.GetString(2),
+                Status = reader.GetString(3),
+                NotaMedia = reader.GetDecimal(4),
+                Midias = reader.IsDBNull(5)
+                    ? []
+                    : [
+                        new EspetaculoMidia
+                        {
+                            TipoMidia = "catalog_card",
+                            StorageBucket = reader.GetString(5),
+                            StoragePath = reader.GetString(6),
+                            AltText = reader.IsDBNull(7) ? null : reader.GetString(7),
+                            OrdemExibicao = reader.GetInt32(8)
+                        }
+                    ]
+            };
+        }
+
         return itens;
     }
 }

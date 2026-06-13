@@ -1,0 +1,7548 @@
+﻿{
+  "0": [
+    {
+      "ItemId": 320,
+      "Similarity": 0.9894826724216381
+    },
+    {
+      "ItemId": 59,
+      "Similarity": 0.9658653020106545
+    },
+    {
+      "ItemId": 107,
+      "Similarity": 0.962024324962438
+    },
+    {
+      "ItemId": 101,
+      "Similarity": 0.9460588461100901
+    },
+    {
+      "ItemId": 174,
+      "Similarity": 0.9401652247520456
+    }
+  ],
+  "1": [
+    {
+      "ItemId": 51,
+      "Similarity": 0.9929032918608072
+    },
+    {
+      "ItemId": 169,
+      "Similarity": 0.9919281020131441
+    },
+    {
+      "ItemId": 96,
+      "Similarity": 0.9828254676283943
+    },
+    {
+      "ItemId": 71,
+      "Similarity": 0.980312118782359
+    },
+    {
+      "ItemId": 48,
+      "Similarity": 0.9788160264956609
+    }
+  ],
+  "2": [
+    {
+      "ItemId": 299,
+      "Similarity": 0.9904058582487247
+    },
+    {
+      "ItemId": 89,
+      "Similarity": 0.988046845373322
+    },
+    {
+      "ItemId": 201,
+      "Similarity": 0.9831125045472103
+    },
+    {
+      "ItemId": 136,
+      "Similarity": 0.9757030276674865
+    },
+    {
+      "ItemId": 138,
+      "Similarity": 0.9741780101437876
+    }
+  ],
+  "3": [
+    {
+      "ItemId": 311,
+      "Similarity": 0.9960224326274629
+    },
+    {
+      "ItemId": 302,
+      "Similarity": 0.993624350513134
+    },
+    {
+      "ItemId": 239,
+      "Similarity": 0.9924964754021165
+    },
+    {
+      "ItemId": 139,
+      "Similarity": 0.9899466859472779
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.9875384401172658
+    }
+  ],
+  "4": [
+    {
+      "ItemId": 82,
+      "Similarity": 0.9941022415985162
+    },
+    {
+      "ItemId": 243,
+      "Similarity": 0.9930151866568698
+    },
+    {
+      "ItemId": 296,
+      "Similarity": 0.9919357847357374
+    },
+    {
+      "ItemId": 214,
+      "Similarity": 0.9878782882727986
+    },
+    {
+      "ItemId": 232,
+      "Similarity": 0.9872724001423485
+    }
+  ],
+  "5": [
+    {
+      "ItemId": 171,
+      "Similarity": 0.9899166045678072
+    },
+    {
+      "ItemId": 121,
+      "Similarity": 0.9883455722267218
+    },
+    {
+      "ItemId": 20,
+      "Similarity": 0.9852123740423342
+    },
+    {
+      "ItemId": 45,
+      "Similarity": 0.9827465676142109
+    },
+    {
+      "ItemId": 21,
+      "Similarity": 0.9810657393296806
+    }
+  ],
+  "6": [
+    {
+      "ItemId": 182,
+      "Similarity": 0.9857779549495521
+    },
+    {
+      "ItemId": 250,
+      "Similarity": 0.983065656669604
+    },
+    {
+      "ItemId": 122,
+      "Similarity": 0.9824599312869566
+    },
+    {
+      "ItemId": 134,
+      "Similarity": 0.9800483974812958
+    },
+    {
+      "ItemId": 218,
+      "Similarity": 0.9753217050132805
+    }
+  ],
+  "7": [
+    {
+      "ItemId": 238,
+      "Similarity": 0.9971941089095862
+    },
+    {
+      "ItemId": 84,
+      "Similarity": 0.9900716162449912
+    },
+    {
+      "ItemId": 342,
+      "Similarity": 0.9888084905004558
+    },
+    {
+      "ItemId": 264,
+      "Similarity": 0.9887077090098064
+    },
+    {
+      "ItemId": 97,
+      "Similarity": 0.9821790970016555
+    }
+  ],
+  "8": [
+    {
+      "ItemId": 207,
+      "Similarity": 0.9862331223572884
+    },
+    {
+      "ItemId": 157,
+      "Similarity": 0.9757470625386958
+    },
+    {
+      "ItemId": 126,
+      "Similarity": 0.9741978794150521
+    },
+    {
+      "ItemId": 72,
+      "Similarity": 0.9738984414110426
+    },
+    {
+      "ItemId": 33,
+      "Similarity": 0.9649746104282233
+    }
+  ],
+  "9": [
+    {
+      "ItemId": 249,
+      "Similarity": 0.9935780400582624
+    },
+    {
+      "ItemId": 260,
+      "Similarity": 0.9854768706528185
+    },
+    {
+      "ItemId": 239,
+      "Similarity": 0.9805143902675221
+    },
+    {
+      "ItemId": 160,
+      "Similarity": 0.9801160572863654
+    },
+    {
+      "ItemId": 24,
+      "Similarity": 0.9770570711738796
+    }
+  ],
+  "10": [
+    {
+      "ItemId": 179,
+      "Similarity": 0.9929937930548741
+    },
+    {
+      "ItemId": 50,
+      "Similarity": 0.9926755839267792
+    },
+    {
+      "ItemId": 232,
+      "Similarity": 0.9853847827525289
+    },
+    {
+      "ItemId": 214,
+      "Similarity": 0.9823518548510529
+    },
+    {
+      "ItemId": 158,
+      "Similarity": 0.981728883818707
+    }
+  ],
+  "11": [
+    {
+      "ItemId": 47,
+      "Similarity": 0.9973889102327355
+    },
+    {
+      "ItemId": 113,
+      "Similarity": 0.9970551979160585
+    },
+    {
+      "ItemId": 340,
+      "Similarity": 0.9835351869150057
+    },
+    {
+      "ItemId": 218,
+      "Similarity": 0.9805230146571312
+    },
+    {
+      "ItemId": 255,
+      "Similarity": 0.9764957808440384
+    }
+  ],
+  "12": [
+    {
+      "ItemId": 158,
+      "Similarity": 0.986017821967744
+    },
+    {
+      "ItemId": 179,
+      "Similarity": 0.980376191511046
+    },
+    {
+      "ItemId": 50,
+      "Similarity": 0.9781274123834571
+    },
+    {
+      "ItemId": 118,
+      "Similarity": 0.9762506817941193
+    },
+    {
+      "ItemId": 10,
+      "Similarity": 0.9758611120369176
+    }
+  ],
+  "13": [
+    {
+      "ItemId": 181,
+      "Similarity": 0.9881546653881742
+    },
+    {
+      "ItemId": 310,
+      "Similarity": 0.9860900033437408
+    },
+    {
+      "ItemId": 204,
+      "Similarity": 0.9841632243346168
+    },
+    {
+      "ItemId": 66,
+      "Similarity": 0.9773545833127985
+    },
+    {
+      "ItemId": 22,
+      "Similarity": 0.972955778925975
+    }
+  ],
+  "14": [
+    {
+      "ItemId": 187,
+      "Similarity": 0.9916848675666745
+    },
+    {
+      "ItemId": 56,
+      "Similarity": 0.981694445876401
+    },
+    {
+      "ItemId": 191,
+      "Similarity": 0.9702261175470742
+    },
+    {
+      "ItemId": 274,
+      "Similarity": 0.9672706731193597
+    },
+    {
+      "ItemId": 231,
+      "Similarity": 0.9627057737731957
+    }
+  ],
+  "15": [
+    {
+      "ItemId": 42,
+      "Similarity": 0.9992505270834234
+    },
+    {
+      "ItemId": 282,
+      "Similarity": 0.9859473604210024
+    },
+    {
+      "ItemId": 66,
+      "Similarity": 0.9840357981010002
+    },
+    {
+      "ItemId": 204,
+      "Similarity": 0.9827375874597808
+    },
+    {
+      "ItemId": 243,
+      "Similarity": 0.9774374032577662
+    }
+  ],
+  "16": [
+    {
+      "ItemId": 52,
+      "Similarity": 0.979419667021449
+    },
+    {
+      "ItemId": 174,
+      "Similarity": 0.9775284957803149
+    },
+    {
+      "ItemId": 256,
+      "Similarity": 0.9566192960804943
+    },
+    {
+      "ItemId": 107,
+      "Similarity": 0.9549096848747544
+    },
+    {
+      "ItemId": 189,
+      "Similarity": 0.9420531885130735
+    }
+  ],
+  "17": [
+    {
+      "ItemId": 92,
+      "Similarity": 0.9851265249168273
+    },
+    {
+      "ItemId": 251,
+      "Similarity": 0.9848303041596643
+    },
+    {
+      "ItemId": 27,
+      "Similarity": 0.984578374865658
+    },
+    {
+      "ItemId": 58,
+      "Similarity": 0.9831713839572077
+    },
+    {
+      "ItemId": 252,
+      "Similarity": 0.9807437475029778
+    }
+  ],
+  "18": [
+    {
+      "ItemId": 312,
+      "Similarity": 0.9978446428767912
+    },
+    {
+      "ItemId": 115,
+      "Similarity": 0.997183855196765
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.989653835319345
+    },
+    {
+      "ItemId": 331,
+      "Similarity": 0.9881834465883474
+    },
+    {
+      "ItemId": 32,
+      "Similarity": 0.9801191205914522
+    }
+  ],
+  "19": [
+    {
+      "ItemId": 106,
+      "Similarity": 0.9940900192413225
+    },
+    {
+      "ItemId": 263,
+      "Similarity": 0.9824143680218724
+    },
+    {
+      "ItemId": 283,
+      "Similarity": 0.9614113660345279
+    },
+    {
+      "ItemId": 220,
+      "Similarity": 0.9588758738245445
+    },
+    {
+      "ItemId": 197,
+      "Similarity": 0.9527817858658598
+    }
+  ],
+  "20": [
+    {
+      "ItemId": 45,
+      "Similarity": 0.9974597120376771
+    },
+    {
+      "ItemId": 21,
+      "Similarity": 0.9957282224571956
+    },
+    {
+      "ItemId": 171,
+      "Similarity": 0.9923441078796709
+    },
+    {
+      "ItemId": 317,
+      "Similarity": 0.9919646106680675
+    },
+    {
+      "ItemId": 254,
+      "Similarity": 0.9910663697266764
+    }
+  ],
+  "21": [
+    {
+      "ItemId": 45,
+      "Similarity": 0.9976940700942867
+    },
+    {
+      "ItemId": 20,
+      "Similarity": 0.9957282224571956
+    },
+    {
+      "ItemId": 254,
+      "Similarity": 0.9952981562423574
+    },
+    {
+      "ItemId": 121,
+      "Similarity": 0.9915270356959026
+    },
+    {
+      "ItemId": 171,
+      "Similarity": 0.9909687272382325
+    }
+  ],
+  "22": [
+    {
+      "ItemId": 310,
+      "Similarity": 0.9736446994718088
+    },
+    {
+      "ItemId": 268,
+      "Similarity": 0.973334420539163
+    },
+    {
+      "ItemId": 13,
+      "Similarity": 0.972955778925975
+    },
+    {
+      "ItemId": 181,
+      "Similarity": 0.9617388831435805
+    },
+    {
+      "ItemId": 88,
+      "Similarity": 0.9581654540311949
+    }
+  ],
+  "23": [
+    {
+      "ItemId": 41,
+      "Similarity": 0.9944565554867842
+    },
+    {
+      "ItemId": 144,
+      "Similarity": 0.9804462314097396
+    },
+    {
+      "ItemId": 128,
+      "Similarity": 0.9687319054388484
+    },
+    {
+      "ItemId": 304,
+      "Similarity": 0.9571530480399411
+    },
+    {
+      "ItemId": 227,
+      "Similarity": 0.9550468312458473
+    }
+  ],
+  "24": [
+    {
+      "ItemId": 55,
+      "Similarity": 0.9937480035115097
+    },
+    {
+      "ItemId": 308,
+      "Similarity": 0.992259329495172
+    },
+    {
+      "ItemId": 160,
+      "Similarity": 0.9884909483864361
+    },
+    {
+      "ItemId": 260,
+      "Similarity": 0.9838210520744961
+    },
+    {
+      "ItemId": 249,
+      "Similarity": 0.9800313802276527
+    }
+  ],
+  "25": [
+    {
+      "ItemId": 141,
+      "Similarity": 0.9934628710837604
+    },
+    {
+      "ItemId": 288,
+      "Similarity": 0.9924123460729234
+    },
+    {
+      "ItemId": 140,
+      "Similarity": 0.9822071573919724
+    },
+    {
+      "ItemId": 215,
+      "Similarity": 0.979530459067034
+    },
+    {
+      "ItemId": 270,
+      "Similarity": 0.9789034636936049
+    }
+  ],
+  "26": [
+    {
+      "ItemId": 261,
+      "Similarity": 0.9961276681154575
+    },
+    {
+      "ItemId": 177,
+      "Similarity": 0.9885290974215672
+    },
+    {
+      "ItemId": 322,
+      "Similarity": 0.9857987636161444
+    },
+    {
+      "ItemId": 57,
+      "Similarity": 0.9824053795561303
+    },
+    {
+      "ItemId": 321,
+      "Similarity": 0.9822079911780979
+    }
+  ],
+  "27": [
+    {
+      "ItemId": 219,
+      "Similarity": 0.9878506590640181
+    },
+    {
+      "ItemId": 251,
+      "Similarity": 0.9866386488499636
+    },
+    {
+      "ItemId": 58,
+      "Similarity": 0.9849736359880321
+    },
+    {
+      "ItemId": 17,
+      "Similarity": 0.984578374865658
+    },
+    {
+      "ItemId": 53,
+      "Similarity": 0.9715216994514103
+    }
+  ],
+  "28": [
+    {
+      "ItemId": 165,
+      "Similarity": 0.9884540543725213
+    },
+    {
+      "ItemId": 222,
+      "Similarity": 0.9745258889776802
+    },
+    {
+      "ItemId": 236,
+      "Similarity": 0.971840843980512
+    },
+    {
+      "ItemId": 192,
+      "Similarity": 0.9681861150960357
+    },
+    {
+      "ItemId": 209,
+      "Similarity": 0.957899770842402
+    }
+  ],
+  "29": [
+    {
+      "ItemId": 317,
+      "Similarity": 0.9839312264562136
+    },
+    {
+      "ItemId": 111,
+      "Similarity": 0.9804363765204728
+    },
+    {
+      "ItemId": 275,
+      "Similarity": 0.978104887733054
+    },
+    {
+      "ItemId": 254,
+      "Similarity": 0.9777369989519344
+    },
+    {
+      "ItemId": 20,
+      "Similarity": 0.9761509954712285
+    }
+  ],
+  "30": [
+    {
+      "ItemId": 103,
+      "Similarity": 0.9831958134927867
+    },
+    {
+      "ItemId": 194,
+      "Similarity": 0.9778048671174058
+    },
+    {
+      "ItemId": 338,
+      "Similarity": 0.9741549458354295
+    },
+    {
+      "ItemId": 98,
+      "Similarity": 0.970298558589935
+    },
+    {
+      "ItemId": 197,
+      "Similarity": 0.9701173360228199
+    }
+  ],
+  "31": [
+    {
+      "ItemId": 196,
+      "Similarity": 0.9861436753513632
+    },
+    {
+      "ItemId": 94,
+      "Similarity": 0.9198808211238367
+    },
+    {
+      "ItemId": 39,
+      "Similarity": 0.8864751300218556
+    },
+    {
+      "ItemId": 257,
+      "Similarity": 0.8843319785997262
+    },
+    {
+      "ItemId": 143,
+      "Similarity": 0.8670019492693857
+    }
+  ],
+  "32": [
+    {
+      "ItemId": 281,
+      "Similarity": 0.9952828046597999
+    },
+    {
+      "ItemId": 18,
+      "Similarity": 0.9801191205914522
+    },
+    {
+      "ItemId": 312,
+      "Similarity": 0.9780485236289068
+    },
+    {
+      "ItemId": 115,
+      "Similarity": 0.9774136861088915
+    },
+    {
+      "ItemId": 331,
+      "Similarity": 0.9739606324572889
+    }
+  ],
+  "33": [
+    {
+      "ItemId": 72,
+      "Similarity": 0.9905937318725733
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.9874138286241386
+    },
+    {
+      "ItemId": 126,
+      "Similarity": 0.9840164345110068
+    },
+    {
+      "ItemId": 312,
+      "Similarity": 0.979906309383459
+    },
+    {
+      "ItemId": 115,
+      "Similarity": 0.9792690586334835
+    }
+  ],
+  "34": [
+    {
+      "ItemId": 140,
+      "Similarity": 0.9942366484469334
+    },
+    {
+      "ItemId": 208,
+      "Similarity": 0.9915130014657089
+    },
+    {
+      "ItemId": 83,
+      "Similarity": 0.9874962697877826
+    },
+    {
+      "ItemId": 270,
+      "Similarity": 0.9871744582297514
+    },
+    {
+      "ItemId": 141,
+      "Similarity": 0.9836645309161424
+    }
+  ],
+  "35": [
+    {
+      "ItemId": 97,
+      "Similarity": 0.99541759001332
+    },
+    {
+      "ItemId": 342,
+      "Similarity": 0.9920269601748315
+    },
+    {
+      "ItemId": 264,
+      "Similarity": 0.9892496475581851
+    },
+    {
+      "ItemId": 170,
+      "Similarity": 0.9873262880993611
+    },
+    {
+      "ItemId": 267,
+      "Similarity": 0.9827564402169663
+    }
+  ],
+  "36": [
+    {
+      "ItemId": 148,
+      "Similarity": 0.9766228819032661
+    },
+    {
+      "ItemId": 125,
+      "Similarity": 0.9701366332858458
+    },
+    {
+      "ItemId": 159,
+      "Similarity": 0.959334095648272
+    },
+    {
+      "ItemId": 69,
+      "Similarity": 0.9376465787448256
+    },
+    {
+      "ItemId": 147,
+      "Similarity": 0.9371972002983664
+    }
+  ],
+  "37": [
+    {
+      "ItemId": 258,
+      "Similarity": 0.9818952338531136
+    },
+    {
+      "ItemId": 294,
+      "Similarity": 0.981210028922865
+    },
+    {
+      "ItemId": 184,
+      "Similarity": 0.9771303224891872
+    },
+    {
+      "ItemId": 137,
+      "Similarity": 0.9730388708277805
+    },
+    {
+      "ItemId": 234,
+      "Similarity": 0.9686978838825532
+    }
+  ],
+  "38": [
+    {
+      "ItemId": 193,
+      "Similarity": 0.999682497490175
+    },
+    {
+      "ItemId": 61,
+      "Similarity": 0.9993605235278408
+    },
+    {
+      "ItemId": 206,
+      "Similarity": 0.9984323261052116
+    },
+    {
+      "ItemId": 198,
+      "Similarity": 0.9975385605496386
+    },
+    {
+      "ItemId": 85,
+      "Similarity": 0.9958164613458491
+    }
+  ],
+  "39": [
+    {
+      "ItemId": 94,
+      "Similarity": 0.9506192870333816
+    },
+    {
+      "ItemId": 31,
+      "Similarity": 0.8864751300218556
+    },
+    {
+      "ItemId": 196,
+      "Similarity": 0.8819377948269655
+    },
+    {
+      "ItemId": 257,
+      "Similarity": 0.7943693258922951
+    },
+    {
+      "ItemId": 143,
+      "Similarity": 0.780357967922291
+    }
+  ],
+  "40": [
+    {
+      "ItemId": 267,
+      "Similarity": 0.9874150199563911
+    },
+    {
+      "ItemId": 170,
+      "Similarity": 0.9800074511617702
+    },
+    {
+      "ItemId": 183,
+      "Similarity": 0.9753115134631891
+    },
+    {
+      "ItemId": 97,
+      "Similarity": 0.9744118683777422
+    },
+    {
+      "ItemId": 265,
+      "Similarity": 0.9734765436196243
+    }
+  ],
+  "41": [
+    {
+      "ItemId": 23,
+      "Similarity": 0.9944565554867842
+    },
+    {
+      "ItemId": 144,
+      "Similarity": 0.9852568953661194
+    },
+    {
+      "ItemId": 128,
+      "Similarity": 0.9735556286713867
+    },
+    {
+      "ItemId": 304,
+      "Similarity": 0.9524901076174497
+    },
+    {
+      "ItemId": 227,
+      "Similarity": 0.9504043400918408
+    }
+  ],
+  "42": [
+    {
+      "ItemId": 15,
+      "Similarity": 0.9992505270834234
+    },
+    {
+      "ItemId": 282,
+      "Similarity": 0.9852187959732511
+    },
+    {
+      "ItemId": 66,
+      "Similarity": 0.9841023211570153
+    },
+    {
+      "ItemId": 204,
+      "Similarity": 0.9828039351016821
+    },
+    {
+      "ItemId": 243,
+      "Similarity": 0.9767213568084205
+    }
+  ],
+  "43": [
+    {
+      "ItemId": 99,
+      "Similarity": 0.9911096066745
+    },
+    {
+      "ItemId": 175,
+      "Similarity": 0.9892369609477543
+    },
+    {
+      "ItemId": 246,
+      "Similarity": 0.987864124474812
+    },
+    {
+      "ItemId": 173,
+      "Similarity": 0.987559599296244
+    },
+    {
+      "ItemId": 180,
+      "Similarity": 0.9811716537035581
+    }
+  ],
+  "44": [
+    {
+      "ItemId": 116,
+      "Similarity": 0.9926433102562661
+    },
+    {
+      "ItemId": 91,
+      "Similarity": 0.9908236454358105
+    },
+    {
+      "ItemId": 210,
+      "Similarity": 0.9859730869895689
+    },
+    {
+      "ItemId": 333,
+      "Similarity": 0.9805609809668299
+    },
+    {
+      "ItemId": 110,
+      "Similarity": 0.9786951193364699
+    }
+  ],
+  "45": [
+    {
+      "ItemId": 21,
+      "Similarity": 0.9976940700942867
+    },
+    {
+      "ItemId": 20,
+      "Similarity": 0.9974597120376771
+    },
+    {
+      "ItemId": 254,
+      "Similarity": 0.9935741565314268
+    },
+    {
+      "ItemId": 171,
+      "Similarity": 0.99243706088612
+    },
+    {
+      "ItemId": 317,
+      "Similarity": 0.9913133423905641
+    }
+  ],
+  "46": [
+    {
+      "ItemId": 166,
+      "Similarity": 0.9882226633082529
+    },
+    {
+      "ItemId": 295,
+      "Similarity": 0.987503302769606
+    },
+    {
+      "ItemId": 90,
+      "Similarity": 0.9835638149672777
+    },
+    {
+      "ItemId": 300,
+      "Similarity": 0.9812689963243828
+    },
+    {
+      "ItemId": 244,
+      "Similarity": 0.9779287180339695
+    }
+  ],
+  "47": [
+    {
+      "ItemId": 11,
+      "Similarity": 0.9973889102327355
+    },
+    {
+      "ItemId": 113,
+      "Similarity": 0.9972181437276161
+    },
+    {
+      "ItemId": 340,
+      "Similarity": 0.985766848665232
+    },
+    {
+      "ItemId": 218,
+      "Similarity": 0.9830464320420846
+    },
+    {
+      "ItemId": 134,
+      "Similarity": 0.9782908469582308
+    }
+  ],
+  "48": [
+    {
+      "ItemId": 217,
+      "Similarity": 0.9961643091220092
+    },
+    {
+      "ItemId": 241,
+      "Similarity": 0.9912512582501536
+    },
+    {
+      "ItemId": 280,
+      "Similarity": 0.9907887712720901
+    },
+    {
+      "ItemId": 105,
+      "Similarity": 0.9843008759648725
+    },
+    {
+      "ItemId": 169,
+      "Similarity": 0.9818372110634312
+    }
+  ],
+  "49": [
+    {
+      "ItemId": 272,
+      "Similarity": 0.9605988214765935
+    },
+    {
+      "ItemId": 306,
+      "Similarity": 0.9226716061436918
+    },
+    {
+      "ItemId": 129,
+      "Similarity": 0.915287101346065
+    },
+    {
+      "ItemId": 309,
+      "Similarity": 0.9035285156258888
+    },
+    {
+      "ItemId": 112,
+      "Similarity": 0.9000400189967853
+    }
+  ],
+  "50": [
+    {
+      "ItemId": 179,
+      "Similarity": 0.9976604014138445
+    },
+    {
+      "ItemId": 10,
+      "Similarity": 0.9926755839267792
+    },
+    {
+      "ItemId": 158,
+      "Similarity": 0.9888920681851076
+    },
+    {
+      "ItemId": 232,
+      "Similarity": 0.9830847668385524
+    },
+    {
+      "ItemId": 214,
+      "Similarity": 0.9800659592196866
+    }
+  ],
+  "51": [
+    {
+      "ItemId": 169,
+      "Similarity": 0.9973935055222442
+    },
+    {
+      "ItemId": 1,
+      "Similarity": 0.9929032918608072
+    },
+    {
+      "ItemId": 71,
+      "Similarity": 0.9872293521038462
+    },
+    {
+      "ItemId": 307,
+      "Similarity": 0.9855645756336174
+    },
+    {
+      "ItemId": 96,
+      "Similarity": 0.9839283412402768
+    }
+  ],
+  "52": [
+    {
+      "ItemId": 174,
+      "Similarity": 0.9890036145297068
+    },
+    {
+      "ItemId": 16,
+      "Similarity": 0.979419667021449
+    },
+    {
+      "ItemId": 107,
+      "Similarity": 0.9659159885565445
+    },
+    {
+      "ItemId": 256,
+      "Similarity": 0.9627888645033722
+    },
+    {
+      "ItemId": 189,
+      "Similarity": 0.9610778781848184
+    }
+  ],
+  "53": [
+    {
+      "ItemId": 298,
+      "Similarity": 0.9928434761016415
+    },
+    {
+      "ItemId": 124,
+      "Similarity": 0.988387349299675
+    },
+    {
+      "ItemId": 335,
+      "Similarity": 0.9875720394565769
+    },
+    {
+      "ItemId": 251,
+      "Similarity": 0.9745423334647267
+    },
+    {
+      "ItemId": 58,
+      "Similarity": 0.9737178779747033
+    }
+  ],
+  "54": [
+    {
+      "ItemId": 75,
+      "Similarity": 0.9931978926502881
+    },
+    {
+      "ItemId": 205,
+      "Similarity": 0.9728966216270679
+    },
+    {
+      "ItemId": 339,
+      "Similarity": 0.968061479681126
+    },
+    {
+      "ItemId": 266,
+      "Similarity": 0.9650262304350238
+    },
+    {
+      "ItemId": 188,
+      "Similarity": 0.9630310640822423
+    }
+  ],
+  "55": [
+    {
+      "ItemId": 24,
+      "Similarity": 0.9937480035115097
+    },
+    {
+      "ItemId": 308,
+      "Similarity": 0.9907704282131785
+    },
+    {
+      "ItemId": 160,
+      "Similarity": 0.982381593273961
+    },
+    {
+      "ItemId": 260,
+      "Similarity": 0.9777691083664213
+    },
+    {
+      "ItemId": 249,
+      "Similarity": 0.9740258285078253
+    }
+  ],
+  "56": [
+    {
+      "ItemId": 187,
+      "Similarity": 0.9898421975146059
+    },
+    {
+      "ItemId": 191,
+      "Similarity": 0.9881025782978905
+    },
+    {
+      "ItemId": 14,
+      "Similarity": 0.981694445876401
+    },
+    {
+      "ItemId": 274,
+      "Similarity": 0.9765976978040368
+    },
+    {
+      "ItemId": 5,
+      "Similarity": 0.960746450925927
+    }
+  ],
+  "57": [
+    {
+      "ItemId": 65,
+      "Similarity": 0.9849612901165335
+    },
+    {
+      "ItemId": 261,
+      "Similarity": 0.9847674976086958
+    },
+    {
+      "ItemId": 26,
+      "Similarity": 0.9824053795561303
+    },
+    {
+      "ItemId": 177,
+      "Similarity": 0.9740359225187826
+    },
+    {
+      "ItemId": 208,
+      "Similarity": 0.9716496472349664
+    }
+  ],
+  "58": [
+    {
+      "ItemId": 251,
+      "Similarity": 0.9982896246840518
+    },
+    {
+      "ItemId": 27,
+      "Similarity": 0.9849736359880321
+    },
+    {
+      "ItemId": 335,
+      "Similarity": 0.984253553874003
+    },
+    {
+      "ItemId": 17,
+      "Similarity": 0.9831713839572077
+    },
+    {
+      "ItemId": 219,
+      "Similarity": 0.9812469150001782
+    }
+  ],
+  "59": [
+    {
+      "ItemId": 101,
+      "Similarity": 0.9787075940886286
+    },
+    {
+      "ItemId": 123,
+      "Similarity": 0.9663980962830471
+    },
+    {
+      "ItemId": 0,
+      "Similarity": 0.9658653020106545
+    },
+    {
+      "ItemId": 163,
+      "Similarity": 0.9656715577298475
+    },
+    {
+      "ItemId": 320,
+      "Similarity": 0.9594162761671959
+    }
+  ],
+  "60": [
+    {
+      "ItemId": 162,
+      "Similarity": 0.9978769143862578
+    },
+    {
+      "ItemId": 108,
+      "Similarity": 0.9874370891798208
+    },
+    {
+      "ItemId": 233,
+      "Similarity": 0.9856197104014924
+    },
+    {
+      "ItemId": 151,
+      "Similarity": 0.9782471098110225
+    },
+    {
+      "ItemId": 242,
+      "Similarity": 0.9695044725453168
+    }
+  ],
+  "61": [
+    {
+      "ItemId": 38,
+      "Similarity": 0.9993605235278408
+    },
+    {
+      "ItemId": 206,
+      "Similarity": 0.9990706148692212
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9990434268945674
+    },
+    {
+      "ItemId": 198,
+      "Similarity": 0.9969022272667164
+    },
+    {
+      "ItemId": 85,
+      "Similarity": 0.9951823225341594
+    }
+  ],
+  "62": [
+    {
+      "ItemId": 231,
+      "Similarity": 0.9937107454659606
+    },
+    {
+      "ItemId": 265,
+      "Similarity": 0.9854320689839382
+    },
+    {
+      "ItemId": 183,
+      "Similarity": 0.978891555096278
+    },
+    {
+      "ItemId": 40,
+      "Similarity": 0.9596658115662637
+    },
+    {
+      "ItemId": 14,
+      "Similarity": 0.9568755100285559
+    }
+  ],
+  "63": [
+    {
+      "ItemId": 229,
+      "Similarity": 0.9878843087370461
+    },
+    {
+      "ItemId": 248,
+      "Similarity": 0.9808915123223604
+    },
+    {
+      "ItemId": 225,
+      "Similarity": 0.9785951044451776
+    },
+    {
+      "ItemId": 77,
+      "Similarity": 0.9765843388204012
+    },
+    {
+      "ItemId": 195,
+      "Similarity": 0.9716656852836388
+    }
+  ],
+  "64": [
+    {
+      "ItemId": 240,
+      "Similarity": 0.9969210054113331
+    },
+    {
+      "ItemId": 120,
+      "Similarity": 0.9955699281106531
+    },
+    {
+      "ItemId": 79,
+      "Similarity": 0.9932581039451914
+    },
+    {
+      "ItemId": 119,
+      "Similarity": 0.9848462888819817
+    },
+    {
+      "ItemId": 117,
+      "Similarity": 0.983283862079701
+    }
+  ],
+  "65": [
+    {
+      "ItemId": 208,
+      "Similarity": 0.9851122374648328
+    },
+    {
+      "ItemId": 57,
+      "Similarity": 0.9849612901165335
+    },
+    {
+      "ItemId": 83,
+      "Similarity": 0.9835707632151732
+    },
+    {
+      "ItemId": 34,
+      "Similarity": 0.9787989520796074
+    },
+    {
+      "ItemId": 140,
+      "Similarity": 0.973276713417323
+    }
+  ],
+  "66": [
+    {
+      "ItemId": 204,
+      "Similarity": 0.9929712543642425
+    },
+    {
+      "ItemId": 181,
+      "Similarity": 0.9889408866530479
+    },
+    {
+      "ItemId": 42,
+      "Similarity": 0.9841023211570153
+    },
+    {
+      "ItemId": 15,
+      "Similarity": 0.9840357981010002
+    },
+    {
+      "ItemId": 13,
+      "Similarity": 0.9773545833127985
+    }
+  ],
+  "67": [
+    {
+      "ItemId": 130,
+      "Similarity": 0.9897577000868659
+    },
+    {
+      "ItemId": 71,
+      "Similarity": 0.9837487698534519
+    },
+    {
+      "ItemId": 96,
+      "Similarity": 0.9821905394672237
+    },
+    {
+      "ItemId": 226,
+      "Similarity": 0.9819927201076415
+    },
+    {
+      "ItemId": 307,
+      "Similarity": 0.9778475246021481
+    }
+  ],
+  "68": [
+    {
+      "ItemId": 332,
+      "Similarity": 0.98383561941058
+    },
+    {
+      "ItemId": 247,
+      "Similarity": 0.9756414933234521
+    },
+    {
+      "ItemId": 150,
+      "Similarity": 0.9649726400965271
+    },
+    {
+      "ItemId": 329,
+      "Similarity": 0.9620786641287966
+    },
+    {
+      "ItemId": 237,
+      "Similarity": 0.9606885214144976
+    }
+  ],
+  "69": [
+    {
+      "ItemId": 147,
+      "Similarity": 0.9743149053597693
+    },
+    {
+      "ItemId": 125,
+      "Similarity": 0.9640578607701049
+    },
+    {
+      "ItemId": 172,
+      "Similarity": 0.9407187448370684
+    },
+    {
+      "ItemId": 36,
+      "Similarity": 0.9376465787448256
+    },
+    {
+      "ItemId": 164,
+      "Similarity": 0.9291739787338369
+    }
+  ],
+  "70": [
+    {
+      "ItemId": 90,
+      "Similarity": 0.9809809698018366
+    },
+    {
+      "ItemId": 300,
+      "Similarity": 0.9786981737658365
+    },
+    {
+      "ItemId": 259,
+      "Similarity": 0.9766700558414118
+    },
+    {
+      "ItemId": 46,
+      "Similarity": 0.967797608246231
+    },
+    {
+      "ItemId": 156,
+      "Similarity": 0.9672913491224302
+    }
+  ],
+  "71": [
+    {
+      "ItemId": 307,
+      "Similarity": 0.9939027749654653
+    },
+    {
+      "ItemId": 169,
+      "Similarity": 0.9881953204132155
+    },
+    {
+      "ItemId": 51,
+      "Similarity": 0.9872293521038462
+    },
+    {
+      "ItemId": 96,
+      "Similarity": 0.9869374681070854
+    },
+    {
+      "ItemId": 67,
+      "Similarity": 0.9837487698534519
+    }
+  ],
+  "72": [
+    {
+      "ItemId": 126,
+      "Similarity": 0.9914289801886356
+    },
+    {
+      "ItemId": 33,
+      "Similarity": 0.9905937318725733
+    },
+    {
+      "ItemId": 207,
+      "Similarity": 0.9829778343314929
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.9798383208741421
+    },
+    {
+      "ItemId": 8,
+      "Similarity": 0.9738984414110426
+    }
+  ],
+  "73": [
+    {
+      "ItemId": 327,
+      "Similarity": 0.9971730682814042
+    },
+    {
+      "ItemId": 114,
+      "Similarity": 0.9935977229452055
+    },
+    {
+      "ItemId": 328,
+      "Similarity": 0.9926037272183531
+    },
+    {
+      "ItemId": 149,
+      "Similarity": 0.9910243951481247
+    },
+    {
+      "ItemId": 245,
+      "Similarity": 0.9883010333141286
+    }
+  ],
+  "74": [
+    {
+      "ItemId": 255,
+      "Similarity": 0.9950386305711764
+    },
+    {
+      "ItemId": 340,
+      "Similarity": 0.9831912040535297
+    },
+    {
+      "ItemId": 318,
+      "Similarity": 0.9757016374559924
+    },
+    {
+      "ItemId": 47,
+      "Similarity": 0.9739428506609905
+    },
+    {
+      "ItemId": 11,
+      "Similarity": 0.9717643449962861
+    }
+  ],
+  "75": [
+    {
+      "ItemId": 54,
+      "Similarity": 0.9931978926502881
+    },
+    {
+      "ItemId": 339,
+      "Similarity": 0.9711336735527881
+    },
+    {
+      "ItemId": 205,
+      "Similarity": 0.9664570504746535
+    },
+    {
+      "ItemId": 188,
+      "Similarity": 0.9660713621974988
+    },
+    {
+      "ItemId": 301,
+      "Similarity": 0.9652967151681219
+    }
+  ],
+  "76": [
+    {
+      "ItemId": 185,
+      "Similarity": 0.9948308685515623
+    },
+    {
+      "ItemId": 325,
+      "Similarity": 0.9758780273452894
+    },
+    {
+      "ItemId": 323,
+      "Similarity": 0.9686388237734116
+    },
+    {
+      "ItemId": 223,
+      "Similarity": 0.9596891830015247
+    },
+    {
+      "ItemId": 213,
+      "Similarity": 0.952368628840847
+    }
+  ],
+  "77": [
+    {
+      "ItemId": 195,
+      "Similarity": 0.9930285875144821
+    },
+    {
+      "ItemId": 78,
+      "Similarity": 0.9907942713965947
+    },
+    {
+      "ItemId": 117,
+      "Similarity": 0.982678558542686
+    },
+    {
+      "ItemId": 154,
+      "Similarity": 0.981085245134533
+    },
+    {
+      "ItemId": 63,
+      "Similarity": 0.9765843388204012
+    }
+  ],
+  "78": [
+    {
+      "ItemId": 195,
+      "Similarity": 0.9977342381711481
+    },
+    {
+      "ItemId": 77,
+      "Similarity": 0.9907942713965947
+    },
+    {
+      "ItemId": 117,
+      "Similarity": 0.9902450286305328
+    },
+    {
+      "ItemId": 154,
+      "Similarity": 0.9901106177801736
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.9752902238746776
+    }
+  ],
+  "79": [
+    {
+      "ItemId": 120,
+      "Similarity": 0.997667579919863
+    },
+    {
+      "ItemId": 240,
+      "Similarity": 0.9963144796443909
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.9932581039451914
+    },
+    {
+      "ItemId": 119,
+      "Similarity": 0.9914740944457187
+    },
+    {
+      "ItemId": 154,
+      "Similarity": 0.9783440441295885
+    }
+  ],
+  "80": [
+    {
+      "ItemId": 326,
+      "Similarity": 0.9989455148537124
+    },
+    {
+      "ItemId": 104,
+      "Similarity": 0.9955888628764457
+    },
+    {
+      "ItemId": 338,
+      "Similarity": 0.9782765431830253
+    },
+    {
+      "ItemId": 194,
+      "Similarity": 0.9770573983547916
+    },
+    {
+      "ItemId": 89,
+      "Similarity": 0.975816031063203
+    }
+  ],
+  "81": [
+    {
+      "ItemId": 86,
+      "Similarity": 0.9925044605038358
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.9895717047596536
+    },
+    {
+      "ItemId": 139,
+      "Similarity": 0.9851995593583314
+    },
+    {
+      "ItemId": 252,
+      "Similarity": 0.9821777170238238
+    },
+    {
+      "ItemId": 311,
+      "Similarity": 0.9812414916690587
+    }
+  ],
+  "82": [
+    {
+      "ItemId": 4,
+      "Similarity": 0.9941022415985162
+    },
+    {
+      "ItemId": 243,
+      "Similarity": 0.9937610709759696
+    },
+    {
+      "ItemId": 296,
+      "Similarity": 0.9926800477843527
+    },
+    {
+      "ItemId": 282,
+      "Similarity": 0.9835951549372535
+    },
+    {
+      "ItemId": 214,
+      "Similarity": 0.9821222336275799
+    }
+  ],
+  "83": [
+    {
+      "ItemId": 208,
+      "Similarity": 0.9959143521122438
+    },
+    {
+      "ItemId": 140,
+      "Similarity": 0.9893610412187672
+    },
+    {
+      "ItemId": 34,
+      "Similarity": 0.9874962697877826
+    },
+    {
+      "ItemId": 65,
+      "Similarity": 0.9835707632151732
+    },
+    {
+      "ItemId": 270,
+      "Similarity": 0.9823677016975852
+    }
+  ],
+  "84": [
+    {
+      "ItemId": 7,
+      "Similarity": 0.9900716162449912
+    },
+    {
+      "ItemId": 238,
+      "Similarity": 0.9873210878729466
+    },
+    {
+      "ItemId": 342,
+      "Similarity": 0.9829520622671638
+    },
+    {
+      "ItemId": 130,
+      "Similarity": 0.9812826990103075
+    },
+    {
+      "ItemId": 264,
+      "Similarity": 0.980225260191331
+    }
+  ],
+  "85": [
+    {
+      "ItemId": 198,
+      "Similarity": 0.9982693990783575
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9961315124851339
+    },
+    {
+      "ItemId": 38,
+      "Similarity": 0.9958164613458491
+    },
+    {
+      "ItemId": 152,
+      "Similarity": 0.9955596191572115
+    },
+    {
+      "ItemId": 313,
+      "Similarity": 0.9955415125437683
+    }
+  ],
+  "86": [
+    {
+      "ItemId": 81,
+      "Similarity": 0.9925044605038358
+    },
+    {
+      "ItemId": 252,
+      "Similarity": 0.9895175130607906
+    },
+    {
+      "ItemId": 92,
+      "Similarity": 0.9863947536021803
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.9822311077433117
+    },
+    {
+      "ItemId": 139,
+      "Similarity": 0.977923445323857
+    }
+  ],
+  "87": [
+    {
+      "ItemId": 142,
+      "Similarity": 0.9809382679149278
+    },
+    {
+      "ItemId": 132,
+      "Similarity": 0.9806137948438217
+    },
+    {
+      "ItemId": 253,
+      "Similarity": 0.9744036482661849
+    },
+    {
+      "ItemId": 341,
+      "Similarity": 0.9726458260787065
+    },
+    {
+      "ItemId": 234,
+      "Similarity": 0.9671890512749594
+    }
+  ],
+  "88": [
+    {
+      "ItemId": 211,
+      "Similarity": 0.9931073542509266
+    },
+    {
+      "ItemId": 305,
+      "Similarity": 0.9898249698467749
+    },
+    {
+      "ItemId": 268,
+      "Similarity": 0.9839953403197648
+    },
+    {
+      "ItemId": 321,
+      "Similarity": 0.9667791987314767
+    },
+    {
+      "ItemId": 93,
+      "Similarity": 0.9644441326183574
+    }
+  ],
+  "89": [
+    {
+      "ItemId": 201,
+      "Similarity": 0.993036772207403
+    },
+    {
+      "ItemId": 2,
+      "Similarity": 0.988046845373322
+    },
+    {
+      "ItemId": 299,
+      "Similarity": 0.9844737456461128
+    },
+    {
+      "ItemId": 326,
+      "Similarity": 0.9758410329647764
+    },
+    {
+      "ItemId": 80,
+      "Similarity": 0.975816031063203
+    }
+  ],
+  "90": [
+    {
+      "ItemId": 300,
+      "Similarity": 0.9976279362789935
+    },
+    {
+      "ItemId": 166,
+      "Similarity": 0.9854014076574783
+    },
+    {
+      "ItemId": 295,
+      "Similarity": 0.9846861471432716
+    },
+    {
+      "ItemId": 46,
+      "Similarity": 0.9835638149672777
+    },
+    {
+      "ItemId": 70,
+      "Similarity": 0.9809809698018366
+    }
+  ],
+  "91": [
+    {
+      "ItemId": 116,
+      "Similarity": 0.9980169598238059
+    },
+    {
+      "ItemId": 44,
+      "Similarity": 0.9908236454358105
+    },
+    {
+      "ItemId": 210,
+      "Similarity": 0.988582161509984
+    },
+    {
+      "ItemId": 127,
+      "Similarity": 0.984855220896742
+    },
+    {
+      "ItemId": 333,
+      "Similarity": 0.9831414536693449
+    }
+  ],
+  "92": [
+    {
+      "ItemId": 252,
+      "Similarity": 0.9954540606713637
+    },
+    {
+      "ItemId": 86,
+      "Similarity": 0.9863947536021803
+    },
+    {
+      "ItemId": 17,
+      "Similarity": 0.9851265249168273
+    },
+    {
+      "ItemId": 81,
+      "Similarity": 0.9806283533315641
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.9715854440688272
+    }
+  ],
+  "93": [
+    {
+      "ItemId": 321,
+      "Similarity": 0.9964497221356404
+    },
+    {
+      "ItemId": 177,
+      "Similarity": 0.9900272429542016
+    },
+    {
+      "ItemId": 261,
+      "Similarity": 0.9812816659148887
+    },
+    {
+      "ItemId": 26,
+      "Similarity": 0.9787827062401246
+    },
+    {
+      "ItemId": 305,
+      "Similarity": 0.9729884214882628
+    }
+  ],
+  "94": [
+    {
+      "ItemId": 39,
+      "Similarity": 0.9506192870333816
+    },
+    {
+      "ItemId": 31,
+      "Similarity": 0.9198808211238367
+    },
+    {
+      "ItemId": 196,
+      "Similarity": 0.9187408117518454
+    },
+    {
+      "ItemId": 257,
+      "Similarity": 0.8210892469746368
+    },
+    {
+      "ItemId": 143,
+      "Similarity": 0.8061283222334555
+    }
+  ],
+  "95": [
+    {
+      "ItemId": 190,
+      "Similarity": 0.9950249983690269
+    },
+    {
+      "ItemId": 178,
+      "Similarity": 0.9936855257680448
+    },
+    {
+      "ItemId": 315,
+      "Similarity": 0.987295407111113
+    },
+    {
+      "ItemId": 110,
+      "Similarity": 0.9665576900392463
+    },
+    {
+      "ItemId": 55,
+      "Similarity": 0.9662812112242684
+    }
+  ],
+  "96": [
+    {
+      "ItemId": 71,
+      "Similarity": 0.9869374681070854
+    },
+    {
+      "ItemId": 51,
+      "Similarity": 0.9839283412402768
+    },
+    {
+      "ItemId": 1,
+      "Similarity": 0.9828254676283943
+    },
+    {
+      "ItemId": 67,
+      "Similarity": 0.9821905394672237
+    },
+    {
+      "ItemId": 169,
+      "Similarity": 0.9814048491784372
+    }
+  ],
+  "97": [
+    {
+      "ItemId": 35,
+      "Similarity": 0.99541759001332
+    },
+    {
+      "ItemId": 264,
+      "Similarity": 0.9933219100120076
+    },
+    {
+      "ItemId": 342,
+      "Similarity": 0.990537352067436
+    },
+    {
+      "ItemId": 170,
+      "Similarity": 0.9828590349194886
+    },
+    {
+      "ItemId": 238,
+      "Similarity": 0.9827376450243507
+    }
+  ],
+  "98": [
+    {
+      "ItemId": 197,
+      "Similarity": 0.9998075140553475
+    },
+    {
+      "ItemId": 336,
+      "Similarity": 0.9984028556917618
+    },
+    {
+      "ItemId": 316,
+      "Similarity": 0.9973842260457203
+    },
+    {
+      "ItemId": 285,
+      "Similarity": 0.9960464701317401
+    },
+    {
+      "ItemId": 283,
+      "Similarity": 0.9904782303486663
+    }
+  ],
+  "99": [
+    {
+      "ItemId": 175,
+      "Similarity": 0.9980936401098668
+    },
+    {
+      "ItemId": 173,
+      "Similarity": 0.9963861349520148
+    },
+    {
+      "ItemId": 246,
+      "Similarity": 0.9953580909921905
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.9911096066745
+    },
+    {
+      "ItemId": 180,
+      "Similarity": 0.9885640456867798
+    }
+  ],
+  "100": [
+    {
+      "ItemId": 289,
+      "Similarity": 0.9902656902293784
+    },
+    {
+      "ItemId": 330,
+      "Similarity": 0.9861274456183607
+    },
+    {
+      "ItemId": 279,
+      "Similarity": 0.9840597799968156
+    },
+    {
+      "ItemId": 328,
+      "Similarity": 0.9791838992186036
+    },
+    {
+      "ItemId": 114,
+      "Similarity": 0.978218519495798
+    }
+  ],
+  "101": [
+    {
+      "ItemId": 123,
+      "Similarity": 0.9870746483463139
+    },
+    {
+      "ItemId": 163,
+      "Similarity": 0.9863743981963403
+    },
+    {
+      "ItemId": 59,
+      "Similarity": 0.9787075940886286
+    },
+    {
+      "ItemId": 314,
+      "Similarity": 0.9733064695620262
+    },
+    {
+      "ItemId": 269,
+      "Similarity": 0.9605634439062533
+    }
+  ],
+  "102": [
+    {
+      "ItemId": 212,
+      "Similarity": 0.9858331135945471
+    },
+    {
+      "ItemId": 334,
+      "Similarity": 0.9853684333060931
+    },
+    {
+      "ItemId": 202,
+      "Similarity": 0.984237328554864
+    },
+    {
+      "ItemId": 269,
+      "Similarity": 0.9689976998080079
+    },
+    {
+      "ItemId": 227,
+      "Similarity": 0.9680314848230115
+    }
+  ],
+  "103": [
+    {
+      "ItemId": 194,
+      "Similarity": 0.9904611267166439
+    },
+    {
+      "ItemId": 30,
+      "Similarity": 0.9831958134927867
+    },
+    {
+      "ItemId": 338,
+      "Similarity": 0.9763449055028783
+    },
+    {
+      "ItemId": 104,
+      "Similarity": 0.975935205996273
+    },
+    {
+      "ItemId": 326,
+      "Similarity": 0.9720877465200705
+    }
+  ],
+  "104": [
+    {
+      "ItemId": 326,
+      "Similarity": 0.9957403078374888
+    },
+    {
+      "ItemId": 80,
+      "Similarity": 0.9955888628764457
+    },
+    {
+      "ItemId": 338,
+      "Similarity": 0.9825352752752181
+    },
+    {
+      "ItemId": 194,
+      "Similarity": 0.9813054994060231
+    },
+    {
+      "ItemId": 103,
+      "Similarity": 0.975935205996273
+    }
+  ],
+  "105": [
+    {
+      "ItemId": 318,
+      "Similarity": 0.9946730510214402
+    },
+    {
+      "ItemId": 280,
+      "Similarity": 0.9933913120915606
+    },
+    {
+      "ItemId": 241,
+      "Similarity": 0.9929268264607065
+    },
+    {
+      "ItemId": 217,
+      "Similarity": 0.9880455797808559
+    },
+    {
+      "ItemId": 48,
+      "Similarity": 0.9843008759648725
+    }
+  ],
+  "106": [
+    {
+      "ItemId": 19,
+      "Similarity": 0.9940900192413225
+    },
+    {
+      "ItemId": 263,
+      "Similarity": 0.9860500284498835
+    },
+    {
+      "ItemId": 220,
+      "Similarity": 0.9643734084282202
+    },
+    {
+      "ItemId": 247,
+      "Similarity": 0.9576034480015451
+    },
+    {
+      "ItemId": 197,
+      "Similarity": 0.9562010473877238
+    }
+  ],
+  "107": [
+    {
+      "ItemId": 174,
+      "Similarity": 0.9763418941533778
+    },
+    {
+      "ItemId": 52,
+      "Similarity": 0.9659159885565445
+    },
+    {
+      "ItemId": 0,
+      "Similarity": 0.962024324962438
+    },
+    {
+      "ItemId": 320,
+      "Similarity": 0.9581525945586691
+    },
+    {
+      "ItemId": 16,
+      "Similarity": 0.9549096848747544
+    }
+  ],
+  "108": [
+    {
+      "ItemId": 233,
+      "Similarity": 0.98979705645803
+    },
+    {
+      "ItemId": 60,
+      "Similarity": 0.9874370891798208
+    },
+    {
+      "ItemId": 162,
+      "Similarity": 0.9868553814321642
+    },
+    {
+      "ItemId": 242,
+      "Similarity": 0.9801681360771572
+    },
+    {
+      "ItemId": 151,
+      "Similarity": 0.9676249781411965
+    }
+  ],
+  "109": [
+    {
+      "ItemId": 277,
+      "Similarity": 0.990428382949455
+    },
+    {
+      "ItemId": 199,
+      "Similarity": 0.9796324956912812
+    },
+    {
+      "ItemId": 228,
+      "Similarity": 0.9796217991509216
+    },
+    {
+      "ItemId": 153,
+      "Similarity": 0.959589598130057
+    },
+    {
+      "ItemId": 290,
+      "Similarity": 0.9577461122356442
+    }
+  ],
+  "110": [
+    {
+      "ItemId": 210,
+      "Similarity": 0.9925142659147942
+    },
+    {
+      "ItemId": 333,
+      "Similarity": 0.9919037937245053
+    },
+    {
+      "ItemId": 127,
+      "Similarity": 0.9909423296059037
+    },
+    {
+      "ItemId": 116,
+      "Similarity": 0.9831827343215667
+    },
+    {
+      "ItemId": 91,
+      "Similarity": 0.9812657679985846
+    }
+  ],
+  "111": [
+    {
+      "ItemId": 29,
+      "Similarity": 0.9804363765204728
+    },
+    {
+      "ItemId": 275,
+      "Similarity": 0.9791586971584949
+    },
+    {
+      "ItemId": 317,
+      "Similarity": 0.9655544593587637
+    },
+    {
+      "ItemId": 44,
+      "Similarity": 0.9633068473773437
+    },
+    {
+      "ItemId": 91,
+      "Similarity": 0.9608293138222455
+    }
+  ],
+  "112": [
+    {
+      "ItemId": 230,
+      "Similarity": 0.9881859930341058
+    },
+    {
+      "ItemId": 167,
+      "Similarity": 0.9865033589604127
+    },
+    {
+      "ItemId": 262,
+      "Similarity": 0.9849856785707036
+    },
+    {
+      "ItemId": 49,
+      "Similarity": 0.9000400189967853
+    },
+    {
+      "ItemId": 276,
+      "Similarity": 0.889700888925798
+    }
+  ],
+  "113": [
+    {
+      "ItemId": 47,
+      "Similarity": 0.9972181437276161
+    },
+    {
+      "ItemId": 11,
+      "Similarity": 0.9970551979160585
+    },
+    {
+      "ItemId": 218,
+      "Similarity": 0.9833708313001787
+    },
+    {
+      "ItemId": 340,
+      "Similarity": 0.9830635109622885
+    },
+    {
+      "ItemId": 134,
+      "Similarity": 0.9786121146676914
+    }
+  ],
+  "114": [
+    {
+      "ItemId": 328,
+      "Similarity": 0.9989931598103503
+    },
+    {
+      "ItemId": 73,
+      "Similarity": 0.9935977229452055
+    },
+    {
+      "ItemId": 168,
+      "Similarity": 0.9911982586045913
+    },
+    {
+      "ItemId": 327,
+      "Similarity": 0.9908068224412818
+    },
+    {
+      "ItemId": 289,
+      "Similarity": 0.9877162868150581
+    }
+  ],
+  "115": [
+    {
+      "ItemId": 312,
+      "Similarity": 0.9993363555666479
+    },
+    {
+      "ItemId": 18,
+      "Similarity": 0.997183855196765
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.9900119074882753
+    },
+    {
+      "ItemId": 331,
+      "Similarity": 0.9885404553367181
+    },
+    {
+      "ItemId": 33,
+      "Similarity": 0.9792690586334835
+    }
+  ],
+  "116": [
+    {
+      "ItemId": 91,
+      "Similarity": 0.9980169598238059
+    },
+    {
+      "ItemId": 44,
+      "Similarity": 0.9926433102562661
+    },
+    {
+      "ItemId": 210,
+      "Similarity": 0.9905278488423307
+    },
+    {
+      "ItemId": 333,
+      "Similarity": 0.9850657627296181
+    },
+    {
+      "ItemId": 110,
+      "Similarity": 0.9831827343215667
+    }
+  ],
+  "117": [
+    {
+      "ItemId": 154,
+      "Similarity": 0.9951466391411753
+    },
+    {
+      "ItemId": 78,
+      "Similarity": 0.9902450286305328
+    },
+    {
+      "ItemId": 195,
+      "Similarity": 0.9893562279340784
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.983283862079701
+    },
+    {
+      "ItemId": 77,
+      "Similarity": 0.982678558542686
+    }
+  ],
+  "118": [
+    {
+      "ItemId": 157,
+      "Similarity": 0.985395634454584
+    },
+    {
+      "ItemId": 12,
+      "Similarity": 0.9762506817941193
+    },
+    {
+      "ItemId": 158,
+      "Similarity": 0.9706520531714
+    },
+    {
+      "ItemId": 207,
+      "Similarity": 0.9676823239672999
+    },
+    {
+      "ItemId": 179,
+      "Similarity": 0.9644957513322009
+    }
+  ],
+  "119": [
+    {
+      "ItemId": 79,
+      "Similarity": 0.9914740944457187
+    },
+    {
+      "ItemId": 120,
+      "Similarity": 0.98918123121025
+    },
+    {
+      "ItemId": 240,
+      "Similarity": 0.9878510371374981
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.9848462888819817
+    },
+    {
+      "ItemId": 221,
+      "Similarity": 0.979103497178789
+    }
+  ],
+  "120": [
+    {
+      "ItemId": 240,
+      "Similarity": 0.9986405698862465
+    },
+    {
+      "ItemId": 79,
+      "Similarity": 0.997667579919863
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.9955699281106531
+    },
+    {
+      "ItemId": 119,
+      "Similarity": 0.98918123121025
+    },
+    {
+      "ItemId": 154,
+      "Similarity": 0.980502299186048
+    }
+  ],
+  "121": [
+    {
+      "ItemId": 171,
+      "Similarity": 0.9967743829014013
+    },
+    {
+      "ItemId": 21,
+      "Similarity": 0.9915270356959026
+    },
+    {
+      "ItemId": 45,
+      "Similarity": 0.9892599720744178
+    },
+    {
+      "ItemId": 20,
+      "Similarity": 0.9891676132285919
+    },
+    {
+      "ItemId": 5,
+      "Similarity": 0.9883455722267218
+    }
+  ],
+  "122": [
+    {
+      "ItemId": 182,
+      "Similarity": 0.99193464111682
+    },
+    {
+      "ItemId": 180,
+      "Similarity": 0.9832314228676395
+    },
+    {
+      "ItemId": 250,
+      "Similarity": 0.9831335897093016
+    },
+    {
+      "ItemId": 6,
+      "Similarity": 0.9824599312869566
+    },
+    {
+      "ItemId": 246,
+      "Similarity": 0.9766013644826177
+    }
+  ],
+  "123": [
+    {
+      "ItemId": 163,
+      "Similarity": 0.9894430784594316
+    },
+    {
+      "ItemId": 101,
+      "Similarity": 0.9870746483463139
+    },
+    {
+      "ItemId": 314,
+      "Similarity": 0.9762745413694138
+    },
+    {
+      "ItemId": 269,
+      "Similarity": 0.9727995086721232
+    },
+    {
+      "ItemId": 59,
+      "Similarity": 0.9663980962830471
+    }
+  ],
+  "124": [
+    {
+      "ItemId": 298,
+      "Similarity": 0.995479547421912
+    },
+    {
+      "ItemId": 53,
+      "Similarity": 0.988387349299675
+    },
+    {
+      "ItemId": 335,
+      "Similarity": 0.9878975132972432
+    },
+    {
+      "ItemId": 245,
+      "Similarity": 0.9766014781785176
+    },
+    {
+      "ItemId": 58,
+      "Similarity": 0.9740342825812
+    }
+  ],
+  "125": [
+    {
+      "ItemId": 36,
+      "Similarity": 0.9701366332858458
+    },
+    {
+      "ItemId": 69,
+      "Similarity": 0.9640578607701049
+    },
+    {
+      "ItemId": 147,
+      "Similarity": 0.963582816341079
+    },
+    {
+      "ItemId": 148,
+      "Similarity": 0.9481195353285123
+    },
+    {
+      "ItemId": 159,
+      "Similarity": 0.9318167674261224
+    }
+  ],
+  "126": [
+    {
+      "ItemId": 72,
+      "Similarity": 0.9914289801886356
+    },
+    {
+      "ItemId": 207,
+      "Similarity": 0.987628518237809
+    },
+    {
+      "ItemId": 33,
+      "Similarity": 0.9840164345110068
+    },
+    {
+      "ItemId": 8,
+      "Similarity": 0.9741978794150521
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.9718269392960349
+    }
+  ],
+  "127": [
+    {
+      "ItemId": 110,
+      "Similarity": 0.9909423296059037
+    },
+    {
+      "ItemId": 210,
+      "Similarity": 0.9890002039340857
+    },
+    {
+      "ItemId": 333,
+      "Similarity": 0.9856855646541949
+    },
+    {
+      "ItemId": 91,
+      "Similarity": 0.984855220896742
+    },
+    {
+      "ItemId": 116,
+      "Similarity": 0.9830639717845463
+    }
+  ],
+  "128": [
+    {
+      "ItemId": 144,
+      "Similarity": 0.9878166627164126
+    },
+    {
+      "ItemId": 41,
+      "Similarity": 0.9735556286713867
+    },
+    {
+      "ItemId": 23,
+      "Similarity": 0.9687319054388484
+    },
+    {
+      "ItemId": 186,
+      "Similarity": 0.9661678597287682
+    },
+    {
+      "ItemId": 273,
+      "Similarity": 0.9605757082021901
+    }
+  ],
+  "129": [
+    {
+      "ItemId": 306,
+      "Similarity": 0.9880336659141475
+    },
+    {
+      "ItemId": 309,
+      "Similarity": 0.9839432579890698
+    },
+    {
+      "ItemId": 49,
+      "Similarity": 0.915287101346065
+    },
+    {
+      "ItemId": 213,
+      "Similarity": 0.8951382419760889
+    },
+    {
+      "ItemId": 272,
+      "Similarity": 0.8838056538653989
+    }
+  ],
+  "130": [
+    {
+      "ItemId": 67,
+      "Similarity": 0.9897577000868659
+    },
+    {
+      "ItemId": 226,
+      "Similarity": 0.9863188455520823
+    },
+    {
+      "ItemId": 7,
+      "Similarity": 0.98167836226069
+    },
+    {
+      "ItemId": 84,
+      "Similarity": 0.9812826990103075
+    },
+    {
+      "ItemId": 238,
+      "Similarity": 0.9809611383423023
+    }
+  ],
+  "131": [
+    {
+      "ItemId": 303,
+      "Similarity": 0.9913298311366386
+    },
+    {
+      "ItemId": 290,
+      "Similarity": 0.9894144572367567
+    },
+    {
+      "ItemId": 235,
+      "Similarity": 0.9892971304502114
+    },
+    {
+      "ItemId": 215,
+      "Similarity": 0.9864711373591778
+    },
+    {
+      "ItemId": 153,
+      "Similarity": 0.9845694478718063
+    }
+  ],
+  "132": [
+    {
+      "ItemId": 142,
+      "Similarity": 0.9945642461068731
+    },
+    {
+      "ItemId": 234,
+      "Similarity": 0.9860429871769191
+    },
+    {
+      "ItemId": 294,
+      "Similarity": 0.9808641148421167
+    },
+    {
+      "ItemId": 87,
+      "Similarity": 0.9806137948438217
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.963296449072148
+    }
+  ],
+  "133": [
+    {
+      "ItemId": 203,
+      "Similarity": 0.9913204152046929
+    },
+    {
+      "ItemId": 200,
+      "Similarity": 0.984998111798136
+    },
+    {
+      "ItemId": 155,
+      "Similarity": 0.9834089752395819
+    },
+    {
+      "ItemId": 291,
+      "Similarity": 0.9589760780075298
+    },
+    {
+      "ItemId": 135,
+      "Similarity": 0.9491932293810306
+    }
+  ],
+  "134": [
+    {
+      "ItemId": 218,
+      "Similarity": 0.9950793818701267
+    },
+    {
+      "ItemId": 182,
+      "Similarity": 0.9816184554297599
+    },
+    {
+      "ItemId": 6,
+      "Similarity": 0.9800483974812958
+    },
+    {
+      "ItemId": 113,
+      "Similarity": 0.9786121146676914
+    },
+    {
+      "ItemId": 47,
+      "Similarity": 0.9782908469582308
+    }
+  ],
+  "135": [
+    {
+      "ItemId": 292,
+      "Similarity": 0.9928800668606783
+    },
+    {
+      "ItemId": 146,
+      "Similarity": 0.9928793176852154
+    },
+    {
+      "ItemId": 291,
+      "Similarity": 0.9893668901519825
+    },
+    {
+      "ItemId": 293,
+      "Similarity": 0.9878970333896449
+    },
+    {
+      "ItemId": 287,
+      "Similarity": 0.9574483818370494
+    }
+  ],
+  "136": [
+    {
+      "ItemId": 138,
+      "Similarity": 0.9919972654646914
+    },
+    {
+      "ItemId": 244,
+      "Similarity": 0.9809221947291707
+    },
+    {
+      "ItemId": 2,
+      "Similarity": 0.9757030276674865
+    },
+    {
+      "ItemId": 299,
+      "Similarity": 0.9726432181234775
+    },
+    {
+      "ItemId": 89,
+      "Similarity": 0.9661205265188306
+    }
+  ],
+  "137": [
+    {
+      "ItemId": 184,
+      "Similarity": 0.99094067614248
+    },
+    {
+      "ItemId": 258,
+      "Similarity": 0.9908155556984412
+    },
+    {
+      "ItemId": 259,
+      "Similarity": 0.9756319759103359
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.9730388708277805
+    },
+    {
+      "ItemId": 294,
+      "Similarity": 0.9722345763731582
+    }
+  ],
+  "138": [
+    {
+      "ItemId": 136,
+      "Similarity": 0.9919972654646914
+    },
+    {
+      "ItemId": 244,
+      "Similarity": 0.9762451857357908
+    },
+    {
+      "ItemId": 2,
+      "Similarity": 0.9741780101437876
+    },
+    {
+      "ItemId": 299,
+      "Similarity": 0.9650706946742755
+    },
+    {
+      "ItemId": 201,
+      "Similarity": 0.9647019347596587
+    }
+  ],
+  "139": [
+    {
+      "ItemId": 224,
+      "Similarity": 0.9955354279242995
+    },
+    {
+      "ItemId": 311,
+      "Similarity": 0.993875779211949
+    },
+    {
+      "ItemId": 3,
+      "Similarity": 0.9899466859472779
+    },
+    {
+      "ItemId": 81,
+      "Similarity": 0.9851995593583314
+    },
+    {
+      "ItemId": 302,
+      "Similarity": 0.9836981843857734
+    }
+  ],
+  "140": [
+    {
+      "ItemId": 34,
+      "Similarity": 0.9942366484469334
+    },
+    {
+      "ItemId": 270,
+      "Similarity": 0.9928559909835136
+    },
+    {
+      "ItemId": 83,
+      "Similarity": 0.9893610412187672
+    },
+    {
+      "ItemId": 141,
+      "Similarity": 0.9881455570259458
+    },
+    {
+      "ItemId": 208,
+      "Similarity": 0.9878062519847353
+    }
+  ],
+  "141": [
+    {
+      "ItemId": 25,
+      "Similarity": 0.9934628710837604
+    },
+    {
+      "ItemId": 140,
+      "Similarity": 0.9881455570259458
+    },
+    {
+      "ItemId": 288,
+      "Similarity": 0.9864227074088434
+    },
+    {
+      "ItemId": 270,
+      "Similarity": 0.9848018624648603
+    },
+    {
+      "ItemId": 34,
+      "Similarity": 0.9836645309161424
+    }
+  ],
+  "142": [
+    {
+      "ItemId": 132,
+      "Similarity": 0.9945642461068731
+    },
+    {
+      "ItemId": 234,
+      "Similarity": 0.9857151288227072
+    },
+    {
+      "ItemId": 87,
+      "Similarity": 0.9809382679149278
+    },
+    {
+      "ItemId": 294,
+      "Similarity": 0.9805396908174958
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.9683949135996305
+    }
+  ],
+  "143": [
+    {
+      "ItemId": 216,
+      "Similarity": 0.9707648865720648
+    },
+    {
+      "ItemId": 176,
+      "Similarity": 0.9405511439893952
+    },
+    {
+      "ItemId": 257,
+      "Similarity": 0.933065183666236
+    },
+    {
+      "ItemId": 324,
+      "Similarity": 0.8763168839519256
+    },
+    {
+      "ItemId": 196,
+      "Similarity": 0.8680171039127319
+    }
+  ],
+  "144": [
+    {
+      "ItemId": 128,
+      "Similarity": 0.9878166627164126
+    },
+    {
+      "ItemId": 41,
+      "Similarity": 0.9852568953661194
+    },
+    {
+      "ItemId": 23,
+      "Similarity": 0.9804462314097396
+    },
+    {
+      "ItemId": 186,
+      "Similarity": 0.954790264269533
+    },
+    {
+      "ItemId": 273,
+      "Similarity": 0.95261152273193
+    }
+  ],
+  "145": [
+    {
+      "ItemId": 312,
+      "Similarity": 0.9906632212083166
+    },
+    {
+      "ItemId": 115,
+      "Similarity": 0.9900119074882753
+    },
+    {
+      "ItemId": 18,
+      "Similarity": 0.989653835319345
+    },
+    {
+      "ItemId": 33,
+      "Similarity": 0.9874138286241386
+    },
+    {
+      "ItemId": 331,
+      "Similarity": 0.9841186286148824
+    }
+  ],
+  "146": [
+    {
+      "ItemId": 293,
+      "Similarity": 0.9949461779268751
+    },
+    {
+      "ItemId": 135,
+      "Similarity": 0.9928793176852154
+    },
+    {
+      "ItemId": 292,
+      "Similarity": 0.9889453607059848
+    },
+    {
+      "ItemId": 291,
+      "Similarity": 0.9823963049679689
+    },
+    {
+      "ItemId": 287,
+      "Similarity": 0.9636460630500556
+    }
+  ],
+  "147": [
+    {
+      "ItemId": 69,
+      "Similarity": 0.9743149053597693
+    },
+    {
+      "ItemId": 172,
+      "Similarity": 0.9646412948439301
+    },
+    {
+      "ItemId": 125,
+      "Similarity": 0.963582816341079
+    },
+    {
+      "ItemId": 278,
+      "Similarity": 0.9523695614073056
+    },
+    {
+      "ItemId": 36,
+      "Similarity": 0.9371972002983664
+    }
+  ],
+  "148": [
+    {
+      "ItemId": 159,
+      "Similarity": 0.9818813129299497
+    },
+    {
+      "ItemId": 36,
+      "Similarity": 0.9766228819032661
+    },
+    {
+      "ItemId": 324,
+      "Similarity": 0.957124325979672
+    },
+    {
+      "ItemId": 125,
+      "Similarity": 0.9481195353285123
+    },
+    {
+      "ItemId": 69,
+      "Similarity": 0.9237336053091892
+    }
+  ],
+  "149": [
+    {
+      "ItemId": 245,
+      "Similarity": 0.9969837129532052
+    },
+    {
+      "ItemId": 73,
+      "Similarity": 0.9910243951481247
+    },
+    {
+      "ItemId": 327,
+      "Similarity": 0.9892674385255181
+    },
+    {
+      "ItemId": 114,
+      "Similarity": 0.9856082602743066
+    },
+    {
+      "ItemId": 328,
+      "Similarity": 0.9846301777370453
+    }
+  ],
+  "150": [
+    {
+      "ItemId": 329,
+      "Similarity": 0.9968924534335201
+    },
+    {
+      "ItemId": 237,
+      "Similarity": 0.9922783732912407
+    },
+    {
+      "ItemId": 271,
+      "Similarity": 0.9889317054985504
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.9748195957656408
+    },
+    {
+      "ItemId": 99,
+      "Similarity": 0.9676305868491197
+    }
+  ],
+  "151": [
+    {
+      "ItemId": 60,
+      "Similarity": 0.9782471098110225
+    },
+    {
+      "ItemId": 162,
+      "Similarity": 0.976215292238653
+    },
+    {
+      "ItemId": 287,
+      "Similarity": 0.9735320571573813
+    },
+    {
+      "ItemId": 108,
+      "Similarity": 0.9676249781411965
+    },
+    {
+      "ItemId": 233,
+      "Similarity": 0.964481335238433
+    }
+  ],
+  "152": [
+    {
+      "ItemId": 85,
+      "Similarity": 0.9955596191572115
+    },
+    {
+      "ItemId": 198,
+      "Similarity": 0.9939094578920783
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9936558346722965
+    },
+    {
+      "ItemId": 38,
+      "Similarity": 0.9933423473288674
+    },
+    {
+      "ItemId": 61,
+      "Similarity": 0.9927113546504263
+    }
+  ],
+  "153": [
+    {
+      "ItemId": 290,
+      "Similarity": 0.9950510238063649
+    },
+    {
+      "ItemId": 235,
+      "Similarity": 0.9925824394270417
+    },
+    {
+      "ItemId": 131,
+      "Similarity": 0.9845694478718063
+    },
+    {
+      "ItemId": 303,
+      "Similarity": 0.9795849636548997
+    },
+    {
+      "ItemId": 228,
+      "Similarity": 0.9791345821160573
+    }
+  ],
+  "154": [
+    {
+      "ItemId": 117,
+      "Similarity": 0.9951466391411753
+    },
+    {
+      "ItemId": 78,
+      "Similarity": 0.9901106177801736
+    },
+    {
+      "ItemId": 195,
+      "Similarity": 0.9878893985587494
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.9813282147619413
+    },
+    {
+      "ItemId": 77,
+      "Similarity": 0.981085245134533
+    }
+  ],
+  "155": [
+    {
+      "ItemId": 203,
+      "Similarity": 0.9886772950415617
+    },
+    {
+      "ItemId": 133,
+      "Similarity": 0.9834089752395819
+    },
+    {
+      "ItemId": 200,
+      "Similarity": 0.9714672446562751
+    },
+    {
+      "ItemId": 253,
+      "Similarity": 0.9600333812876527
+    },
+    {
+      "ItemId": 341,
+      "Similarity": 0.9583269792461077
+    }
+  ],
+  "156": [
+    {
+      "ItemId": 259,
+      "Similarity": 0.9765433830229796
+    },
+    {
+      "ItemId": 70,
+      "Similarity": 0.9672913491224302
+    },
+    {
+      "ItemId": 258,
+      "Similarity": 0.9577417109983519
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.9577207305008305
+    },
+    {
+      "ItemId": 137,
+      "Similarity": 0.9532918437676663
+    }
+  ],
+  "157": [
+    {
+      "ItemId": 118,
+      "Similarity": 0.985395634454584
+    },
+    {
+      "ItemId": 207,
+      "Similarity": 0.9790904123818882
+    },
+    {
+      "ItemId": 8,
+      "Similarity": 0.9757470625386958
+    },
+    {
+      "ItemId": 126,
+      "Similarity": 0.9708474361280508
+    },
+    {
+      "ItemId": 72,
+      "Similarity": 0.9627668473779977
+    }
+  ],
+  "158": [
+    {
+      "ItemId": 50,
+      "Similarity": 0.9888920681851076
+    },
+    {
+      "ItemId": 179,
+      "Similarity": 0.988576482040586
+    },
+    {
+      "ItemId": 12,
+      "Similarity": 0.986017821967744
+    },
+    {
+      "ItemId": 10,
+      "Similarity": 0.981728883818707
+    },
+    {
+      "ItemId": 232,
+      "Similarity": 0.9752410430928107
+    }
+  ],
+  "159": [
+    {
+      "ItemId": 148,
+      "Similarity": 0.9818813129299497
+    },
+    {
+      "ItemId": 324,
+      "Similarity": 0.9743328422047421
+    },
+    {
+      "ItemId": 36,
+      "Similarity": 0.959334095648272
+    },
+    {
+      "ItemId": 125,
+      "Similarity": 0.9318167674261224
+    },
+    {
+      "ItemId": 69,
+      "Similarity": 0.9181810868186313
+    }
+  ],
+  "160": [
+    {
+      "ItemId": 260,
+      "Similarity": 0.9944804585208975
+    },
+    {
+      "ItemId": 24,
+      "Similarity": 0.9884909483864361
+    },
+    {
+      "ItemId": 308,
+      "Similarity": 0.986815068755015
+    },
+    {
+      "ItemId": 249,
+      "Similarity": 0.9863646267401377
+    },
+    {
+      "ItemId": 55,
+      "Similarity": 0.982381593273961
+    }
+  ],
+  "161": [
+    {
+      "ItemId": 286,
+      "Similarity": 0.9859577609779315
+    },
+    {
+      "ItemId": 319,
+      "Similarity": 0.9811542029378646
+    },
+    {
+      "ItemId": 276,
+      "Similarity": 0.9418249932951198
+    },
+    {
+      "ItemId": 167,
+      "Similarity": 0.8604303475933326
+    },
+    {
+      "ItemId": 262,
+      "Similarity": 0.8601766107957697
+    }
+  ],
+  "162": [
+    {
+      "ItemId": 60,
+      "Similarity": 0.9978769143862578
+    },
+    {
+      "ItemId": 233,
+      "Similarity": 0.9876909052953374
+    },
+    {
+      "ItemId": 108,
+      "Similarity": 0.9868553814321642
+    },
+    {
+      "ItemId": 151,
+      "Similarity": 0.976215292238653
+    },
+    {
+      "ItemId": 242,
+      "Similarity": 0.9714049216598101
+    }
+  ],
+  "163": [
+    {
+      "ItemId": 123,
+      "Similarity": 0.9894430784594316
+    },
+    {
+      "ItemId": 314,
+      "Similarity": 0.9865508686351838
+    },
+    {
+      "ItemId": 101,
+      "Similarity": 0.9863743981963403
+    },
+    {
+      "ItemId": 269,
+      "Similarity": 0.9734806105374539
+    },
+    {
+      "ItemId": 59,
+      "Similarity": 0.9656715577298475
+    }
+  ],
+  "164": [
+    {
+      "ItemId": 278,
+      "Similarity": 0.9773849024959405
+    },
+    {
+      "ItemId": 209,
+      "Similarity": 0.972646812876224
+    },
+    {
+      "ItemId": 172,
+      "Similarity": 0.9684183767503618
+    },
+    {
+      "ItemId": 236,
+      "Similarity": 0.9514400915484886
+    },
+    {
+      "ItemId": 192,
+      "Similarity": 0.9512908715412103
+    }
+  ],
+  "165": [
+    {
+      "ItemId": 28,
+      "Similarity": 0.9884540543725213
+    },
+    {
+      "ItemId": 236,
+      "Similarity": 0.9829997488481746
+    },
+    {
+      "ItemId": 192,
+      "Similarity": 0.9727793156741884
+    },
+    {
+      "ItemId": 222,
+      "Similarity": 0.963557470176451
+    },
+    {
+      "ItemId": 209,
+      "Similarity": 0.9623956637741342
+    }
+  ],
+  "166": [
+    {
+      "ItemId": 295,
+      "Similarity": 0.9992633974401955
+    },
+    {
+      "ItemId": 46,
+      "Similarity": 0.9882226633082529
+    },
+    {
+      "ItemId": 300,
+      "Similarity": 0.9877156180984944
+    },
+    {
+      "ItemId": 90,
+      "Similarity": 0.9854014076574783
+    },
+    {
+      "ItemId": 244,
+      "Similarity": 0.9746795859091334
+    }
+  ],
+  "167": [
+    {
+      "ItemId": 262,
+      "Similarity": 0.9956558788273258
+    },
+    {
+      "ItemId": 230,
+      "Similarity": 0.9916220482139796
+    },
+    {
+      "ItemId": 112,
+      "Similarity": 0.9865033589604127
+    },
+    {
+      "ItemId": 49,
+      "Similarity": 0.8890919972747829
+    },
+    {
+      "ItemId": 272,
+      "Similarity": 0.8885535104958867
+    }
+  ],
+  "168": [
+    {
+      "ItemId": 114,
+      "Similarity": 0.9911982586045913
+    },
+    {
+      "ItemId": 328,
+      "Similarity": 0.9902090555420627
+    },
+    {
+      "ItemId": 327,
+      "Similarity": 0.9875684061997801
+    },
+    {
+      "ItemId": 289,
+      "Similarity": 0.9874202792867912
+    },
+    {
+      "ItemId": 73,
+      "Similarity": 0.9858236714563534
+    }
+  ],
+  "169": [
+    {
+      "ItemId": 51,
+      "Similarity": 0.9973935055222442
+    },
+    {
+      "ItemId": 1,
+      "Similarity": 0.9919281020131441
+    },
+    {
+      "ItemId": 71,
+      "Similarity": 0.9881953204132155
+    },
+    {
+      "ItemId": 307,
+      "Similarity": 0.9865272872539428
+    },
+    {
+      "ItemId": 48,
+      "Similarity": 0.9818372110634312
+    }
+  ],
+  "170": [
+    {
+      "ItemId": 267,
+      "Similarity": 0.9924031296999831
+    },
+    {
+      "ItemId": 35,
+      "Similarity": 0.9873262880993611
+    },
+    {
+      "ItemId": 97,
+      "Similarity": 0.9828590349194886
+    },
+    {
+      "ItemId": 40,
+      "Similarity": 0.9800074511617702
+    },
+    {
+      "ItemId": 342,
+      "Similarity": 0.9795532781930817
+    }
+  ],
+  "171": [
+    {
+      "ItemId": 121,
+      "Similarity": 0.9967743829014013
+    },
+    {
+      "ItemId": 45,
+      "Similarity": 0.99243706088612
+    },
+    {
+      "ItemId": 20,
+      "Similarity": 0.9923441078796709
+    },
+    {
+      "ItemId": 21,
+      "Similarity": 0.9909687272382325
+    },
+    {
+      "ItemId": 5,
+      "Similarity": 0.9899166045678072
+    }
+  ],
+  "172": [
+    {
+      "ItemId": 278,
+      "Similarity": 0.986818290165368
+    },
+    {
+      "ItemId": 164,
+      "Similarity": 0.9684183767503618
+    },
+    {
+      "ItemId": 147,
+      "Similarity": 0.9646412948439301
+    },
+    {
+      "ItemId": 209,
+      "Similarity": 0.9603102259501823
+    },
+    {
+      "ItemId": 69,
+      "Similarity": 0.9407187448370684
+    }
+  ],
+  "173": [
+    {
+      "ItemId": 99,
+      "Similarity": 0.9963861349520148
+    },
+    {
+      "ItemId": 175,
+      "Similarity": 0.9960828094718852
+    },
+    {
+      "ItemId": 246,
+      "Similarity": 0.9917776384776158
+    },
+    {
+      "ItemId": 180,
+      "Similarity": 0.9905446038818729
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.987559599296244
+    }
+  ],
+  "174": [
+    {
+      "ItemId": 52,
+      "Similarity": 0.9890036145297068
+    },
+    {
+      "ItemId": 16,
+      "Similarity": 0.9775284957803149
+    },
+    {
+      "ItemId": 107,
+      "Similarity": 0.9763418941533778
+    },
+    {
+      "ItemId": 256,
+      "Similarity": 0.9572976674122426
+    },
+    {
+      "ItemId": 189,
+      "Similarity": 0.950916490151606
+    }
+  ],
+  "175": [
+    {
+      "ItemId": 99,
+      "Similarity": 0.9980936401098668
+    },
+    {
+      "ItemId": 173,
+      "Similarity": 0.9960828094718852
+    },
+    {
+      "ItemId": 246,
+      "Similarity": 0.9934693716098449
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.9892369609477543
+    },
+    {
+      "ItemId": 180,
+      "Similarity": 0.986700997953726
+    }
+  ],
+  "176": [
+    {
+      "ItemId": 216,
+      "Similarity": 0.9453983285142231
+    },
+    {
+      "ItemId": 143,
+      "Similarity": 0.9405511439893952
+    },
+    {
+      "ItemId": 324,
+      "Similarity": 0.9277011753568759
+    },
+    {
+      "ItemId": 257,
+      "Similarity": 0.9096067867709515
+    },
+    {
+      "ItemId": 159,
+      "Similarity": 0.9055701943480182
+    }
+  ],
+  "177": [
+    {
+      "ItemId": 321,
+      "Similarity": 0.9917999471208422
+    },
+    {
+      "ItemId": 93,
+      "Similarity": 0.9900272429542016
+    },
+    {
+      "ItemId": 26,
+      "Similarity": 0.9885290974215672
+    },
+    {
+      "ItemId": 261,
+      "Similarity": 0.987523791986033
+    },
+    {
+      "ItemId": 322,
+      "Similarity": 0.9809188109677086
+    }
+  ],
+  "178": [
+    {
+      "ItemId": 95,
+      "Similarity": 0.9936855257680448
+    },
+    {
+      "ItemId": 190,
+      "Similarity": 0.9914900025946718
+    },
+    {
+      "ItemId": 315,
+      "Similarity": 0.9838150233428029
+    },
+    {
+      "ItemId": 55,
+      "Similarity": 0.9722511549064397
+    },
+    {
+      "ItemId": 24,
+      "Similarity": 0.9708216501724493
+    }
+  ],
+  "179": [
+    {
+      "ItemId": 50,
+      "Similarity": 0.9976604014138445
+    },
+    {
+      "ItemId": 10,
+      "Similarity": 0.9929937930548741
+    },
+    {
+      "ItemId": 158,
+      "Similarity": 0.988576482040586
+    },
+    {
+      "ItemId": 232,
+      "Similarity": 0.9808235590586939
+    },
+    {
+      "ItemId": 12,
+      "Similarity": 0.980376191511046
+    }
+  ],
+  "180": [
+    {
+      "ItemId": 173,
+      "Similarity": 0.9905446038818729
+    },
+    {
+      "ItemId": 250,
+      "Similarity": 0.9893186567517107
+    },
+    {
+      "ItemId": 99,
+      "Similarity": 0.9885640456867798
+    },
+    {
+      "ItemId": 246,
+      "Similarity": 0.9874564859214514
+    },
+    {
+      "ItemId": 175,
+      "Similarity": 0.986700997953726
+    }
+  ],
+  "181": [
+    {
+      "ItemId": 204,
+      "Similarity": 0.99164342670839
+    },
+    {
+      "ItemId": 66,
+      "Similarity": 0.9889408866530479
+    },
+    {
+      "ItemId": 13,
+      "Similarity": 0.9881546653881742
+    },
+    {
+      "ItemId": 310,
+      "Similarity": 0.9822240058966638
+    },
+    {
+      "ItemId": 42,
+      "Similarity": 0.9747311310224364
+    }
+  ],
+  "182": [
+    {
+      "ItemId": 122,
+      "Similarity": 0.99193464111682
+    },
+    {
+      "ItemId": 6,
+      "Similarity": 0.9857779549495521
+    },
+    {
+      "ItemId": 134,
+      "Similarity": 0.9816184554297599
+    },
+    {
+      "ItemId": 218,
+      "Similarity": 0.9791446394301203
+    },
+    {
+      "ItemId": 180,
+      "Similarity": 0.9754625516479898
+    }
+  ],
+  "183": [
+    {
+      "ItemId": 265,
+      "Similarity": 0.9932653368477159
+    },
+    {
+      "ItemId": 62,
+      "Similarity": 0.978891555096278
+    },
+    {
+      "ItemId": 40,
+      "Similarity": 0.9753115134631891
+    },
+    {
+      "ItemId": 231,
+      "Similarity": 0.9728642108786645
+    },
+    {
+      "ItemId": 267,
+      "Similarity": 0.9678563564360754
+    }
+  ],
+  "184": [
+    {
+      "ItemId": 137,
+      "Similarity": 0.99094067614248
+    },
+    {
+      "ItemId": 258,
+      "Similarity": 0.9861777305454671
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.9771303224891872
+    },
+    {
+      "ItemId": 294,
+      "Similarity": 0.9763192528091076
+    },
+    {
+      "ItemId": 234,
+      "Similarity": 0.9712417554130748
+    }
+  ],
+  "185": [
+    {
+      "ItemId": 76,
+      "Similarity": 0.9948308685515623
+    },
+    {
+      "ItemId": 325,
+      "Similarity": 0.9771219284039534
+    },
+    {
+      "ItemId": 323,
+      "Similarity": 0.9735386807928635
+    },
+    {
+      "ItemId": 223,
+      "Similarity": 0.9584892434148274
+    },
+    {
+      "ItemId": 213,
+      "Similarity": 0.9535532830041162
+    }
+  ],
+  "186": [
+    {
+      "ItemId": 128,
+      "Similarity": 0.9661678597287682
+    },
+    {
+      "ItemId": 273,
+      "Similarity": 0.9660209652697852
+    },
+    {
+      "ItemId": 144,
+      "Similarity": 0.954790264269533
+    },
+    {
+      "ItemId": 222,
+      "Similarity": 0.9535060532248671
+    },
+    {
+      "ItemId": 41,
+      "Similarity": 0.9414604542037882
+    }
+  ],
+  "187": [
+    {
+      "ItemId": 14,
+      "Similarity": 0.9916848675666745
+    },
+    {
+      "ItemId": 56,
+      "Similarity": 0.9898421975146059
+    },
+    {
+      "ItemId": 191,
+      "Similarity": 0.9781838426131381
+    },
+    {
+      "ItemId": 274,
+      "Similarity": 0.971956572285783
+    },
+    {
+      "ItemId": 231,
+      "Similarity": 0.9581084372105978
+    }
+  ],
+  "188": [
+    {
+      "ItemId": 301,
+      "Similarity": 0.9958199191156768
+    },
+    {
+      "ItemId": 339,
+      "Similarity": 0.9941582326716887
+    },
+    {
+      "ItemId": 279,
+      "Similarity": 0.9893846124042653
+    },
+    {
+      "ItemId": 330,
+      "Similarity": 0.9860872793263589
+    },
+    {
+      "ItemId": 100,
+      "Similarity": 0.9753241005545794
+    }
+  ],
+  "189": [
+    {
+      "ItemId": 256,
+      "Similarity": 0.984093835720152
+    },
+    {
+      "ItemId": 284,
+      "Similarity": 0.9786394292990385
+    },
+    {
+      "ItemId": 297,
+      "Similarity": 0.9667220434478833
+    },
+    {
+      "ItemId": 225,
+      "Similarity": 0.9662326009316938
+    },
+    {
+      "ItemId": 248,
+      "Similarity": 0.9648226132600299
+    }
+  ],
+  "190": [
+    {
+      "ItemId": 95,
+      "Similarity": 0.9950249983690269
+    },
+    {
+      "ItemId": 315,
+      "Similarity": 0.9921932247328344
+    },
+    {
+      "ItemId": 178,
+      "Similarity": 0.9914900025946718
+    },
+    {
+      "ItemId": 110,
+      "Similarity": 0.9712514263280659
+    },
+    {
+      "ItemId": 55,
+      "Similarity": 0.9668904369387157
+    }
+  ],
+  "191": [
+    {
+      "ItemId": 56,
+      "Similarity": 0.9881025782978905
+    },
+    {
+      "ItemId": 187,
+      "Similarity": 0.9781838426131381
+    },
+    {
+      "ItemId": 14,
+      "Similarity": 0.9702261175470742
+    },
+    {
+      "ItemId": 274,
+      "Similarity": 0.9696107210737441
+    },
+    {
+      "ItemId": 5,
+      "Similarity": 0.9539836606884669
+    }
+  ],
+  "192": [
+    {
+      "ItemId": 209,
+      "Similarity": 0.9774399373309259
+    },
+    {
+      "ItemId": 165,
+      "Similarity": 0.9727793156741884
+    },
+    {
+      "ItemId": 28,
+      "Similarity": 0.9681861150960357
+    },
+    {
+      "ItemId": 236,
+      "Similarity": 0.9645111382154203
+    },
+    {
+      "ItemId": 278,
+      "Similarity": 0.9514266835709975
+    }
+  ],
+  "193": [
+    {
+      "ItemId": 38,
+      "Similarity": 0.999682497490175
+    },
+    {
+      "ItemId": 61,
+      "Similarity": 0.9990434268945674
+    },
+    {
+      "ItemId": 206,
+      "Similarity": 0.9981158181383455
+    },
+    {
+      "ItemId": 198,
+      "Similarity": 0.9978547024613363
+    },
+    {
+      "ItemId": 85,
+      "Similarity": 0.9961315124851339
+    }
+  ],
+  "194": [
+    {
+      "ItemId": 103,
+      "Similarity": 0.9904611267166439
+    },
+    {
+      "ItemId": 338,
+      "Similarity": 0.9856125449936586
+    },
+    {
+      "ItemId": 104,
+      "Similarity": 0.9813054994060231
+    },
+    {
+      "ItemId": 30,
+      "Similarity": 0.9778048671174058
+    },
+    {
+      "ItemId": 326,
+      "Similarity": 0.9774156648666193
+    }
+  ],
+  "195": [
+    {
+      "ItemId": 78,
+      "Similarity": 0.9977342381711481
+    },
+    {
+      "ItemId": 77,
+      "Similarity": 0.9930285875144821
+    },
+    {
+      "ItemId": 117,
+      "Similarity": 0.9893562279340784
+    },
+    {
+      "ItemId": 154,
+      "Similarity": 0.9878893985587494
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.973134930900595
+    }
+  ],
+  "196": [
+    {
+      "ItemId": 31,
+      "Similarity": 0.9861436753513632
+    },
+    {
+      "ItemId": 94,
+      "Similarity": 0.9187408117518454
+    },
+    {
+      "ItemId": 257,
+      "Similarity": 0.88538814630042
+    },
+    {
+      "ItemId": 39,
+      "Similarity": 0.8819377948269655
+    },
+    {
+      "ItemId": 143,
+      "Similarity": 0.8680171039127319
+    }
+  ],
+  "197": [
+    {
+      "ItemId": 98,
+      "Similarity": 0.9998075140553475
+    },
+    {
+      "ItemId": 336,
+      "Similarity": 0.9982109840527779
+    },
+    {
+      "ItemId": 316,
+      "Similarity": 0.9971927456870572
+    },
+    {
+      "ItemId": 285,
+      "Similarity": 0.9958555030309927
+    },
+    {
+      "ItemId": 283,
+      "Similarity": 0.990667140510097
+    }
+  ],
+  "198": [
+    {
+      "ItemId": 85,
+      "Similarity": 0.9982693990783575
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9978547024613363
+    },
+    {
+      "ItemId": 38,
+      "Similarity": 0.9975385605496386
+    },
+    {
+      "ItemId": 313,
+      "Similarity": 0.9971971020851713
+    },
+    {
+      "ItemId": 61,
+      "Similarity": 0.9969022272667164
+    }
+  ],
+  "199": [
+    {
+      "ItemId": 228,
+      "Similarity": 0.9881665967237254
+    },
+    {
+      "ItemId": 277,
+      "Similarity": 0.9881641231304851
+    },
+    {
+      "ItemId": 109,
+      "Similarity": 0.9796324956912812
+    },
+    {
+      "ItemId": 153,
+      "Similarity": 0.9773546117806328
+    },
+    {
+      "ItemId": 290,
+      "Similarity": 0.9726267107961537
+    }
+  ],
+  "200": [
+    {
+      "ItemId": 133,
+      "Similarity": 0.984998111798136
+    },
+    {
+      "ItemId": 203,
+      "Similarity": 0.9823970096447225
+    },
+    {
+      "ItemId": 155,
+      "Similarity": 0.9714672446562751
+    },
+    {
+      "ItemId": 292,
+      "Similarity": 0.9565104494228521
+    },
+    {
+      "ItemId": 253,
+      "Similarity": 0.9563030916800536
+    }
+  ],
+  "201": [
+    {
+      "ItemId": 89,
+      "Similarity": 0.993036772207403
+    },
+    {
+      "ItemId": 2,
+      "Similarity": 0.9831125045472103
+    },
+    {
+      "ItemId": 299,
+      "Similarity": 0.9777243352596718
+    },
+    {
+      "ItemId": 326,
+      "Similarity": 0.9701769692887457
+    },
+    {
+      "ItemId": 80,
+      "Similarity": 0.9691844109413775
+    }
+  ],
+  "202": [
+    {
+      "ItemId": 212,
+      "Similarity": 0.9919274862275536
+    },
+    {
+      "ItemId": 102,
+      "Similarity": 0.984237328554864
+    },
+    {
+      "ItemId": 334,
+      "Similarity": 0.9806135369217548
+    },
+    {
+      "ItemId": 227,
+      "Similarity": 0.9748032551978476
+    },
+    {
+      "ItemId": 304,
+      "Similarity": 0.9726187322205301
+    }
+  ],
+  "203": [
+    {
+      "ItemId": 133,
+      "Similarity": 0.9913204152046929
+    },
+    {
+      "ItemId": 155,
+      "Similarity": 0.9886772950415617
+    },
+    {
+      "ItemId": 200,
+      "Similarity": 0.9823970096447225
+    },
+    {
+      "ItemId": 291,
+      "Similarity": 0.9544648283712767
+    },
+    {
+      "ItemId": 253,
+      "Similarity": 0.9526115768212834
+    }
+  ],
+  "204": [
+    {
+      "ItemId": 66,
+      "Similarity": 0.9929712543642425
+    },
+    {
+      "ItemId": 181,
+      "Similarity": 0.99164342670839
+    },
+    {
+      "ItemId": 13,
+      "Similarity": 0.9841632243346168
+    },
+    {
+      "ItemId": 42,
+      "Similarity": 0.9828039351016821
+    },
+    {
+      "ItemId": 15,
+      "Similarity": 0.9827375874597808
+    }
+  ],
+  "205": [
+    {
+      "ItemId": 266,
+      "Similarity": 0.9906301716132341
+    },
+    {
+      "ItemId": 198,
+      "Similarity": 0.9729445788280544
+    },
+    {
+      "ItemId": 54,
+      "Similarity": 0.9728966216270679
+    },
+    {
+      "ItemId": 313,
+      "Similarity": 0.9717632192733434
+    },
+    {
+      "ItemId": 85,
+      "Similarity": 0.9713684765372691
+    }
+  ],
+  "206": [
+    {
+      "ItemId": 61,
+      "Similarity": 0.9990706148692212
+    },
+    {
+      "ItemId": 38,
+      "Similarity": 0.9984323261052116
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9981158181383455
+    },
+    {
+      "ItemId": 198,
+      "Similarity": 0.9959785886060317
+    },
+    {
+      "ItemId": 85,
+      "Similarity": 0.9942618666666193
+    }
+  ],
+  "207": [
+    {
+      "ItemId": 126,
+      "Similarity": 0.987628518237809
+    },
+    {
+      "ItemId": 8,
+      "Similarity": 0.9862331223572884
+    },
+    {
+      "ItemId": 72,
+      "Similarity": 0.9829778343314929
+    },
+    {
+      "ItemId": 157,
+      "Similarity": 0.9790904123818882
+    },
+    {
+      "ItemId": 33,
+      "Similarity": 0.9756906577615565
+    }
+  ],
+  "208": [
+    {
+      "ItemId": 83,
+      "Similarity": 0.9959143521122438
+    },
+    {
+      "ItemId": 34,
+      "Similarity": 0.9915130014657089
+    },
+    {
+      "ItemId": 140,
+      "Similarity": 0.9878062519847353
+    },
+    {
+      "ItemId": 65,
+      "Similarity": 0.9851122374648328
+    },
+    {
+      "ItemId": 270,
+      "Similarity": 0.9808347979359882
+    }
+  ],
+  "209": [
+    {
+      "ItemId": 192,
+      "Similarity": 0.9774399373309259
+    },
+    {
+      "ItemId": 278,
+      "Similarity": 0.9727887916135171
+    },
+    {
+      "ItemId": 164,
+      "Similarity": 0.972646812876224
+    },
+    {
+      "ItemId": 165,
+      "Similarity": 0.9623956637741342
+    },
+    {
+      "ItemId": 172,
+      "Similarity": 0.9603102259501823
+    }
+  ],
+  "210": [
+    {
+      "ItemId": 333,
+      "Similarity": 0.9944332430301734
+    },
+    {
+      "ItemId": 110,
+      "Similarity": 0.9925142659147942
+    },
+    {
+      "ItemId": 116,
+      "Similarity": 0.9905278488423307
+    },
+    {
+      "ItemId": 127,
+      "Similarity": 0.9890002039340857
+    },
+    {
+      "ItemId": 91,
+      "Similarity": 0.988582161509984
+    }
+  ],
+  "211": [
+    {
+      "ItemId": 305,
+      "Similarity": 0.9956160994812828
+    },
+    {
+      "ItemId": 88,
+      "Similarity": 0.9931073542509266
+    },
+    {
+      "ItemId": 268,
+      "Similarity": 0.9773208216286347
+    },
+    {
+      "ItemId": 321,
+      "Similarity": 0.9733100268699609
+    },
+    {
+      "ItemId": 93,
+      "Similarity": 0.9709433449380702
+    }
+  ],
+  "212": [
+    {
+      "ItemId": 202,
+      "Similarity": 0.9919274862275536
+    },
+    {
+      "ItemId": 102,
+      "Similarity": 0.9858331135945471
+    },
+    {
+      "ItemId": 227,
+      "Similarity": 0.9816878113210605
+    },
+    {
+      "ItemId": 304,
+      "Similarity": 0.979325077599437
+    },
+    {
+      "ItemId": 334,
+      "Similarity": 0.9728497691867242
+    }
+  ],
+  "213": [
+    {
+      "ItemId": 323,
+      "Similarity": 0.9781117875790322
+    },
+    {
+      "ItemId": 325,
+      "Similarity": 0.9753287073978445
+    },
+    {
+      "ItemId": 185,
+      "Similarity": 0.9535532830041162
+    },
+    {
+      "ItemId": 76,
+      "Similarity": 0.952368628840847
+    },
+    {
+      "ItemId": 223,
+      "Similarity": 0.9157361391894462
+    }
+  ],
+  "214": [
+    {
+      "ItemId": 232,
+      "Similarity": 0.9968765787674321
+    },
+    {
+      "ItemId": 4,
+      "Similarity": 0.9878782882727986
+    },
+    {
+      "ItemId": 296,
+      "Similarity": 0.9824261179923256
+    },
+    {
+      "ItemId": 10,
+      "Similarity": 0.9823518548510529
+    },
+    {
+      "ItemId": 82,
+      "Similarity": 0.9821222336275799
+    }
+  ],
+  "215": [
+    {
+      "ItemId": 303,
+      "Similarity": 0.9950561582370989
+    },
+    {
+      "ItemId": 288,
+      "Similarity": 0.9869216766816917
+    },
+    {
+      "ItemId": 131,
+      "Similarity": 0.9864711373591778
+    },
+    {
+      "ItemId": 290,
+      "Similarity": 0.9801828531320038
+    },
+    {
+      "ItemId": 235,
+      "Similarity": 0.980067705409005
+    }
+  ],
+  "216": [
+    {
+      "ItemId": 143,
+      "Similarity": 0.9707648865720648
+    },
+    {
+      "ItemId": 257,
+      "Similarity": 0.9600421435736357
+    },
+    {
+      "ItemId": 176,
+      "Similarity": 0.9453983285142231
+    },
+    {
+      "ItemId": 324,
+      "Similarity": 0.8826907890636877
+    },
+    {
+      "ItemId": 159,
+      "Similarity": 0.8626320051120713
+    }
+  ],
+  "217": [
+    {
+      "ItemId": 48,
+      "Similarity": 0.9961643091220092
+    },
+    {
+      "ItemId": 280,
+      "Similarity": 0.9945830984169604
+    },
+    {
+      "ItemId": 241,
+      "Similarity": 0.9945233453895335
+    },
+    {
+      "ItemId": 105,
+      "Similarity": 0.9880455797808559
+    },
+    {
+      "ItemId": 318,
+      "Similarity": 0.9828448995285868
+    }
+  ],
+  "218": [
+    {
+      "ItemId": 134,
+      "Similarity": 0.9950793818701267
+    },
+    {
+      "ItemId": 113,
+      "Similarity": 0.9833708313001787
+    },
+    {
+      "ItemId": 47,
+      "Similarity": 0.9830464320420846
+    },
+    {
+      "ItemId": 11,
+      "Similarity": 0.9805230146571312
+    },
+    {
+      "ItemId": 182,
+      "Similarity": 0.9791446394301203
+    }
+  ],
+  "219": [
+    {
+      "ItemId": 27,
+      "Similarity": 0.9878506590640181
+    },
+    {
+      "ItemId": 251,
+      "Similarity": 0.9820841750678163
+    },
+    {
+      "ItemId": 58,
+      "Similarity": 0.9812469150001782
+    },
+    {
+      "ItemId": 53,
+      "Similarity": 0.9729864465086753
+    },
+    {
+      "ItemId": 17,
+      "Similarity": 0.9727986625799637
+    }
+  ],
+  "220": [
+    {
+      "ItemId": 247,
+      "Similarity": 0.9705877852431655
+    },
+    {
+      "ItemId": 263,
+      "Similarity": 0.9700138787616209
+    },
+    {
+      "ItemId": 106,
+      "Similarity": 0.9643734084282202
+    },
+    {
+      "ItemId": 332,
+      "Similarity": 0.9626119548416472
+    },
+    {
+      "ItemId": 19,
+      "Similarity": 0.9588758738245445
+    }
+  ],
+  "221": [
+    {
+      "ItemId": 119,
+      "Similarity": 0.979103497178789
+    },
+    {
+      "ItemId": 240,
+      "Similarity": 0.976375985987669
+    },
+    {
+      "ItemId": 120,
+      "Similarity": 0.9750799859548909
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.9742645499241147
+    },
+    {
+      "ItemId": 79,
+      "Similarity": 0.9728622364032916
+    }
+  ],
+  "222": [
+    {
+      "ItemId": 273,
+      "Similarity": 0.9811841629779893
+    },
+    {
+      "ItemId": 28,
+      "Similarity": 0.9745258889776802
+    },
+    {
+      "ItemId": 165,
+      "Similarity": 0.963557470176451
+    },
+    {
+      "ItemId": 186,
+      "Similarity": 0.9535060532248671
+    },
+    {
+      "ItemId": 236,
+      "Similarity": 0.9477639214132657
+    }
+  ],
+  "223": [
+    {
+      "ItemId": 242,
+      "Similarity": 0.9737138938425823
+    },
+    {
+      "ItemId": 76,
+      "Similarity": 0.9596891830015247
+    },
+    {
+      "ItemId": 185,
+      "Similarity": 0.9584892434148274
+    },
+    {
+      "ItemId": 233,
+      "Similarity": 0.9550654792363742
+    },
+    {
+      "ItemId": 108,
+      "Similarity": 0.9549011247249473
+    }
+  ],
+  "224": [
+    {
+      "ItemId": 139,
+      "Similarity": 0.9955354279242995
+    },
+    {
+      "ItemId": 311,
+      "Similarity": 0.9914484022518596
+    },
+    {
+      "ItemId": 81,
+      "Similarity": 0.9895717047596536
+    },
+    {
+      "ItemId": 3,
+      "Similarity": 0.9875384401172658
+    },
+    {
+      "ItemId": 86,
+      "Similarity": 0.9822311077433117
+    }
+  ],
+  "225": [
+    {
+      "ItemId": 248,
+      "Similarity": 0.9973234245470967
+    },
+    {
+      "ItemId": 297,
+      "Similarity": 0.988728510444898
+    },
+    {
+      "ItemId": 284,
+      "Similarity": 0.9819219993376487
+    },
+    {
+      "ItemId": 63,
+      "Similarity": 0.9785951044451776
+    },
+    {
+      "ItemId": 229,
+      "Similarity": 0.970672775707122
+    }
+  ],
+  "226": [
+    {
+      "ItemId": 130,
+      "Similarity": 0.9863188455520823
+    },
+    {
+      "ItemId": 67,
+      "Similarity": 0.9819927201076415
+    },
+    {
+      "ItemId": 238,
+      "Similarity": 0.9802926723467246
+    },
+    {
+      "ItemId": 7,
+      "Similarity": 0.9775961356286026
+    },
+    {
+      "ItemId": 264,
+      "Similarity": 0.9695508492302537
+    }
+  ],
+  "227": [
+    {
+      "ItemId": 304,
+      "Similarity": 0.9975484063690062
+    },
+    {
+      "ItemId": 212,
+      "Similarity": 0.9816878113210605
+    },
+    {
+      "ItemId": 202,
+      "Similarity": 0.9748032551978476
+    },
+    {
+      "ItemId": 102,
+      "Similarity": 0.9680314848230115
+    },
+    {
+      "ItemId": 334,
+      "Similarity": 0.956372432635953
+    }
+  ],
+  "228": [
+    {
+      "ItemId": 199,
+      "Similarity": 0.9881665967237254
+    },
+    {
+      "ItemId": 277,
+      "Similarity": 0.9881532394673465
+    },
+    {
+      "ItemId": 109,
+      "Similarity": 0.9796217991509216
+    },
+    {
+      "ItemId": 153,
+      "Similarity": 0.9791345821160573
+    },
+    {
+      "ItemId": 290,
+      "Similarity": 0.9772153100530524
+    }
+  ],
+  "229": [
+    {
+      "ItemId": 63,
+      "Similarity": 0.9878843087370461
+    },
+    {
+      "ItemId": 77,
+      "Similarity": 0.9744592675955749
+    },
+    {
+      "ItemId": 225,
+      "Similarity": 0.970672775707122
+    },
+    {
+      "ItemId": 195,
+      "Similarity": 0.9696109172033041
+    },
+    {
+      "ItemId": 248,
+      "Similarity": 0.9692317228919164
+    }
+  ],
+  "230": [
+    {
+      "ItemId": 167,
+      "Similarity": 0.9916220482139796
+    },
+    {
+      "ItemId": 112,
+      "Similarity": 0.9881859930341058
+    },
+    {
+      "ItemId": 262,
+      "Similarity": 0.9873502563314116
+    },
+    {
+      "ItemId": 49,
+      "Similarity": 0.8904585072483567
+    },
+    {
+      "ItemId": 276,
+      "Similarity": 0.887780443192632
+    }
+  ],
+  "231": [
+    {
+      "ItemId": 62,
+      "Similarity": 0.9937107454659606
+    },
+    {
+      "ItemId": 265,
+      "Similarity": 0.9793241629526095
+    },
+    {
+      "ItemId": 183,
+      "Similarity": 0.9728642108786645
+    },
+    {
+      "ItemId": 14,
+      "Similarity": 0.9627057737731957
+    },
+    {
+      "ItemId": 187,
+      "Similarity": 0.9581084372105978
+    }
+  ],
+  "232": [
+    {
+      "ItemId": 214,
+      "Similarity": 0.9968765787674321
+    },
+    {
+      "ItemId": 4,
+      "Similarity": 0.9872724001423485
+    },
+    {
+      "ItemId": 10,
+      "Similarity": 0.9853847827525289
+    },
+    {
+      "ItemId": 50,
+      "Similarity": 0.9830847668385524
+    },
+    {
+      "ItemId": 82,
+      "Similarity": 0.9819290106128847
+    }
+  ],
+  "233": [
+    {
+      "ItemId": 108,
+      "Similarity": 0.98979705645803
+    },
+    {
+      "ItemId": 162,
+      "Similarity": 0.9876909052953374
+    },
+    {
+      "ItemId": 60,
+      "Similarity": 0.9856197104014924
+    },
+    {
+      "ItemId": 242,
+      "Similarity": 0.9742550734999412
+    },
+    {
+      "ItemId": 151,
+      "Similarity": 0.964481335238433
+    }
+  ],
+  "234": [
+    {
+      "ItemId": 294,
+      "Similarity": 0.987007229292176
+    },
+    {
+      "ItemId": 132,
+      "Similarity": 0.9860429871769191
+    },
+    {
+      "ItemId": 142,
+      "Similarity": 0.9857151288227072
+    },
+    {
+      "ItemId": 184,
+      "Similarity": 0.9712417554130748
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.9686978838825532
+    }
+  ],
+  "235": [
+    {
+      "ItemId": 290,
+      "Similarity": 0.9945626100135877
+    },
+    {
+      "ItemId": 153,
+      "Similarity": 0.9925824394270417
+    },
+    {
+      "ItemId": 131,
+      "Similarity": 0.9892971304502114
+    },
+    {
+      "ItemId": 303,
+      "Similarity": 0.9842647848797239
+    },
+    {
+      "ItemId": 215,
+      "Similarity": 0.980067705409005
+    }
+  ],
+  "236": [
+    {
+      "ItemId": 165,
+      "Similarity": 0.9829997488481746
+    },
+    {
+      "ItemId": 28,
+      "Similarity": 0.971840843980512
+    },
+    {
+      "ItemId": 192,
+      "Similarity": 0.9645111382154203
+    },
+    {
+      "ItemId": 209,
+      "Similarity": 0.9543023225190891
+    },
+    {
+      "ItemId": 164,
+      "Similarity": 0.9514400915484886
+    }
+  ],
+  "237": [
+    {
+      "ItemId": 329,
+      "Similarity": 0.9951849494524685
+    },
+    {
+      "ItemId": 150,
+      "Similarity": 0.9922783732912407
+    },
+    {
+      "ItemId": 271,
+      "Similarity": 0.9813794178541837
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.9792309636817209
+    },
+    {
+      "ItemId": 175,
+      "Similarity": 0.9733850751883439
+    }
+  ],
+  "238": [
+    {
+      "ItemId": 7,
+      "Similarity": 0.9971941089095862
+    },
+    {
+      "ItemId": 264,
+      "Similarity": 0.9888244006445399
+    },
+    {
+      "ItemId": 84,
+      "Similarity": 0.9873210878729466
+    },
+    {
+      "ItemId": 342,
+      "Similarity": 0.9860649661335096
+    },
+    {
+      "ItemId": 97,
+      "Similarity": 0.9827376450243507
+    }
+  ],
+  "239": [
+    {
+      "ItemId": 302,
+      "Similarity": 0.9928472364085774
+    },
+    {
+      "ItemId": 3,
+      "Similarity": 0.9924964754021165
+    },
+    {
+      "ItemId": 311,
+      "Similarity": 0.9891755740160241
+    },
+    {
+      "ItemId": 139,
+      "Similarity": 0.9831828207466661
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.9808073319504851
+    }
+  ],
+  "240": [
+    {
+      "ItemId": 120,
+      "Similarity": 0.9986405698862465
+    },
+    {
+      "ItemId": 64,
+      "Similarity": 0.9969210054113331
+    },
+    {
+      "ItemId": 79,
+      "Similarity": 0.9963144796443909
+    },
+    {
+      "ItemId": 119,
+      "Similarity": 0.9878510371374981
+    },
+    {
+      "ItemId": 117,
+      "Similarity": 0.9803067916997008
+    }
+  ],
+  "241": [
+    {
+      "ItemId": 280,
+      "Similarity": 0.9995293151525043
+    },
+    {
+      "ItemId": 217,
+      "Similarity": 0.9945233453895335
+    },
+    {
+      "ItemId": 105,
+      "Similarity": 0.9929268264607065
+    },
+    {
+      "ItemId": 48,
+      "Similarity": 0.9912512582501536
+    },
+    {
+      "ItemId": 318,
+      "Similarity": 0.9876747699558938
+    }
+  ],
+  "242": [
+    {
+      "ItemId": 108,
+      "Similarity": 0.9801681360771572
+    },
+    {
+      "ItemId": 233,
+      "Similarity": 0.9742550734999412
+    },
+    {
+      "ItemId": 223,
+      "Similarity": 0.9737138938425823
+    },
+    {
+      "ItemId": 162,
+      "Similarity": 0.9714049216598101
+    },
+    {
+      "ItemId": 60,
+      "Similarity": 0.9695044725453168
+    }
+  ],
+  "243": [
+    {
+      "ItemId": 296,
+      "Similarity": 0.9961713478160782
+    },
+    {
+      "ItemId": 82,
+      "Similarity": 0.9937610709759696
+    },
+    {
+      "ItemId": 4,
+      "Similarity": 0.9930151866568698
+    },
+    {
+      "ItemId": 282,
+      "Similarity": 0.989706699119646
+    },
+    {
+      "ItemId": 214,
+      "Similarity": 0.9819944444307871
+    }
+  ],
+  "244": [
+    {
+      "ItemId": 136,
+      "Similarity": 0.9809221947291707
+    },
+    {
+      "ItemId": 46,
+      "Similarity": 0.9779287180339695
+    },
+    {
+      "ItemId": 138,
+      "Similarity": 0.9762451857357908
+    },
+    {
+      "ItemId": 166,
+      "Similarity": 0.9746795859091334
+    },
+    {
+      "ItemId": 295,
+      "Similarity": 0.9739798002081226
+    }
+  ],
+  "245": [
+    {
+      "ItemId": 149,
+      "Similarity": 0.9969837129532052
+    },
+    {
+      "ItemId": 73,
+      "Similarity": 0.9883010333141286
+    },
+    {
+      "ItemId": 327,
+      "Similarity": 0.9865537112394406
+    },
+    {
+      "ItemId": 114,
+      "Similarity": 0.9826780405240968
+    },
+    {
+      "ItemId": 328,
+      "Similarity": 0.9817057621647267
+    }
+  ],
+  "246": [
+    {
+      "ItemId": 99,
+      "Similarity": 0.9953580909921905
+    },
+    {
+      "ItemId": 175,
+      "Similarity": 0.9934693716098449
+    },
+    {
+      "ItemId": 173,
+      "Similarity": 0.9917776384776158
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.987864124474812
+    },
+    {
+      "ItemId": 180,
+      "Similarity": 0.9874564859214514
+    }
+  ],
+  "247": [
+    {
+      "ItemId": 332,
+      "Similarity": 0.9758033887051151
+    },
+    {
+      "ItemId": 68,
+      "Similarity": 0.9756414933234521
+    },
+    {
+      "ItemId": 220,
+      "Similarity": 0.9705877852431655
+    },
+    {
+      "ItemId": 106,
+      "Similarity": 0.9576034480015451
+    },
+    {
+      "ItemId": 19,
+      "Similarity": 0.9521826115969179
+    }
+  ],
+  "248": [
+    {
+      "ItemId": 225,
+      "Similarity": 0.9973234245470967
+    },
+    {
+      "ItemId": 297,
+      "Similarity": 0.9902281668330896
+    },
+    {
+      "ItemId": 284,
+      "Similarity": 0.9834010637675241
+    },
+    {
+      "ItemId": 63,
+      "Similarity": 0.9808915123223604
+    },
+    {
+      "ItemId": 229,
+      "Similarity": 0.9692317228919164
+    }
+  ],
+  "249": [
+    {
+      "ItemId": 9,
+      "Similarity": 0.9935780400582624
+    },
+    {
+      "ItemId": 260,
+      "Similarity": 0.9917942013033736
+    },
+    {
+      "ItemId": 160,
+      "Similarity": 0.9863646267401377
+    },
+    {
+      "ItemId": 24,
+      "Similarity": 0.9800313802276527
+    },
+    {
+      "ItemId": 308,
+      "Similarity": 0.9783840385204379
+    }
+  ],
+  "250": [
+    {
+      "ItemId": 180,
+      "Similarity": 0.9893186567517107
+    },
+    {
+      "ItemId": 173,
+      "Similarity": 0.9850188586381099
+    },
+    {
+      "ItemId": 175,
+      "Similarity": 0.9833557589913222
+    },
+    {
+      "ItemId": 122,
+      "Similarity": 0.9831335897093016
+    },
+    {
+      "ItemId": 6,
+      "Similarity": 0.983065656669604
+    }
+  ],
+  "251": [
+    {
+      "ItemId": 58,
+      "Similarity": 0.9982896246840518
+    },
+    {
+      "ItemId": 27,
+      "Similarity": 0.9866386488499636
+    },
+    {
+      "ItemId": 17,
+      "Similarity": 0.9848303041596643
+    },
+    {
+      "ItemId": 335,
+      "Similarity": 0.9825965745087439
+    },
+    {
+      "ItemId": 219,
+      "Similarity": 0.9820841750678163
+    }
+  ],
+  "252": [
+    {
+      "ItemId": 92,
+      "Similarity": 0.9954540606713637
+    },
+    {
+      "ItemId": 86,
+      "Similarity": 0.9895175130607906
+    },
+    {
+      "ItemId": 81,
+      "Similarity": 0.9821777170238238
+    },
+    {
+      "ItemId": 17,
+      "Similarity": 0.9807437475029778
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.9721159514224089
+    }
+  ],
+  "253": [
+    {
+      "ItemId": 341,
+      "Similarity": 0.9981487010319717
+    },
+    {
+      "ItemId": 87,
+      "Similarity": 0.9744036482661849
+    },
+    {
+      "ItemId": 155,
+      "Similarity": 0.9600333812876527
+    },
+    {
+      "ItemId": 200,
+      "Similarity": 0.9563030916800536
+    },
+    {
+      "ItemId": 142,
+      "Similarity": 0.956296414327914
+    }
+  ],
+  "254": [
+    {
+      "ItemId": 21,
+      "Similarity": 0.9952981562423574
+    },
+    {
+      "ItemId": 45,
+      "Similarity": 0.9935741565314268
+    },
+    {
+      "ItemId": 20,
+      "Similarity": 0.9910663697266764
+    },
+    {
+      "ItemId": 121,
+      "Similarity": 0.9875443401817772
+    },
+    {
+      "ItemId": 171,
+      "Similarity": 0.9863512311711902
+    }
+  ],
+  "255": [
+    {
+      "ItemId": 74,
+      "Similarity": 0.9950386305711764
+    },
+    {
+      "ItemId": 340,
+      "Similarity": 0.9783948221612293
+    },
+    {
+      "ItemId": 11,
+      "Similarity": 0.9764957808440384
+    },
+    {
+      "ItemId": 47,
+      "Similarity": 0.9755080962728099
+    },
+    {
+      "ItemId": 113,
+      "Similarity": 0.9751888630296955
+    }
+  ],
+  "256": [
+    {
+      "ItemId": 189,
+      "Similarity": 0.984093835720152
+    },
+    {
+      "ItemId": 284,
+      "Similarity": 0.9683355131712453
+    },
+    {
+      "ItemId": 52,
+      "Similarity": 0.9627888645033722
+    },
+    {
+      "ItemId": 297,
+      "Similarity": 0.9618059544636004
+    },
+    {
+      "ItemId": 174,
+      "Similarity": 0.9572976674122426
+    }
+  ],
+  "257": [
+    {
+      "ItemId": 216,
+      "Similarity": 0.9600421435736357
+    },
+    {
+      "ItemId": 143,
+      "Similarity": 0.933065183666236
+    },
+    {
+      "ItemId": 176,
+      "Similarity": 0.9096067867709515
+    },
+    {
+      "ItemId": 196,
+      "Similarity": 0.88538814630042
+    },
+    {
+      "ItemId": 31,
+      "Similarity": 0.8843319785997262
+    }
+  ],
+  "258": [
+    {
+      "ItemId": 137,
+      "Similarity": 0.9908155556984412
+    },
+    {
+      "ItemId": 184,
+      "Similarity": 0.9861777305454671
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.9818952338531136
+    },
+    {
+      "ItemId": 294,
+      "Similarity": 0.9810762379459053
+    },
+    {
+      "ItemId": 259,
+      "Similarity": 0.9758296670152822
+    }
+  ],
+  "259": [
+    {
+      "ItemId": 70,
+      "Similarity": 0.9766700558414118
+    },
+    {
+      "ItemId": 156,
+      "Similarity": 0.9765433830229796
+    },
+    {
+      "ItemId": 258,
+      "Similarity": 0.9758296670152822
+    },
+    {
+      "ItemId": 137,
+      "Similarity": 0.9756319759103359
+    },
+    {
+      "ItemId": 90,
+      "Similarity": 0.9685131073315706
+    }
+  ],
+  "260": [
+    {
+      "ItemId": 160,
+      "Similarity": 0.9944804585208975
+    },
+    {
+      "ItemId": 249,
+      "Similarity": 0.9917942013033736
+    },
+    {
+      "ItemId": 9,
+      "Similarity": 0.9854768706528185
+    },
+    {
+      "ItemId": 24,
+      "Similarity": 0.9838210520744961
+    },
+    {
+      "ItemId": 308,
+      "Similarity": 0.9821609563526488
+    }
+  ],
+  "261": [
+    {
+      "ItemId": 26,
+      "Similarity": 0.9961276681154575
+    },
+    {
+      "ItemId": 177,
+      "Similarity": 0.987523791986033
+    },
+    {
+      "ItemId": 57,
+      "Similarity": 0.9847674976086958
+    },
+    {
+      "ItemId": 322,
+      "Similarity": 0.9820354276265246
+    },
+    {
+      "ItemId": 93,
+      "Similarity": 0.9812816659148887
+    }
+  ],
+  "262": [
+    {
+      "ItemId": 167,
+      "Similarity": 0.9956558788273258
+    },
+    {
+      "ItemId": 230,
+      "Similarity": 0.9873502563314116
+    },
+    {
+      "ItemId": 112,
+      "Similarity": 0.9849856785707036
+    },
+    {
+      "ItemId": 272,
+      "Similarity": 0.8920116841552078
+    },
+    {
+      "ItemId": 49,
+      "Similarity": 0.8893630825350598
+    }
+  ],
+  "263": [
+    {
+      "ItemId": 106,
+      "Similarity": 0.9860500284498835
+    },
+    {
+      "ItemId": 19,
+      "Similarity": 0.9824143680218724
+    },
+    {
+      "ItemId": 220,
+      "Similarity": 0.9700138787616209
+    },
+    {
+      "ItemId": 285,
+      "Similarity": 0.9631548221734365
+    },
+    {
+      "ItemId": 316,
+      "Similarity": 0.9619072545747627
+    }
+  ],
+  "264": [
+    {
+      "ItemId": 342,
+      "Similarity": 0.9971779282913068
+    },
+    {
+      "ItemId": 97,
+      "Similarity": 0.9933219100120076
+    },
+    {
+      "ItemId": 35,
+      "Similarity": 0.9892496475581851
+    },
+    {
+      "ItemId": 238,
+      "Similarity": 0.9888244006445399
+    },
+    {
+      "ItemId": 7,
+      "Similarity": 0.9887077090098064
+    }
+  ],
+  "265": [
+    {
+      "ItemId": 183,
+      "Similarity": 0.9932653368477159
+    },
+    {
+      "ItemId": 62,
+      "Similarity": 0.9854320689839382
+    },
+    {
+      "ItemId": 231,
+      "Similarity": 0.9793241629526095
+    },
+    {
+      "ItemId": 40,
+      "Similarity": 0.9734765436196243
+    },
+    {
+      "ItemId": 267,
+      "Similarity": 0.9615463221856835
+    }
+  ],
+  "266": [
+    {
+      "ItemId": 205,
+      "Similarity": 0.9906301716132341
+    },
+    {
+      "ItemId": 206,
+      "Similarity": 0.975921964476479
+    },
+    {
+      "ItemId": 61,
+      "Similarity": 0.9750367762608538
+    },
+    {
+      "ItemId": 38,
+      "Similarity": 0.9744288183743418
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9741273436353265
+    }
+  ],
+  "267": [
+    {
+      "ItemId": 170,
+      "Similarity": 0.9924031296999831
+    },
+    {
+      "ItemId": 40,
+      "Similarity": 0.9874150199563911
+    },
+    {
+      "ItemId": 35,
+      "Similarity": 0.9827564402169663
+    },
+    {
+      "ItemId": 97,
+      "Similarity": 0.9819270279060455
+    },
+    {
+      "ItemId": 342,
+      "Similarity": 0.9779992638139305
+    }
+  ],
+  "268": [
+    {
+      "ItemId": 88,
+      "Similarity": 0.9839953403197648
+    },
+    {
+      "ItemId": 211,
+      "Similarity": 0.9773208216286347
+    },
+    {
+      "ItemId": 305,
+      "Similarity": 0.975257511724433
+    },
+    {
+      "ItemId": 22,
+      "Similarity": 0.973334420539163
+    },
+    {
+      "ItemId": 310,
+      "Similarity": 0.9654638623823419
+    }
+  ],
+  "269": [
+    {
+      "ItemId": 314,
+      "Similarity": 0.986316439185412
+    },
+    {
+      "ItemId": 163,
+      "Similarity": 0.9734806105374539
+    },
+    {
+      "ItemId": 123,
+      "Similarity": 0.9727995086721232
+    },
+    {
+      "ItemId": 334,
+      "Similarity": 0.9719891196786967
+    },
+    {
+      "ItemId": 102,
+      "Similarity": 0.9689976998080079
+    }
+  ],
+  "270": [
+    {
+      "ItemId": 140,
+      "Similarity": 0.9928559909835136
+    },
+    {
+      "ItemId": 34,
+      "Similarity": 0.9871744582297514
+    },
+    {
+      "ItemId": 141,
+      "Similarity": 0.9848018624648603
+    },
+    {
+      "ItemId": 83,
+      "Similarity": 0.9823677016975852
+    },
+    {
+      "ItemId": 208,
+      "Similarity": 0.9808347979359882
+    }
+  ],
+  "271": [
+    {
+      "ItemId": 150,
+      "Similarity": 0.9889317054985504
+    },
+    {
+      "ItemId": 329,
+      "Similarity": 0.9860614888437544
+    },
+    {
+      "ItemId": 237,
+      "Similarity": 0.9813794178541837
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.965776370127575
+    },
+    {
+      "ItemId": 246,
+      "Similarity": 0.9617761530223083
+    }
+  ],
+  "272": [
+    {
+      "ItemId": 49,
+      "Similarity": 0.9605988214765935
+    },
+    {
+      "ItemId": 262,
+      "Similarity": 0.8920116841552078
+    },
+    {
+      "ItemId": 306,
+      "Similarity": 0.8890259683304009
+    },
+    {
+      "ItemId": 167,
+      "Similarity": 0.8885535104958867
+    },
+    {
+      "ItemId": 129,
+      "Similarity": 0.8838056538653989
+    }
+  ],
+  "273": [
+    {
+      "ItemId": 222,
+      "Similarity": 0.9811841629779893
+    },
+    {
+      "ItemId": 186,
+      "Similarity": 0.9660209652697852
+    },
+    {
+      "ItemId": 128,
+      "Similarity": 0.9605757082021901
+    },
+    {
+      "ItemId": 28,
+      "Similarity": 0.9566479060146731
+    },
+    {
+      "ItemId": 144,
+      "Similarity": 0.95261152273193
+    }
+  ],
+  "274": [
+    {
+      "ItemId": 56,
+      "Similarity": 0.9765976978040368
+    },
+    {
+      "ItemId": 187,
+      "Similarity": 0.971956572285783
+    },
+    {
+      "ItemId": 5,
+      "Similarity": 0.9701912475789264
+    },
+    {
+      "ItemId": 191,
+      "Similarity": 0.9696107210737441
+    },
+    {
+      "ItemId": 121,
+      "Similarity": 0.9688198999293591
+    }
+  ],
+  "275": [
+    {
+      "ItemId": 111,
+      "Similarity": 0.9791586971584949
+    },
+    {
+      "ItemId": 29,
+      "Similarity": 0.978104887733054
+    },
+    {
+      "ItemId": 254,
+      "Similarity": 0.977636154345766
+    },
+    {
+      "ItemId": 21,
+      "Similarity": 0.9731417890282794
+    },
+    {
+      "ItemId": 45,
+      "Similarity": 0.9714936274671883
+    }
+  ],
+  "276": [
+    {
+      "ItemId": 286,
+      "Similarity": 0.9546301055118126
+    },
+    {
+      "ItemId": 161,
+      "Similarity": 0.9418249932951198
+    },
+    {
+      "ItemId": 319,
+      "Similarity": 0.9250897768233105
+    },
+    {
+      "ItemId": 112,
+      "Similarity": 0.889700888925798
+    },
+    {
+      "ItemId": 230,
+      "Similarity": 0.887780443192632
+    }
+  ],
+  "277": [
+    {
+      "ItemId": 109,
+      "Similarity": 0.990428382949455
+    },
+    {
+      "ItemId": 199,
+      "Similarity": 0.9881641231304851
+    },
+    {
+      "ItemId": 228,
+      "Similarity": 0.9881532394673465
+    },
+    {
+      "ItemId": 153,
+      "Similarity": 0.9677742309907811
+    },
+    {
+      "ItemId": 290,
+      "Similarity": 0.9658991943996645
+    }
+  ],
+  "278": [
+    {
+      "ItemId": 172,
+      "Similarity": 0.986818290165368
+    },
+    {
+      "ItemId": 164,
+      "Similarity": 0.9773849024959405
+    },
+    {
+      "ItemId": 209,
+      "Similarity": 0.9727887916135171
+    },
+    {
+      "ItemId": 147,
+      "Similarity": 0.9523695614073056
+    },
+    {
+      "ItemId": 192,
+      "Similarity": 0.9514266835709975
+    }
+  ],
+  "279": [
+    {
+      "ItemId": 301,
+      "Similarity": 0.9901984189962668
+    },
+    {
+      "ItemId": 330,
+      "Similarity": 0.9900760275004726
+    },
+    {
+      "ItemId": 188,
+      "Similarity": 0.9893846124042653
+    },
+    {
+      "ItemId": 339,
+      "Similarity": 0.9841307513231511
+    },
+    {
+      "ItemId": 100,
+      "Similarity": 0.9840597799968156
+    }
+  ],
+  "280": [
+    {
+      "ItemId": 241,
+      "Similarity": 0.9995293151525043
+    },
+    {
+      "ItemId": 217,
+      "Similarity": 0.9945830984169604
+    },
+    {
+      "ItemId": 105,
+      "Similarity": 0.9933913120915606
+    },
+    {
+      "ItemId": 48,
+      "Similarity": 0.9907887712720901
+    },
+    {
+      "ItemId": 318,
+      "Similarity": 0.9881343536796944
+    }
+  ],
+  "281": [
+    {
+      "ItemId": 32,
+      "Similarity": 0.9952828046597999
+    },
+    {
+      "ItemId": 18,
+      "Similarity": 0.9796510006856943
+    },
+    {
+      "ItemId": 312,
+      "Similarity": 0.977582379061209
+    },
+    {
+      "ItemId": 115,
+      "Similarity": 0.976948146336528
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.9709005853598097
+    }
+  ],
+  "282": [
+    {
+      "ItemId": 243,
+      "Similarity": 0.989706699119646
+    },
+    {
+      "ItemId": 296,
+      "Similarity": 0.9874847614881546
+    },
+    {
+      "ItemId": 15,
+      "Similarity": 0.9859473604210024
+    },
+    {
+      "ItemId": 42,
+      "Similarity": 0.9852187959732511
+    },
+    {
+      "ItemId": 82,
+      "Similarity": 0.9835951549372535
+    }
+  ],
+  "283": [
+    {
+      "ItemId": 197,
+      "Similarity": 0.990667140510097
+    },
+    {
+      "ItemId": 98,
+      "Similarity": 0.9904782303486663
+    },
+    {
+      "ItemId": 336,
+      "Similarity": 0.9889113326883713
+    },
+    {
+      "ItemId": 316,
+      "Similarity": 0.9879119689143548
+    },
+    {
+      "ItemId": 285,
+      "Similarity": 0.9865994852248088
+    }
+  ],
+  "284": [
+    {
+      "ItemId": 297,
+      "Similarity": 0.9875600062124182
+    },
+    {
+      "ItemId": 248,
+      "Similarity": 0.9834010637675241
+    },
+    {
+      "ItemId": 225,
+      "Similarity": 0.9819219993376487
+    },
+    {
+      "ItemId": 189,
+      "Similarity": 0.9786394292990385
+    },
+    {
+      "ItemId": 256,
+      "Similarity": 0.9683355131712453
+    }
+  ],
+  "285": [
+    {
+      "ItemId": 316,
+      "Similarity": 0.998655222726355
+    },
+    {
+      "ItemId": 336,
+      "Similarity": 0.997636078318508
+    },
+    {
+      "ItemId": 98,
+      "Similarity": 0.9960464701317401
+    },
+    {
+      "ItemId": 197,
+      "Similarity": 0.9958555030309927
+    },
+    {
+      "ItemId": 283,
+      "Similarity": 0.9865994852248088
+    }
+  ],
+  "286": [
+    {
+      "ItemId": 161,
+      "Similarity": 0.9859577609779315
+    },
+    {
+      "ItemId": 319,
+      "Similarity": 0.9676326726911652
+    },
+    {
+      "ItemId": 276,
+      "Similarity": 0.9546301055118126
+    },
+    {
+      "ItemId": 167,
+      "Similarity": 0.8711052621645464
+    },
+    {
+      "ItemId": 262,
+      "Similarity": 0.8708451913005206
+    }
+  ],
+  "287": [
+    {
+      "ItemId": 151,
+      "Similarity": 0.9735320571573813
+    },
+    {
+      "ItemId": 293,
+      "Similarity": 0.9666770091766008
+    },
+    {
+      "ItemId": 146,
+      "Similarity": 0.9636460630500556
+    },
+    {
+      "ItemId": 162,
+      "Similarity": 0.9621885610948392
+    },
+    {
+      "ItemId": 60,
+      "Similarity": 0.9616362129525922
+    }
+  ],
+  "288": [
+    {
+      "ItemId": 25,
+      "Similarity": 0.9924123460729234
+    },
+    {
+      "ItemId": 215,
+      "Similarity": 0.9869216766816917
+    },
+    {
+      "ItemId": 141,
+      "Similarity": 0.9864227074088434
+    },
+    {
+      "ItemId": 303,
+      "Similarity": 0.9827019562850572
+    },
+    {
+      "ItemId": 131,
+      "Similarity": 0.9763275194768344
+    }
+  ],
+  "289": [
+    {
+      "ItemId": 100,
+      "Similarity": 0.9902656902293784
+    },
+    {
+      "ItemId": 328,
+      "Similarity": 0.9887005131989112
+    },
+    {
+      "ItemId": 114,
+      "Similarity": 0.9877162868150581
+    },
+    {
+      "ItemId": 168,
+      "Similarity": 0.9874202792867912
+    },
+    {
+      "ItemId": 73,
+      "Similarity": 0.9814698399494091
+    }
+  ],
+  "290": [
+    {
+      "ItemId": 153,
+      "Similarity": 0.9950510238063649
+    },
+    {
+      "ItemId": 235,
+      "Similarity": 0.9945626100135877
+    },
+    {
+      "ItemId": 131,
+      "Similarity": 0.9894144572367567
+    },
+    {
+      "ItemId": 303,
+      "Similarity": 0.9843809209989182
+    },
+    {
+      "ItemId": 215,
+      "Similarity": 0.9801828531320038
+    }
+  ],
+  "291": [
+    {
+      "ItemId": 135,
+      "Similarity": 0.9893668901519825
+    },
+    {
+      "ItemId": 292,
+      "Similarity": 0.9823970384070605
+    },
+    {
+      "ItemId": 146,
+      "Similarity": 0.9823963049679689
+    },
+    {
+      "ItemId": 293,
+      "Similarity": 0.97751841468446
+    },
+    {
+      "ItemId": 287,
+      "Similarity": 0.9594699095649631
+    }
+  ],
+  "292": [
+    {
+      "ItemId": 135,
+      "Similarity": 0.9928800668606783
+    },
+    {
+      "ItemId": 146,
+      "Similarity": 0.9889453607059848
+    },
+    {
+      "ItemId": 293,
+      "Similarity": 0.9857733936682105
+    },
+    {
+      "ItemId": 291,
+      "Similarity": 0.9823970384070605
+    },
+    {
+      "ItemId": 151,
+      "Similarity": 0.9579003861227503
+    }
+  ],
+  "293": [
+    {
+      "ItemId": 146,
+      "Similarity": 0.9949461779268751
+    },
+    {
+      "ItemId": 135,
+      "Similarity": 0.9878970333896449
+    },
+    {
+      "ItemId": 292,
+      "Similarity": 0.9857733936682105
+    },
+    {
+      "ItemId": 291,
+      "Similarity": 0.97751841468446
+    },
+    {
+      "ItemId": 287,
+      "Similarity": 0.9666770091766008
+    }
+  ],
+  "294": [
+    {
+      "ItemId": 234,
+      "Similarity": 0.987007229292176
+    },
+    {
+      "ItemId": 37,
+      "Similarity": 0.981210028922865
+    },
+    {
+      "ItemId": 258,
+      "Similarity": 0.9810762379459053
+    },
+    {
+      "ItemId": 132,
+      "Similarity": 0.9808641148421167
+    },
+    {
+      "ItemId": 142,
+      "Similarity": 0.9805396908174958
+    }
+  ],
+  "295": [
+    {
+      "ItemId": 166,
+      "Similarity": 0.9992633974401955
+    },
+    {
+      "ItemId": 46,
+      "Similarity": 0.987503302769606
+    },
+    {
+      "ItemId": 300,
+      "Similarity": 0.9869969952926168
+    },
+    {
+      "ItemId": 90,
+      "Similarity": 0.9846861471432716
+    },
+    {
+      "ItemId": 244,
+      "Similarity": 0.9739798002081226
+    }
+  ],
+  "296": [
+    {
+      "ItemId": 243,
+      "Similarity": 0.9961713478160782
+    },
+    {
+      "ItemId": 82,
+      "Similarity": 0.9926800477843527
+    },
+    {
+      "ItemId": 4,
+      "Similarity": 0.9919357847357374
+    },
+    {
+      "ItemId": 282,
+      "Similarity": 0.9874847614881546
+    },
+    {
+      "ItemId": 214,
+      "Similarity": 0.9824261179923256
+    }
+  ],
+  "297": [
+    {
+      "ItemId": 248,
+      "Similarity": 0.9902281668330896
+    },
+    {
+      "ItemId": 225,
+      "Similarity": 0.988728510444898
+    },
+    {
+      "ItemId": 284,
+      "Similarity": 0.9875600062124182
+    },
+    {
+      "ItemId": 63,
+      "Similarity": 0.971487805124499
+    },
+    {
+      "ItemId": 189,
+      "Similarity": 0.9667220434478833
+    }
+  ],
+  "298": [
+    {
+      "ItemId": 124,
+      "Similarity": 0.995479547421912
+    },
+    {
+      "ItemId": 53,
+      "Similarity": 0.9928434761016415
+    },
+    {
+      "ItemId": 335,
+      "Similarity": 0.9893561987627988
+    },
+    {
+      "ItemId": 251,
+      "Similarity": 0.9762796826925304
+    },
+    {
+      "ItemId": 58,
+      "Similarity": 0.9754522862613556
+    }
+  ],
+  "299": [
+    {
+      "ItemId": 2,
+      "Similarity": 0.9904058582487247
+    },
+    {
+      "ItemId": 89,
+      "Similarity": 0.9844737456461128
+    },
+    {
+      "ItemId": 201,
+      "Similarity": 0.9777243352596718
+    },
+    {
+      "ItemId": 136,
+      "Similarity": 0.9726432181234775
+    },
+    {
+      "ItemId": 138,
+      "Similarity": 0.9650706946742755
+    }
+  ],
+  "300": [
+    {
+      "ItemId": 90,
+      "Similarity": 0.9976279362789935
+    },
+    {
+      "ItemId": 166,
+      "Similarity": 0.9877156180984944
+    },
+    {
+      "ItemId": 295,
+      "Similarity": 0.9869969952926168
+    },
+    {
+      "ItemId": 46,
+      "Similarity": 0.9812689963243828
+    },
+    {
+      "ItemId": 70,
+      "Similarity": 0.9786981737658365
+    }
+  ],
+  "301": [
+    {
+      "ItemId": 188,
+      "Similarity": 0.9958199191156768
+    },
+    {
+      "ItemId": 339,
+      "Similarity": 0.9938119902758493
+    },
+    {
+      "ItemId": 279,
+      "Similarity": 0.9901984189962668
+    },
+    {
+      "ItemId": 330,
+      "Similarity": 0.9820224655306621
+    },
+    {
+      "ItemId": 100,
+      "Similarity": 0.9761034031429985
+    }
+  ],
+  "302": [
+    {
+      "ItemId": 3,
+      "Similarity": 0.993624350513134
+    },
+    {
+      "ItemId": 239,
+      "Similarity": 0.9928472364085774
+    },
+    {
+      "ItemId": 311,
+      "Similarity": 0.9896972410177592
+    },
+    {
+      "ItemId": 139,
+      "Similarity": 0.9836981843857734
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.981320207586589
+    }
+  ],
+  "303": [
+    {
+      "ItemId": 215,
+      "Similarity": 0.9950561582370989
+    },
+    {
+      "ItemId": 131,
+      "Similarity": 0.9913298311366386
+    },
+    {
+      "ItemId": 290,
+      "Similarity": 0.9843809209989182
+    },
+    {
+      "ItemId": 235,
+      "Similarity": 0.9842647848797239
+    },
+    {
+      "ItemId": 288,
+      "Similarity": 0.9827019562850572
+    }
+  ],
+  "304": [
+    {
+      "ItemId": 227,
+      "Similarity": 0.9975484063690062
+    },
+    {
+      "ItemId": 212,
+      "Similarity": 0.979325077599437
+    },
+    {
+      "ItemId": 202,
+      "Similarity": 0.9726187322205301
+    },
+    {
+      "ItemId": 102,
+      "Similarity": 0.9657339532478423
+    },
+    {
+      "ItemId": 23,
+      "Similarity": 0.9571530480399411
+    }
+  ],
+  "305": [
+    {
+      "ItemId": 211,
+      "Similarity": 0.9956160994812828
+    },
+    {
+      "ItemId": 88,
+      "Similarity": 0.9898249698467749
+    },
+    {
+      "ItemId": 321,
+      "Similarity": 0.9753650959016241
+    },
+    {
+      "ItemId": 268,
+      "Similarity": 0.975257511724433
+    },
+    {
+      "ItemId": 93,
+      "Similarity": 0.9729884214882628
+    }
+  ],
+  "306": [
+    {
+      "ItemId": 129,
+      "Similarity": 0.9880336659141475
+    },
+    {
+      "ItemId": 309,
+      "Similarity": 0.9775527453695648
+    },
+    {
+      "ItemId": 49,
+      "Similarity": 0.9226716061436918
+    },
+    {
+      "ItemId": 272,
+      "Similarity": 0.8890259683304009
+    },
+    {
+      "ItemId": 213,
+      "Similarity": 0.8855379012678858
+    }
+  ],
+  "307": [
+    {
+      "ItemId": 71,
+      "Similarity": 0.9939027749654653
+    },
+    {
+      "ItemId": 169,
+      "Similarity": 0.9865272872539428
+    },
+    {
+      "ItemId": 51,
+      "Similarity": 0.9855645756336174
+    },
+    {
+      "ItemId": 96,
+      "Similarity": 0.980998020049068
+    },
+    {
+      "ItemId": 1,
+      "Similarity": 0.9786705704096634
+    }
+  ],
+  "308": [
+    {
+      "ItemId": 24,
+      "Similarity": 0.992259329495172
+    },
+    {
+      "ItemId": 55,
+      "Similarity": 0.9907704282131785
+    },
+    {
+      "ItemId": 160,
+      "Similarity": 0.986815068755015
+    },
+    {
+      "ItemId": 260,
+      "Similarity": 0.9821609563526488
+    },
+    {
+      "ItemId": 249,
+      "Similarity": 0.9783840385204379
+    }
+  ],
+  "309": [
+    {
+      "ItemId": 129,
+      "Similarity": 0.9839432579890698
+    },
+    {
+      "ItemId": 306,
+      "Similarity": 0.9775527453695648
+    },
+    {
+      "ItemId": 49,
+      "Similarity": 0.9035285156258888
+    },
+    {
+      "ItemId": 213,
+      "Similarity": 0.8977814202762556
+    },
+    {
+      "ItemId": 323,
+      "Similarity": 0.8939703271692385
+    }
+  ],
+  "310": [
+    {
+      "ItemId": 13,
+      "Similarity": 0.9860900033437408
+    },
+    {
+      "ItemId": 181,
+      "Similarity": 0.9822240058966638
+    },
+    {
+      "ItemId": 204,
+      "Similarity": 0.9741606870633133
+    },
+    {
+      "ItemId": 22,
+      "Similarity": 0.9736446994718088
+    },
+    {
+      "ItemId": 66,
+      "Similarity": 0.972888384748308
+    }
+  ],
+  "311": [
+    {
+      "ItemId": 3,
+      "Similarity": 0.9960224326274629
+    },
+    {
+      "ItemId": 139,
+      "Similarity": 0.993875779211949
+    },
+    {
+      "ItemId": 224,
+      "Similarity": 0.9914484022518596
+    },
+    {
+      "ItemId": 302,
+      "Similarity": 0.9896972410177592
+    },
+    {
+      "ItemId": 239,
+      "Similarity": 0.9891755740160241
+    }
+  ],
+  "312": [
+    {
+      "ItemId": 115,
+      "Similarity": 0.9993363555666479
+    },
+    {
+      "ItemId": 18,
+      "Similarity": 0.9978446428767912
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.9906632212083166
+    },
+    {
+      "ItemId": 331,
+      "Similarity": 0.9891898337687798
+    },
+    {
+      "ItemId": 33,
+      "Similarity": 0.979906309383459
+    }
+  ],
+  "313": [
+    {
+      "ItemId": 198,
+      "Similarity": 0.9971971020851713
+    },
+    {
+      "ItemId": 85,
+      "Similarity": 0.9955415125437683
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9950638009648917
+    },
+    {
+      "ItemId": 38,
+      "Similarity": 0.9947494247372385
+    },
+    {
+      "ItemId": 61,
+      "Similarity": 0.9941166437497002
+    }
+  ],
+  "314": [
+    {
+      "ItemId": 163,
+      "Similarity": 0.9865508686351838
+    },
+    {
+      "ItemId": 269,
+      "Similarity": 0.986316439185412
+    },
+    {
+      "ItemId": 123,
+      "Similarity": 0.9762745413694138
+    },
+    {
+      "ItemId": 101,
+      "Similarity": 0.9733064695620262
+    },
+    {
+      "ItemId": 334,
+      "Similarity": 0.9727468281408318
+    }
+  ],
+  "315": [
+    {
+      "ItemId": 190,
+      "Similarity": 0.9921932247328344
+    },
+    {
+      "ItemId": 95,
+      "Similarity": 0.987295407111113
+    },
+    {
+      "ItemId": 178,
+      "Similarity": 0.9838150233428029
+    },
+    {
+      "ItemId": 110,
+      "Similarity": 0.977414768018599
+    },
+    {
+      "ItemId": 210,
+      "Similarity": 0.9715590562708272
+    }
+  ],
+  "316": [
+    {
+      "ItemId": 336,
+      "Similarity": 0.9989781104129013
+    },
+    {
+      "ItemId": 285,
+      "Similarity": 0.998655222726355
+    },
+    {
+      "ItemId": 98,
+      "Similarity": 0.9973842260457203
+    },
+    {
+      "ItemId": 197,
+      "Similarity": 0.9971927456870572
+    },
+    {
+      "ItemId": 283,
+      "Similarity": 0.9879119689143548
+    }
+  ],
+  "317": [
+    {
+      "ItemId": 20,
+      "Similarity": 0.9919646106680675
+    },
+    {
+      "ItemId": 45,
+      "Similarity": 0.9913133423905641
+    },
+    {
+      "ItemId": 21,
+      "Similarity": 0.9896031077278266
+    },
+    {
+      "ItemId": 254,
+      "Similarity": 0.9849982997446799
+    },
+    {
+      "ItemId": 171,
+      "Similarity": 0.9844307969080928
+    }
+  ],
+  "318": [
+    {
+      "ItemId": 105,
+      "Similarity": 0.9946730510214402
+    },
+    {
+      "ItemId": 280,
+      "Similarity": 0.9881343536796944
+    },
+    {
+      "ItemId": 241,
+      "Similarity": 0.9876747699558938
+    },
+    {
+      "ItemId": 217,
+      "Similarity": 0.9828448995285868
+    },
+    {
+      "ItemId": 48,
+      "Similarity": 0.9791394393158029
+    }
+  ],
+  "319": [
+    {
+      "ItemId": 161,
+      "Similarity": 0.9811542029378646
+    },
+    {
+      "ItemId": 286,
+      "Similarity": 0.9676326726911652
+    },
+    {
+      "ItemId": 276,
+      "Similarity": 0.9250897768233105
+    },
+    {
+      "ItemId": 167,
+      "Similarity": 0.8464412527663685
+    },
+    {
+      "ItemId": 262,
+      "Similarity": 0.8461956876855348
+    }
+  ],
+  "320": [
+    {
+      "ItemId": 0,
+      "Similarity": 0.9894826724216381
+    },
+    {
+      "ItemId": 59,
+      "Similarity": 0.9594162761671959
+    },
+    {
+      "ItemId": 107,
+      "Similarity": 0.9581525945586691
+    },
+    {
+      "ItemId": 101,
+      "Similarity": 0.9398707541694848
+    },
+    {
+      "ItemId": 174,
+      "Similarity": 0.9364115949559896
+    }
+  ],
+  "321": [
+    {
+      "ItemId": 93,
+      "Similarity": 0.9964497221356404
+    },
+    {
+      "ItemId": 177,
+      "Similarity": 0.9917999471208422
+    },
+    {
+      "ItemId": 26,
+      "Similarity": 0.9822079911780979
+    },
+    {
+      "ItemId": 261,
+      "Similarity": 0.9795262556597755
+    },
+    {
+      "ItemId": 305,
+      "Similarity": 0.9753650959016241
+    }
+  ],
+  "322": [
+    {
+      "ItemId": 26,
+      "Similarity": 0.9857987636161444
+    },
+    {
+      "ItemId": 261,
+      "Similarity": 0.9820354276265246
+    },
+    {
+      "ItemId": 177,
+      "Similarity": 0.9809188109677086
+    },
+    {
+      "ItemId": 321,
+      "Similarity": 0.9746943509529566
+    },
+    {
+      "ItemId": 93,
+      "Similarity": 0.9713211806949665
+    }
+  ],
+  "323": [
+    {
+      "ItemId": 213,
+      "Similarity": 0.9781117875790322
+    },
+    {
+      "ItemId": 185,
+      "Similarity": 0.9735386807928635
+    },
+    {
+      "ItemId": 325,
+      "Similarity": 0.9732194224356151
+    },
+    {
+      "ItemId": 76,
+      "Similarity": 0.9686388237734116
+    },
+    {
+      "ItemId": 223,
+      "Similarity": 0.9348943384342474
+    }
+  ],
+  "324": [
+    {
+      "ItemId": 159,
+      "Similarity": 0.9743328422047421
+    },
+    {
+      "ItemId": 148,
+      "Similarity": 0.957124325979672
+    },
+    {
+      "ItemId": 36,
+      "Similarity": 0.935687366096563
+    },
+    {
+      "ItemId": 176,
+      "Similarity": 0.9277011753568759
+    },
+    {
+      "ItemId": 125,
+      "Similarity": 0.9094913527605746
+    }
+  ],
+  "325": [
+    {
+      "ItemId": 185,
+      "Similarity": 0.9771219284039534
+    },
+    {
+      "ItemId": 76,
+      "Similarity": 0.9758780273452894
+    },
+    {
+      "ItemId": 213,
+      "Similarity": 0.9753287073978445
+    },
+    {
+      "ItemId": 323,
+      "Similarity": 0.9732194224356151
+    },
+    {
+      "ItemId": 223,
+      "Similarity": 0.9374511421626746
+    }
+  ],
+  "326": [
+    {
+      "ItemId": 80,
+      "Similarity": 0.9989455148537124
+    },
+    {
+      "ItemId": 104,
+      "Similarity": 0.9957403078374888
+    },
+    {
+      "ItemId": 338,
+      "Similarity": 0.9786357044867962
+    },
+    {
+      "ItemId": 194,
+      "Similarity": 0.9774156648666193
+    },
+    {
+      "ItemId": 89,
+      "Similarity": 0.9758410329647764
+    }
+  ],
+  "327": [
+    {
+      "ItemId": 73,
+      "Similarity": 0.9971730682814042
+    },
+    {
+      "ItemId": 114,
+      "Similarity": 0.9908068224412818
+    },
+    {
+      "ItemId": 328,
+      "Similarity": 0.9898184001313999
+    },
+    {
+      "ItemId": 149,
+      "Similarity": 0.9892674385255181
+    },
+    {
+      "ItemId": 168,
+      "Similarity": 0.9875684061997801
+    }
+  ],
+  "328": [
+    {
+      "ItemId": 114,
+      "Similarity": 0.9989931598103503
+    },
+    {
+      "ItemId": 73,
+      "Similarity": 0.9926037272183531
+    },
+    {
+      "ItemId": 168,
+      "Similarity": 0.9902090555420627
+    },
+    {
+      "ItemId": 327,
+      "Similarity": 0.9898184001313999
+    },
+    {
+      "ItemId": 289,
+      "Similarity": 0.9887005131989112
+    }
+  ],
+  "329": [
+    {
+      "ItemId": 150,
+      "Similarity": 0.9968924534335201
+    },
+    {
+      "ItemId": 237,
+      "Similarity": 0.9951849494524685
+    },
+    {
+      "ItemId": 271,
+      "Similarity": 0.9860614888437544
+    },
+    {
+      "ItemId": 43,
+      "Similarity": 0.9777908482356077
+    },
+    {
+      "ItemId": 99,
+      "Similarity": 0.970558110876376
+    }
+  ],
+  "330": [
+    {
+      "ItemId": 279,
+      "Similarity": 0.9900760275004726
+    },
+    {
+      "ItemId": 100,
+      "Similarity": 0.9861274456183607
+    },
+    {
+      "ItemId": 188,
+      "Similarity": 0.9860872793263589
+    },
+    {
+      "ItemId": 301,
+      "Similarity": 0.9820224655306621
+    },
+    {
+      "ItemId": 339,
+      "Similarity": 0.980406469290406
+    }
+  ],
+  "331": [
+    {
+      "ItemId": 312,
+      "Similarity": 0.9891898337687798
+    },
+    {
+      "ItemId": 115,
+      "Similarity": 0.9885404553367181
+    },
+    {
+      "ItemId": 18,
+      "Similarity": 0.9881834465883474
+    },
+    {
+      "ItemId": 145,
+      "Similarity": 0.9841186286148824
+    },
+    {
+      "ItemId": 32,
+      "Similarity": 0.9739606324572889
+    }
+  ],
+  "332": [
+    {
+      "ItemId": 68,
+      "Similarity": 0.98383561941058
+    },
+    {
+      "ItemId": 247,
+      "Similarity": 0.9758033887051151
+    },
+    {
+      "ItemId": 150,
+      "Similarity": 0.9663854045368437
+    },
+    {
+      "ItemId": 329,
+      "Similarity": 0.9636443887247879
+    },
+    {
+      "ItemId": 220,
+      "Similarity": 0.9626119548416472
+    }
+  ],
+  "333": [
+    {
+      "ItemId": 210,
+      "Similarity": 0.9944332430301734
+    },
+    {
+      "ItemId": 110,
+      "Similarity": 0.9919037937245053
+    },
+    {
+      "ItemId": 127,
+      "Similarity": 0.9856855646541949
+    },
+    {
+      "ItemId": 116,
+      "Similarity": 0.9850657627296181
+    },
+    {
+      "ItemId": 91,
+      "Similarity": 0.9831414536693449
+    }
+  ],
+  "334": [
+    {
+      "ItemId": 102,
+      "Similarity": 0.9853684333060931
+    },
+    {
+      "ItemId": 202,
+      "Similarity": 0.9806135369217548
+    },
+    {
+      "ItemId": 212,
+      "Similarity": 0.9728497691867242
+    },
+    {
+      "ItemId": 314,
+      "Similarity": 0.9727468281408318
+    },
+    {
+      "ItemId": 269,
+      "Similarity": 0.9719891196786967
+    }
+  ],
+  "335": [
+    {
+      "ItemId": 298,
+      "Similarity": 0.9893561987627988
+    },
+    {
+      "ItemId": 124,
+      "Similarity": 0.9878975132972432
+    },
+    {
+      "ItemId": 53,
+      "Similarity": 0.9875720394565769
+    },
+    {
+      "ItemId": 58,
+      "Similarity": 0.984253553874003
+    },
+    {
+      "ItemId": 251,
+      "Similarity": 0.9825965745087439
+    }
+  ],
+  "336": [
+    {
+      "ItemId": 316,
+      "Similarity": 0.9989781104129013
+    },
+    {
+      "ItemId": 98,
+      "Similarity": 0.9984028556917618
+    },
+    {
+      "ItemId": 197,
+      "Similarity": 0.9982109840527779
+    },
+    {
+      "ItemId": 285,
+      "Similarity": 0.997636078318508
+    },
+    {
+      "ItemId": 283,
+      "Similarity": 0.9889113326883713
+    }
+  ],
+  "337": [
+    {
+      "ItemId": 206,
+      "Similarity": 0.9915598521479595
+    },
+    {
+      "ItemId": 61,
+      "Similarity": 0.9906460819394943
+    },
+    {
+      "ItemId": 38,
+      "Similarity": 0.9900185089829878
+    },
+    {
+      "ItemId": 193,
+      "Similarity": 0.9897073121510065
+    },
+    {
+      "ItemId": 198,
+      "Similarity": 0.9876059026956108
+    }
+  ],
+  "338": [
+    {
+      "ItemId": 194,
+      "Similarity": 0.9856125449936586
+    },
+    {
+      "ItemId": 104,
+      "Similarity": 0.9825352752752181
+    },
+    {
+      "ItemId": 326,
+      "Similarity": 0.9786357044867962
+    },
+    {
+      "ItemId": 80,
+      "Similarity": 0.9782765431830253
+    },
+    {
+      "ItemId": 103,
+      "Similarity": 0.9763449055028783
+    }
+  ],
+  "339": [
+    {
+      "ItemId": 188,
+      "Similarity": 0.9941582326716887
+    },
+    {
+      "ItemId": 301,
+      "Similarity": 0.9938119902758493
+    },
+    {
+      "ItemId": 279,
+      "Similarity": 0.9841307513231511
+    },
+    {
+      "ItemId": 330,
+      "Similarity": 0.980406469290406
+    },
+    {
+      "ItemId": 75,
+      "Similarity": 0.9711336735527881
+    }
+  ],
+  "340": [
+    {
+      "ItemId": 47,
+      "Similarity": 0.985766848665232
+    },
+    {
+      "ItemId": 11,
+      "Similarity": 0.9835351869150057
+    },
+    {
+      "ItemId": 74,
+      "Similarity": 0.9831912040535297
+    },
+    {
+      "ItemId": 113,
+      "Similarity": 0.9830635109622885
+    },
+    {
+      "ItemId": 218,
+      "Similarity": 0.9787163580062993
+    }
+  ],
+  "341": [
+    {
+      "ItemId": 253,
+      "Similarity": 0.9981487010319717
+    },
+    {
+      "ItemId": 87,
+      "Similarity": 0.9726458260787065
+    },
+    {
+      "ItemId": 155,
+      "Similarity": 0.9583269792461077
+    },
+    {
+      "ItemId": 200,
+      "Similarity": 0.9546099129162244
+    },
+    {
+      "ItemId": 142,
+      "Similarity": 0.9546032591881906
+    }
+  ],
+  "342": [
+    {
+      "ItemId": 264,
+      "Similarity": 0.9971779282913068
+    },
+    {
+      "ItemId": 35,
+      "Similarity": 0.9920269601748315
+    },
+    {
+      "ItemId": 97,
+      "Similarity": 0.990537352067436
+    },
+    {
+      "ItemId": 7,
+      "Similarity": 0.9888084905004558
+    },
+    {
+      "ItemId": 238,
+      "Similarity": 0.9860649661335096
+    }
+  ]
+}

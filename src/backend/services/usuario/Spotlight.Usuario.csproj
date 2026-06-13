@@ -15,6 +15,9 @@
     <!-- Banco relacional (PostgreSQL / Supabase) via Npgsql / ADO.NET — sem ORM -->
     <PackageReference Include="Npgsql" Version="9.0.2" />
 
+    <!-- Banco documental (MongoDB Atlas) para telemetria comportamental -->
+    <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+
     <!-- Autenticação JWT (Supabase emite tokens HS256) -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
 

@@ -1,0 +1,18 @@
+[
+  {
+    "name": "catalogo",
+    "url": "http://localhost:5001/health/ready"
+  },
+  {
+    "name": "usuario",
+    "url": "http://localhost:5002/health/ready"
+  },
+  {
+    "name": "recomendacao",
+    "url": "http://localhost:5003/health/ready"
+  },
+  {
+    "name": "geolocalizacao",
+    "url": "http://localhost:5004/health"
+  }
+]

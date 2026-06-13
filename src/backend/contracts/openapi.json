@@ -380,8 +380,8 @@
         "tags": [
           "Catálogo"
         ],
-        "summary": "Avaliar um espetáculo (cadastrado)",
-        "description": "Cria uma avaliação. Um usuário só pode avaliar cada espetáculo uma vez (UNIQUE id_usuario, id_espetaculo).",
+        "summary": "Salvar avaliacao de um espetaculo (cadastrado)",
+        "description": "Cria ou atualiza a avaliacao do usuario para o espetaculo. A constraint UNIQUE (id_usuario, id_espetaculo) garante uma unica avaliacao ativa por usuario/espetaculo.",
         "security": [
           {
             "bearerAuth": []
@@ -399,7 +399,7 @@
         },
         "responses": {
           "201": {
-            "description": "Avaliação criada.",
+            "description": "Avaliacao criada ou atualizada.",
             "content": {
               "application/json": {
                 "schema": {
@@ -419,9 +419,6 @@
           },
           "404": {
             "$ref": "#/components/responses/Erro404"
-          },
-          "409": {
-            "$ref": "#/components/responses/Erro409"
           },
           "500": {
             "$ref": "#/components/responses/Erro500"
@@ -797,6 +794,81 @@
         }
       }
     },
+    "/usuario/telemetria": {
+      "post": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Registrar evento de telemetria do aplicativo",
+        "description": "Registra eventos comportamentais do app mobile na colecao interacoes do MongoDB. O header Authorization e opcional: se enviado e valido, o evento e associado ao usuario autenticado; se ausente, anonymousId e obrigatorio.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetriaEventoCreate"
+              },
+              "examples": {
+                "visualizacaoEspetaculo": {
+                  "summary": "Visualizacao de espetaculo",
+                  "value": {
+                    "eventId": "evt_01HX9F7M9XK2",
+                    "eventType": "show_viewed",
+                    "source": "mobile",
+                    "sessionId": "sess_01HX9F7M8T",
+                    "occurredAt": "2026-06-09T14:32:00Z",
+                    "screen": "Detalhes",
+                    "entity": {
+                      "type": "espetaculo",
+                      "id": "42"
+                    },
+                    "properties": {
+                      "durationMs": 23000,
+                      "origin": "catalog"
+                    },
+                    "device": {
+                      "platform": "ios",
+                      "appVersion": "1.0.0"
+                    },
+                    "anonymousId": "anon_01HX9F7M8T"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Evento aceito para persistencia.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetriaEventoAceito"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Erro503"
+          }
+        }
+      }
+    },
     "/recomendacao/me": {
       "get": {
         "tags": [
@@ -1099,14 +1171,28 @@
         }
       },
       "Erro409": {
-        "description": "Conflito (ex.: avaliação duplicada).",
+        "description": "Conflito de regra de negocio.",
         "content": {
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Erro"
             },
             "example": {
-              "error": "Você já avaliou este espetáculo.",
+              "error": "Conflito de regra de negocio.",
+              "traceId": "00-abc123-def456-00"
+            }
+          }
+        }
+      },
+      "Erro503": {
+        "description": "Servico temporariamente indisponivel.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            },
+            "example": {
+              "error": "Telemetria nao configurada.",
               "traceId": "00-abc123-def456-00"
             }
           }
@@ -1305,12 +1391,12 @@
           "precoMinimo": {
             "type": "number",
             "format": "float",
-            "example": 40.0
+            "example": 40
           },
           "precoMaximo": {
             "type": "number",
             "format": "float",
-            "example": 120.0
+            "example": 120
           },
           "disponibilidade": {
             "type": "integer",
@@ -1481,7 +1567,7 @@
             "format": "float",
             "minimum": 0,
             "maximum": 5,
-            "example": 5.0
+            "example": 5
           },
           "comentario": {
             "type": "string",
@@ -1779,7 +1865,7 @@
       },
       "UsuarioUpdate": {
         "type": "object",
-        "description": "Campos opcionais do próprio perfil.",
+        "description": "Campos opcionais do próprio perfil. Localização é gerenciada por PUT /usuario/me/localizacao e não é aceita neste schema — ver schema Localizacao usado por aquela rota.",
         "properties": {
           "nome": {
             "type": "string",
@@ -1788,9 +1874,6 @@
           "dataNascimento": {
             "type": "string",
             "format": "date"
-          },
-          "localizacao": {
-            "$ref": "#/components/schemas/Localizacao"
           }
         }
       },
@@ -1855,7 +1938,133 @@
           "faixaPrecoMax": {
             "type": "number",
             "format": "float",
-            "example": 150.0
+            "example": 150
+          }
+        }
+      },
+      "TelemetriaEntity": {
+        "type": "object",
+        "required": [
+          "type",
+          "id"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "espetaculo",
+              "sessao",
+              "teatro",
+              "categoria",
+              "busca"
+            ],
+            "example": "espetaculo"
+          },
+          "id": {
+            "type": "string",
+            "example": "42"
+          }
+        }
+      },
+      "TelemetriaEventoCreate": {
+        "type": "object",
+        "description": "Evento de telemetria gerado pelo aplicativo. Se Authorization nao for enviado, anonymousId e obrigatorio.",
+        "required": [
+          "eventType",
+          "source",
+          "sessionId"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "Identificador idempotente gerado pelo cliente. Se omitido, o backend gera um identificador.",
+            "example": "evt_01HX9F7M9XK2"
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "session_started",
+              "screen_viewed",
+              "show_card_clicked",
+              "show_viewed",
+              "search_performed",
+              "favorite_toggled",
+              "purchase_clicked",
+              "session_ended"
+            ],
+            "example": "show_viewed"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "mobile"
+            ],
+            "example": "mobile"
+          },
+          "sessionId": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "sess_01HX9F7M8T"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-06-09T14:32:00Z"
+          },
+          "screen": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "Detalhes"
+          },
+          "entity": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TelemetriaEntity"
+              }
+            ],
+            "nullable": true
+          },
+          "properties": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "Metadados livres do evento. Nao deve conter dados sensiveis."
+          },
+          "device": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "Metadados do dispositivo/app. Nao deve conter dados sensiveis."
+          },
+          "anonymousId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "anon_01HX9F7M8T"
+          }
+        }
+      },
+      "TelemetriaEventoAceito": {
+        "type": "object",
+        "required": [
+          "eventId",
+          "status"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "example": "evt_01HX9F7M9XK2"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted"
+            ],
+            "example": "accepted"
           }
         }
       },
@@ -1883,6 +2092,40 @@
             "format": "float",
             "nullable": true,
             "example": 4.7
+          },
+          "midias": {
+            "type": "array",
+            "description": "Mídias do espetáculo (capas, banners) ordenadas por ordemExibicao.",
+            "items": {
+              "$ref": "#/components/schemas/EspetaculoMidia"
+            }
+          }
+        }
+      },
+      "EspetaculoMidia": {
+        "type": "object",
+        "description": "Arquivo associado ao espetáculo no Supabase Storage.",
+        "properties": {
+          "tipoMidia": {
+            "type": "string",
+            "example": "capa"
+          },
+          "storageBucket": {
+            "type": "string",
+            "example": "espetaculos"
+          },
+          "storagePath": {
+            "type": "string",
+            "example": "12/capa.jpg"
+          },
+          "altText": {
+            "type": "string",
+            "nullable": true,
+            "example": "Cartaz de O Auto da Compadecida"
+          },
+          "ordemExibicao": {
+            "type": "integer",
+            "example": 1
           }
         }
       },

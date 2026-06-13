@@ -5,7 +5,10 @@ import {
   PreferenceStep,
   PreferenceStepIndicator,
 } from '@/frontend/models/Preference';
-import { getPreferenceOptions } from '@/frontend/repositories/PreferenceRepository';
+import {
+  getPreferenceOptions,
+  salvarPreferenciasUsuario,
+} from '@/frontend/repositories/PreferenceRepository';
 
 const initialSelection: PreferenceSelection = {
   priceRangeId: null,
@@ -14,12 +17,15 @@ const initialSelection: PreferenceSelection = {
 
 const steps: PreferenceStep[] = ['genres', 'price'];
 
-export function usePreferenceSelectionViewModel() {
+export function usePreferenceSelectionViewModel(accessToken?: string | null) {
   const options = useMemo(() => getPreferenceOptions(), []);
   const [selection, setSelection] = useState<PreferenceSelection>(initialSelection);
   const [currentStep, setCurrentStep] = useState<PreferenceStep>('genres');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function selectPriceRange(priceRangeId: string) {
+    setError(null);
     setSelection((current) => ({
       ...current,
       priceRangeId,
@@ -27,6 +33,7 @@ export function usePreferenceSelectionViewModel() {
   }
 
   function toggleGenre(genreId: string) {
+    setError(null);
     setSelection((current) => {
       const genreIsSelected = current.genreIds.includes(genreId);
 
@@ -50,7 +57,7 @@ export function usePreferenceSelectionViewModel() {
     completed: step === 'genres' ? genreStepIsComplete : priceStepIsComplete,
   }));
 
-  function goToNextStep() {
+  async function goToNextStep() {
     if (!canContinue) {
       return null;
     }
@@ -63,12 +70,22 @@ export function usePreferenceSelectionViewModel() {
     return submitPreferences();
   }
 
-  function submitPreferences() {
+  async function submitPreferences() {
     if (!genreStepIsComplete || !priceStepIsComplete) {
       return null;
     }
 
-    return selection;
+    try {
+      setLoading(true);
+      setError(null);
+      await salvarPreferenciasUsuario(accessToken, selection);
+      return selection;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Nao foi possivel salvar suas preferencias.');
+      return null;
+    } finally {
+      setLoading(false);
+    }
   }
 
   return {
@@ -80,6 +97,8 @@ export function usePreferenceSelectionViewModel() {
     selectedPriceRangeId: selection.priceRangeId,
     selectedGenreIds: selection.genreIds,
     canContinue,
+    loading,
+    error,
     selectPriceRange,
     toggleGenre,
     goToNextStep,

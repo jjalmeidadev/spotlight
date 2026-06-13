@@ -52,7 +52,10 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
             }
         }
 
-        return (itens, total);
+        var midiasPorEspetaculo = await CarregarMidiasPorEspetaculoAsync(
+            conexao, itens.Select(e => e.Id).ToArray(), cancellationToken);
+
+        return (itens.Select(e => ComMidias(e, midiasPorEspetaculo)).ToList(), total);
     }
 
     /// <summary>Monta a cláusula WHERE e a lista de parâmetros conforme os filtros ativos.</summary>
@@ -62,7 +65,10 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
         var condicoes = new List<string>();
         var parametros = new List<(string, object)>();
 
-        if (!string.IsNullOrWhiteSpace(filtro.Q))
+        // Termos com 1-2 caracteres não acionam o índice GIN trigram
+        // (idx_espetaculo_titulo_trgm) — descartar o filtro evita Seq Scan
+        // disfarçado de busca semântica.
+        if (!string.IsNullOrWhiteSpace(filtro.Q) && filtro.Q.Trim().Length >= 3)
         {
             condicoes.Add("e.titulo ILIKE @q");
             parametros.Add(("q", $"%{filtro.Q.Trim()}%"));
@@ -70,7 +76,9 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
 
         if (!string.IsNullOrWhiteSpace(filtro.Status))
         {
-            condicoes.Add("e.status::text = @status");
+            // Cast no parâmetro (não na coluna) preserva o uso do índice
+            // idx_espetaculo_status_popularidade — e.status::text desabilitaria.
+            condicoes.Add("e.status = @status::status_espetaculo_enum");
             parametros.Add(("status", filtro.Status));
         }
 
@@ -108,6 +116,9 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
     {
         "nota_media" => "e.nota_media DESC",
         "titulo" => "e.titulo ASC",
+        // popularidade DESC aproveita idx_espetaculo_status_popularidade
+        // quando combinado com filtro de status; sem o filtro o plano cai
+        // em Seq Scan + sort, comportamento aceitável.
         _ => "e.popularidade DESC"
     };
 
@@ -139,6 +150,7 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
         var categorias = await CarregarCategoriasAsync(conexao, id, cancellationToken);
         var atores = await CarregarAtoresAsync(conexao, id, cancellationToken);
         var sessoes = await CarregarSessoesAsync(conexao, id, cancellationToken);
+        var midias = await CarregarMidiasPorEspetaculoAsync(conexao, [id], cancellationToken);
 
         return new EspetaculoDetalhe
         {
@@ -157,7 +169,8 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
             UpdatedAt = detalhe.UpdatedAt,
             Categorias = categorias,
             Atores = atores,
-            Sessoes = sessoes
+            Sessoes = sessoes,
+            Midias = midias.TryGetValue(id, out var itensMidia) ? itensMidia : []
         };
     }
 
@@ -285,6 +298,69 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
         return itens;
     }
 
+    private static async Task<Dictionary<int, IReadOnlyList<EspetaculoMidia>>> CarregarMidiasPorEspetaculoAsync(
+        NpgsqlConnection conexao, IReadOnlyList<int> espetaculoIds, CancellationToken cancellationToken)
+    {
+        var resultado = new Dictionary<int, IReadOnlyList<EspetaculoMidia>>();
+        if (espetaculoIds.Count == 0) return resultado;
+
+        await using var cmd = conexao.CreateCommand();
+        cmd.CommandText = """
+            SELECT id_espetaculo, tipo_midia, storage_bucket, storage_path, alt_text, ordem_exibicao
+            FROM espetaculo_midia
+            WHERE id_espetaculo = ANY(@ids)
+            ORDER BY id_espetaculo, tipo_midia, ordem_exibicao;
+            """;
+        cmd.Parameters.AddWithValue("ids", espetaculoIds.Distinct().ToArray());
+
+        var grupos = new Dictionary<int, List<EspetaculoMidia>>();
+        await using var r = await cmd.ExecuteReaderAsync(cancellationToken);
+        while (await r.ReadAsync(cancellationToken))
+        {
+            var espetaculoId = r.GetInt32(0);
+            if (!grupos.TryGetValue(espetaculoId, out var midias))
+            {
+                midias = [];
+                grupos[espetaculoId] = midias;
+            }
+
+            midias.Add(new EspetaculoMidia
+            {
+                TipoMidia = r.GetString(1),
+                StorageBucket = r.GetString(2),
+                StoragePath = r.GetString(3),
+                AltText = r.IsDBNull(4) ? null : r.GetString(4),
+                OrdemExibicao = r.GetInt32(5)
+            });
+        }
+
+        foreach (var (id, midias) in grupos)
+        {
+            resultado[id] = midias;
+        }
+
+        return resultado;
+    }
+
+    private static Espetaculo ComMidias(
+        Espetaculo espetaculo,
+        IReadOnlyDictionary<int, IReadOnlyList<EspetaculoMidia>> midiasPorEspetaculo)
+    {
+        return new Espetaculo
+        {
+            Id = espetaculo.Id,
+            Titulo = espetaculo.Titulo,
+            Genero = espetaculo.Genero,
+            Status = espetaculo.Status,
+            FaixaEtaria = espetaculo.FaixaEtaria,
+            ClassificacaoIndicativa = espetaculo.ClassificacaoIndicativa,
+            Duracao = espetaculo.Duracao,
+            NotaMedia = espetaculo.NotaMedia,
+            Popularidade = espetaculo.Popularidade,
+            Midias = midiasPorEspetaculo.TryGetValue(espetaculo.Id, out var midias) ? midias : []
+        };
+    }
+
     // -----------------------------------------------------------------------
     // Existência (usada por rotas aninhadas para devolver 404 cedo)
     // -----------------------------------------------------------------------
@@ -385,7 +461,6 @@ public class EspetaculoRepository(NpgsqlDataSource dataSource) : IEspetaculoRepo
 
         if (sets.Count > 0)
         {
-            sets.Add("updated_at = NOW()");
             await using var cmd = conexao.CreateCommand();
             cmd.Transaction = tx;
             cmd.CommandText = $"UPDATE espetaculo SET {string.Join(", ", sets)} WHERE id_espetaculo = @id;";

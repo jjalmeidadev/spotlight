@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
   ImageBackground,
   ListRenderItemInfo,
@@ -18,10 +19,12 @@ import { Carousel, CarouselItem } from '@/frontend/components/Carousel';
 import { ShowcaseCard } from '@/frontend/components/ShowcaseCard';
 import { colors, spacing, typography } from '@/frontend/theme';
 import type { EspetaculoSemelhante } from '../models/DetalhesModels';
+import { emitTelemetryEvent } from '../repositories/TelemetryRepository';
 import { useDetalhesViewModel } from '../viewmodels/DetalhesViewModels';
 
 
 type DetalhesViewProps = {
+  accessToken?: string | null;
   espetaculoId: string;
   onClose?: () => void;
   onEspetaculoSemelhantePress?: (espetaculoId: string) => void;
@@ -38,12 +41,33 @@ const NOVICA_REBELDE_CAPA_ASPECT_RATIO =
 
 
 export default function DetalhesView({
+  accessToken,
   espetaculoId,
   onClose,
   onEspetaculoSemelhantePress,
   onComprarIngresso,
 }: DetalhesViewProps) {
-  const viewModel = useDetalhesViewModel(espetaculoId, { onComprarIngresso });
+  const viewModel = useDetalhesViewModel(espetaculoId, { accessToken, onComprarIngresso });
+  const lastViewedIdRef = React.useRef<string | null>(null);
+
+
+  React.useEffect(() => {
+    if (!viewModel.detalhe || lastViewedIdRef.current === viewModel.detalhe.id) {
+      return;
+    }
+
+
+    lastViewedIdRef.current = viewModel.detalhe.id;
+    emitTelemetryEvent(
+      {
+        eventType: 'show_viewed',
+        screen: 'DetalhesView',
+        entity: { type: 'espetaculo', id: viewModel.detalhe.id },
+        properties: { origin: 'catalog' },
+      },
+      accessToken,
+    );
+  }, [accessToken, viewModel.detalhe]);
 
 
   if (viewModel.loading) {
@@ -100,6 +124,7 @@ export default function DetalhesView({
     return null;
   }
 
+  const detalheAtual = espetaculo;
 
   const similarCarouselData: Array<CarouselItem<EspetaculoSemelhante>> =
     viewModel.espetaculosSemelhantes.map((item: EspetaculoSemelhante) => ({
@@ -110,11 +135,30 @@ export default function DetalhesView({
 
   const renderSimilarItem = ({
     item,
+    index,
   }: ListRenderItemInfo<CarouselItem<EspetaculoSemelhante>>) => (
     <ShowcaseCard
       title={item.titulo}
       imageUri={item.imagemUrl}
-      onPress={() => onEspetaculoSemelhantePress?.(item.id)}
+      onPress={() => {
+        emitTelemetryEvent(
+          {
+            eventType: 'show_card_clicked',
+            screen: 'DetalhesView',
+            entity: { type: 'espetaculo', id: item.id },
+            properties: {
+              origin: 'similar',
+              position: index,
+              recommendationAlgorithm: item.algoritmo,
+              recommendationScore: item.score,
+            },
+          },
+          accessToken,
+        );
+
+
+        onEspetaculoSemelhantePress?.(item.id);
+      }}
     />
   );
 
@@ -126,6 +170,52 @@ export default function DetalhesView({
         ? { uri: espetaculo.imagemUrl }
         : undefined;
   const usaCapaLocal = espetaculo.titulo === 'A Noviça Rebelde';
+
+
+  function handleBuyPress() {
+    if (!detalheAtual.linkCompra) {
+      return;
+    }
+
+
+    emitTelemetryEvent(
+      {
+        eventType: 'purchase_clicked',
+        screen: 'DetalhesView',
+        entity: { type: 'espetaculo', id: detalheAtual.id },
+        properties: {
+          provider: getPurchaseProvider(detalheAtual.linkCompra),
+        },
+      },
+      accessToken,
+    );
+
+
+    viewModel.comprarIngresso();
+  }
+
+  async function salvarAvaliacao(nota: number) {
+    try {
+      await viewModel.avaliar(nota);
+      emitTelemetryEvent(
+        {
+          eventType: 'show_card_clicked',
+          screen: 'DetalhesView',
+          entity: { type: 'espetaculo', id: detalheAtual.id },
+          properties: {
+            origin: 'rating',
+            rating: nota,
+          },
+        },
+        accessToken,
+      );
+    } catch (error) {
+      Alert.alert(
+        'Avaliacao nao salva',
+        error instanceof Error ? error.message : 'Nao foi possivel salvar sua avaliacao.',
+      );
+    }
+  }
 
 
   return (
@@ -200,33 +290,31 @@ export default function DetalhesView({
 
 
           <View style={styles.actionsRow}>
-            <StarRating value={espetaculo.notaMedia} />
+            <StarRating
+              disabled={viewModel.avaliando}
+              onChange={async (nota) => {
+                if (viewModel.avaliacaoUsuario !== null) {
+                  Alert.alert(
+                    'Alterar avaliacao?',
+                    `Voce ja avaliou este espetaculo. Deseja alterar sua nota para ${nota}?`,
+                    [
+                      { text: 'Cancelar', style: 'cancel' },
+                      { text: 'Alterar', onPress: () => void salvarAvaliacao(nota) },
+                    ],
+                  );
+                  return;
+                }
+
+                await salvarAvaliacao(nota);
+              }}
+              value={viewModel.avaliacaoUsuario ?? espetaculo.notaMedia}
+            />
 
 
             <View style={styles.actionsRight}>
               <Pressable
-                accessibilityLabel={
-                  viewModel.favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'
-                }
                 accessibilityRole="button"
-                hitSlop={8}
-                onPress={viewModel.alternarFavorito}
-                style={({ pressed }: { pressed: boolean }) => [
-                  styles.favoriteButton,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text
-                  style={[styles.favoriteIcon, viewModel.favorito && styles.favoriteIconActive]}
-                >
-                  ♥
-                </Text>
-              </Pressable>
-
-
-              <Pressable
-                accessibilityRole="button"
-                onPress={viewModel.comprarIngresso}
+                onPress={handleBuyPress}
                 style={({ pressed }: { pressed: boolean }) => [
                   styles.buyButton,
                   pressed && styles.pressed,
@@ -241,6 +329,14 @@ export default function DetalhesView({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Descrição</Text>
             <Text style={styles.description}>{espetaculo.descricao}</Text>
+            <View style={styles.infoGrid}>
+              <InfoPill label="Classificação" value={espetaculo.classificacaoIndicativa ?? espetaculo.faixaEtaria} />
+              <InfoPill label="Status" value={formatStatus(espetaculo.status)} />
+              <InfoPill label="Próxima sessão" value={espetaculo.proximaSessao} />
+              <InfoPill label="Teatro" value={espetaculo.teatro} />
+              <InfoPill label="Preço" value={espetaculo.preco} />
+              <InfoPill label="Produtora" value={espetaculo.produtora} />
+            </View>
           </View>
 
 
@@ -263,12 +359,44 @@ export default function DetalhesView({
 }
 
 
+function getPurchaseProvider(linkCompra: string) {
+  try {
+    return new URL(linkCompra).hostname.replace(/^www\./, '');
+  } catch {
+    return 'unknown';
+  }
+}
+
+function formatStatus(status?: string) {
+  if (!status) return null;
+
+  return status
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function InfoPill({ label, value }: { label: string; value?: string | null }) {
+  if (!value) {
+    return null;
+  }
+
+  return (
+    <View style={styles.infoPill}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
+}
+
+
 type StarRatingProps = {
+  disabled?: boolean;
+  onChange?: (value: number) => void;
   value: number;
 };
 
 
-function StarRating({ value }: StarRatingProps) {
+function StarRating({ disabled, onChange, value }: StarRatingProps) {
   const filledStars = Math.max(0, Math.min(STAR_COUNT, Math.round(value)));
 
 
@@ -283,9 +411,19 @@ function StarRating({ value }: StarRatingProps) {
 
 
         return (
-          <Text key={index} style={[styles.star, filled ? styles.starFilled : styles.starEmpty]}>
-            {filled ? '★' : '☆'}
-          </Text>
+          <Pressable
+            accessibilityLabel={`Avaliar com ${index + 1} de 5 estrelas`}
+            accessibilityRole="button"
+            disabled={disabled || !onChange}
+            hitSlop={6}
+            key={index}
+            onPress={() => onChange?.(index + 1)}
+            style={({ pressed }: { pressed: boolean }) => pressed && styles.pressed}
+          >
+            <Text style={[styles.star, filled ? styles.starFilled : styles.starEmpty]}>
+              {filled ? '★' : '☆'}
+            </Text>
+          </Pressable>
         );
       })}
     </View>
@@ -446,20 +584,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     flexShrink: 1,
   },
-  favoriteButton: {
-    minWidth: spacing.touchMin,
-    minHeight: spacing.touchMin,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  favoriteIcon: {
-    color: colors.primary,
-    fontSize: 22,
-    lineHeight: 24,
-  },
-  favoriteIconActive: {
-    opacity: 1,
-  },
   buyButton: {
     minHeight: 36,
     borderRadius: 999,
@@ -489,6 +613,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
   },
+  infoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  infoPill: {
+    borderColor: 'rgba(255, 255, 255, 0.42)',
+    borderRadius: 12,
+    borderWidth: 1,
+    maxWidth: '100%',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
+  infoLabel: {
+    color: colors.textSubtle,
+    ...typography.caption,
+    fontSize: 9,
+    lineHeight: 11,
+    textTransform: 'uppercase',
+  },
+  infoValue: {
+    color: colors.textStrong,
+    ...typography.caption,
+    fontSize: 11,
+    lineHeight: 14,
+    marginTop: 2,
+  },
   similarSection: {
     marginTop: spacing.xs,
   },
@@ -499,6 +651,3 @@ const styles = StyleSheet.create({
     opacity: 0.82,
   },
 });
-
-
-

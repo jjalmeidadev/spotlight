@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Npgsql;
+using NpgsqlTypes;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Application.UseCases;
 using Spotlight.Usuario.Domain.Entities;
@@ -21,7 +22,7 @@ public class UsuarioRepository(NpgsqlDataSource dataSource) : IUsuarioRepository
         cmd.CommandText = """
             SELECT id_usuario, nome, email, data_nascimento, localizacao,
                    tipo_usuario::text, data_cadastro
-            FROM usuario
+            FROM public.usuario
             WHERE id_usuario = @id;
             """;
         cmd.Parameters.AddWithValue("id", id);
@@ -41,13 +42,44 @@ public class UsuarioRepository(NpgsqlDataSource dataSource) : IUsuarioRepository
         };
     }
 
+    public async Task GarantirPerfilAsync(
+        Guid id,
+        string email,
+        string? nome,
+        DateOnly? dataNascimento,
+        CancellationToken cancellationToken)
+    {
+        await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
+        await using var cmd = conexao.CreateCommand();
+        cmd.CommandText = """
+            INSERT INTO public.usuario (id_usuario, nome, email, data_nascimento)
+            SELECT @id, @nome, @email, @data_nascimento
+            WHERE EXISTS (
+                SELECT 1
+                FROM auth.users
+                WHERE id = @id
+            )
+            ON CONFLICT (id_usuario) DO NOTHING;
+            """;
+        cmd.Parameters.AddWithValue("id", id);
+        cmd.Parameters.AddWithValue("nome", string.IsNullOrWhiteSpace(nome)
+            ? email.Split('@', 2)[0]
+            : nome.Trim());
+        cmd.Parameters.AddWithValue("email", email.Trim());
+        cmd.Parameters.AddWithValue("data_nascimento", dataNascimento is null
+            ? DBNull.Value
+            : dataNascimento.Value);
+
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     public async Task<bool> AtualizarAsync(Guid id, UsuarioUpdateDto dados, CancellationToken cancellationToken)
     {
         // Confirma existência antes do update — devolve 404 cedo se o id sumiu.
         await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
         await using (var existe = conexao.CreateCommand())
         {
-            existe.CommandText = "SELECT 1 FROM usuario WHERE id_usuario = @id;";
+            existe.CommandText = "SELECT 1 FROM public.usuario WHERE id_usuario = @id;";
             existe.Parameters.AddWithValue("id", id);
             if (await existe.ExecuteScalarAsync(cancellationToken) is null) return false;
         }
@@ -64,12 +96,11 @@ public class UsuarioRepository(NpgsqlDataSource dataSource) : IUsuarioRepository
 
         Add("nome = @nome", "nome", dados.Nome);
         Add("data_nascimento = @nasc", "nasc", dados.DataNascimento);
-        Add("localizacao = @loc", "loc", dados.Localizacao);
 
         if (sets.Count == 0) return true; // nada a atualizar — semântica no-op
 
         await using var cmd = conexao.CreateCommand();
-        cmd.CommandText = $"UPDATE usuario SET {string.Join(", ", sets)} WHERE id_usuario = @id;";
+        cmd.CommandText = $"UPDATE public.usuario SET {string.Join(", ", sets)} WHERE id_usuario = @id;";
         cmd.Parameters.AddWithValue("id", id);
         foreach (var (nome, valor) in parametros) cmd.Parameters.AddWithValue(nome, valor);
         await cmd.ExecuteNonQueryAsync(cancellationToken);
@@ -80,7 +111,7 @@ public class UsuarioRepository(NpgsqlDataSource dataSource) : IUsuarioRepository
     {
         await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
         await using var cmd = conexao.CreateCommand();
-        cmd.CommandText = "SELECT perfil_preferencias::text FROM usuario WHERE id_usuario = @id;";
+        cmd.CommandText = "SELECT perfil_preferencias::text FROM public.usuario WHERE id_usuario = @id;";
         cmd.Parameters.AddWithValue("id", id);
 
         var raw = await cmd.ExecuteScalarAsync(cancellationToken) as string;
@@ -97,11 +128,11 @@ public class UsuarioRepository(NpgsqlDataSource dataSource) : IUsuarioRepository
         await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
         await using var cmd = conexao.CreateCommand();
         cmd.CommandText = """
-            UPDATE usuario SET perfil_preferencias = @prefs::jsonb
+            UPDATE public.usuario SET perfil_preferencias = @prefs
             WHERE id_usuario = @id;
             """;
         cmd.Parameters.AddWithValue("id", id);
-        cmd.Parameters.AddWithValue("prefs", JsonSerializer.Serialize(dados, JsonOpts));
+        cmd.Parameters.Add("prefs", NpgsqlDbType.Jsonb).Value = JsonSerializer.Serialize(dados, JsonOpts);
         return await cmd.ExecuteNonQueryAsync(cancellationToken) > 0;
     }
 }

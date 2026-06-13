@@ -168,6 +168,38 @@ public class CatalogoUseCasesTests
         Assert.Equal(7, avaliacaoRepositorio.LastEspetaculoId);
     }
 
+    [Fact]
+    public async Task CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio()
+    {
+        var avaliacaoRepositorio = new FakeAvaliacaoRepository
+        {
+            CriarResult = new Avaliacao
+            {
+                Id = 9,
+                Nota = 5,
+                Comentario = null,
+                CreatedAt = new DateTime(2026, 6, 12, 8, 0, 0, DateTimeKind.Utc)
+            }
+        };
+        var espetaculoRepositorio = new FakeEspetaculoRepository { ExisteResult = true };
+        var useCase = new CriarAvaliacaoUseCase(avaliacaoRepositorio, espetaculoRepositorio);
+        var usuarioId = Guid.NewGuid();
+
+        var resultado = await useCase.ExecutarAsync(
+            20,
+            usuarioId,
+            new AvaliacaoCreateDto { Nota = 5, Comentario = null },
+            Ct);
+
+        Assert.Equal(1, espetaculoRepositorio.ExisteCalls);
+        Assert.Equal(1, avaliacaoRepositorio.CriarCalls);
+        Assert.Equal(20, avaliacaoRepositorio.LastEspetaculoId);
+        Assert.Equal(usuarioId, avaliacaoRepositorio.LastUsuarioId);
+        Assert.Equal(5, avaliacaoRepositorio.LastNota);
+        Assert.Null(avaliacaoRepositorio.LastComentario);
+        Assert.Equal(5, resultado.Nota);
+    }
+
     public static TheoryData<decimal?> NotasInvalidas => new()
     {
         null,
@@ -179,7 +211,9 @@ public class CatalogoUseCasesTests
     [MemberData(nameof(NotasInvalidas))]
     public async Task CriarAvaliacao_ComNotaInvalida_LancaValidation(decimal? nota)
     {
-        var useCase = new CriarAvaliacaoUseCase(new FakeAvaliacaoRepository(), new FakeEspetaculoRepository());
+        var avaliacaoRepositorio = new FakeAvaliacaoRepository();
+        var espetaculoRepositorio = new FakeEspetaculoRepository { ExisteResult = true };
+        var useCase = new CriarAvaliacaoUseCase(avaliacaoRepositorio, espetaculoRepositorio);
 
         var ex = await Assert.ThrowsAsync<CatalogoValidationException>(() => useCase.ExecutarAsync(
             1,
@@ -188,6 +222,25 @@ public class CatalogoUseCasesTests
             Ct));
 
         Assert.Contains("nota", ex.Details.Keys);
+        Assert.Equal(0, espetaculoRepositorio.ExisteCalls);
+        Assert.Equal(0, avaliacaoRepositorio.CriarCalls);
+    }
+
+    [Fact]
+    public async Task CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao()
+    {
+        var avaliacaoRepositorio = new FakeAvaliacaoRepository();
+        var espetaculoRepositorio = new FakeEspetaculoRepository { ExisteResult = false };
+        var useCase = new CriarAvaliacaoUseCase(avaliacaoRepositorio, espetaculoRepositorio);
+
+        await Assert.ThrowsAsync<CatalogoNotFoundException>(() => useCase.ExecutarAsync(
+            999,
+            Guid.NewGuid(),
+            new AvaliacaoCreateDto { Nota = 4 },
+            Ct));
+
+        Assert.Equal(1, espetaculoRepositorio.ExisteCalls);
+        Assert.Equal(0, avaliacaoRepositorio.CriarCalls);
     }
 
     [Fact]
@@ -302,6 +355,7 @@ public class CatalogoUseCasesTests
         public int LastObterDetalheId { get; private set; }
         public int CriarCalls { get; private set; }
         public int AtualizarCalls { get; private set; }
+        public int ExisteCalls { get; private set; }
 
         public Task<(IReadOnlyList<Espetaculo> Itens, int Total)> ListarAsync(
             ListarEspetaculosFiltro filtro,
@@ -317,7 +371,11 @@ public class CatalogoUseCasesTests
             return Task.FromResult(Detalhe);
         }
 
-        public Task<bool> ExisteAsync(int id, CancellationToken cancellationToken) => Task.FromResult(ExisteResult);
+        public Task<bool> ExisteAsync(int id, CancellationToken cancellationToken)
+        {
+            ExisteCalls++;
+            return Task.FromResult(ExisteResult);
+        }
 
         public Task<int> CriarAsync(EspetaculoCreateDto dados, CancellationToken cancellationToken)
         {
@@ -342,6 +400,9 @@ public class CatalogoUseCasesTests
         public int LastPageSize { get; private set; }
         public int LastEspetaculoId { get; private set; }
         public Guid LastUsuarioId { get; private set; }
+        public int CriarCalls { get; private set; }
+        public decimal LastNota { get; private set; }
+        public string? LastComentario { get; private set; }
 
         public Task<(IReadOnlyList<Avaliacao> Itens, int Total)> ListarPorEspetaculoAsync(
             int espetaculoId,
@@ -361,8 +422,11 @@ public class CatalogoUseCasesTests
             string? comentario,
             CancellationToken cancellationToken)
         {
+            CriarCalls++;
             LastEspetaculoId = espetaculoId;
             LastUsuarioId = usuarioId;
+            LastNota = nota;
+            LastComentario = comentario;
             return Task.FromResult(CriarResult);
         }
     }

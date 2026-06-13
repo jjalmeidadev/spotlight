@@ -1,4 +1,4 @@
-# Contratos de API — Spotlight 
+﻿# Contratos de API — Spotlight
 
 Especificação das rotas que serão implementadas no backend, servindo como
 **fonte da verdade** para o desenvolvimento, para o Swagger  e para o
@@ -103,7 +103,7 @@ Em erros de validação (400), inclui `details` por campo:
 | 401 | Não autenticado (token ausente/ inválido) |
 | 403 | Autenticado, mas sem permissão |
 | 404 | Recurso não encontrado |
-| 409 | Conflito (ex.: avaliação duplicada) |
+| 409 | Conflito de regra de negócio |
 | 500 | Erro interno |
 
 ---
@@ -315,7 +315,7 @@ Em erros de validação (400), inclui `details` por campo:
   "data": [
     { "id": 88, "data": "2026-06-10", "horario": "20:00",
       "precoMinimo": 40.00, "precoMaximo": 120.00, "disponibilidade": 230,
-      "linkCompra": "https://...", 
+      "linkCompra": "https://...",
       "teatro": { "id": 2, "nome": "Teatro Aventura", "cidade": "Campinas", "estado": "SP" } }
   ]
 }
@@ -343,8 +343,13 @@ Em erros de validação (400), inclui `details` por campo:
 ---
 
 ### 3.10 `POST /catalogo/espetaculos/{id}/avaliacoes`
-**Finalidade:** avaliar um espetáculo. **Requer `cadastrado`.** Um usuário só pode
-avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)`).
+**Finalidade:** salvar a avaliação de um espetáculo. **Requer `cadastrado`.** Um usuário
+mantém uma única avaliação por espetáculo (constraint `UNIQUE (id_usuario, id_espetaculo)`);
+se já existir uma avaliação para o mesmo par usuário/espetáculo, a nota e o comentário são atualizados.
+As avaliações são dados transacionais e permanecem na base relacional
+PostgreSQL/Supabase, na tabela `avaliacao`. Elas também podem alimentar o modelo
+de recomendação como feedback explícito, mas não devem ser duplicadas como nota
+canônica na collection MongoDB de telemetria.
 
 **Request**
 - Path param: `id`. Headers: `Authorization`, `Content-Type`.
@@ -354,7 +359,7 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 ```
 
 **Responses**
-- `201 Created`:
+- `201 Created` — avaliação criada ou atualizada:
 ```json
 { "id": 41, "nota": 4.5, "comentario": "...", "createdAt": "2026-05-26T19:00:00Z" }
 ```
@@ -362,10 +367,6 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 - `401` — token ausente ou inválido. `Erro`.
 - `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `404` — espetáculo inexistente.
-- `409 Conflict` — usuário já avaliou este espetáculo:
-```json
-{ "error": "Você já avaliou este espetáculo.", "traceId": "00-...-00" }
-```
 - `500` — `Erro`.
 
 ---
@@ -386,7 +387,13 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
   "nome": "Maria Souza",
   "email": "maria@exemplo.com",
   "dataNascimento": "1995-04-12",
-  "localizacao": "Campinas, SP",
+  "localizacao": {
+    "formattedAddress": "Av. Paulista, 1578 - Bela Vista, São Paulo - SP",
+    "latitude": -23.55052,
+    "longitude": -46.633308,
+    "placeId": "123456789",
+    "provider": "openstreetmap_nominatim"
+  },
   "tipoUsuario": "cadastrado",
   "dataCadastro": "2026-03-01T10:00:00Z"
 }
@@ -394,6 +401,8 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 - `401` — token ausente ou inválido. `Erro`.
 - `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
 - `500` — `Erro`.
+
+> `localizacao` é `null` quando o usuário ainda não consentiu a coleta. Quando presente, o objeto sempre tem as 5 chaves documentadas — gravadas exclusivamente por `PUT /usuario/me/localizacao` (4.3).
 
 ---
 
@@ -404,8 +413,10 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 - Headers: `Authorization`, `Content-Type`.
 - Body (campos opcionais):
 ```json
-{ "nome": "string (máx 150)", "dataNascimento": "1995-04-12", "localizacao": { "formattedAddress": "Campinas, SP", "latitude": -22.90556, "longitude": -47.06083, "placeId": "123", "provider": "openstreetmap_nominatim" } }
+{ "nome": "string (máx 150)", "dataNascimento": "1995-04-12" }
 ```
+
+> O campo `localizacao` **não** faz parte deste contrato. Mesmo que enviado no body, é silenciosamente ignorado pelo deserializador (a propriedade não existe no `UsuarioUpdateDto`) — a coluna JSONB no banco nunca é tocada por esta rota. Para atualizar a localização, use `PUT /usuario/me/localizacao` (4.3), que valida o payload estruturado antes de gravar.
 
 **Responses**
 - `200 OK` — perfil atualizado (mesmo schema de 4.1).
@@ -418,10 +429,11 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
 
 ### 4.3 `PUT /usuario/me/localizacao`
 **Finalidade:** atualizar a localização consentida do usuário autenticado. **Requer `cadastrado`.**
+Esta é a **única** rota que escreve na coluna JSONB `usuario.localizacao` — `PUT /usuario/me` (4.2) não a aceita.
 
 **Request**
 - Headers: `Authorization`, `Content-Type`.
-- Body:
+- Body (todas as 5 chaves obrigatórias, em camelCase):
 ```json
 {
   "formattedAddress": "Rua Caetanopolis, Sao Paulo, SP",
@@ -431,6 +443,18 @@ avaliar cada espetáculo uma vez (constraint `UNIQUE (id_usuario, id_espetaculo)
   "provider": "openstreetmap_nominatim"
 }
 ```
+
+Validações aplicadas antes da gravação:
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `formattedAddress` | `string` | não-vazia |
+| `latitude` | `number` | `-90 ≤ lat ≤ 90` |
+| `longitude` | `number` | `-180 ≤ lon ≤ 180` |
+| `placeId` | `string` | obrigatório, sem validação extra |
+| `provider` | `string` | obrigatório |
+
+> **Fluxo recomendado para o cliente:** obtenha o objeto chamando `GET /geolocalizacao/geocoding` ou `GET /geolocalizacao/geocoding/reverse` (5.1 e 5.2) e repasse a resposta inteira como body desta rota. Os valores de `placeId` e `provider` vêm preenchidos pelo serviço de geocoding (`provider = "openstreetmap_nominatim"`) — o cliente não deve fabricar esses campos manualmente.
 
 **Responses**
 - `200 OK`:
@@ -492,6 +516,104 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 ---
 
+### 4.7 `POST /usuario/telemetria`
+**Finalidade:** receber eventos de telemetria comportamental gerados pelo aplicativo
+mobile, como visualização de tela, clique em card, busca e abertura de
+compra. Os eventos válidos são enviados para persistência na coleção
+`interacoes` do MongoDB.
+
+> O catálogo completo de eventos, a justificativa de coleta, as propriedades por
+> evento e o schema lógico da collection estão detalhados em
+> [`telemetria.md`](./telemetria.md).
+
+**Autenticação**
+- Header `Authorization: Bearer <jwt>` opcional.
+- Se o JWT for enviado e válido, o backend associa o evento ao `sub` do token.
+- Se o JWT não for enviado, `anonymousId` é obrigatório.
+- Se o JWT for enviado, mas for inválido, a resposta deve ser `401`.
+
+**Request**
+- Headers: `Content-Type: application/json`; `Authorization` opcional.
+- Body:
+```json
+{
+  "eventId": "evt_01HX9F7M9XK2",
+  "eventType": "show_viewed",
+  "source": "mobile",
+  "sessionId": "sess_01HX9F7M8T",
+  "occurredAt": "2026-06-09T14:32:00Z",
+  "screen": "Detalhes",
+  "entity": {
+    "type": "espetaculo",
+    "id": "42"
+  },
+  "properties": {
+    "durationMs": 23000,
+    "origin": "catalog"
+  },
+  "device": {
+    "platform": "ios",
+    "appVersion": "1.0.0"
+  },
+  "anonymousId": "anon_01HX9F7M8T"
+}
+```
+
+**Campos**
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `eventId` | `string` | Não | Idempotência no cliente. Se omitido, o backend gera um identificador. |
+| `eventType` | `string` | Sim | Enum inicial: `session_started`, `screen_viewed`, `show_card_clicked`, `show_viewed`, `search_performed`, `favorite_toggled`, `purchase_clicked`, `session_ended`. |
+| `source` | `string` | Sim | Origem do evento. Enum inicial: `mobile`. |
+| `sessionId` | `string` | Sim | Identificador da sessão de uso do app. |
+| `occurredAt` | `date-time` | Não | Momento em que o evento ocorreu no cliente. Se omitido, o backend usa o horário de recebimento. |
+| `screen` | `string` | Não | Tela onde o evento ocorreu. |
+| `entity.type` | `string` | Condicional | Obrigatório quando `entity` for enviado. Enum inicial: `espetaculo`, `sessao`, `teatro`, `categoria`, `busca`. |
+| `entity.id` | `string` | Condicional | Obrigatório quando `entity` for enviado. |
+| `properties` | `object` | Não | Metadados livres do evento. Não deve conter dados sensíveis. |
+| `device` | `object` | Não | Metadados do dispositivo/app. Não deve conter dados sensíveis. |
+| `anonymousId` | `string` | Condicional | Obrigatório quando não houver usuário autenticado. |
+
+> Limite alvo para `properties` + `device`: 16 KB serializados. Validações mais
+> estritas por tipo de evento devem ser implementadas na tarefa de validação do
+> payload.
+
+**Responses**
+- `202 Accepted` — evento validado e aceito para processamento de telemetria:
+```json
+{ "eventId": "evt_01HX9F7M9XK2", "status": "accepted" }
+```
+> A telemetria é best-effort: falhas transitórias de escrita no MongoDB são
+> registradas em log e não bloqueiam a navegação do aplicativo.
+- `400 Bad Request` — validação (`Erro` com `details`).
+- `401 Unauthorized` — token enviado, mas ausente/inválido para associação autenticada. `Erro`.
+- `503 Service Unavailable` — telemetria/MongoDB não configurados no ambiente. `Erro`.
+- `500` — falha inesperada. `Erro`.
+
+**Documento persistido no MongoDB**
+
+O backend normaliza o payload para a coleção `interacoes` com campos em
+`snake_case`:
+```json
+{
+  "event_id": "evt_01HX9F7M9XK2",
+  "user_id": "a1b2c3d4-0000-0000-0000-000000000000",
+  "anonymous_id": "anon_01HX9F7M8T",
+  "session_id": "sess_01HX9F7M8T",
+  "event_type": "show_viewed",
+  "source": "mobile",
+  "screen": "Detalhes",
+  "occurred_at": "2026-06-09T14:32:00Z",
+  "received_at": "2026-06-09T14:32:01Z",
+  "entity": { "type": "espetaculo", "id": "42" },
+  "properties": { "durationMs": 23000, "origin": "catalog" },
+  "device": { "platform": "ios", "appVersion": "1.0.0" }
+}
+```
+
+---
+
 ## 5. Serviço de Geolocalização
 
 ### 5.1 `GET /geolocalizacao/geocoding`
@@ -535,25 +657,158 @@ Mapeia o campo `perfil_preferencias` (JSONB).
 
 ## 6. Serviço de Recomendação
 
-### 6.1 `GET /recomendacao/me`
-**Finalidade:** recomendações personalizadas para o usuário autenticado, ordenadas
-por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `recomendacao`).
+### 6.1 Schemas do serviço de recomendação
+
+#### EspetáculoRecomendado
+
+Objeto usado dentro das respostas de recomendação. Representa o subconjunto do espetáculo necessário para exibição em listas e carrosséis.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `id` | integer | Sim | Identificador do espetáculo. |
+| `titulo` | string | Sim | Título do espetáculo. |
+| `genero` | string ou null | Não | Gênero textual do espetáculo, quando cadastrado. |
+| `status` | string | Sim | Status do espetáculo. Ex.: `em_cartaz`, `em_breve`, `encerrado`. |
+| `notaMedia` | number | Sim | Média de avaliações do espetáculo. |
+| `midias` | array | Sim | Mídias do espetáculo (capas, banners) ordenadas por `ordemExibicao`. Pode ser vazia. Cada item tem `tipoMidia`, `storageBucket`, `storagePath`, `altText` (nullable) e `ordemExibicao`. |
+
+Exemplo:
+
+```json
+{
+  "id": 12,
+  "titulo": "O Auto da Compadecida",
+  "genero": "Comédia",
+  "status": "em_cartaz",
+  "notaMedia": 4.7,
+  "midias": [
+    {
+      "tipoMidia": "capa",
+      "storageBucket": "espetaculos",
+      "storagePath": "12/capa.jpg",
+      "altText": "Cartaz de O Auto da Compadecida",
+      "ordemExibicao": 1
+    }
+  ]
+}
+```
+
+#### RecomendacaoItem
+
+Item retornado em `GET /recomendacao/me`.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `espetaculo` | EspetáculoRecomendado | Sim | Espetáculo recomendado. |
+| `score` | number | Sim | Pontuação calculada pelo algoritmo de recomendação. Deve ser maior ou igual a zero. |
+| `tipoAlgoritmo` | string | Sim | Algoritmo responsável pela recomendação. Ex.: `SVD`, `k-NN`, `content_based`. |
+| `motivo` | string ou null | Não | Explicação textual da recomendação. |
+| `dataGeracao` | string date-time | Sim | Momento em que a recomendação foi gerada. |
+
+Exemplo:
+
+```json
+{
+  "espetaculo": {
+    "id": 12,
+    "titulo": "O Auto da Compadecida",
+    "genero": "Comédia",
+    "status": "em_cartaz",
+    "notaMedia": 4.7
+  },
+  "score": 0.934512,
+  "tipoAlgoritmo": "SVD",
+  "motivo": "Por que você gostou de outras comédias populares.",
+  "dataGeracao": "2026-05-25T03:00:00Z"
+}
+```
+
+#### SimilarItem
+
+Item retornado em `GET /recomendacao/espetaculos/{id}/similares`.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `espetaculo` | EspetáculoRecomendado | Sim | Espetáculo similar ao espetáculo de origem. |
+| `score` | number | Sim | Grau de similaridade no intervalo esperado de 0 a 1. |
+| `tipoAlgoritmo` | string | Sim | Algoritmo usado para calcular similaridade. Ex.: `k-NN`, `SVD`. |
+
+Exemplo:
+
+```json
+{
+  "espetaculo": {
+    "id": 18,
+    "titulo": "Morte e Vida Severina",
+    "genero": "Drama",
+    "status": "em_cartaz",
+    "notaMedia": 4.5
+  },
+  "score": 0.81234,
+  "tipoAlgoritmo": "k-NN"
+}
+```
+
+#### Lista de recomendação
+
+Envelope usado pelas rotas de recomendação.
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `data` | array | Sim | Lista de itens retornados. Pode ser vazia quando não houver recomendações disponíveis. |
+
+Exemplo:
+
+```json
+{
+  "data": []
+}
+```
+
+---
+
+### 6.2 `GET /recomendacao/me`
+
+**Finalidade:** recomendações personalizadas para o usuário autenticado, ordenadas por `score`. **Requer `cadastrado`.** Lê predições pré-processadas da tabela `recomendacao`.
+
+**Regra básica:** o backend retorna recomendações já calculadas pelo pipeline/modelo de recomendação. A rota não treina o modelo nem recalcula scores em tempo real; ela consulta os resultados persistidos para o usuário autenticado.
 
 **Request**
-- Header: `Authorization`.
+
+- Headers:
+
+| Header | Obrigatório | Descrição |
+|---|---|---|
+| `Authorization: Bearer <token-jwt>` | Sim | JWT válido de usuário `cadastrado`. |
+
 - Query params:
-```json
-{ "limite": "integer (default 10, máx 50)" }
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `limite` | integer | Não | Default 10. Valores menores que 1 usam 10. Valor máximo 50. |
+
+Exemplo de request:
+
+```http
+GET /recomendacao/me?limite=5
+Authorization: Bearer <token-jwt>
 ```
 
 **Responses**
-- `200 OK`:
+
+- `200 OK` - lista de `RecomendacaoItem`:
+
 ```json
 {
   "data": [
     {
-      "espetaculo": { "id": 12, "titulo": "O Auto da Compadecida", "genero": "Comédia",
-                      "status": "em_cartaz", "notaMedia": 4.7 },
+      "espetaculo": {
+        "id": 12,
+        "titulo": "O Auto da Compadecida",
+        "genero": "Comédia",
+        "status": "em_cartaz",
+        "notaMedia": 4.7
+      },
       "score": 0.934512,
       "tipoAlgoritmo": "SVD",
       "motivo": "Por que você gostou de outras comédias populares.",
@@ -562,40 +817,81 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
   ]
 }
 ```
-- `401` — token ausente ou inválido. `Erro`.
-- `403` — token válido, mas usuário sem permissão (ex.: `visitante`). `Erro`.
-- `500` — `Erro`.
+
+- `200 OK` - sem recomendações disponíveis:
+
+```json
+{
+  "data": []
+}
+```
+
+- `401 Unauthorized` - token ausente ou inválido. Schema `Erro`.
+- `403 Forbidden` - token válido, mas usuário sem permissão. Schema `Erro`.
+- `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
 
-### 6.2 `GET /recomendacao/espetaculos/{id}/similares`
+### 6.3 `GET /recomendacao/espetaculos/{id}/similares`
+
 **Finalidade:** espetáculos similares a um dado espetáculo (item-item). **Público.**
 
-> **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os
-> usuários), então **não** sai da tabela `recomendacao` — essa é por-usuário e
-> protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm de uma
-> **estrutura dedicada de similaridade global**, populada em batch pelo k-NN, com
-> leitura pública. (Tabela proposta: `similaridade_item` — ver seção 6; ainda
-> **precisa ser criada** no schema do banco.)
+> **Fonte dos dados:** a similaridade item-item é **global** (igual para todos os usuários), então **não** sai da tabela `recomendacao` - essa é por usuário e protegida por RLS (`auth.uid() = id_usuario`). Estes similares vêm da tabela dedicada `similaridade_item` (definida em `01_create_database.sql`), populada em batch pelos algoritmos de recomendação (k-NN, SVD, k-means) com leitura pública via política RLS `similaridade_item: leitura pública`.
 
 **Request**
-- Path param: `id`. Query: `limite` (default 10, máx 50).
+
+- Path params:
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `id` | integer | Sim | Identificador do espetáculo de origem. |
+
+- Query params:
+
+| Campo | Tipo | Obrigatório | Regra |
+|---|---|---|---|
+| `limite` | integer | Não | Default 10. Valores menores que 1 usam 10. Valor máximo 50. |
+
+Exemplo de request:
+
+```http
+GET /recomendacao/espetaculos/12/similares?limite=5
+```
 
 **Responses**
-- `200 OK`:
+
+- `200 OK` - lista de `SimilarItem`:
+
 ```json
 {
   "data": [
-    { "espetaculo": { "id": 18, "titulo": "Morte e Vida Severina", "genero": "Drama",
-                      "status": "em_cartaz", "notaMedia": 4.5 },
-      "score": 0.812340, "tipoAlgoritmo": "k-NN" }
+    {
+      "espetaculo": {
+        "id": 18,
+        "titulo": "Morte e Vida Severina",
+        "genero": "Drama",
+        "status": "em_cartaz",
+        "notaMedia": 4.5
+      },
+      "score": 0.81234,
+      "tipoAlgoritmo": "k-NN"
+    }
   ]
 }
 ```
-- `404` (espetáculo inexistente) / `500` — `Erro`.
+
+- `200 OK` - sem similares disponíveis:
+
+```json
+{
+  "data": []
+}
+```
+
+- `404 Not Found` - espetáculo de origem inexistente. Schema `Erro`.
+- `500 Internal Server Error` - erro inesperado. Schema `Erro`.
 
 ---
-
 ## 7. Rastreabilidade (rota → entidade do banco)
 
 | Rota | Tabela(s) principal(is) |
@@ -608,13 +904,16 @@ por `score`. **Requer `cadastrado`.** Lê predições pré-processadas (tabela `
 | `/usuario/me*` | `usuario` (inclui `perfil_preferencias` JSONB) |
 | `/geolocalizacao/geocoding*` | API externa OpenStreetMap/Nominatim; sem persistência direta |
 | `/recomendacao/me` | `recomendacao` (por-usuário, RLS), `espetaculo` |
-| `/recomendacao/espetaculos/{id}/similares` | `similaridade_item` (global, leitura pública — **a criar**), `espetaculo` |
+| `/recomendacao/espetaculos/{id}/similares` | `similaridade_item` (global, leitura pública), `espetaculo` |
 
-> **`similaridade_item` (proposta — ainda não existe no schema):** estrutura para
-> similaridade global item-item, populada em batch pelo k-NN. Campos sugeridos:
-> `id_espetaculo_origem` (FK), `id_espetaculo_similar` (FK), `score` (NUMERIC),
-> `tipo_algoritmo` (VARCHAR), com RLS de **leitura pública** (espelhando
-> `espetaculo`/`avaliacao`). A criação dessa tabela deve ser combinada com a equipe
-> de banco/ML antes de implementar a rota.
+> **`similaridade_item`:** estrutura para similaridade global item-item, populada
+> em batch pelos algoritmos de recomendação. Definida em `01_create_database.sql`
+> com os campos `id_espetaculo_origem` (FK), `id_espetaculo_similar` (FK),
+> `score_similaridade NUMERIC(8,6)` em `[0, 1]`, `tipo_algoritmo VARCHAR(50)` e
+> `data_geracao TIMESTAMPTZ`. A validação de `tipo_algoritmo` é delegada à função
+> central `public.is_tipo_algoritmo_valido()` (migration
+> `08_tipo_algoritmo_e_unique_recomendacao.sql`) que reaproveita a mesma lista de
+> algoritmos usada em `recomendacao`. RLS de **leitura pública** habilitada
+> (`similaridade_item: leitura pública` com `USING (true)`).
 
 ---

@@ -1,47 +1,93 @@
-#- Portal Aventura
+# Guia de Padrões de Desenvolvimento — Portal Aventura
 
 ## 1. Introdução
 
-Este documento estabelece os padrões de codificação e padrões de projeto adotados no desenvolvimento do sistema de recomendação do Portal Aventura. O objetivo é garantir qualidade, manutenibilidade e consistência do código ao longo de todo o projeto.
+Este documento estabelece os padrões de codificação e padrões de projeto adotados no desenvolvimento do Portal Aventura. O objetivo é garantir qualidade, manutenibilidade e consistência do código em todas as camadas do produto:
+
+- **Frontend** mobile em React Native + Expo (TypeScript), organizado por MVVM.
+- **Backend** em .NET 9 com microsserviços (`catalogo`, `geolocalizacao`, `recomendacao`, `usuario`) e API Gateway, organizados por Clean Architecture.
+- **Banco de dados** PostgreSQL hospedado no Supabase (com RLS), acessado por SQL puro via Npgsql — sem ORM.
+- **Modelos de recomendação** em notebooks Jupyter (KNN, SVD) e modelo incrementado em ML.NET embarcado no microsserviço de recomendação.
+
+O guia serve como referência rápida para novas implementações e como ponto de revisão em code review.
 
 ## 2. Padrões de Codificação
 
 ### 2.1 Convenções Gerais
 
 #### 2.1.1 Estrutura de Diretórios
-```
+
+```text
 g04/
-├── documentos/          # Documentação do projeto
-│   ├── img/            # Imagens e diagramas
-│   └── *.md            # Arquivos Markdown de documentação
-├── src/                # Código-fonte
-│   ├── aad/            # Análise e tratamento de dados
-│   ├── database/       # Scripts SQL e configurações de BD
-│   ├── dataset/        # Datasets processados
-│   └── models/         # Modelos de machine learning
-└── colab_csv_utf8/     # Datasets originais
+├── App.js                                # Bootstrap do app Expo (delegado para src/frontend)
+├── app.json, package.json                # Configuração do Expo / Node
+├── docker-compose.yml                    # Orquestração local dos serviços backend
+├── documentos/                           # Documentação do projeto (markdowns + imagens)
+│   ├── img/                              # Imagens, diagramas, mockups, wireframes
+│   └── *.md                              # Projeto, Manual de instalação, padrões, SOA, etc.
+├── src/
+│   ├── aad/                              # Notebooks de análise e tratamento de dados
+│   ├── backend/                          # Backend SOA em ASP.NET Core (.NET 9)
+│   │   ├── Spotlight.sln                 # Solution: gateway + 4 serviços + projetos de teste
+│   │   ├── api-gateway/                  # Spotlight.Gateway (porta 5000) — YARP
+│   │   ├── services/
+│   │   │   ├── catalogo/                # Spotlight.Catalogo        (5001)
+│   │   │   ├── usuario/                 # Spotlight.Usuario         (5002) + telemetria Mongo
+│   │   │   ├── recomendacao/            # Spotlight.Recomendacao    (5003) + ML.NET strategy
+│   │   │   └── geolocalizacao/          # Spotlight.Geolocalizacao  (5004) — Nominatim
+│   │   ├── contracts/                   # Contratos de API/eventos e docs operacionais
+│   │   ├── ml-engine/                   # Adapters de inferência/treino consumidos pelos serviços
+│   │   ├── scripts/                     # Scripts auxiliares (PowerShell)
+│   │   └── tests/                       # Projetos xUnit por serviço (Spotlight.<Servico>.Tests)
+│   ├── frontend/                        # App Expo / React Native em arquitetura MVVM
+│   │   ├── components/                  # Componentes visuais reutilizáveis
+│   │   ├── screens/                     # Telas (Views)
+│   │   ├── viewmodels/                  # ViewModels (hooks de tela)
+│   │   ├── repositories/                # Acesso aos serviços backend
+│   │   ├── models/                      # Tipos/entidades de UI
+│   │   ├── hooks/, theme/, config/      # Suporte (sessão, paleta, endpoints)
+│   ├── database/                        # Scripts SQL (PostgreSQL/Supabase)
+│   │   ├── 0X_*.sql                     # Bootstrap (criação, seed, rollback)
+│   │   ├── migrations/                  # Migrations numeradas (04+) com rollback
+│   │   └── load_test/{,pgbench/}        # Massa sintética e cenários de carga
+│   ├── dataset/                         # Datasets processados (input do training)
+│   └── models/                          # Notebooks + treino ML.NET + artefatos publicados
+│       ├── Spotlight.Recomendacao.ModelTraining/   # Projeto .NET de treino
+│       ├── artifacts/                              # Modelo .zip e similaridades
+│       └── reports/                                # Métricas e exemplos do modelo
+└── colab_csv_utf8/                       # Datasets originais (CSV bruto, read-only)
 ```
 
 #### 2.1.2 Nomenclatura de Arquivos
-- **Notebooks Jupyter**: `snake_case` (ex: `sistema_recomendacao_knn.ipynb`)
-- **Scripts SQL**: `XX_descricao.sql` onde XX é número sequencial
-- **Datasets**: `nome_descritivo.csv` (ex: `recomendacao_balanceado.csv`)
-- **Documentação**: `PascalCase.md` (ex: `GuiaPadroesDesenvolvimento.md`)
 
-### 2.2 Padrões Python (Notebooks Jupyter)
+| Tipo | Convenção | Exemplo |
+|------|-----------|---------|
+| Notebooks Jupyter | `snake_case.ipynb` | `sistema_recomendacao_knn.ipynb` |
+| Scripts SQL DDL | `NN_descricao.sql` (numeração sequencial) | `01_create_database.sql` |
+| Migrations SQL | `NN_descricao.sql` + `NN_descricao_rollback.sql` | `08_tipo_algoritmo_e_unique_recomendacao.sql` |
+| Datasets | `nome_descritivo.csv` | `recomendacao_balanceado.csv` |
+| Arquivos C# (classes) | `PascalCase.cs` | `RecomendacaoService.cs` |
+| Arquivos TS (componentes/screens) | `PascalCase.tsx` | `CatalogView.tsx` |
+| Hooks/ViewModels TS | `useNomeViewModel.ts` | `useCatalogViewModel.ts` |
+| Repositórios TS | `NomeRepository.ts` | `CatalogRepository.ts` |
+| Documentação | `PascalCase.md` | `GuiaPadroesDesenvolvimento.md` |
+
+### 2.2 Padrões Python (Notebooks de ML)
 
 #### 2.2.1 Estrutura de Notebooks
+
 ```python
 # Estrutura padrão de um notebook:
-# 1. Configuração do Ambiente
-# 2. Carregamento de Dados
-# 3. Análise Exploratória
+# 1. Configuração do ambiente
+# 2. Carregamento de dados
+# 3. Análise exploratória
 # 4. Modelagem
 # 5. Avaliação
-# 6. Conclusão
+# 6. Conclusão / exportação de artefatos
 ```
 
 #### 2.2.2 Importações
+
 ```python
 # Bibliotecas principais
 import pandas as pd
@@ -54,11 +100,12 @@ import seaborn as sns
 # Modelo e avaliação
 from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import train_test_split
+from scipy.sparse import csr_matrix
 ```
 
 #### 2.2.3 Configuração de Caminhos
+
 ```python
-# Uso de pathlib para caminhos independentes de SO
 from pathlib import Path
 
 CWD = Path.cwd().resolve()
@@ -71,69 +118,102 @@ else:
 ```
 
 #### 2.2.4 Convenções de Código
-- **Variáveis**: `snake_case` (ex: `matriz_item_usuario`)
-- **Constantes**: `UPPER_SNAKE_CASE` (ex: `N_VIZINHOS`)
-- **Funções**: `snake_case` com verbos descritivos
+
+- **Variáveis**: `snake_case` (`matriz_item_usuario`).
+- **Constantes**: `UPPER_SNAKE_CASE` (`N_VIZINHOS`, `SEED`).
+- **Funções**: `snake_case` com verbo descritivo no nome.
+- **Reprodutibilidade**: fixar seeds (`random_state=42`).
+- **Docstrings** no padrão numpy/google com parâmetros, retornos e observações:
+
 ```python
 def recomendar_espetaculos(item_id, n_recomendacoes=10, verbose=True):
-    """
-    Recomenda espetaculos similares a um espetaculo-alvo.
-    
+    """Recomenda espetaculos similares a um espetaculo-alvo.
+
     Parametros
     ----------
     item_id : int
-        ID numerico do espetaculo de referencia
+        ID numerico do espetaculo de referencia.
     n_recomendacoes : int
-        Numero de recomendacoes a retornar
+        Numero de recomendacoes a retornar.
     verbose : bool
-        Se True, exibe cabecalho com espetaculo de referencia
-    
+        Se True, exibe cabecalho com espetaculo de referencia.
+
     Retorna
     -------
     pd.DataFrame
-        Dataframe com recomendacoes ordenadas por similaridade
+        Dataframe com recomendacoes ordenadas por similaridade.
     """
 ```
 
-#### 2.2.5 Documentação Inline
-```python
-# Seções principais com markdown
-## 1. Configuracao do Ambiente
+### 2.3 Padrões C# (.NET 9)
 
-# Comentários explicativos antes de blocos complexos
-# Zero representa ausência de interação na matriz de similaridade
-matriz_preenchida = matriz_item_usuario.fillna(0)
+#### 2.3.1 Organização por Microsserviço
+
+Cada microsserviço (`catalogo`, `geolocalizacao`, `recomendacao`, `usuario`) segue **Clean Architecture** com quatro camadas:
+
+```text
+services/<servico>/
+├── domain/
+│   ├── entities/        # Entidades de domínio e exceções de negócio
+│   └── value-objects/
+├── application/
+│   ├── dtos/            # DTOs do contrato público (entrada/saída)
+│   ├── services/        # Serviços de aplicação (orquestram strategies)
+│   └── usecases/        # Casos de uso (1 por endpoint) + interfaces de repositório
+├── infrastructure/
+│   ├── auth/            # JWT, policies, contexto de usuário
+│   ├── persistence/     # Implementações de repositório (Npgsql)
+│   ├── model/           # Clientes para artefatos de ML (ML.NET, etc.)
+│   └── storage/         # Sync com Supabase Storage, etc.
+├── presentation/
+│   ├── controllers/     # Controllers HTTP (ApiController)
+│   └── middleware/      # ErrorHandling, request logging customizado
+└── Program.cs           # Composition Root (DI, pipeline, Swagger, health)
 ```
 
-### 2.3 Padrões SQL
+### 2.3 Padrões SQL (PostgreSQL / Supabase)
 
 #### 2.3.1 Estrutura de Scripts
+Os scripts em `src/database/` usam PostgreSQL (Supabase) com `auth.users` como fonte da identidade. Cada entidade do domínio tem RLS habilitado e políticas explícitas.
+
 ```sql
 -- 01_create_database.sql
 -- Descrição: Criação da estrutura do banco de dados
 
-CREATE DATABASE IF NOT EXISTS portal_aventura;
-USE portal_aventura;
-
--- Tabelas principais
-CREATE TABLE usuarios (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TYPE tipo_usuario_enum AS ENUM (
+    'visitante', 'cadastrado', 'administrador'
 );
+
+CREATE TABLE usuario (
+    id_usuario      UUID              PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    nome            VARCHAR(150)      NOT NULL,
+    email           VARCHAR(255)      NOT NULL UNIQUE,
+    data_cadastro   TIMESTAMP         NOT NULL DEFAULT NOW(),
+    tipo_usuario    tipo_usuario_enum NOT NULL DEFAULT 'cadastrado',
+
+    CONSTRAINT chk_email_formato CHECK (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$')
+);
+
+ALTER TABLE usuario ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "usuario: leitura do próprio perfil"
+    ON usuario FOR SELECT
+    USING (auth.uid() = id_usuario);
 ```
 
 #### 2.3.2 Convenções SQL
-- **Palavras-chave**: MAIÚSCULAS (ex: `SELECT`, `WHERE`)
-- **Nomes de tabelas**: snake_case plural (ex: `usuarios`, `espetaculos`)
-- **Nomes de colunas**: snake_case singular (ex: `user_id`, `item_id`)
-- **Chaves primárias**: `id` ou `tabela_id`
-- **Chaves estrangeiras**: `tabela_referenciada_id`
+- **Palavras-chave**: MAIÚSCULAS (`SELECT`, `WHERE`, `JOIN`).
+- **Nomes de tabelas**: `snake_case` no **singular** (`usuario`, `espetaculo`, `sessao`) — alinha com a nomenclatura de entidades C#.
+- **Nomes de colunas**: `snake_case` (`nota_media`, `data_cadastro`).
+- **Chaves primárias**: `id_<entidade>` (`id_usuario`, `id_espetaculo`) — torna o JOIN auto-documentado.
+- **Chaves estrangeiras**: nome igual ao da PK referenciada (`id_usuario` em `avaliacao` referencia `usuario.id_usuario`).
+- **Tipos**: `UUID` quando vinculado a `auth.users`; `SERIAL`/`INT` para entidades sem identidade externa.
+- **Enums**: ENUMs nativos (`CREATE TYPE ..._enum`) em vez de `VARCHAR + CHECK`.
+- **Migrations**: `src/database/migrations/NN_descricao.sql` numeradas; cada migration deve ter rollback equivalente em `src/database/03_rollback.sql` ou arquivo `NN_descricao_rollback.sql`.
+- **RLS**: toda tabela com dado de usuário final tem `ENABLE ROW LEVEL SECURITY` + política nomeada (`"<tabela>: <ação descrita>"`).
 
-### 2.4 Padrões de Documentação
+#### 2.6.1 Estrutura de Markdown
 
-#### 2.4.1 Estrutura de Documentos Markdown
 ```markdown
 # Título Principal
 
@@ -145,339 +225,470 @@ CREATE TABLE usuarios (
 | Valor  | Explicação |
 ```
 
-#### 2.4.2 Tabelas de Métricas
+#### 2.6.2 Tabelas de Métricas
+
 ```markdown
-| Métrica | Valor |
-|---------|-------|
-| RMSE    | 1.5977 |
-| MAE     | 1.2296 |
-| Cobertura | 69.8% |
+| Métrica   | Valor   |
+|-----------|---------|
+| RMSE      | 1.5977  |
+| MAE       | 1.2296  |
+| Cobertura | 69.8%   |
 ```
+
+#### 2.6.3 Diagramas
+
+Diagramas (arquitetura, sequência, ER) ficam em `documentos/img/` em PNG/SVG, com a fonte (Mermaid, draw.io) versionada junto quando possível.
+
+### 2.7 Padrões de Mensagens de Commit (Conventional Commits)
+
+#### 2.7.1 Estrutura
+
+```text
+<type>: <descrição> #<issue>
+```
+
+* **Exemplos válidos:**
+  - `docs: atualiza guia de padrões #234`
+  - `feat: cria endpoint de recomendação personalizada #34`
+  - `fix(api): corrige validação de limite #105`
+
+* **Regras:**
+  - `type` ∈ {`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `revert`}.
+  - Descrição não pode ser vazia.
+  - Issue obrigatória, com pelo menos 2 dígitos (`#12`).
+
+#### 2.7.2 Ativação do Hook Local
+
+Para habilitar a validação automática no commit:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Para desabilitar:
+
+```bash
+git config --unset core.hooksPath
+```
+
+### 2.6 Padrões Frontend (React Native / TypeScript)
+
+O app em `src/frontend/` segue arquitetura **MVVM**: a View (componente da tela) consome um ViewModel (hook) que orquestra estado e chamadas aos Repositories. Componentes visuais são puros e não tocam em rede.
+
+#### 2.6.1 Camadas e nomenclatura
+| Camada | Diretório | Convenção de arquivo | Exemplo |
+|--------|-----------|----------------------|---------|
+| View (tela) | `screens/` | `<Nome>View.tsx` ou `<Nome>Screen.tsx` | `CatalogView.tsx`, `LoadingScreen.tsx` |
+| Componente visual | `components/` | `<Nome>.tsx` (PascalCase) | `CatalogRail.tsx`, `SearchBar.tsx` |
+| ViewModel | `viewmodels/` | `use<Nome>ViewModel.ts` | `useCatalogViewModel.ts` |
+| Repository | `repositories/` | `<Nome>Repository.ts` | `CatalogRepository.ts` |
+| Model/Tipo | `models/` | `<Nome>.ts` (PascalCase) | `CatalogItem.ts`, `Usuario.ts` |
+| Configuração | `config/`, `theme/`, `hooks/` | `camelCase.ts` | `api.ts`, `catalogImages.ts` |
+
+#### 2.6.2 Convenções de Código
+- **Linguagem**: TypeScript com tipagem explícita em props e retornos de função pública. `any` é proibido fora de adaptadores de terceiros.
+- **Componentes**: `function ComponentName() {}` (sem `React.FC`). Props tipadas em `type <Componente>Props`.
+- **Hooks (ViewModels)**: sempre prefixados com `use`. Devem retornar um objeto nomeado (não tupla) para que a View desestruture por nome.
+- **Acesso a backend**: somente nos Repositories. Views e ViewModels nunca chamam `fetch`/axios diretamente.
+- **Tipos de API**: sufixo `Api` para o contrato bruto vindo do backend (`EspetaculoResumoApi`), separado dos modelos de UI.
+- **Identificadores**: `camelCase` para variáveis/funções, `PascalCase` para tipos/componentes, `UPPER_SNAKE_CASE` para constantes de módulo.
+- **Estilos**: `StyleSheet.create` no fim do arquivo da View; tokens compartilhados em `theme/`.
+- **Cleanup de efeitos**: useEffect com dado assíncrono deve usar flag local (`let ativo = true`) e cancelar setState após unmount.
+
+### 2.7 Padrões Backend (C# / .NET 9 / Clean Architecture)
+
+Cada microsserviço sob `src/backend/services/<servico>/` segue a mesma divisão em quatro camadas. Dependências apontam **sempre para dentro** (presentation → application → domain; infrastructure implementa contratos de domain/application).
+
+#### 2.7.1 Camadas e nomenclatura
+| Camada | Diretório | Responsabilidade | Sufixo |
+|--------|-----------|------------------|--------|
+| `domain/` | `entities/`, `value-objects/` | Entidades, exceções de domínio, contratos de repositório | `<Entidade>`, `I<Entidade>Repository`, `NotFoundException` |
+| `application/` | `usecases/`, `dtos/` | Casos de uso e DTOs de entrada/saída | `<Acao><Entidade>UseCase`, `<Entidade>Dto` |
+| `infrastructure/` | `persistence/`, `auth/`, ... | Implementação de repositórios (Npgsql), autenticação, integrações | `<Entidade>Repository`, `AuthSetup` |
+| `presentation/` | `controllers/`, `middleware/` | Controllers HTTP, pipeline de exceções | `<Entidade>sController`, `ErrorHandlingMiddleware` |
+
+#### 2.7.2 Convenções de Código
+- **Namespaces**: refletem a camada — `Spotlight.<Servico>.<Camada>.<Subpasta>` (ex.: `Spotlight.Catalogo.Application.UseCases`).
+- **Nomes**: `PascalCase` para classes/métodos/propriedades; `_camelCase` para campos privados; constantes em `PascalCase` (ex.: `PageSizeMaximo`).
+- **Métodos assíncronos**: sufixo `Async` e parâmetro `CancellationToken` obrigatório em todo método público que faz I/O.
+- **Use cases**: classe única por caso de uso, ponto de entrada `ExecutarAsync(...)`, validação/normalização em método `private static`.
+- **Injeção de dependência**: por **construtor primário** (C# 12) — `public class X(IDep d)`. Sem property injection, sem service locator.
+- **DTOs**: classes anêmicas com `{ get; set; }`; `record` somente quando o DTO precisa de igualdade estrutural (eventos de domínio).
+- **Acesso a dados**: SQL puro via `NpgsqlDataSource` injetado (singleton). **Não usar EF Core** — o padrão do projeto é Npgsql/ADO.NET.
+- **Exceções de domínio**: lançar `NotFoundException`/`ValidationException` próprias do serviço; o `ErrorHandlingMiddleware` traduz para `ErroDto` + status HTTP.
+- **Comentários XML**: `///` em controllers, use cases e contratos públicos (alimenta Swagger).
+
+#### 2.7.3 Convenções de API REST
+- **Idioma**: rotas e DTOs em português (`/espetaculos`, `EspetaculoResumoDto`).
+- **Rotas**: substantivos no plural em `kebab-case` (`/espetaculos/{id}/avaliacoes`). O prefixo do serviço (`/catalogo`, `/usuario`, etc.) é adicionado pelo gateway YARP e **não** aparece na rota interna do controller.
+- **Verbos HTTP**: GET (consulta), POST (criação), PUT (atualização completa), DELETE (remoção). `204 No Content` para DELETE bem-sucedido.
+- **Envelope de resposta**: listagens retornam `ListaDto<T>` (`{ data }`) ou `ListaPaginadaDto<T>` (`{ data, pagination }`). Erros retornam `ErroDto`.
+- **Autorização**: `[Authorize(Policy = AuthSetup.Policy<Papel>)]` nas rotas protegidas; rotas públicas marcadas com `<summary>` explícito.
+- **OpenAPI**: todo endpoint declara `[ProducesResponseType]` para 200/201 e cada status de erro relevante.
+
+### 2.8 Padrões de Testes
+
+- **Framework**: xUnit por serviço, em `src/backend/tests/Spotlight.<Servico>.Tests/`.
+- **Nomenclatura de teste**: `<Sujeito>_<Cenario>_<ResultadoEsperado>` — exemplo: `ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado`.
+- **Fakes**: implementações in-memory dos repositórios (`FakeEspetaculoRepository`), no mesmo arquivo do teste ou em `Fakes/` quando reutilizadas.
+- **Categorias**: testes que dependem de banco/HTTP real recebem `[Trait("Category", "Integration")]` — o pipeline CI roda apenas `Category!=Integration` na etapa `test:unit`.
+- **Cobertura**: cada use case deve ter ao menos um caminho feliz e um caminho de exceção (`NotFoundException`/`ValidationException`).
 
 ## 3. Padrões de Projeto
 
-### 3.1 Padrão Criacional: Builder Pattern
+Os padrões abaixo são aplicados de forma consistente nas camadas correspondentes do projeto.
 
-#### 3.1.1 Problema Concreto no Sistema
-O sistema de recomendação do Portal Aventura enfrenta o seguinte problema concreto:
+### 3.1 Clean Architecture (Backend C#)
 
-**Complexidade na construção do modelo de recomendação**: A criação de um modelo KNN funcional requer múltiplas etapas interdependentes que devem ser executadas em ordem específica:
-1. Carregamento e validação dos dados
-2. Construção da matriz item-usuário com tratamento de esparsidade
-3. Configuração de hiperparâmetros do modelo
-4. Transformação para matriz esparsa CSR
-5. Treinamento do modelo
-6. Geração de mapeamentos auxiliares (item_to_idx, idx_to_item)
+Cada microsserviço segue Clean Architecture (ver 2.3.1). Os benefícios concretos observados:
 
-Sem um padrão adequado, esse processo resultaria em:
-- Código procedural longo e difícil de manter
-- Duplicação ao criar variações do modelo (diferentes valores de k)
-- Dificuldade para testar etapas individuais
-- Acoplamento forte entre as etapas de construção
+- **Testabilidade**: casos de uso e strategies dependem de interfaces, então são testáveis com fakes em xUnit sem subir banco ou HTTP.
+- **Substituibilidade**: a camada `infrastructure` pode ser trocada (ex.: Npgsql → outra biblioteca) sem tocar nos casos de uso.
+- **Limites claros**: controllers ficam finos — só fazem binding de request e delegam ao caso de uso correspondente.
 
-#### 3.1.2 Por que o Builder Pattern Resolve Este Problema
-O **Builder Pattern** é o padrão criacional mais adequado porque:
+### 3.2 Strategy Pattern (Backend C#)
 
-1. **Construção passo a passo**: Permite controlar cada etapa da criação do modelo complexo
-2. **Encapsulamento da complexidade**: Esconde os detalhes de implementação de cada etapa
-3. **Flexibilidade de configuração**: Facilita criar diferentes configurações do modelo (k=15, k=20, etc.)
-4. **Imutabilidade controlada**: Garante que o modelo só seja usado quando completamente construído
-5. **Interface fluente**: Melhora a legibilidade com method chaining
+#### 3.2.1 Problema
 
-#### 3.1.3 Comparação com Outros Padrões Criacionais GoF
+O endpoint `GET /recomendacao/me` pode atender o usuário de duas formas:
 
-| Padrão | Por que NÃO foi escolhido | Problema que resolveria | Nossa necessidade |
-|--------|---------------------------|------------------------|-------------------|
-| **Factory Method** | Criamos sempre o mesmo tipo de objeto (modelo KNN), não uma hierarquia | Criação polimórfica de objetos | Construção complexa de um único tipo |
-| **Abstract Factory** | Não temos famílias de objetos relacionados | Criar famílias de objetos compatíveis | Construir um objeto complexo passo a passo |
-| **Singleton** | Precisamos múltiplas instâncias para comparação (k=15 vs k=20) | Garantir instância única | Múltiplas configurações do modelo |
-| **Prototype** | Não clonamos modelos existentes, construímos do zero | Clonar objetos complexos | Construir novos modelos com configurações específicas |
+1. Usando o modelo incrementado ML.NET, quando o artefato está presente e habilitado.
+2. Usando as recomendações pré-processadas no PostgreSQL, como fallback.
 
-#### 3.1.4 Implementação Detalhada
+A escolha do algoritmo não pode vazar para o controller nem para o caso de uso.
+
+#### 3.2.2 Implementação
+
+```csharp
+// application/services/RecomendacaoService.cs
+
+public interface IRecomendacaoStrategy
+{
+    Task<IReadOnlyList<RecomendacaoDto>> ListarAsync(
+        Guid usuarioId, int limite, CancellationToken cancellationToken);
+}
+
+public sealed class ModeloMlNetRecomendacaoStrategy(
+    IRecomendacaoRepository repositorio,
+    IModeloRecomendacaoClient modeloClient,
+    PostgresPreProcessadoRecomendacaoStrategy fallbackStrategy,
+    ILogger<ModeloMlNetRecomendacaoStrategy> logger) : IRecomendacaoStrategy
+{
+    public async Task<IReadOnlyList<RecomendacaoDto>> ListarAsync(
+        Guid usuarioId, int limite, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var predicoes = await modeloClient.PredizerAsync(usuarioId, limite, cancellationToken);
+            if (predicoes.Count == 0)
+                return await fallbackStrategy.ListarAsync(usuarioId, limite, cancellationToken);
+
+            // ... enriquece com dados do Postgres e retorna ...
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex, "Falha ao executar strategy ML.NET; usando strategy PostgreSQL.");
+            return await fallbackStrategy.ListarAsync(usuarioId, limite, cancellationToken);
+        }
+    }
+}
+
+public sealed class PostgresPreProcessadoRecomendacaoStrategy(
+    IRecomendacaoRepository repositorio) : IRecomendacaoStrategy
+{
+    public async Task<IReadOnlyList<RecomendacaoDto>> ListarAsync(
+        Guid usuarioId, int limite, CancellationToken cancellationToken)
+    {
+        var itens = await repositorio.ListarPorUsuarioAsync(usuarioId, limite, cancellationToken);
+        return itens.Select(Mapear).ToList();
+    }
+}
+```
+
+#### 3.2.3 Justificativa
+
+- **Open/Closed**: novas estratégias (ex.: motor remoto via HTTP) podem ser adicionadas sem alterar o `RecomendacaoService` nem o controller.
+- **Fallback explícito**: a strategy ML.NET delega de forma controlada para a strategy PostgreSQL.
+- **Testabilidade**: cada strategy é coberta isoladamente em `Spotlight.Recomendacao.Tests/RecomendacaoUseCasesTests.cs`.
+
+### 3.3 Factory Method (Backend C#)
+
+#### 3.3.1 Problema
+
+O `RecomendacaoService` precisa de uma strategy, mas a escolha entre ML.NET e PostgreSQL depende de:
+
+- flag `RecommendationModel:Enabled` em configuração;
+- presença dos artefatos no disco (modelo ZIP, CSV de candidatos).
+
+Não queremos que o service nem o controller conheçam esses detalhes.
+
+#### 3.3.2 Implementação
+
+```csharp
+public interface IRecomendacaoStrategyFactory
+{
+    IRecomendacaoStrategy Criar();
+}
+
+public sealed class RecomendacaoStrategyFactory(
+    IModeloRecomendacaoClient modeloClient,
+    ModeloMlNetRecomendacaoStrategy modeloStrategy,
+    PostgresPreProcessadoRecomendacaoStrategy postgresStrategy)
+    : IRecomendacaoStrategyFactory
+{
+    public IRecomendacaoStrategy Criar() =>
+        modeloClient.Habilitado ? modeloStrategy : postgresStrategy;
+}
+```
+
+O `RecomendacaoService` apenas pede uma strategy:
+
+```csharp
+var strategy = strategyFactory.Criar();
+var recomendacoes = await strategy.ListarAsync(usuarioId, limiteNormalizado, cancellationToken);
+```
+
+### 3.4 Repository Pattern
+
+#### 3.4.1 No Backend
+
+Cada microsserviço declara interfaces de repositório em `application/usecases/` e as implementa em `infrastructure/persistence/` com Npgsql. Isso isola SQL do domínio.
+
+```csharp
+// application/usecases/IRecomendacaoRepository.cs
+public interface IRecomendacaoRepository
+{
+    Task<IReadOnlyList<Recomendacao>> ListarPorUsuarioAsync(
+        Guid usuarioId, int limite, CancellationToken cancellationToken);
+
+    Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(
+        IEnumerable<int> espetaculoIds, CancellationToken cancellationToken);
+}
+```
+
+#### 3.4.2 No Frontend
+
+O mesmo conceito vale no app: os repositórios em `src/frontend/repositories/` encapsulam o `fetch` para o gateway e a montagem de URLs do Supabase Storage. ViewModels nunca chamam `fetch` direto.
+
+```ts
+// repositories/CatalogRepository.ts
+export async function listarEspetaculosCatalogo(): Promise<EspetaculoResumoApi[]> {
+  const url = `${API_BASE_URL}/catalogo/espetaculos?pageSize=50&ordenarPor=popularidade`;
+  const payload = await fetchJson<ListaPaginada<EspetaculoResumoApi>>(url);
+  return payload.data ?? [];
+}
+```
+
+### 3.5 Dependency Injection (Backend C#)
+
+Toda composição é feita no `Program.cs` do microsserviço. Padrões adotados:
+
+- `NpgsqlDataSource` como **singleton** (pool de conexões).
+- Repositórios e use cases como **scoped** (1 por request).
+- Strategies concretas registradas e a factory também — assim o DI resolve as dependências de cada strategy sem `new` manual.
+
+```csharp
+builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
+builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
+builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
+builder.Services.AddSingleton<IModeloRecomendacaoClient, MlNetModeloRecomendacaoClient>();
+builder.Services.AddScoped<ModeloMlNetRecomendacaoStrategy>();
+builder.Services.AddScoped<PostgresPreProcessadoRecomendacaoStrategy>();
+builder.Services.AddScoped<IRecomendacaoStrategyFactory, RecomendacaoStrategyFactory>();
+builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
+builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
+```
+
+### 3.6 Error Handling via Middleware (Backend C#)
+
+Exceções de domínio (`NotFoundException`, `ValidationException`, `ConflictException`) são traduzidas para o envelope `{ error, traceId, details? }` por um middleware único registrado no início do pipeline:
+
+```csharp
+app.UseMiddleware<ErrorHandlingMiddleware>();
+```
+
+Vantagens:
+
+- Controllers permanecem livres de `try/catch`.
+- O contrato de erro é único em todos os endpoints.
+- Stack trace nunca vaza em produção; em dev, detalhes vão no campo `details`.
+
+### 3.7 MVVM (Frontend)
+
+Aplicado conforme a seção 2.4.1. Vale destacar os critérios para alocar lógica:
+
+| Tipo de lógica | Onde colocar |
+|----------------|--------------|
+| Estado de UI (input, filtros, loading) | ViewModel (`useXxxViewModel`) |
+| Cálculos derivados do estado | ViewModel, com `useMemo` |
+| Acesso a API / Storage | Repository |
+| Renderização e estilo | View (`.tsx` em `screens/`) |
+| Tipos de domínio do app | Model (`models/`) |
+
+### 3.8 Builder Pattern (Notebooks de ML)
+
+Para a construção incremental dos modelos KNN/SVD nos notebooks, é recomendado encapsular as etapas (carregar dados → construir matriz → configurar → treinar → avaliar) em um Builder. Isso reduz duplicação ao comparar configurações (ex.: `k=15` vs `k=20`) e mantém o notebook legível.
+
 ```python
 class ModeloRecomendacaoBuilder:
-    """
-    Builder para construção incremental do sistema de recomendação.
-    Permite configuração flexível dos componentes do modelo.
-    """
-    
+    """Builder para construção incremental do sistema de recomendação."""
+
     def __init__(self):
         self.dados = None
         self.matriz = None
         self.modelo = None
-        self.metricas = {}
-    
+
     def carregar_dados(self, path):
-        """Etapa 1: Carregamento dos dados"""
         self.dados = pd.read_csv(path)
         return self
-    
+
     def construir_matriz(self):
-        """Etapa 2: Construção da matriz item-usuário"""
         self.matriz = self.dados.pivot_table(
-            index='item_id',
-            columns='user_id', 
-            values='rating'
+            index='item_id', columns='user_id', values='rating'
         )
         return self
-    
+
     def configurar_modelo(self, n_vizinhos=20):
-        """Etapa 3: Configuração do modelo KNN"""
         self.modelo = NearestNeighbors(
-            n_neighbors=n_vizinhos,
-            metric='cosine',
-            algorithm='brute'
+            n_neighbors=n_vizinhos, metric='cosine', algorithm='brute'
         )
         return self
-    
+
     def treinar(self):
-        """Etapa 4: Treinamento do modelo"""
         matriz_esparsa = csr_matrix(self.matriz.fillna(0))
         self.modelo.fit(matriz_esparsa)
         return self
-    
+
     def build(self):
-        """Retorna o modelo completo construído"""
-        return {
-            'modelo': self.modelo,
-            'matriz': self.matriz,
-            'metricas': self.metricas
-        }
+        return {'modelo': self.modelo, 'matriz': self.matriz}
 
-# Uso do Builder Pattern
-sistema = ModeloRecomendacaoBuilder()
+
+sistema = (
+    ModeloRecomendacaoBuilder()
     .carregar_dados('../dataset/recomendacao_balanceado.csv')
     .construir_matriz()
     .configurar_modelo(n_vizinhos=20)
     .treinar()
     .build()
-```
-
-#### 3.1.5 Aplicação Prática no Código Real do Projeto
-
-No notebook `sistema_recomendacao_knn.ipynb`, o processo atual de construção do modelo segue exatamente as etapas que o Builder encapsula:
-
-```python
-# Código atual (procedural) - linha por linha no notebook:
-df = pd.read_csv('../dataset/recomendacao_balanceado.csv')
-matriz_item_usuario = df.pivot_table(index='item_id', columns='user_id', values='rating')
-matriz_preenchida = matriz_item_usuario.fillna(0)
-matriz_esparsa = csr_matrix(matriz_preenchida.values)
-modelo_knn = NearestNeighbors(n_neighbors=20, metric='cosine', algorithm='brute')
-modelo_knn.fit(matriz_esparsa)
-
-# Com Builder Pattern - mais limpo e reutilizável:
-modelo = ModeloRecomendacaoBuilder()
-    .carregar_dados('../dataset/recomendacao_balanceado.csv')
-    .construir_matriz()
-    .configurar_modelo(n_vizinhos=20)
-    .treinar()
-    .build()
-```
-
-#### 3.1.6 Benefícios Concretos para o Portal Aventura
-
-1. **Experimentação facilitada**: Testar diferentes valores de k sem duplicar código
-2. **Manutenção simplificada**: Mudanças em uma etapa não afetam as outras
-3. **Testes unitários**: Cada método do builder pode ser testado isoladamente
-4. **Documentação viva**: O código se torna autodocumentado
-5. **Extensibilidade**: Fácil adicionar novas etapas (ex: normalização, validação)
-
-#### 3.1.7 Validação da Escolha
-O Builder Pattern é a escolha correta porque nosso problema central é a **complexidade de construção**, não a criação de diferentes tipos (Factory), nem a necessidade de instância única (Singleton), nem a clonagem (Prototype). É um caso clássico de uso do Builder conforme descrito no livro GoF: "Separar a construção de um objeto complexo de sua representação".
-
-### 3.2 Padrão Comportamental: Strategy Pattern
-
-#### 3.2.1 Contexto de Aplicação
-O **Strategy Pattern** é implementado para permitir diferentes estratégias de recomendação (KNN, SVD, Funk SVD) de forma intercambiável.
-
-#### 3.2.2 Implementação
-```python
-from abc import ABC, abstractmethod
-
-class EstrategiaRecomendacao(ABC):
-    """Interface para estratégias de recomendação"""
-    
-    @abstractmethod
-    def treinar(self, dados):
-        """Treina o modelo com os dados fornecidos"""
-        pass
-    
-    @abstractmethod
-    def recomendar(self, item_id, n_recomendacoes=10):
-        """Retorna recomendações para um item"""
-        pass
-    
-    @abstractmethod
-    def avaliar(self, dados_teste):
-        """Avalia o desempenho do modelo"""
-        pass
-
-class RecomendacaoKNN(EstrategiaRecomendacao):
-    """Estratégia de recomendação usando KNN"""
-    
-    def __init__(self, n_vizinhos=20):
-        self.n_vizinhos = n_vizinhos
-        self.modelo = None
-        self.matriz = None
-    
-    def treinar(self, dados):
-        # Construir matriz item-usuário
-        self.matriz = dados.pivot_table(
-            index='item_id',
-            columns='user_id',
-            values='rating'
-        ).fillna(0)
-        
-        # Treinar modelo KNN
-        self.modelo = NearestNeighbors(
-            n_neighbors=self.n_vizinhos,
-            metric='cosine'
-        )
-        self.modelo.fit(csr_matrix(self.matriz))
-        return self
-    
-    def recomendar(self, item_id, n_recomendacoes=10):
-        idx = self.item_to_idx[item_id]
-        dist, indices = self.modelo.kneighbors(
-            self.matriz[idx],
-            n_neighbors=n_recomendacoes + 1
-        )
-        # Processar e retornar recomendações
-        return self._processar_recomendacoes(indices, dist)
-    
-    def avaliar(self, dados_teste):
-        # Calcular RMSE, MAE e cobertura
-        metricas = {
-            'RMSE': self._calcular_rmse(dados_teste),
-            'MAE': self._calcular_mae(dados_teste),
-            'Cobertura': self._calcular_cobertura(dados_teste)
-        }
-        return metricas
-
-class RecomendacaoSVD(EstrategiaRecomendacao):
-    """Estratégia de recomendação usando SVD"""
-    
-    def __init__(self, n_fatores=50):
-        self.n_fatores = n_fatores
-        self.modelo = None
-    
-    def treinar(self, dados):
-        # Implementação SVD
-        pass
-    
-    def recomendar(self, item_id, n_recomendacoes=10):
-        # Implementação específica SVD
-        pass
-    
-    def avaliar(self, dados_teste):
-        # Avaliação específica SVD
-        pass
-
-class SistemaRecomendacao:
-    """Contexto que usa as estratégias"""
-    
-    def __init__(self, estrategia: EstrategiaRecomendacao):
-        self.estrategia = estrategia
-    
-    def mudar_estrategia(self, estrategia: EstrategiaRecomendacao):
-        """Permite trocar a estratégia em tempo de execução"""
-        self.estrategia = estrategia
-    
-    def executar_recomendacao(self, item_id, n=10):
-        """Delega a recomendação para a estratégia atual"""
-        return self.estrategia.recomendar(item_id, n)
-    
-    def comparar_estrategias(self, estrategias, dados_teste):
-        """Compara múltiplas estratégias"""
-        resultados = []
-        for estrategia in estrategias:
-            self.mudar_estrategia(estrategia)
-            metricas = estrategia.avaliar(dados_teste)
-            resultados.append({
-                'modelo': estrategia.__class__.__name__,
-                **metricas
-            })
-        return pd.DataFrame(resultados)
-
-# Uso do Strategy Pattern
-# Criar diferentes estratégias
-knn_strategy = RecomendacaoKNN(n_vizinhos=20)
-svd_strategy = RecomendacaoSVD(n_fatores=50)
-
-# Criar sistema com estratégia inicial
-sistema = SistemaRecomendacao(knn_strategy)
-
-# Treinar e usar
-knn_strategy.treinar(dados_treino)
-recomendacoes = sistema.executar_recomendacao(item_id=16, n=10)
-
-# Trocar estratégia em tempo de execução
-sistema.mudar_estrategia(svd_strategy)
-svd_strategy.treinar(dados_treino)
-recomendacoes_svd = sistema.executar_recomendacao(item_id=16, n=10)
-
-# Comparar estratégias
-resultados = sistema.comparar_estrategias(
-    [knn_strategy, svd_strategy],
-    dados_teste
 )
 ```
 
-#### 3.2.3 Justificativa
-O Strategy Pattern foi escolhido porque:
-- **Flexibilidade de algoritmos**: Permite trocar entre KNN, SVD e outros modelos facilmente
-- **Princípio Open/Closed**: Aberto para extensão (novos algoritmos), fechado para modificação
-- **Comparação facilitada**: Permite avaliar múltiplos modelos com a mesma interface
-- **Manutenibilidade**: Cada estratégia é independente e pode ser modificada isoladamente
+### 3.9 Comparação dos Padrões Criacionais Considerados
+
+| Padrão | Onde se aplica | Por que foi escolhido |
+|--------|----------------|------------------------|
+| **Builder** | Notebooks de ML | Construção complexa passo a passo de um único tipo de objeto (modelo de recomendação) |
+| **Factory Method** | Backend C# (recomendação) | Seleção dinâmica entre strategies conforme configuração e disponibilidade de artefatos |
+| **Strategy** | Backend C# (recomendação) | Algoritmos intercambiáveis (ML.NET ↔ PostgreSQL pré-processado) com mesma interface |
+| **Repository** | Backend C# e frontend TS | Isolar acesso a dados/API do resto da aplicação |
+| **MVVM** | Frontend RN | Separar View, estado/regra de apresentação (ViewModel) e dados (Repository) |
+
+Padrões considerados e **não** adotados:
+
+- **Singleton** para o modelo de recomendação: não, pois precisamos avaliar múltiplas configurações em paralelo nos experimentos.
+- **Abstract Factory**: não há famílias de objetos relacionados; o problema atual é uma seleção 1-de-N.
+- **Prototype**: modelos são construídos do zero a partir dos artefatos, não clonados.
 
 ## 4. Boas Práticas Implementadas
 
 ### 4.1 Gestão de Dados
-- **Versionamento de datasets**: Manter versões balanceadas e não balanceadas
-- **Separação clara**: Dados brutos em `colab_csv_utf8/`, processados em `src/dataset/`
-- **Reproducibilidade**: Seeds fixas para operações aleatórias (`random_state=42`)
 
-### 4.2 Experimentação e Avaliação
-- **Múltiplas métricas**: RMSE, MAE, Cobertura, Hit Rate@10
-- **Comparação sistemática**: Tabela comparativa entre modelos
-- **Visualizações**: Gráficos salvos em `documentos/img/`
+- Datasets originais em `colab_csv_utf8/` (somente leitura), processados em `src/dataset/`.
+- Seeds fixas (`random_state=42`) para todos os experimentos.
+- Migrations versionadas em `src/database/migrations/` com rollback espelhado.
+- Tabelas com dados de usuário **sempre** com RLS habilitado.
 
-### 4.3 Documentação
-- **Docstrings detalhadas**: Parâmetros, retornos e exceções documentados
-- **Seções estruturadas**: Notebooks organizados em seções numeradas
-- **Tabelas de resultados**: Métricas apresentadas de forma clara
+### 4.2 Backend
 
-### 4.4 Performance
-- **Matrizes esparsas**: Uso de `csr_matrix` para economia de memória
-- **Processamento paralelo**: `n_jobs=-1` para usar todos os cores
-- **Cache de resultados**: Evitar recálculos desnecessários
+- **Sem ORM**: SQL puro via Npgsql; `NpgsqlDataSource` como singleton.
+- **Use case por endpoint**: facilita teste e mantém controllers magros.
+- **Strategies + Factory** para escolha de algoritmo de recomendação.
+- **Middleware** único traduz exceções de domínio para o envelope de erro padronizado.
+- **JWT do Supabase** validado por chave simétrica e/ou JWKS; policies (`Cadastrado`, `Administrador`) em `infrastructure/auth/AuthSetup.cs`.
+- **Health checks**: `/health` (liveness) e `/health/ready` (readiness com check no Postgres).
+
+### 4.3 Frontend
+
+- **MVVM** estrito: View → ViewModel → Repository.
+- **Sem fetch direto na View**.
+- **Estado de erro e loading explícitos** no ViewModel.
+- **Cleanup de efeitos assíncronos** com flag `ativo` para evitar `setState` após unmount.
+- **Tipos de API separados dos modelos de domínio** (sufixo `Api`).
+
+### 4.4 ML / Notebooks
+
+- Estrutura de seções numeradas (Configuração, Carregamento, EDA, Modelagem, Avaliação, Conclusão).
+- Métricas múltiplas: RMSE, MAE, Cobertura, Hit Rate@K.
+- Comparação sistemática de variantes em tabela.
+- Artefatos finais exportados para `src/models/artifacts/` para consumo pelo backend.
+- Uso de `csr_matrix` e `n_jobs=-1` para escalabilidade.
+
+### 4.5 Testes
+
+- Projetos xUnit em `src/backend/tests/Spotlight.<Servico>.Tests/`.
+- Testes de caso de uso usam **fakes** das interfaces (`IRecomendacaoRepository`, `IModeloRecomendacaoClient`) — não mocks de banco.
+- Testes de integração (quando aplicável) usam `WebApplicationFactory<Program>` com o `Program` parcial exposto em cada microsserviço.
 
 ## 5. Checklist de Verificação
 
 ### Antes do Commit
-- [ ] Código segue convenções de nomenclatura
-- [ ] Funções possuem docstrings completas
-- [ ] Notebooks estão organizados em seções
-- [ ] Paths usam pathlib para portabilidade
-- [ ] Seeds aleatórias estão fixadas
-- [ ] Métricas estão documentadas
-- [ ] Visualizações salvas em `documentos/img/`
+- [ ] Código segue convenções de nomenclatura da camada/linguagem
+- [ ] Mensagem de commit segue Conventional Commits + `#<issue>`
+- [ ] Notebooks: seções numeradas, paths com `pathlib`, seeds fixadas
+- [ ] Backend C#: método público assíncrono recebe `CancellationToken` e tem sufixo `Async`
+- [ ] Backend C#: novos use cases/repositórios registrados no `Program.cs`
+- [ ] Frontend TS: acesso a backend permanece no Repository (View/ViewModel não chamam `fetch`)
+- [ ] SQL: PostgreSQL puro, tabelas no singular, PK `id_<entidade>`, RLS habilitado se houver dado de usuário
 
 ### Review de Código
-- [ ] Builder Pattern usado para construções complexas
-- [ ] Strategy Pattern para algoritmos intercambiáveis
-- [ ] Separação clara de responsabilidades
-- [ ] Código reutilizável e extensível
-- [ ] Tratamento adequado de exceções
-- [ ] Performance otimizada com matrizes esparsas
+- [ ] Builder Pattern para construções complexas (modelo de ML)
+- [ ] Strategy Pattern para algoritmos intercambiáveis (KNN/ML.NET/Postgres fallback)
+- [ ] Camadas da Clean Architecture preservadas (dependências apontam para dentro)
+- [ ] MVVM no frontend: View renderiza, ViewModel orquestra, Repository acessa rede
+- [ ] DTOs separados das entidades de domínio e dos tipos `Api` do frontend
+- [ ] Tratamento de erro via `NotFoundException`/`ValidationException` + `ErrorHandlingMiddleware`
+- [ ] Cobertura mínima de testes xUnit no caminho feliz e no caminho de exceção
 
-## 6. Conclusão
+## 6. Revisão de Padrões — Lacunas e Recomendações
 
-Este guia estabelece os padrões fundamentais para o desenvolvimento do Portal Aventura. A adoção consistente destes padrões garante:
-- **Qualidade**: Código limpo e bem estruturado
-- **Manutenibilidade**: Fácil compreensão e modificação
-- **Escalabilidade**: Arquitetura preparada para crescimento
-- **Colaboração**: Padrões claros para toda a equipe
+Esta seção registra a auditoria dos padrões em uso no repositório, comparando o que estava documentado no guia com o que foi observado no código (backend C#, frontend RN/TS, SQL e testes). As lacunas marcadas como **aplicado** já estão incorporadas nas seções acima; as **pendentes** ficam como recomendações para próximas iterações.
 
-Os padrões de projeto Builder e Strategy fornecem a flexibilidade necessária para evoluir o sistema de recomendação, permitindo experimentação com diferentes algoritmos e configurações sem comprometer a estrutura base do código.
+### 7.1 Resumo das Lacunas
+
+| # | Lacuna identificada | Severidade | Recomendação | Status |
+|---|---------------------|------------|--------------|--------|
+| 1 | Seção SQL exemplificava sintaxe MySQL (`AUTO_INCREMENT`, `USE`, `IF NOT EXISTS` no `CREATE DATABASE`) e tabelas no plural, divergindo do banco real (PostgreSQL/Supabase, singular, UUID, RLS). | Alta | Reescrever 2.3 com PostgreSQL e refletir a convenção `id_<entidade>` usada em `src/database/`. | Aplicado (2.3) |
+| 2 | Padrões do frontend (React Native + TypeScript) não estavam documentados, embora o Index já citasse cobertura de TS. | Alta | Adicionar seção 2.6 com camadas MVVM, nomenclatura de arquivos e regras de acesso a rede. | Aplicado (2.6) |
+| 3 | Backend C# tinha apenas os padrões de projeto descritos (3.3); faltavam as convenções gerais (camadas Clean Architecture, sufixos `UseCase`/`Dto`/`Repository`, construtor primário, `Async` + `CancellationToken`). | Alta | Adicionar seção 2.7 cobrindo camadas, código e API REST. | Aplicado (2.7) |
+| 4 | Testes xUnit por serviço não tinham convenção registrada (nome do teste, `Trait("Category", "Integration")` usado no CI). | Média | Adicionar seção 2.8 com nomenclatura e categorias. | Aplicado (2.8) |
+| 5 | Diagrama de diretórios não incluía `src/backend/ml-engine/`, que já existe e é consumido pelos serviços. | Baixa | Atualizar 2.1.1. | Aplicado (2.1.1) |
+| 6 | Não há configuração compartilhada de linter/formatter no repositório (`.editorconfig`/ESLint/Prettier). Atualmente o estilo é mantido manualmente. | Média | Adicionar `.editorconfig` na raiz (indentação, finais de linha) e ESLint + Prettier para `src/frontend/`. Para o backend, adotar `dotnet format` como passo opcional no pipeline. | Pendente |
+| 7 | Não há análise estática de C# (`dotnet format --verify-no-changes`, analyzers) no pipeline `build`/`test:unit`. | Média | Acrescentar `dotnet format --verify-no-changes` ao job `build` do `.gitlab-ci.yml`. | Pendente |
+| 8 | Não há padrão documentado para tratamento de configuração sensível (apenas `.env.example` na raiz). Variáveis novas tendem a se espalhar pelo `appsettings.json` e pelo `Program.cs`. | Baixa | Padronizar leitura via `Environment.GetEnvironmentVariable(...)` + fallback em `appsettings.json`, conforme já praticado no `catalogo/Program.cs`. | Pendente (documentar como ADR) |
+| 9 | Mensagens de log seguem formato livre — Serilog já está configurado, mas não há convenção sobre quais propriedades enriquecer (`UserId`, `RequestId`, `Servico`). | Baixa | Definir conjunto mínimo de propriedades em um documento operacional separado. | Pendente |
+
+### 7.2 Pontos Aderentes (sem ajuste necessário)
+
+- **Estrutura de diretórios** dos quatro microsserviços é homogênea (`application/`, `domain/`, `infrastructure/`, `presentation/`).
+- **Convenção de commit** (`<type>: <descrição> #<issue>`) está implementada via Git Hook e respeitada no histórico recente.
+- **Padrões de projeto** Builder/Strategy/Factory estão aplicados no código real (notebooks de ML e `Spotlight.Recomendacao`) e cobertos por testes.
+- **Separação de DTOs** entre `application/dtos` (backend) e `models/`+sufixo `Api` (frontend) está consistente.
+- **RLS no banco** está habilitado nas tabelas de usuário, em linha com a recomendação do Supabase.
+
+### 7.3 Próximos Passos Recomendados
+
+1. Adicionar `.editorconfig` na raiz e ESLint/Prettier ao frontend (item 6).
+2. Plugar `dotnet format --verify-no-changes` no job `build` do GitLab CI (item 7).
+3. Registrar como ADR a estratégia de configuração por `.env` + `appsettings.json` (item 8).
+4. Definir o vocabulário mínimo de log estruturado no documento operacional (item 9).
+
+## 7. Conclusão
+
+Os padrões deste guia refletem o estado atual do Portal Aventura:
+
+- **Clean Architecture + Strategy + Factory + Repository** no backend C# garantem que o algoritmo de recomendação possa evoluir sem mexer em controllers nem em casos de uso.
+- **MVVM + Repository** no frontend mantêm Views simples e testáveis, e centralizam o contato com o gateway.
+- **SQL puro com Npgsql** sobre PostgreSQL/Supabase preserva controle fino sobre o schema e RLS, sem o acoplamento de um ORM.
+- **Builder** continua sendo a forma recomendada de organizar a construção de modelos nos notebooks de ML.
+
+A aderência consistente a esses padrões reduz fricção em code review, facilita onboarding e mantém o código previsível em todas as camadas do produto.
