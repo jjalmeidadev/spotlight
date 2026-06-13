@@ -154,7 +154,7 @@
     - [4.3.4 Normalização do Modelo Relacional](#434-normalização-do-modelo-relacional)
     - [4.3.5 Tabelas Associativas dos Relacionamentos N:N](#435-tabelas-associativas-dos-relacionamentos-nn)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
-    - [4.4.6 Dockerização dos Serviços Backend (atualização)](#446-dockerização-dos-serviços-backend-atualização)
+    - [4.4.6 Dockerização da aplicação full-stack](#446-dockerização-da-aplicação-full-stack)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
   - [5.2 Diagrama de Componentes da UML](#52-diagrama-de-componentes-da-uml)
@@ -196,6 +196,7 @@
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
     - [10.2.1 Modo de desenvolvimento para demonstração](#1021-modo-de-desenvolvimento-para-demonstração)
     - [10.2.2 Problemas comuns em execução local](#1022-problemas-comuns-em-execução-local)
+  - [10.3 Execução containerizada com Docker Compose](#103-execução-containerizada-com-docker-compose)
 - [Referências](#referências)
 
 # 1. Introdução
@@ -2624,82 +2625,88 @@ Os scripts mapeados em `docker-entrypoint-initdb.d/` são executados automaticam
 
 Para instruções completas de execução, variáveis de ambiente necessárias e procedimentos de rollback, consulte [`src/database/README.md`](../src/database/README.md).
 
-# 4.4.6 Dockerização dos Serviços Backend
+# 4.4.6 Dockerização da aplicação full-stack
 
-A equipe introduziu uma dockerização focalizada nos microsserviços backend (`catalogo`, `usuario`, `recomendacao`, `geolocalizacao`) com o objetivo de padronizar execução, isolar dependências e preparar a solução para integração contínua. Esta seção documenta as alterações, padrões aplicados e instruções de uso.
+A aplicação Spotlight foi dockerizada de forma full-stack, com foco em paridade entre desenvolvimento e produção, isolamento dos serviços, redução da superfície de ataque e preparação para deploy em ambiente de nuvem ou VPS. A solução mantém Supabase e MongoDB Atlas como dependências externas em nuvem; portanto, esses bancos não são provisionados pelo Compose de produção.
 
-Objetivo
-- Padronizar a execução dos serviços backend em containers Docker.
-- Manter o banco de dados transacional (PostgreSQL/Supabase) como serviço remoto (Supabase cloud) conforme arquivo de configuração `.env` do ambiente, evitando duplicação de dados locais.
+### Arquitetura containerizada
 
-O que foi adicionado / modificado
-- Dockerfiles multi-stage para cada serviço (compilação + runtime) — localizados em:
-  - `src/backend/services/catalogo/Dockerfile`
-  - `src/backend/services/usuario/Dockerfile`
-  - `src/backend/services/recomendacao/Dockerfile`
-  - `src/backend/services/geolocalizacao/Dockerfile`
+| Componente | Tecnologia | Artefato Docker | Papel no ambiente |
+|---|---|---|---|
+| Frontend | Expo SDK 54, React Native Web e React 19 | `Dockerfile.frontend` + Nginx | Build web estático e publicação da interface |
+| API Gateway | ASP.NET Core .NET 9 + YARP | `src/backend/api-gateway/Dockerfile` | Entrada única para os serviços backend |
+| Catálogo | ASP.NET Core .NET 9 | `src/backend/services/catalogo/Dockerfile` | Consulta e gestão de dados de catálogo |
+| Usuário | ASP.NET Core .NET 9 | `src/backend/services/usuario/Dockerfile` | Perfil, preferências, localização e telemetria |
+| Recomendação | ASP.NET Core .NET 9 | `src/backend/services/recomendacao/Dockerfile` | Recomendações e itens similares |
+| Geolocalização | ASP.NET Core .NET 9 | `src/backend/services/geolocalizacao/Dockerfile` | Integração com OpenStreetMap/Nominatim |
 
-- `.dockerignore` para cada serviço para reduzir contexto de build e excluir artefatos:
-  - `src/backend/services/*/.dockerignore`
+O frontend se comunica com o backend por meio da variável `EXPO_PUBLIC_API_BASE_URL`. Em desenvolvimento, o valor usual é `http://localhost:5000`, apontando para o API Gateway. Em produção web, o build usa `PROD_EXPO_PUBLIC_API_BASE_URL=/api`; o Nginx recebe chamadas em `/api/*` e encaminha internamente para `gateway:8080/*`.
 
-- `docker-compose.yml` na raiz foi atualizado para orquestrar os quatro serviços backend como containers independentes e mapear portas locais: 5001 (`catalogo`), 5002 (`usuario`), 5003 (`recomendacao`) e 5004 (`geolocalizacao`). Neste fluxo o PostgreSQL não é mais levantado pelo compose (a aplicação usa a connection string do Supabase remoto definida em `.env`).
+### Arquivos de infraestrutura
 
-- Healthchecks: cada serviço ganhou `healthcheck` no `docker-compose.yml`, apontando para os endpoints `/health` ou `/health/ready` expostos pela aplicação ASP.NET Core, para permitir verificação de readiness a partir do orquestrador local.
+- `Dockerfile.frontend`: Dockerfile multi-stage do frontend, com estágios de desenvolvimento, build web e runtime Nginx. Ele fica na raiz porque o projeto Expo também tem seus arquivos de entrada na raiz (`package.json`, `package-lock.json`, `App.js`, `app.json`, `assets/`) e consome código em `src/frontend/`; assim, o contexto de build inclui todos os arquivos necessários sem cópias artificiais.
+- `deploy/nginx/default.conf`: configuração do Nginx para SPA fallback, cache de assets e proxy reverso de `/api` para o gateway.
+- `docker-compose.dev.yml`: ambiente de desenvolvimento com hot reload, volumes, portas locais e `dotnet watch`.
+- `docker-compose.prod.yml`: ambiente de produção com apenas o frontend exposto ao host e serviços backend em rede interna do Compose.
+- `.dockerignore`: exclusão de dependências, artefatos de build e arquivos sensíveis do contexto Docker.
+- `src/backend/api-gateway/appsettings.DockerDevelopment.json`: destinos do YARP resolvidos por DNS interno do Compose para desenvolvimento.
+- `src/backend/api-gateway/appsettings.Production.json`: destinos do YARP resolvidos por DNS interno do Compose para produção.
+- `src/backend/services/*/.dockerignore`: exclusão de `bin/`, `obj/`, arquivos temporários e `.env` nos builds de cada serviço.
 
-- Segurança e qualidade nas imagens:
-  - Labels de imagem (`org.opencontainers.image.*`) adicionadas aos Dockerfiles.
-  - Criação de usuário não-root (`appuser`) no runtime image e mudança do `USER` para reduzir riscos de execução como root.
+### Estratégia dos Dockerfiles
 
-Padrões aplicados
-- Dockerfiles multi-stage (SDK -> publish -> ASP.NET runtime) para minimizar tamanho da imagem e velocidade de start.
-- Isolamento do contexto de build via `.dockerignore` para evitar inclusão de bin/obj, .git e arquivos sensíveis.
-- Uso de variáveis de ambiente para `DATABASE_CONNECTION_STRING` e `SUPABASE_JWT_SECRET` (lidas pelo `DotNetEnv` no startup dos serviços).
-- Healthchecks no compose para automação de dependência e monitoramento local.
+Os Dockerfiles backend usam multi-stage build: o estágio `build` usa `mcr.microsoft.com/dotnet/sdk:9.0-alpine` para restaurar dependências e publicar a aplicação; o estágio `runtime` usa `mcr.microsoft.com/dotnet/aspnet:9.0-alpine`, contém apenas os binários publicados e executa como usuário não-root `spotlight`.
 
-Variáveis e segurança
-- O compose espera que exista um `.env` na raiz com, no mínimo, as variáveis de conexão e segredos (ex.: `DATABASE_CONNECTION_STRING`, `SUPABASE_JWT_SECRET`, `NOMINATIM_*`).
-- IMPORTANT: Não versionar arquivos `.env` com credenciais. Remover do histórico do Git e usar GitLab/GitHub CI variables, Docker secrets ou um vault para ambientes compartilhados.
+O frontend também usa multi-stage build. O estágio de build usa `node:22-alpine` para executar `npm ci` e `expo export --platform web`; o runtime usa `nginxinc/nginx-unprivileged:1.27-alpine`, que já é preparado para rodar Nginx sem privilégios de root na porta `8080`.
 
-Como executar localmente (resumo)
-1. Colocar o `.env` (com as variáveis finais do ambiente) na raiz do repositório.
-2. Abrir Docker Desktop (Windows) e garantir que o daemon esteja ativo.
-3. Na raiz do projeto executar:
+As imagens Alpine foram escolhidas por reduzirem tamanho e superfície de ataque. A contrapartida é que dependências nativas devem ser compatíveis com musl libc; os builds locais dos serviços .NET e do frontend foram validados com essa base. O `curl` foi mantido nas imagens .NET runtime apenas para viabilizar os healthchecks definidos no Compose.
 
-```bash
-docker compose up -d --build
+### Segurança e isolamento
+
+- Os containers de aplicação executam como usuário não-root.
+- Em produção, o Compose aplica `read_only`, `tmpfs`, `cap_drop: ALL` e `security_opt: no-new-privileges:true`.
+- Apenas o frontend publica porta no host em produção (`FRONTEND_PORT:8080`).
+- Gateway e serviços backend ficam acessíveis somente pela rede Docker.
+- A rede backend continua com saída para a internet, pois os serviços precisam acessar Supabase, MongoDB Atlas e Nominatim.
+- Segredos permanecem no `.env` local, variáveis de ambiente do provedor ou vault/secret manager. O arquivo `.env` não deve ser versionado.
+
+### Cache e performance de build
+
+Os builds .NET usam BuildKit cache para pacotes NuGet com `id` por serviço e `sharing=locked`. Essa configuração acelera builds repetidos e evita corrupção de cache quando o CI executa builds em paralelo. O frontend usa `npm ci` com cache de npm, mantendo instalação reprodutível a partir do `package-lock.json`.
+
+### Variáveis de ambiente relevantes
+
+| Variável | Uso |
+|---|---|
+| `DATABASE_CONNECTION_STRING` | Conexão dos serviços .NET com Supabase/PostgreSQL |
+| `SUPABASE_JWT_SECRET` | Validação de JWT emitido pelo Supabase Auth |
+| `SUPABASE_URL` | Acesso backend a APIs do Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Uso backend restrito; nunca deve ir para o frontend |
+| `MONGODB_CONNECTION_STRING` | Conexão do serviço de usuário com MongoDB Atlas |
+| `MONGODB_DATABASE` | Database de telemetria no MongoDB |
+| `MONGODB_TELEMETRY_COLLECTION` | Collection de eventos comportamentais |
+| `NOMINATIM_BASE_URL` | URL base do serviço de geolocalização |
+| `NOMINATIM_USER_AGENT` | User-Agent obrigatório para Nominatim |
+| `EXPO_PUBLIC_SUPABASE_URL` | URL pública do Supabase usada no frontend |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Chave pública do Supabase usada no frontend |
+| `EXPO_PUBLIC_API_BASE_URL` | URL da API no desenvolvimento |
+| `PROD_EXPO_PUBLIC_API_BASE_URL` | URL da API injetada no build web de produção |
+
+### Validação realizada
+
+Foram validados o export web do Expo, a sintaxe dos Compose de desenvolvimento e produção e os builds das imagens do frontend, gateway e quatro serviços backend. Os comandos usados foram:
+
+```powershell
+npm.cmd run build:web
+docker compose -f docker-compose.dev.yml config --quiet
+docker compose -f docker-compose.prod.yml config --quiet
+docker build -f Dockerfile.frontend --target runtime ...
+docker build -t spotlight-gateway:local src/backend/api-gateway
+docker build -t spotlight-catalogo:local src/backend/services/catalogo
+docker build -t spotlight-usuario:local src/backend/services/usuario
+docker build -t spotlight-recomendacao:local src/backend/services/recomendacao
+docker build -t spotlight-geolocalizacao:local src/backend/services/geolocalizacao
 ```
-
-4. Conferir que os containers estão `running`:
-
-```bash
-docker compose ps
-docker compose logs -f catalogo usuario recomendacao geolocalizacao
-```
-
-5. Validar endpoints (exemplos):
-
-```bash
-curl -i http://localhost:5001/health
-curl -i http://localhost:5001/health/ready
-curl -i http://localhost:5002/health
-curl -i http://localhost:5003/health
-curl -i http://localhost:5004/health
-```
-
-Observações operacionais
-- Os serviços fazem leitura do `DATABASE_CONNECTION_STRING` no ambiente; quando apontados para o Supabase remoto, as checagens de readiness dependem da disponibilidade do Supabase.
-
-Boa prática
-- Remover/arquivar o `.env` sensível do repositório e documentar no README onde armazenar/como fornecer as variáveis em CI.
-
-
-Referências e arquivos afetados
-- `docker-compose.yml` (raiz) — orquestração dos serviços backend.
-- `src/backend/services/*/Dockerfile` — build e runtime das aplicações.
-- `src/backend/services/*/.dockerignore` — exclusões de contexto de build.
-- `src/backend/README.md` — instruções atualizadas de execução e validação.
-
-Esta documentação descreve a configuração aplicada em 2026-06-02 e deve ser revisada caso o fluxo de deploy (local vs. cloud) mude ou se a equipe optar por containerizar também o API Gateway ou o banco localmente.
 
 # 5. Solução Técnica (Design)
 _conteúdo_
@@ -4477,6 +4484,22 @@ personalizadas em vez de depender apenas de conteúdo estático.
 | Recomendação | Similaridade item-item | O backend mantém `similaridade_item` para retornar eventos semelhantes ao espetáculo visualizado |
 | Frontend | Tela inicial integrada | A home do app passou a montar trilhas como recomendados, populares, próximos e catálogo em cartaz a partir das respostas da API |
 
+### Evidências da Evolução da Sprint 4
+
+&emsp;A comparação entre `origin/main` e `origin/develop` evidencia que a Sprint 4 não foi apenas uma atualização visual: ela adicionou contratos, rotas, persistência, testes e integração no aplicativo. As principais evidências rastreáveis no repositório são:
+
+| Frente | Evidência na diff `main..develop` | Progresso em relação à Sprint 3 |
+|---|---|---|
+| Integração do catálogo no app | [`CatalogRepository.ts`](../src/frontend/repositories/CatalogRepository.ts), [`useCatalogViewModel.ts`](../src/frontend/viewmodels/useCatalogViewModel.ts), [`CatalogView.tsx`](../src/frontend/screens/CatalogView.tsx) | A Sprint 3 validava a experiência com dados mockados; a Sprint 4 passou a buscar catálogo, destaques, populares e itens em cartaz pela API. |
+| Detalhes, similares e avaliação | [`DetalhesView.tsx`](../src/frontend/screens/DetalhesView.tsx), [`DetalhesViewModels.ts`](../src/frontend/viewmodels/DetalhesViewModels.ts), [`RatingRepository.ts`](../src/frontend/repositories/RatingRepository.ts), [`RecommendationRepository.ts`](../src/frontend/repositories/RecommendationRepository.ts) | A tela de detalhes deixou de ser estática e passou a carregar dados reais, registrar nota e consultar similares do serviço de recomendação. |
+| Recomendação personalizada | [`RecomendacaoService.cs`](../src/backend/services/recomendacao/application/services/RecomendacaoService.cs), [`RecomendacaoMeController.cs`](../src/backend/services/recomendacao/presentation/controllers/RecomendacaoMeController.cs), [`EspetaculosSimilaresController.cs`](../src/backend/services/recomendacao/presentation/controllers/EspetaculosSimilaresController.cs), [`MlNetModeloRecomendacaoClient.cs`](../src/backend/services/recomendacao/infrastructure/model/MlNetModeloRecomendacaoClient.cs) | O backend evoluiu de contrato e prova de conceito para serviço com rota autenticada, estratégia ML.NET e fallback PostgreSQL. |
+| Modelo e artefatos de recomendação | [`Program.cs`](../src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining/Program.cs), [`item_similarities.json`](../src/models/artifacts/item_similarities.json), [`recomendacao_mlnet_metrics.json`](../src/models/reports/recomendacao_mlnet_metrics.json), [`README_modelo_classificacao_recomendacao.md`](../src/models/reports/README_modelo_classificacao_recomendacao.md) | O modelo saiu do notebook exploratório e passou a ter pipeline de treinamento, métricas, artefatos versionados e consumo pela API. |
+| Telemetria comportamental | [`TelemetriaController.cs`](../src/backend/services/usuario/presentation/controllers/TelemetriaController.cs), [`TelemetriaService.cs`](../src/backend/services/usuario/application/usecases/TelemetriaService.cs), [`MongoTelemetriaRepository.cs`](../src/backend/services/usuario/infrastructure/persistence/MongoTelemetriaRepository.cs), [`TelemetryRepository.ts`](../src/frontend/repositories/TelemetryRepository.ts), [`useTelemetrySession.ts`](../src/frontend/hooks/useTelemetrySession.ts) | A Sprint 3 não persistia eventos comportamentais; a Sprint 4 adicionou contrato, validação, envio pelo app e gravação no MongoDB Atlas. |
+| Banco de dados e governança de acesso | [`06_indexes.sql`](../src/database/migrations/06_indexes.sql), [`09_espetaculo_midia.sql`](../src/database/migrations/09_espetaculo_midia.sql), [`11_seed_recomendacao_incremental.sql`](../src/database/migrations/11_seed_recomendacao_incremental.sql), [`12_controle_acesso_administrativo_catalogo.sql`](../src/database/migrations/12_controle_acesso_administrativo_catalogo.sql), [`13_rls_similaridade_item_avaliacao.sql`](../src/database/migrations/13_rls_similaridade_item_avaliacao.sql) | O banco ganhou índices, mídia de catálogo, seeds incrementais de recomendação, controle administrativo e policies RLS para tabelas novas ou sensíveis. |
+| Contratos, Swagger e documentação técnica | [`api-contracts.md`](../src/backend/contracts/api-contracts.md), [`openapi.json`](../src/backend/contracts/openapi.json), [`telemetria.md`](../src/backend/contracts/telemetria.md), [`supabase-storage.md`](../src/backend/contracts/supabase-storage.md) | A documentação técnica passou a cobrir recomendação, similares, telemetria e storage, reduzindo divergência entre contrato e implementação. |
+| Validação automatizada | [`RecomendacaoServiceTests.cs`](../src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoServiceTests.cs), [`RecomendacaoBaseControllerTests.cs`](../src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoBaseControllerTests.cs), [`MongoTelemetryIndexesTests.cs`](../src/backend/tests/Spotlight.Usuario.Tests/MongoTelemetryIndexesTests.cs), [`TelemetriaMongoIntegrationTests.cs`](../src/backend/tests/Spotlight.Usuario.Tests/TelemetriaMongoIntegrationTests.cs), [`Test-TelemetriaAtlasE2E.ps1`](../src/backend/scripts/Test-TelemetriaAtlasE2E.ps1) | A Sprint 4 ampliou a validação além do fluxo manual, cobrindo recomendação, health checks, índices MongoDB, integração Mongo opt-in e validação E2E com Atlas. |
+| Execução e infraestrutura local | [`docker-compose.yml`](../docker-compose.yml), [`catalogo/Dockerfile`](../src/backend/services/catalogo/Dockerfile), [`recomendacao/Dockerfile`](../src/backend/services/recomendacao/Dockerfile), [`usuario/Dockerfile`](../src/backend/services/usuario/Dockerfile), [`.gitlab-ci.yml`](../.gitlab-ci.yml) | O ambiente ganhou suporte mais claro para execução dos serviços backend, variáveis centralizadas e pipeline de CI para reduzir regressões entre branches. |
+
 ### Fluxo Principal Entregue
 
 &emsp;O fluxo principal da Sprint 4 pode ser descrito em etapas:
@@ -4560,6 +4583,12 @@ melhorar o treinamento nas próximas iterações.
   padronização de mídias no banco.
 - O fluxo completo está funcional localmente, mas a evidência em ambiente
   publicado no servidor Inteli deve ser registrada separadamente.
+
+### Evidência de execução da aplicação
+
+Como evidência do progresso incremental da Sprint 4, foi gravado um vídeo demonstrativo da aplicação.
+
+**Link do vídeo demonstrativo:** [Vídeo Demonstrativo Sprint 4](https://drive.google.com/drive/folders/1Cwcd_nm-zFCijOIywWhobz_m0UwTmE5t?usp=sharing)
 
 ## 8.3.3 Sprint 5
 _conteúdo_
@@ -5460,16 +5489,122 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 ## 9.1.2 Resultados
 
-Na Sprint 5 foi executada uma rodada de testes automatizados de regras de negócio focada nos Services e UseCases do backend. O objetivo foi validar regras críticas em nível de aplicação, com cenários positivos, negativos e de borda, sem depender de banco real, autenticação externa ou serviços de terceiros. Essa abordagem complementa os testes funcionais planejados e reduz o risco de regressão em comportamentos centrais do sistema.
+&emsp;Esta seção registra a execução real da bateria descrita em 9.1.1 sobre o código atualmente versionado em `src/backend/Spotlight.sln`. O recorte privilegia a camada **backend automatizada** (xUnit + `Microsoft.AspNetCore.Mvc.Testing` + `Testcontainers.MongoDb`), que é o que já está implementado. As camadas **mobile (Detox)** e **admin web (Playwright)** previstas em 9.1.1 ainda não possuem projetos versionados; entram aqui como lacuna consciente ao final da seção. O recorte adotado evita misturar planejamento e execução: nada nesta seção 9.1.2 descreve teste que **não tenha sido efetivamente rodado** nesta data.
 
-### Escopo executado
+### Ambiente de execução
+
+| Item | Valor |
+|---|---|
+| Data/hora da execução | 2026-06-12, 18:48–19:15 BRT |
+| Plataforma | Windows 11 + WSL2 (Ubuntu) chamando o SDK do host |
+| Runtime | .NET SDK 9.0.314, xUnit 2.x via `Microsoft.NET.Test.Sdk` 17.x |
+| Banco/serviços auxiliares | Postgres não exigido (use cases isolados com fakes); Mongo provisionado em container efêmero pelo `Testcontainers.MongoDb` durante `TelemetriaMongoIntegrationTests` |
+| Docker Engine | Docker Desktop 4.77.0 (engine `29.5.3`), contexto `desktop-linux` |
+| Comando consolidado | `dotnet test src/backend/Spotlight.sln -e RUN_MONGO_INTEGRATION_TESTS=true --logger "trx;LogFileName=tf-solution.trx"` |
+| Comando por serviço | `dotnet test src/backend/tests/Spotlight.<Servico>.Tests/Spotlight.<Servico>.Tests.csproj -e RUN_MONGO_INTEGRATION_TESTS=true` |
+| Scripts de reprodução | `documentos/evidencias/testes-funcionais/run-tests.bat` (solution) e `run-per-project.bat` (um trx por projeto) |
+
+&emsp;A variável `RUN_MONGO_INTEGRATION_TESTS=true` é necessária para que o atributo `MongoIntegrationFactAttribute` libere os 5 testes de integração com Mongo; sem ela, esses casos ficam marcados como `Ignorado` para evitar falsos negativos em estações sem Docker. Nesta execução, o flag foi passado explicitamente via `-e` do `dotnet test`, que injeta a variável no processo do `vstest` (a forma "exportar no shell" não funcionou porque o runner roda em sessão Windows com bloco de environment próprio — comportamento registrado para consulta futura).
+
+### Síntese quantitativa
+
+<sub>Tabela X - Resultado consolidado por projeto de teste</sub>
+
+| Projeto | Total | Aprovados | Ignorados | Reprovados | Tempo |
+|---|---:|---:|---:|---:|---:|
+| Spotlight.Catalogo.Tests | 20 | 20 | 0 | 0 | 1,0 s |
+| Spotlight.Gateway.Tests | 2 | 2 | 0 | 0 | 1,0 s |
+| Spotlight.Geolocalizacao.Tests | 7 | 7 | 0 | 0 | 0,1 s |
+| Spotlight.Recomendacao.Tests | 16 | 16 | 0 | 0 | 0,9 s |
+| Spotlight.Usuario.Tests | 38 | 38 | 0 | 0 | 35 s |
+| **Total** | **83** | **83** | **0** | **0** | **≈ 38 s** |
+
+&emsp;A taxa de aprovação foi de **100 % (83 / 83)**, sem teste reprovado e sem teste ignorado. Os 35 s do projeto `Spotlight.Usuario.Tests` concentram o ciclo de provisionamento do container MongoDB efêmero (`mongo:7.0`) consumido pelos cinco testes de `TelemetriaMongoIntegrationTests`; os demais projetos rodam em < 2 s cada.
+
+### Rastreabilidade RF ↔ Testes automatizados
+
+&emsp;A tabela abaixo cita o **nome exato do método xUnit** que cobre cada RF e marca de forma explícita quais sub-cenários do plano (P/N de 9.1.1) ainda dependem da camada E2E mobile/web. A intenção é não inflar cobertura.
+
+<sub>Tabela X - Cobertura automatizada por requisito funcional</sub>
+
+| RF | Sub-cenários cobertos nesta execução | Sub-cenários ainda dependentes de E2E ou ambiente externo | Métodos xUnit que rodaram |
+|---|---|---|---|
+| RF01 — Cadastro | Garantia de perfil pós-`auth.signup` no schema `public.usuario` (caminho do trigger `on_auth_user_created`) e contrato do DTO de update | TF-RF01-P01..P03 e N01..N05 — todos validam UI/Supabase Auth (Detox + provisionamento Supabase) | `ObterUsuarioMe_QuandoExiste_MapeiaPerfil`, `ObterUsuarioMe_QuandoNaoExiste_LancaNotFound`, `UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo` |
+| RF02 — Login | Nenhuma cobertura backend direta nesta execução. O API Gateway sobe via `WebApplicationFactory` e responde smoke checks (`/health` e `/api/ping`), o que confirma a pré-condição de o serviço estar acessível para receber um JWT, mas o fluxo de autenticação em si vive no Supabase Auth | TF-RF02-P01..P03 e N01..N04: dependem do Supabase Auth e do app mobile (token em SecureStore, restauro de sessão, bloqueio após 5 tentativas) — todos planejados para Detox + contract test contra `auth/v1/token` | `Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Health_Returns_200`, `Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Ping_Returns_200` |
+| RF03 — Preferências e localização | TF-RF03-P01 (gravar múltiplos gêneros), TF-RF03-P02 (editar preferência existente), TF-RF03-N01 (faixa de preço inválida no equivalente backend = preço negativo), TF-RF03-N02 (DTO ignora `localizacao` por canal incorreto), atualização de localização com validação de endereço e coordenadas | TF-RF03-P03 (botão "Pular" na UI) e N03 (categoria inexistente vinda da UI) | `ObterPreferencias_QuandoExiste_MapeiaPreferencias`, `AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias`, `AtualizarPreferencias_ComPrecoNegativo_LancaValidation`, `AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound`, `UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco`, `UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation`, `UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict` |
+| RF04 — Recomendações na home | TF-RF04-P01 no contrato backend: lista ranqueada de itens, mapeamento dos campos do card e respeito ao limite. TF-RF04-N02 (cold start sem histórico) atendido pela rota de fallback Postgres pré-processado | TF-RF04-P02 (label "Baseado nas suas preferências"), P03 (interseção < 80 % entre usuários), N01 (ML Engine fora do ar — banner de degradação), N03 (resposta vazia → CTA) — todos dependem da UI | `ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado` (Theory com 5 inlines: `null`, `0`, `-5`, `20`, `999`) |
+| RF05 — Pesquisa | Normalização do filtro de pesquisa, paginação (`page=0` → 1, `pageSize=500` → 100) e ordenação | TF-RF05-P02 (case-insensitive), P04 (debounce de 300 ms na UI), N03 (SQL injection no termo — depende do repositório PostgreSQL real) | `ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado` |
+| RF06 — Filtros (categoria, data, preço, localização) | Filtros aplicados na listagem com mapeamento e paginação; geocodificação para o filtro por cidade/região (cache, validação de endereço vazio, coordenadas fora do intervalo, falha de upstream do Nominatim) | TF-RF06-P02 (combinação UI), N01 (mensagem "Nenhum resultado"), N02/N03 (limites do slider e date picker na UI) | `ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado`, `ListarCategoriasETeatros_MapeiamListasSimples`, `ObterTeatro_QuandoNaoExiste_LancaNotFound`, mais os 7 testes de `NominatimGeocodingServiceTests` |
+| RF07 — Detalhes do espetáculo | TF-RF07-P01 (detalhe completo: título, sinopse, categoria, sessões com horário, teatro e link), TF-RF07-P02 (carrossel via lista de sessões), TF-RF07-N02 (id inexistente → `NotFoundException`) | TF-RF07-P03 (sheet de compartilhamento do SO), N01 (descrição nula com layout intacto), N03 (sem sessões futuras → CTA "Avisar") | `ObterEspetaculo_QuandoExiste_MapeiaDetalheCompleto`, `ObterEspetaculo_QuandoNaoExiste_LancaNotFound`, `ListarSessoes_QuandoEspetaculoExiste_MapeiaSessoes` |
+| RF08 — Avaliações de outros usuários | TF-RF08-P01/P02 (lista com nota, comentário, autor e ordenação por data via paginação normalizada) e validação de espetáculo inexistente | TF-RF08-N02 (avaliação moderada some da lista), N03 (autor anônimo quando `perfil_publico=false`) — regras de visibilidade ainda não estão em código | `ListarAvaliacoes_NormalizaPaginacaoEMapeiaUsuario`, `ListarAvaliacoes_QuandoEspetaculoNaoExiste_LancaNotFound` |
+| RF09 — Avaliar espetáculo | TF-RF09-P01 (submeter nota válida), TF-RF09-N01 (`null`, `-0,1`, `5,1` rejeitados pelo `ValidationException`), histórico de avaliações por usuário com paginação | TF-RF09-P02 (editar avaliação), P03 (média recalculada em ≤ 2 s — RNF02), N02 (sem auth → 401), N03 (espetáculo 404) | `CriarAvaliacao_ComNotaValida_RetornaAvaliacaoCriada`, `CriarAvaliacao_ComNotaInvalida_LancaValidation` (Theory 3 inlines), `ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado` |
+| RF10 — Comentar espetáculo | TF-RF10-P01/P02 cobertos pelo mesmo DTO da avaliação (campo `comentario` chega ao repositório com `usuario_id` e `espetaculo_id` corretos) | TF-RF10-P03 (editar próprio comentário), N02 (limite de 500 caracteres na UI), N03 (sanitização de XSS pela camada de apresentação), N04 (`DELETE` por outro usuário → 403) | `CriarAvaliacao_ComNotaValida_RetornaAvaliacaoCriada` (campo `Comentario="Excelente"`) |
+| RF11 — Telemetria | TF-RF11-P01..P04 cobertos fim-a-fim pelo `TelemetriaService` + `TelemetriaController` + persistência real no Mongo (5 testes em container), incluindo indexação `event_id` único e `received_at` TTL; TF-RF11-N01 (Mongo fora do ar → 202 best-effort) e N02/N03 (payload inválido rejeitado) | TF-RF11-P05 (latência percebida no app mobile — depende do dispositivo) | 9 testes `TelemetriaService_*` e 3 `TelemetriaController_*` (todos em `UsuarioUseCasesTests`), 2 de `MongoTelemetryIndexesTests`, 5 de `TelemetriaMongoIntegrationTests` (incluindo `PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo`, `Startup_ComMongoConfigurado_CriaIndicesOperacionais`, `PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento`, `PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento`, `PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort`) |
+| RF12 — Recomendação personalizada | TF-RF12-P01 (lista ranqueada respeita limite e mapeia campos), TF-RF12-N02 (modelo ML.NET desabilitado → fallback Postgres pré-processado) | TF-RF12-P02 (predominância "infantil" para perfil declarado), P03 (diversidade ≥ 2 categorias), N01 (catálogo insuficiente com mensagem CTA), N03 (timeout do ML Engine — exige perf real) | `ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado`, `ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres`, `RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet` |
+| RF13 — Atualização contínua | TF-RF13 indireto: a `RecomendacaoStrategyFactory` consulta o estado do modelo a cada chamada e o teste prova que, com o flag habilitado, a próxima resposta vem do ranking ML.NET e não da rota de fallback | TF-RF13-P01 (avaliação 5★ ajusta lista observada), P02 (volta de longo prazo), N01..N03 (sinais reais em telemetria com janela temporal) | `RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet`, `ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres` |
+| RF14 — Filtragem colaborativa | TF-RF14-P01 (origem existe → lista de similares vinda do k-NN é mapeada e respeita limite) e TF-RF14-N01 indireto (a `RecomendacaoStrategyFactory` escolhe a `PostgresPreProcessadoRecomendacaoStrategy` como fallback quando o motor k-NN/SVD não está disponível) | TF-RF14-P02 (≥ 2 vizinhos distintos no trace) e N02 (item já consumido pelo alvo — exige filtro explícito sobre a base de interações) | `ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado` (Theory 4 inlines), `ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista` (defensiva contra id inválido) |
+| RF15 — Cold start (popularidade) | TF-RF15-P01 (estratégia padrão é a `PostgresPreProcessadoRecomendacaoStrategy` quando o modelo ML.NET não está habilitado) | TF-RF15-P02 (preferência declarada filtra cold start), P03 (refresh semanal do ranking), N01 (catálogo vazio com mensagem), N02 (job de popularidade atrasado → alerta SRE) | `ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado` com `PostgresPreProcessadoRecomendacaoStrategy` (variante sem flag ML.NET) |
+| RF16 — Administração de conteúdo | TF-RF16-P01 (criar com payload válido), TF-RF16-P02 (atualizar — `NotFoundException` quando id inexistente), TF-RF16-P03 (excluir — `NotFoundException` quando id inexistente), TF-RF16-N03 (criar com campos faltando acumula erros), validação de título acima do limite | TF-RF16-P04 (criar categoria), P05 (moderar avaliação), N01 (usuário comum → 403), N02 (espetáculo com sessões futuras → 409), N04 (duplicidade de categoria → 422) — exigem painel admin ou rota dedicada ainda não implementada | `CriarEspetaculo_ComDadosValidos_CriaEBuscaDetalhe`, `CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao`, `AtualizarEspetaculo_QuandoRepositorioNaoAtualiza_LancaNotFound`, `AtualizarEspetaculo_ComTituloMuitoLongo_NaoChamaRepositorio`, `ExcluirEspetaculo_QuandoNaoExiste_LancaNotFound` |
+
+&emsp;Como ancoragem transversal, as suítes `HealthEndpointsTests` de Catálogo, Recomendação e Usuário (3 testes cada) e do Gateway (2 testes) sobem cada serviço via `WebApplicationFactory` e validam `/health` (liveness), `/api/ping` (smoke) e, nos serviços com banco, `/health/ready` (readiness, retornando **HTTP 503** sem connection string — pré-condição transversal para o RNF03 e para qualquer dos 16 RFs).
+
+### Cenários negativos validados em destaque
+
+&emsp;A bateria preserva a premissa de "sistemas reais falham mais do que sucedem" descrita em 9.1.1. Os cenários negativos abaixo passaram nesta execução e merecem destaque:
+
+- **Validação acumulando erros em um único retorno** (`CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao`): título em branco, duração zero, status inválido e ator sem `Papel` retornam um único `ValidationException` com todas as chaves preenchidas — evita o anti-padrão "uma chamada por erro".
+- **Sanitização defensiva do pipeline de telemetria**: 6 testes (`TelemetriaService_ComPayloadInvalido_*`, `…ComEnumsInvalidos_*`, `…ComRegrasDoEventoInvalidas_*`, `…ComMetadadosAcimaDoLimite_*`, `…ComDataForaDaJanela_*`, `…ComDataFutura_*`) rejeitam payloads antes mesmo do repositório, atendendo a TF-RF11-N02/N03.
+- **Falha não-blocante na persistência**: `TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro` reproduz TF-RF11-N01 (MongoDB indisponível) — a API responde **202 Accepted** e a navegação do usuário não é bloqueada; já com Mongo disponível, `PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort` confirma o mesmo contrato no controller.
+- **Erro precoce em recomendação inexistente** (`ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista`): o `NotFoundException` é lançado **antes** de tocar o repositório de similaridades, evitando varredura desnecessária (TF-RF14-N01 / N02).
+- **Readiness honesto sem banco**: `Get_HealthReady_Returns_503_SemBanco` em Catálogo, Usuário e Recomendação confirma que o serviço não se declara pronto enquanto o Postgres não responder — comportamento esperado pelo orquestrador para evitar tráfego prematuro (RNF03/RNF12).
+- **DTO ignora campo desconhecido sem efeito colateral** (`UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo`): documenta que `PUT /me` com `{"localizacao":"São Paulo"}` desserializa sem erro mas não toca a coluna `localizacao` — atualizar localização exige o endpoint dedicado `PUT /me/localizacao` (TF-RF03-N02).
+- **Idempotência em telemetria** (`PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento`): demonstra que reenvios do app com mesmo `event_id` não duplicam documentos no Mongo — pré-condição para retentativas seguras em redes móveis instáveis.
+
+### Evidências e artefatos
+
+&emsp;Todos os artefatos da execução estão versionados em [`documentos/evidencias/testes-funcionais/`](./evidencias/testes-funcionais/):
+
+| Arquivo | Conteúdo |
+|---|---|
+| `README.md` | Comando único, comando por projeto, tabela-resumo e descrição dos demais arquivos |
+| `run-tests.bat` | Script de reprodução da bateria consolidada (`Spotlight.sln`) — invoca o `dotnet test` com a env `RUN_MONGO_INTEGRATION_TESTS=true` |
+| `run-per-project.bat` | Script de reprodução por projeto, gerando uma `*.trx` distinta para cada serviço |
+| `saida-completa.txt` | Log integral do `dotnet test` da solution, com nome, duração e status de cada um dos 83 testes |
+| `saida-por-projeto.txt` | Log do `dotnet test` em modo por projeto (linha-resumo `Aprovado!  – Com falha: 0…` por serviço) |
+| `Spotlight.Catalogo.Tests.trx` | Resultado TRX (Visual Studio Test Results) — 20 testes |
+| `Spotlight.Gateway.Tests.trx` | Resultado TRX — 2 testes |
+| `Spotlight.Geolocalizacao.Tests.trx` | Resultado TRX — 7 testes |
+| `Spotlight.Recomendacao.Tests.trx` | Resultado TRX — 16 testes |
+| `Spotlight.Usuario.Tests.trx` | Resultado TRX — 38 testes (inclui os 5 de integração Mongo) |
+
+&emsp;Cada TRX preserva `executionId`, `outcome`, `duration` e `startTime` de cada caso, viabilizando importação em ReportGenerator, Azure Test Plans e equivalentes sem reexecução. Conferência rápida: `grep -oE 'outcome="[^"]+"' *.trx | sort | uniq -c` totaliza **83 `Passed`** e nenhum outro estado.
+
+### Lacunas conscientes e plano de cobertura
+
+&emsp;A execução **não produziu nenhum teste reprovado e nenhum teste ignorado**. As lacunas abaixo são deliberadas — referem-se a cenários previstos em 9.1.1 que dependem de camadas (UI mobile, painel admin web, ambiente Supabase real) ainda não automatizadas e que, por isso, **não foram exercitadas nesta rodada**:
+
+| Lacuna | Onde se manifesta | Caminho previsto |
+|---|---|---|
+| Camada E2E mobile (Detox) ainda não versionada | TF-RF01 e TF-RF02 (cadastro/login no app), TF-RF04-P02 (cabeçalho "Baseado nas suas preferências"), TF-RF05-P04 (debounce), TF-RF07-P03 (compartilhamento via sheet do SO), TF-RF09-P02 (edição de avaliação), TF-RF10-N03 (XSS no campo de comentário) | Subir esqueleto `src/frontend/e2e` (Detox + RNTL) com pelo menos um cenário por persona priorizada |
+| Painel administrativo web (Playwright) ainda não versionado | TF-RF16-P04 (criar categoria), TF-RF16-P05 (moderar), TF-RF16-N01 (403 para usuário comum), N02 (409 com sessões futuras), N04 (422 duplicidade) | Subir `src/admin-web/tests` na sprint dedicada ao painel |
+| Login real (TF-RF02) só foi validado por smoke do gateway | Login com credenciais válidas/erradas, rate limiting (TF-RF02-N04), restauração de sessão (TF-RF02-P02) | Adicionar contract test contra `auth/v1/token` em ambiente de homologação e cobertura Detox no fluxo "Entrar" |
+| Cenários subjetivos de relevância de recomendação (RF12-P02/P03, RF14-P02) | Predominância por gênero declarado, diversidade ≥ 2 categorias, ≥ 2 vizinhos distintos | Sessão exploratória dupla (dois avaliadores independentes) prevista em 9.1.1 + métrica NDCG@5 offline |
+| Latência percebida no mobile (RF11-P05, RF12-P01/N03) | Tempo card → detalhe, timeout de 3 s no Gateway | Será coberto pela bateria de RNFs (seção 9.2) com Lighthouse mobile e simulação de timeout no ML Engine |
+
+&emsp;Em resumo: dos 16 RFs catalogados em 3.1, **14 têm pelo menos um sub-cenário validado nesta execução** (RF03 a RF16), **2 (RF01, RF02)** só foram exercitados nos contratos adjacentes (perfil/JWT) por não haver Detox versionado; nenhum teste planejado para esta rodada falhou. Os achados negativos da bateria são, por desenho, validações de mensagens de erro e códigos HTTP, e todos seguiram o contrato.
+
+### Rodada complementar — regras de negócio (Sprint 5)
+
+&emsp;Em complemento à bateria geral consolidada acima, na Sprint 5 foi executada uma rodada dedicada de testes automatizados de regras de negócio focada nos Services e UseCases do backend. O objetivo foi validar regras críticas em nível de aplicação, com cenários positivos, negativos e de borda, sem depender de banco real, autenticação externa ou serviços de terceiros. Essa abordagem complementa os testes funcionais planejados e reduz o risco de regressão em comportamentos centrais do sistema.
+
+#### Escopo executado
 
 | Serviço | Regra de negócio validada | Cenários cobertos |
 |---|---|---|
 | Catálogo | Avaliações de espetáculo devem aceitar notas dentro do intervalo permitido, rejeitar notas inválidas e não criar avaliação para espetáculo inexistente. | Nota limite `5`, comentário nulo, nota `null`, nota menor que `0`, nota maior que `5`, espetáculo inexistente. |
 | Recomendação | A API deve respeitar o limite de recomendações solicitado mesmo quando o modelo ML.NET retorna mais predições do que o permitido. | Modelo retorna 3 predições; backend recebe limite `2`; resposta final preserva ranking e retorna apenas 2 itens. |
 
-### Casos adicionados ou reforçados
+#### Casos adicionados ou reforçados
 
 | Caso | Arquivo | Resultado esperado |
 |---|---|---|
@@ -5478,7 +5613,7 @@ Na Sprint 5 foi executada uma rodada de testes automatizados de regras de negóc
 | `CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao` | `src/backend/tests/Spotlight.Catalogo.Tests/CatalogoUseCasesTests.cs` | Espetáculo inexistente gera `NotFoundException` e nenhuma avaliação é persistida. |
 | `ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal` | `src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoUseCasesTests.cs` | Resultado final respeita o limite normalizado e mantém a ordem de ranking do modelo. |
 
-### Evidência de execução
+#### Evidência de execução
 
 Os testes foram executados localmente em configuração `Release`, pois havia serviços do backend em execução usando os binários `Debug`.
 
@@ -5488,7 +5623,7 @@ dotnet test src/backend/tests/Spotlight.Recomendacao.Tests/Spotlight.Recomendaca
 dotnet test src/backend/Spotlight.sln -c Release --no-restore
 ```
 
-Resultado observado:
+Resultado observado, já considerando os 4 testes novos somados à bateria registrada nas tabelas anteriores:
 
 | Comando | Aprovados | Ignorados | Falhas |
 |---|---:|---:|---:|
@@ -5496,9 +5631,9 @@ Resultado observado:
 | `Spotlight.Recomendacao.Tests` | 39 | 0 | 0 |
 | `Spotlight.sln` | 103 | 5 | 0 |
 
-Os 5 testes ignorados pertencem aos testes de integração MongoDB condicionais do projeto `Spotlight.Usuario.Tests`, que dependem de configuração externa específica para execução. Eles não representam falha da suíte de regras de negócio executada nesta tarefa.
+Os 5 testes ignorados pertencem aos testes de integração MongoDB condicionais do projeto `Spotlight.Usuario.Tests`, que dependem de configuração externa específica para execução (veja `RUN_MONGO_INTEGRATION_TESTS` na subseção "Ambiente de execução" acima). Eles não representam falha da suíte de regras de negócio executada nesta tarefa.
 
-### Abrangência e limitações
+#### Abrangência e limitações
 
 Os testes cobrem regras críticas de validação de avaliação e recomendação personalizada, incluindo tratamento de erro e limite de resposta. A camada de persistência real, policies RLS e integração com Supabase/PostgreSQL continuam sendo responsabilidade dos testes de integração e das validações de banco descritas nas demais seções deste capítulo.
 
@@ -5740,29 +5875,13 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 ---
 
-### 9.2.1.10 RNF09 — Processamento assíncrono com fila (Sprint 5)
+### 9.2.1.10 RNF09 — Processamento assíncrono
 
-**Identificador e nome:** RNF09 — Processamento assíncrono de eventos (aspecto: Desempenho).
+**Status:** Não aplicável nesta versão.
 
-**Objetivo do teste:** Validar, na Sprint 5, que o processamento via fila (RabbitMQ ou equivalente) não degrada a experiência síncrona do usuário além do limite e atinge a taxa mínima de eventos, condição para endurecer a telemetria e reduzir perda de sinais comportamentais (RF11 a RF14).
+O RNF09 não será executado porque a infraestrutura de processamento assíncrono prevista no planejamento, incluindo RabbitMQ ou mecanismo equivalente, não foi implementada no escopo atual do projeto.
 
-**Ferramenta(s):** k6 com cenário de eventos simultâneos.
-
-**Pré-condições:**
-
-- Sistema com fila configurada e consumidores ativos (ML Engine ou serviço de processamento).
-- Script k6 que publica interações de usuário e mede tempo de resposta das APIs síncronas em paralelo.
-- Baseline de tempo de resposta sem carga na fila estabelecida.
-
-**Cenário positivo:** Serão simulados **100 eventos simultâneos** na fila enquanto requisições síncronas de leitura são executadas. Considera-se sucesso quando o aumento médio do tempo de resposta for ≤ **500 ms** em relação à baseline e o processamento atingir ≥ **100 eventos/segundo** sem perda de mensagens.
-
-**Cenário negativo:** O consumidor da fila será pausado ou limitado artificialmente. Espera-se acúmulo de mensagens e possível aumento de latência; o sistema deve recuperar o processamento após retomada do consumidor, com registro de mensagens não processadas (dead letter ou equivalente), se houver.
-
-**Pós-condições:** Sistema estável após teste; métricas de fila e latência arquivadas. Evidências: `[INSERIR_RELATORIO_K6_FILA_RNF09]`.
-
-**Critério de aceitação:** Aumento de tempo ≤ **500 ms**; processamento ≥ **100 eventos/segundo** sem perda.
-
-**RFs associados (rastreabilidade):** RF11, RF12, RF13, RF14.
+Por esse motivo, não foram criados scripts, cenários de execução ou resultados simulados para este requisito. Caso a infraestrutura assíncrona seja implementada futuramente, o planejamento e os testes deste RNF deverão ser retomados.
 
 ---
 
@@ -5900,24 +6019,338 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 ## 9.2.2 Resultados
 
-&emsp;Esta subseção consolida a execução dos testes de RNF. Cada resultado deve indicar data de execução, ambiente, ferramenta utilizada, métricas observadas, evidência gerada, veredito e limitação. Essa estrutura evita tratar planejamento como resultado executado e permite evolução incremental conforme demais verificações de RNF forem concluídas.
+ Esta subseção consolida os artefatos, auditorias e execuções relacionadas aos requisitos não funcionais do Spotlight. A análise foi estruturada para distinguir três situações: testes efetivamente executados com métricas disponíveis, auditorias estáticas baseadas no código e na infraestrutura versionada, e suítes automatizadas cuja execução integrada depende de ambiente, credenciais, dispositivos ou período de observação ainda não disponíveis. Dessa forma, o documento preserva a rastreabilidade sem confundir implementação da automação com aprovação do requisito.
 
-| RNF | Status da execução | Ferramenta/evidência | Métricas registradas | Veredito | Limitações |
-|-----|--------------------|----------------------|----------------------|----------|------------|
-| RNF01 | A executar | Lighthouse mobile ou medição equivalente | FCP, TTI e tempo total por tela | Pendente | Depende de build acessível em dispositivo ou URL auditável |
-| RNF02 | A executar | Logs/timestamps do fluxo de recomendação | Tempo entre interação e exibição da recomendação | Pendente | Depende de perfil de teste com histórico e recomendação operacional |
-| RNF03 | A executar | UptimeRobot ou health checks programados | Percentual de disponibilidade | Pendente | Janela completa de 30 dias pode exceder o ciclo acadêmico |
-| RNF04 | A executar | Checklist em dispositivo físico | Tamanho de áreas de toque e comportamento mobile | Pendente | Amostra limitada de aparelhos |
-| RNF05 | A executar | OWASP ZAP, Postman ou evidências HTTP | HTTPS, 401/403, JWT e armazenamento de senha | Pendente | Varredura ativa exige escopo controlado |
-| RNF06 | Executado parcialmente | `src/database/load_test/resultados_pgbench.txt` | TPS, latência média, falhas e carga de leitura/escrita no PostgreSQL | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
-| RNF07 | A executar | Amostras de logs dos serviços | Campos obrigatórios e tempo de emissão | Pendente | Depende de ambiente com logs preservados |
-| RNF08 | A executar | Logs de deploy e health checks | Tempo de indisponibilidade por serviço | Pendente | Depende de pipeline/deploy isolado |
-| RNF09 | Planejado para Sprint 5 | k6/fila ou teste de broker | Eventos por segundo e impacto na latência | Não executado nesta sprint | RabbitMQ ainda tratado como evolução planejada |
-| RNF10 | A executar via seção 9.3.2 | Planilha SUS e tarefas T01 a T09 | Taxa de sucesso, toques e SUS | Pendente | Depende de consolidação dos participantes externos |
-| RNF11 | A executar | Matriz de dispositivos | Erros por plataforma e fluxo | Pendente | Amostra limitada de Android/iOS |
-| RNF12 | A executar | Docker/health checks | Tempo de reinicialização por container | Pendente | Depende de compose completo e ambiente local estável |
+ Os scripts e instrumentos foram centralizados em `src/backend/tests/non-functional`, com uma pasta por RNF. Os artefatos temporários produzidos em futuras execuções permanecem fora do versionamento, enquanto os arquivos `README.md` e `RESULTADOS.md` de cada pasta registram os critérios, comandos e limitações.
 
-&emsp;O resultado já disponível nesta revisão é o teste de carga de banco com `pgbench`, associado ao RNF06 e usado como evidência parcial de desempenho da camada de persistência. Os demais RNFs permanecem preparados para registro nas tasks de execução correspondentes, especialmente desempenho, segurança e usabilidade.
+### 9.2.2.1 Visão consolidada
+
+| RNF   | Estado da execução                 | Evidência principal                                                                         | Resultado consolidado                                                                                                                               | Veredito                            |
+| ----- | ---------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| RNF01 | Instrumentação concluída           | `src/backend/tests/non-functional/rnf01/`                                                   | Lighthouse mobile, planilha de cinco execuções por tela e analisador implementados; medições finais dependem da aplicação acessível                 | Pendente de execução integrada      |
+| RNF02 | Instrumentação concluída           | `src/backend/tests/non-functional/rnf02/`                                                   | Cenário k6 com três perfis e 30 medições implementado; depende de três JWTs válidos e serviço de recomendação disponível                            | Pendente de execução integrada      |
+| RNF03 | Monitor implementado               | `src/backend/tests/non-functional/rnf03/`                                                   | Monitor HTTP, cálculo de disponibilidade e simulação de indisponibilidade entregues; período mensal não concluído                                   | Pendente de janela de observação    |
+| RNF04 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf04/RESULTADOS.md`                                      | Seis alvos interativos com altura declarada inferior a 44 foram identificados                                                                       | Não conforme na auditoria estática  |
+| RNF05 | Suíte de segurança implementada    | `src/backend/tests/non-functional/rnf05/`                                                   | Newman, ZAP, inspeção estática, HTTPS e verificação agregada de bcrypt preparados; execução completa exige homologação autorizada e segredos locais | Pendente de execução integrada      |
+| RNF06 | Banco executado; API instrumentada | `src/database/load_test/resultados_pgbench.txt` e `src/backend/tests/non-functional/rnf06/` | 242.011 transações no PostgreSQL, sem falhas; carga HTTP com 200 VUs implementada, mas bloqueada por health checks HTTP 503 no ambiente local       | Aprovado no banco e pendente na API |
+| RNF07 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf07/RESULTADOS.md`                                      | Serilog presente, porém sem comprovação de saída JSON e enriquecimento padronizado com os cinco campos obrigatórios                                 | Parcialmente conforme               |
+| RNF08 | Automação concluída                | `src/backend/tests/non-functional/rnf08/`                                                   | Atualização isolada com `--no-deps`, monitoramento e rollback documentados; Gateway não integra o Compose atual                                     | Pendente de deploy controlado       |
+| RNF09 | Não aplicável                      | Registro documental                                                                         | Infraestrutura assíncrona não implementada e removida do escopo de execução                                                                         | Não aplicável nesta versão          |
+| RNF10 | Instrumentos concluídos            | `src/backend/tests/non-functional/rnf10/`                                                   | Roteiro T01–T09, planilha e analisador entregues; depende de cinco participantes externos                                                           | Pendente de sessões com usuários    |
+| RNF11 | Matriz concluída                   | `src/backend/tests/non-functional/rnf11/`                                                   | Matriz com quatro dispositivos, dez fluxos e 200 execuções planejadas; depende de dispositivos físicos                                              | Pendente de validação física        |
+| RNF12 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf12/RESULTADOS.md`                                      | Quatro serviços possuem Dockerfile, health check, política de reinício e rede; Gateway não está containerizado no Compose                           | Parcialmente conforme               |
+
+### 9.2.2.2 RNF01 — Tempo de carregamento das telas
+
+ Foi criada uma suíte para medir o carregamento das telas principais em até 2.000 ms. A estratégia combina Lighthouse em modo mobile para a versão Expo Web com uma planilha de medições percebidas em Android e iOS. O analisador calcula mínimo, média, máximo, percentil 95 e percentual de execuções aprovadas.
+
+ O executor realiza cinco rodadas do Lighthouse, atendendo à quantidade de repetições prevista. Como o aplicativo utiliza navegação por estado, a entrada web pode ser auditada automaticamente, enquanto as demais telas exigem navegação real e preenchimento da planilha.
+
+| Item verificado                        | Estado                              |
+| -------------------------------------- | ----------------------------------- |
+| Executor Lighthouse mobile             | Implementado                        |
+| Cinco execuções por tela               | Suportadas pelo executor            |
+| Registro mobile Android/iOS            | Modelo de planilha disponível       |
+| Cálculo de média, mínimo, máximo e p95 | Implementado                        |
+| Cenário de rede degradada              | Campo e procedimento documentados   |
+| Métricas finais                        | Não coletadas em ambiente integrado |
+
+**Critério:** 100% das cinco execuções de cada tela em até 2.000 ms, com feedback visual em condição degradada.
+
+**Veredito:** pendente de execução com o frontend acessível e preenchimento das medições das telas.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf01/run-rnf01.ps1`;
+* `src/backend/tests/non-functional/rnf01/analyze-rnf01.py`;
+* `src/backend/tests/non-functional/rnf01/measurements.template.csv`;
+* `src/backend/tests/non-functional/rnf01/RESULTADOS.md`.
+
+### 9.2.2.3 RNF02 — Latência das recomendações
+
+ Foi implementado um cenário k6 para três perfis distintos, com dez execuções por perfil e total de 30 medições HTTP. A automação valida status 2xx, presença de conteúdo e tempo máximo de 2.000 ms. Uma planilha complementar registra o tempo percebido entre o início da solicitação e a renderização da recomendação na interface, incluindo a presença de spinner ou feedback de carregamento.
+
+| Item verificado          | Estado                              |
+| ------------------------ | ----------------------------------- |
+| Três perfis de teste     | Parametrizados por variáveis locais |
+| Dez execuções por perfil | Configuradas                        |
+| Total de 30 medições     | Configurado                         |
+| Threshold de 2.000 ms    | Implementado                        |
+| Medição da interface     | Modelo de planilha disponível       |
+| Tokens JWT válidos       | Necessários e não versionados       |
+| Resultado integrado      | Não coletado                        |
+
+**Critério:** 100% das 30 medições em até 2.000 ms, com feedback visual quando houver atraso.
+
+**Veredito:** pendente de execução integrada com três perfis autenticados e serviço de recomendação operacional.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf02/recommendation-latency.js`;
+* `src/backend/tests/non-functional/rnf02/run-rnf02.ps1`;
+* `src/backend/tests/non-functional/rnf02/interface-measurements.template.csv`;
+* `src/backend/tests/non-functional/rnf02/analyze-rnf02.py`.
+
+### 9.2.2.4 RNF03 — Disponibilidade
+
+ Foi entregue um monitor HTTP configurável para os endpoints críticos, com registro de timestamp, código HTTP, latência e disponibilidade. O analisador calcula o percentual de uptime por endpoint e identifica incidentes com início, fim e duração. Também foi criado um script de indisponibilidade controlada para validar detecção e recuperação em homologação.
+
+ O critério mensal de 99% exige janela de observação prolongada. Portanto, a existência do monitor e de uma execução curta não substitui o acompanhamento do período real. A documentação orienta que datas exatas sejam informadas e que o resultado seja classificado como parcial quando 30 dias não tiverem sido concluídos.
+
+| Item verificado                | Estado                                 |
+| ------------------------------ | -------------------------------------- |
+| Monitor de endpoints           | Implementado                           |
+| Intervalo configurável         | Implementado                           |
+| Registro de incidentes         | Implementado                           |
+| Simulação de indisponibilidade | Implementada com confirmação explícita |
+| Cálculo de uptime              | Implementado                           |
+| Período mensal completo        | Não concluído                          |
+
+**Critério:** disponibilidade igual ou superior a 99%, equivalente a no máximo 7h18min de indisponibilidade em um mês de 30 dias.
+
+**Veredito:** pendente de janela representativa de monitoramento.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf03/run-rnf03.ps1`;
+* `src/backend/tests/non-functional/rnf03/simulate-outage.ps1`;
+* `src/backend/tests/non-functional/rnf03/analyze-rnf03.py`;
+* `src/backend/tests/non-functional/rnf03/endpoints.example.json`.
+
+### 9.2.2.5 RNF04 — Mobile first e áreas de toque
+
+ A auditoria estática identificou elementos interativos com altura explicitamente inferior ao mínimo de 44 unidades de layout. A existência da constante `spacing.touchMin = 44` e sua utilização em componentes como `Chip` não garante a conformidade integral da interface, pois outros estilos possuem dimensões menores.
+
+| Local identificado                   | Dimensão declarada | Resultado    |
+| ------------------------------------ | -----------------: | ------------ |
+| `FilterDropdown.button`              |    `minHeight: 34` | Não conforme |
+| `FilterDropdown.menuItem`            |    `minHeight: 30` | Não conforme |
+| `CatalogHero.cta`                    |    `minHeight: 28` | Não conforme |
+| ação secundária em `DetalhesView`    |    `minHeight: 36` | Não conforme |
+| botão de confirmação em `App.js`     |    `minHeight: 36` | Não conforme |
+| opção em `PreferenceSelectionScreen` |    `minHeight: 42` | Não conforme |
+
+ Também foram entregues um checklist de componentes e um analisador para calcular a conformidade geral e por plataforma após validação física em Android e iOS.
+
+**Critério:** 100% dos elementos interativos com largura e altura mínimas de 44 unidades e funcionamento por toque em Android e iOS.
+
+**Veredito:** não conforme na auditoria estática; validação física ainda necessária para completar a cobertura.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf04/run-static-touch-audit.ps1`;
+* `src/backend/tests/non-functional/rnf04/touch-target-checklist.csv`;
+* `src/backend/tests/non-functional/rnf04/analyze-rnf04.py`;
+* `src/backend/tests/non-functional/rnf04/RESULTADOS.md`.
+
+### 9.2.2.6 RNF05 — Segurança
+
+ Foi criada uma suíte reproduzível para autenticação JWT, autorização, transporte HTTPS, armazenamento de senha e varredura web. Os cenários HTTP são executados por Newman e produzem relatórios JSON e JUnit. A inspeção de transporte verifica se o acesso HTTP é bloqueado ou redirecionado para HTTPS. A consulta de senha trabalha apenas com métricas agregadas, sem exportar hashes. O OWASP ZAP Baseline foi configurado como verificação passiva, enquanto a análise ativa exige habilitação explícita e ambiente autorizado.
+
+| Controle                                          | Evidência gerada                | Critério                                                       |
+| ------------------------------------------------- | ------------------------------- | -------------------------------------------------------------- |
+| Token ausente, malformado, adulterado ou expirado | Newman JSON/JUnit               | HTTP 401                                                       |
+| Usuário sem papel necessário                      | Newman JSON/JUnit               | HTTP 403                                                       |
+| Token válido                                      | Newman JSON/JUnit               | Não retornar 401/403                                           |
+| Transporte                                        | `transport-results.json`        | HTTP bloqueado ou redirecionado para HTTPS                     |
+| Armazenamento de senha                            | `password-storage-results.json` | 100% bcrypt, custo mínimo 10 e nenhuma suspeita de texto plano |
+| Configuração JWT e segredos                       | `static-security-results.json`  | Assinatura e expiração configuradas; zero segredos confirmados |
+| Vulnerabilidades web                              | Relatórios ZAP                  | Zero alerta alto sem tratamento                                |
+
+ Tokens, credenciais e connection strings são recebidos apenas por variáveis do processo e não são versionados.
+
+**Veredito:** suíte implementada; resultado integrado pendente de ambiente autorizado, URL HTTPS e credenciais locais válidas.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf05/postman/RNF05-Seguranca.postman_collection.json`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-rnf05.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-static-security-check.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-transport-check.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-password-storage-check.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-zap.ps1`;
+* `src/backend/tests/non-functional/rnf05/RESULTADOS.md`.
+
+### 9.2.2.7 RNF06 — Carga e escalabilidade
+
+#### Evidência complementar da camada de persistência
+
+ O teste de banco disponível no repositório foi executado em PostgreSQL 16 Alpine, em Docker local, utilizando aproximadamente 208 mil registros, 20 clientes, quatro threads e duração de 30 segundos por cenário. Essa execução é complementar e não substitui a carga HTTP completa das APIs.
+
+| Cenário                            |  Transações | Falhas | Taxa de erro | Latência média |            Throughput |
+| ---------------------------------- | ----------: | -----: | -----------: | -------------: | --------------------: |
+| Leitura de catálogo e recomendação |      85.108 |      0 |       0,000% |       7,043 ms | 2.839,57 transações/s |
+| Escrita de avaliação e auditoria   |     156.903 |      0 |       0,000% |       3,823 ms | 5.232,15 transações/s |
+| **Total**                          | **242.011** |  **0** |   **0,000%** |              — |                     — |
+
+ A execução também registrou 256.903 linhas na auditoria de avaliações, sem transações com falha. As duas latências médias ficaram muito abaixo do limite de 3.000 ms definido para o RNF06.
+
+#### Automação HTTP
+
+ Foi implementado um cenário k6 com catálogo, busca e recomendação, configurado para 200 usuários virtuais durante dez minutos. Os thresholds exigem tempo médio inferior a 3.000 ms e taxa de erro inferior a 1%. Um segundo cenário aumenta a carga até 300 usuários e depois reduz para 50, permitindo observar degradação e recuperação. O executor coleta resumo JSON, console, CPU, memória e logs dos serviços.
+
+ Durante a preparação local, os health checks de catálogo e recomendação responderam HTTP 503. Por essa razão, não foi registrada aprovação da camada HTTP sem uma execução confiável. O script permanece pronto para reprodução assim que as dependências do ambiente estiverem saudáveis e houver JWT válido para a recomendação.
+
+**Critério:** 200 usuários simultâneos por dez minutos, tempo médio inferior a 3.000 ms, taxa de erro inferior a 1% e ausência de queda crítica.
+
+**Veredito:** camada de persistência aprovada no escopo executado; carga HTTP pendente por indisponibilidade das dependências locais.
+
+**Evidências:**
+
+* `src/database/load_test/resultados_pgbench.txt`;
+* `src/backend/tests/non-functional/rnf06/load-test.js`;
+* `src/backend/tests/non-functional/rnf06/run-rnf06.ps1`;
+* `src/backend/tests/non-functional/rnf06/generate-rnf06-report.ps1`;
+* `src/backend/tests/non-functional/rnf06/RESULTADOS.md`.
+
+### 9.2.2.8 RNF07 — Logs estruturados
+
+ A auditoria do código identificou uso de Serilog e `UseSerilogRequestLogging` nos serviços. Entretanto, os arquivos de configuração analisados definem principalmente níveis mínimos e não comprovam saída JSON nem enriquecimento padronizado com timestamp, nível, serviço, sessão ou correlation ID e dispositivo.
+
+ Foi implementado um executor que envia `X-Correlation-ID`, `X-Session-ID` e `X-Device-ID`, coleta os logs dos quatro containers e utiliza um validador para verificar os cinco campos obrigatórios, latência de emissão e possível exposição de dados sensíveis.
+
+| Requisito                 | Resultado da auditoria                                                  |
+| ------------------------- | ----------------------------------------------------------------------- |
+| Infraestrutura de logging | Serilog presente                                                        |
+| Timestamp e nível         | Disponíveis no formato atual, sujeitos à validação do registro coletado |
+| Nome do serviço           | Não comprovado de forma padronizada                                     |
+| Sessão ou correlation ID  | Não comprovado de forma padronizada                                     |
+| Dispositivo               | Não comprovado de forma padronizada                                     |
+| Saída JSON estruturada    | Não identificada explicitamente                                         |
+| Busca por segredos        | Implementada no validador                                               |
+
+**Critério:** 100% dos eventos registrados em até 1.000 ms, com timestamp, nível, serviço, sessão/correlation ID e dispositivo, sem segredos.
+
+**Veredito:** parcialmente conforme; a infraestrutura existe, mas os campos obrigatórios e a saída estruturada precisam ser comprovados ou implementados.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf07/run-rnf07.ps1`;
+* `src/backend/tests/non-functional/rnf07/validate-logs.py`;
+* `src/backend/tests/non-functional/rnf07/events.example.json`;
+* `src/backend/tests/non-functional/rnf07/RESULTADOS.md`.
+
+### 9.2.2.9 RNF08 — Deploy independente
+
+ Foi implementado um executor de deploy isolado que realiza o build do serviço alvo, aplica `docker compose up -d --no-deps`, monitora seu health check e confirma a continuidade dos demais serviços. O script inicia em modo seguro e somente executa a alteração real quando recebe confirmação explícita. Também registra o tempo até recuperação, falhas externas ao alvo e instrução de rollback.
+
+ O Compose analisado contém catálogo, usuário, recomendação e geolocalização. O API Gateway possui projeto próprio, porém não integra o `docker-compose.yml` atual; por isso, não está coberto pelo deploy containerizado.
+
+| Item verificado                 | Estado                       |
+| ------------------------------- | ---------------------------- |
+| Build isolado                   | Automatizado                 |
+| Atualização sem dependências    | Automatizada com `--no-deps` |
+| Monitoramento do alvo           | Automatizado                 |
+| Verificação dos demais serviços | Automatizada                 |
+| Limite de cinco minutos         | Configurado                  |
+| Rollback                        | Documentado                  |
+| Gateway no Compose              | Ausente                      |
+| Deploy controlado executado     | Pendente                     |
+
+**Critério:** serviço alvo recuperado em até 300 segundos e 100% dos demais serviços operacionais durante a atualização.
+
+**Veredito:** automação concluída; resultado final pendente de execução em ambiente de deploy autorizado.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf08/run-rnf08.ps1`;
+* `src/backend/tests/non-functional/rnf08/services.json`;
+* `src/backend/tests/non-functional/rnf08/RESULTADOS.md`.
+
+### 9.2.2.10 RNF09 — Processamento assíncrono
+
+ O RNF09 foi classificado como **não aplicável nesta versão**. A infraestrutura de processamento assíncrono com RabbitMQ ou mecanismo equivalente não foi implementada e foi removida do escopo de execução dos testes. Não foram criados scripts, métricas ou evidências artificiais para esse requisito.
+
+**Veredito:** não aplicável nesta versão.
+
+### 9.2.2.11 RNF10 — Usabilidade
+
+ Foram preparados o roteiro T01–T09, a planilha de sessões e o analisador de resultados. A matriz prevê cinco participantes externos e 45 execuções, uma por participante e tarefa. O cálculo considera conclusão sem ajuda, quantidade de toques, tempo e observações qualitativas, identificando automaticamente tarefas abaixo de 85% de sucesso ou acima de três toques.
+
+| Item verificado                             | Estado       |
+| ------------------------------------------- | ------------ |
+| Roteiro T01–T09                             | Implementado |
+| Planilha de cinco participantes             | Implementada |
+| Anonimização por identificadores como `P01` | Documentada  |
+| Cálculo por tarefa e consolidado            | Implementado |
+| Registro de toques e ajuda                  | Implementado |
+| Sessões externas realizadas                 | Pendente     |
+
+**Critério:** pelo menos 85% de sucesso sem ajuda e média de até três toques nas execuções bem-sucedidas.
+
+**Veredito:** pendente de aplicação das sessões com participantes externos. Os resultados devem ser relacionados também à seção 9.3.2.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf10/tasks.csv`;
+* `src/backend/tests/non-functional/rnf10/sessions.template.csv`;
+* `src/backend/tests/non-functional/rnf10/analyze-rnf10.py`;
+* `src/backend/tests/non-functional/rnf10/RESULTADOS.md`.
+
+### 9.2.2.12 RNF11 — Compatibilidade Android e iOS
+
+ Foi criada uma matriz para dois dispositivos Android 10+ e dois dispositivos iOS 15+, cobrindo dez fluxos e cinco repetições por fluxo e dispositivo. Isso totaliza 200 execuções, sendo 100 por plataforma, e permite calcular a taxa de erro em incrementos de 1%.
+
+ O analisador consolida erros por plataforma, dispositivo e fluxo, incluindo crash, falha visual e comportamento funcional incorreto. A exigência de dispositivos físicos foi mantida; emuladores não substituem essa validação sem que a limitação seja declarada.
+
+| Item verificado                        | Estado             |
+| -------------------------------------- | ------------------ |
+| Dois Android e dois iOS                | Matriz preparada   |
+| Dez fluxos principais                  | Mapeados           |
+| Cinco repetições por fluxo/dispositivo | Planejadas         |
+| Total de 200 execuções                 | Planilha preparada |
+| Cálculo de erro por plataforma         | Implementado       |
+| Execução em dispositivos físicos       | Pendente           |
+
+**Critério:** taxa de erro igual ou inferior a 1% em Android e iOS.
+
+**Veredito:** pendente de validação nos quatro dispositivos físicos.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf11/devices.template.csv`;
+* `src/backend/tests/non-functional/rnf11/executions.template.csv`;
+* `src/backend/tests/non-functional/rnf11/analyze-rnf11.py`;
+* `src/backend/tests/non-functional/rnf11/RESULTADOS.md`.
+
+### 9.2.2.13 RNF12 — Containers e recuperação
+
+ A auditoria estática do repositório identificou quatro serviços no Compose: catálogo, usuário, recomendação e geolocalização. Todos possuem Dockerfile, health check, política `restart: unless-stopped` e participação na rede `spotlight_network`. O API Gateway possui projeto .NET, porém não possui Dockerfile nem entrada no Compose analisado.
+
+ Também foi criado um executor que reinicia cada serviço de forma controlada, mede o tempo até o health check positivo e verifica se os demais containers permanecem disponíveis. Operações destrutivas exigem o parâmetro explícito `-Execute`.
+
+| Item verificado                | Resultado estático                   |
+| ------------------------------ | ------------------------------------ |
+| Catálogo containerizado        | Conforme                             |
+| Usuário containerizado         | Conforme                             |
+| Recomendação containerizada    | Conforme                             |
+| Geolocalização containerizada  | Conforme                             |
+| Health checks                  | Presentes nos quatro serviços        |
+| Política de reinício           | `unless-stopped` nos quatro serviços |
+| Rede isolada                   | `spotlight_network`                  |
+| API Gateway containerizado     | Não conforme / fora do Compose       |
+| Recuperação em até 30 segundos | Pendente de execução controlada      |
+
+**Critério:** 100% dos serviços do escopo em containers isolados e retorno ao health check em até 30 segundos, sem indisponibilizar os demais.
+
+**Veredito:** parcialmente conforme na auditoria estática; os quatro serviços do Compose atendem à estrutura prevista, mas o Gateway não está containerizado e a recuperação temporal depende de execução controlada.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf12/audit-containers.ps1`;
+* `src/backend/tests/non-functional/rnf12/run-rnf12.ps1`;
+* `src/backend/tests/non-functional/rnf12/services.json`;
+* `src/backend/tests/non-functional/rnf12/RESULTADOS.md`.
+
+### 9.2.2.14 Síntese dos achados
+
+ A execução dos cards resultou em uma base reproduzível para todos os RNFs aplicáveis. A maior parte dos requisitos possui executor, modelo de evidência, critérios automatizados e relatório associado. As auditorias estáticas permitiram identificar não conformidades concretas antes das execuções externas: alvos de toque inferiores a 44 unidades no RNF04, ausência de comprovação de cinco campos estruturados no RNF07 e ausência do API Gateway no Compose nos RNF08 e RNF12.
+
+ O RNF06 possui evidência quantitativa da camada de persistência, com 242.011 transações processadas sem falhas. A validação de carga HTTP permanece pendente porque os serviços responderam HTTP 503 nos health checks do ambiente local. Os RNFs dependentes de usuários, dispositivos, credenciais ou períodos prolongados foram mantidos como pendentes, com os instrumentos necessários para execução posterior.
+
+ Como próximos passos técnicos, recomenda-se priorizar: correção dos alvos de toque subdimensionados; enriquecimento estruturado dos logs; inclusão do API Gateway na estratégia de containerização; estabilização das dependências para execução do k6; disponibilização de ambiente HTTPS de homologação; e realização das sessões com usuários e dispositivos físicos.
+
+---
 
 ## 9.3 Testes de Usabilidade
 
@@ -6138,19 +6571,80 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 ## 9.3.2 Resultados
 
-&emsp;Esta subseção será preenchida após a execução da rodada de usabilidade com participantes externos. Para manter coerência, os dados abaixo devem registrar apenas resultados efetivamente coletados na planilha de campo e no questionário SUS.
+&emsp;Esta subseção consolida os resultados da rodada de testes de usabilidade realizada com cinco participantes, identificados como P1, P2, P3, P4 e P5. A análise combina os comportamentos observados durante a execução das tarefas com as pontuações obtidas por meio do System Usability Scale (SUS), permitindo avaliar a efetividade dos fluxos principais e a percepção global de facilidade de uso do aplicativo.
 
 | Métrica | Resultado observado | Critério de aceitação | Veredito |
 |---------|---------------------|-----------------------|----------|
-| Quantidade de participantes externos | A preencher | Mínimo de 5 participantes | Pendente |
-| Participante 60+ com baixa familiaridade tecnológica | A preencher | Pelo menos 1 participante | Pendente |
-| Média SUS | A preencher | SUS médio ≥ 68 | Pendente |
-| Taxa média de conclusão das tarefas | A preencher | ≥ 85% | Pendente |
-| Tarefas concluídas em até 3 toques | A preencher | ≥ 85% das execuções bem-sucedidas | Pendente |
-| Principais dificuldades observadas | A preencher | Registro qualitativo | Pendente |
-| Melhorias priorizadas | A preencher | Backlog de ajustes | Pendente |
+| Quantidade de participantes externos | 5 participantes | Mínimo de 5 participantes | Atendido |
+| Participante 60+ com baixa familiaridade tecnológica | Não informado nos dados consolidados | Pelo menos 1 participante | Não conclusivo |
+| Média SUS | 79,5 | SUS médio ≥ 68 | Atendido |
+| Taxa média de conclusão das tarefas | 100% | ≥ 85% | Atendido |
+| Tarefas concluídas em até 3 toques | Não informado nos dados consolidados | ≥ 85% das execuções bem-sucedidas | Não conclusivo |
+| Principais dificuldades observadas | Filtros, navegação horizontal, faixa de preço, destaque do botão de compra e ausência de sugestões na busca | Registro qualitativo | Registrado |
+| Melhorias priorizadas | Refinar filtros, carrosséis, busca, faixa de preço e botão de compra | Backlog de ajustes | Definido |
 
-&emsp;As evidências esperadas são a planilha de anotações, os tempos por tarefa, a contagem de toques, a indicação de auxílio, as respostas SUS e os comentários espontâneos dos participantes. Esses registros serão usados para validar principalmente RNF04, RNF10 e RNF11.
+&emsp;As evidências consideradas nesta análise são os registros de conclusão das tarefas, as dificuldades observadas durante as sessões e as pontuações individuais do questionário SUS. Não foram disponibilizados dados consolidados de tempo, número de toques ou perfil etário dos participantes; portanto, não é possível emitir veredito sobre esses critérios específicos sem extrapolar as informações coletadas.
+
+### 9.3.2.1 Resultados gerais dos testes
+
+&emsp;A rodada foi efetivamente realizada com cinco participantes externos, e todos concluíram todas as tarefas propostas no roteiro, resultando em taxa observada de conclusão de 100%. Esse resultado supera o critério quantitativo de 85% definido no planejamento e comprova boa efetividade geral dos fluxos avaliados, uma vez que os participantes conseguiram alcançar os objetivos estabelecidos sem ocorrência de bloqueios. Entretanto, a conclusão integral não significa ausência de dificuldades: P4 necessitou de ajuda leve nas etapas de preferências e filtros, enquanto P5 apresentou maior dificuldade na seleção da faixa de preço, na utilização dos filtros e na navegação horizontal.
+
+&emsp;Como o critério de sucesso do RNF10 também considera a conclusão sem auxílio verbal que revele o caminho na interface e a eficiência em até três toques, os dados disponíveis não permitem afirmar que todas as execuções atenderam integralmente a esse requisito. A natureza exata da ajuda fornecida a P4 não foi detalhada, e as quantidades de toques por tarefa não foram consolidadas. Assim, confirma-se o atendimento ao critério de conclusão, mas a eficiência por toques permanece não conclusiva. As dificuldades de P4 e P5 devem ser tratadas como prioridade de melhoria, pois indicam menor autonomia na interação com determinados componentes.
+
+### 9.3.2.2 Análise dos comportamentos observados
+
+&emsp;Os comportamentos observados demonstram variação relevante entre os participantes. P3 apresentou o melhor desempenho geral e percorreu os fluxos sem dificuldades relevantes, indicando que a organização da interface é adequada para usuários capazes de reconhecer os padrões de interação adotados. P1 também apresentou bom desempenho, com pequena dificuldade apenas para perceber a possibilidade de deslocamento horizontal nos carrosséis de espetáculos.
+
+&emsp;P2 esperava receber sugestões automáticas durante a busca, comportamento compatível com padrões recorrentes em aplicações digitais. Além disso, considerou os filtros e o botão de compra pouco destacados, o que evidencia limitações de visibilidade e hierarquia visual em elementos importantes para descoberta e conversão. P4 precisou de ajuda leve nas etapas de definição de preferências e aplicação de filtros, sugerindo que os controles dessas telas não comunicam de forma plenamente autônoma seu estado ou a ação necessária para prosseguir.
+
+&emsp;P5 concentrou o maior número de dificuldades, especialmente na seleção da faixa de preço, no uso dos filtros e na navegação horizontal. A recorrência desses pontos em mais de um participante indica que não se trata apenas de uma dificuldade isolada. A navegação horizontal foi pouco percebida por P1 e P5, enquanto os filtros geraram observações para P2, P4 e P5. Esses padrões apontam para problemas de descobribilidade, destaque visual e clareza dos mecanismos de refinamento do catálogo. Embora não tenham impedido a conclusão das tarefas, as dificuldades de P4 e P5 reduziram a autonomia de uso e, por isso, representam os achados de maior prioridade para refinamento.
+
+### 9.3.2.3 Análise dos resultados SUS
+
+| Participante | Pontuação SUS | Interpretação |
+|--------------|--------------:|---------------|
+| P1 | 85 | Acima da média e classificação A |
+| P2 | 85 | Acima da média e classificação A |
+| P3 | 85 | Acima da média e classificação A |
+| P4 | 85 | Acima da média e classificação A |
+| P5 | 57,5 | Abaixo da média de usabilidade |
+| **Média** | **79,5** | **Acima da média de usabilidade** |
+
+&emsp;A média SUS do grupo foi de 79,5 pontos, valor superior ao referencial de 68 pontos e, portanto, indicativo de usabilidade global acima da média. O resultado atende ao critério de aceitação estabelecido no planejamento. Contudo, a média permanece abaixo do limiar de 80,3 pontos adotado para a classificação A, não permitindo atribuir essa classificação ao resultado agregado da rodada.
+
+&emsp;Individualmente, P1, P2, P3 e P4 obtiveram 85 pontos, superando tanto a média de 68 quanto o limiar de 80,3 para classificação A. P5 obteve 57,5 pontos, resultado abaixo da média de usabilidade. A diferença de 27,5 pontos entre P5 e os demais participantes demonstra que a percepção positiva predominante não foi uniforme. Esse resultado é coerente com as dificuldades observadas por P5 e reforça a necessidade de aprimorar os componentes de faixa de preço, filtros e navegação horizontal, de modo a reduzir a dependência de familiaridade prévia com padrões de interação mobile.
+
+### 9.3.2.4 Pontos positivos
+
+- Conclusão de todas as tarefas por todos os participantes, sem ocorrência de bloqueios que impedissem o término dos fluxos.
+- Média SUS de 79,5 pontos, superior ao referencial de 68 e compatível com usabilidade global acima da média.
+- Pontuação SUS de 85 para quatro dos cinco participantes, correspondente à classificação A na interpretação adotada.
+- Desempenho de P3 sem dificuldades relevantes, evidenciando que a interface permite navegação fluida quando seus padrões de interação são prontamente reconhecidos.
+- Capacidade dos participantes de concluir os fluxos de preferências, catálogo, busca, filtros, detalhes e intenção de compra, ainda que com diferentes níveis de dificuldade.
+
+### 9.3.2.5 Problemas identificados
+
+- Baixa percepção da navegação horizontal nos carrosséis, observada em P1 e P5.
+- Ausência de sugestões automáticas na busca, recurso esperado por P2.
+- Baixo destaque visual dos filtros, apontado por P2 e associado às dificuldades de P4 e P5.
+- Baixo destaque do botão de compra, reduzindo a visibilidade da principal ação de conversão para P2.
+- Dificuldade de P5 na seleção da faixa de preço.
+- Necessidade de ajuda leve para P4 nas etapas de preferências e filtros.
+- Experiência menos satisfatória para P5, refletida tanto nas dificuldades observadas quanto na pontuação SUS de 57,5.
+
+### 9.3.2.6 Recomendações de melhoria
+
+&emsp;Recomenda-se tornar os carrosséis horizontais mais descobríveis por meio da exibição parcial do próximo card, de indicadores visuais de continuidade ou de orientação breve no primeiro contato, sem alterar a simplicidade do catálogo. Para a busca, recomenda-se avaliar a inclusão de sugestões automáticas relacionadas aos espetáculos disponíveis, mantendo comunicação clara quando não houver correspondências.
+
+&emsp;Os filtros devem receber maior destaque na hierarquia visual e apresentar estados de seleção mais evidentes, incluindo retorno perceptível após a aplicação. A seleção de faixa de preço deve ser revisada quanto à clareza dos rótulos, área de toque e representação do valor escolhido. Também se recomenda reforçar visualmente o botão de compra, assegurando contraste, posicionamento e identificação compatíveis com sua relevância no fluxo.
+
+&emsp;Após a implementação dos ajustes, recomenda-se repetir as tarefas T03, T05, T06, T08 e T09 com o mesmo roteiro, pois elas abrangem os elementos que concentraram as dificuldades observadas. Uma nova aplicação do SUS permitirá verificar se as alterações reduzem a diferença entre participantes e elevam a média do grupo acima do limiar de 80,3 pontos.
+
+### 9.3.2.7 Conclusão
+
+&emsp;Os resultados indicam que o Spotlight atendeu aos critérios de aceitação relativos à pontuação SUS e à conclusão das tarefas. A média SUS de 79,5 superou o critério mínimo de 68 pontos, e a taxa de conclusão de 100% superou o limiar de 85%. O resultado agregado permanece abaixo de 80,3 e, portanto, não recebe classificação A. Além disso, não é possível concluir o atendimento ao critério de eficiência em até três toques nem confirmar a participação do perfil 60+ com baixa familiaridade tecnológica, pois essas informações não constam nos dados consolidados.
+
+&emsp;Conclui-se que a solução possui uma base de interação funcional e compreensível. Os pontos críticos identificados não impediram o uso, mas afetaram a descobribilidade, a hierarquia visual e a autonomia em componentes de busca, filtros, faixa de preço, carrosséis e compra. Após a implementação dos ajustes, recomenda-se realizar nova rodada de validação com ênfase nas tarefas T03, T05, T06, T08 e T09, preservando o roteiro sempre que possível para permitir a comparação dos resultados.
 
 ## 9.4 Testes de Integração
 
@@ -6757,6 +7251,102 @@ npx expo start --lan --clear
 | Falha ao resolver localização | Serviço de geolocalização indisponível ou bloqueio de rede externa | Prosseguir com o fluxo; a localização é tratada como recurso opcional na demonstração |
 
 &emsp;Na Sprint 3, a geolocalização foi implementada como integração adicional via OpenStreetMap/Nominatim. Para evitar que instabilidades externas ou bloqueios locais interrompam o fluxo principal de autenticação, a aplicação mobile trata a localização como recurso opcional: quando ela falha, o erro é registrado em console, mas login e cadastro continuam funcionando.
+
+## 10.3 Execução containerizada com Docker Compose
+
+&emsp;Além da execução manual via `run-all.ps1` e Expo, o projeto possui uma estratégia de execução containerizada separando desenvolvimento e produção. Essa separação evita misturar hot reload, volumes e portas de debug com uma configuração mais restrita de produção.
+
+### 10.3.1 Preparação do ambiente
+
+&emsp;O arquivo `.env.example` deve ser copiado para `.env` e preenchido com os valores reais do ambiente. O `.env` não deve ser versionado, pois contém connection strings e segredos.
+
+```powershell
+Copy-Item .env.example .env
+```
+
+&emsp;As variáveis mínimas para o funcionamento integrado são:
+
+```env
+DATABASE_CONNECTION_STRING=
+SUPABASE_JWT_SECRET=
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_API_BASE_URL=http://localhost:5000
+PROD_EXPO_PUBLIC_API_BASE_URL=/api
+MONGODB_CONNECTION_STRING=
+MONGODB_DATABASE=spotlight_telemetry
+MONGODB_TELEMETRY_COLLECTION=interacoes
+NOMINATIM_BASE_URL=https://nominatim.openstreetmap.org
+NOMINATIM_USER_AGENT=spotlight-inteli-g04/1.0
+```
+
+### 10.3.2 Desenvolvimento com hot reload
+
+&emsp;Para desenvolvimento, o Compose monta volumes do código fonte, preserva `node_modules` e pacotes NuGet em volumes Docker e executa os serviços .NET com `dotnet watch`. O frontend roda pelo Expo/Metro.
+
+```powershell
+docker compose -f docker-compose.dev.yml up --build
+```
+
+&emsp;Portas locais esperadas:
+
+| Serviço | Porta local | URL |
+|---|---:|---|
+| Frontend Expo Web | 8081 | `http://localhost:8081` |
+| API Gateway | 5000 | `http://localhost:5000` |
+| Catálogo | 5001 | `http://localhost:5001` |
+| Usuário | 5002 | `http://localhost:5002` |
+| Recomendação | 5003 | `http://localhost:5003` |
+| Geolocalização | 5004 | `http://localhost:5004` |
+
+### 10.3.3 Produção local ou VPS
+
+&emsp;Para produção, o Compose publica apenas o frontend. O frontend servido por Nginx encaminha `/api/*` para o gateway interno, e o gateway distribui as requisições aos serviços `catalogo`, `usuario`, `recomendacao` e `geolocalizacao`.
+
+```powershell
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+&emsp;Comandos de verificação:
+
+```powershell
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f gateway
+docker compose -f docker-compose.prod.yml logs -f frontend
+```
+
+&emsp;A aplicação web fica disponível em:
+
+```txt
+http://localhost:8080
+```
+
+&emsp;Em um servidor, a porta `8080` pode ser colocada atrás de um proxy reverso com TLS, como Caddy, Traefik ou Nginx. Para um deploy simples em VPS, o desenho recomendado é:
+
+1. Proxy reverso externo nas portas 80/443.
+2. Serviço `frontend` acessível apenas pelo proxy ou pela porta local configurada.
+3. API Gateway e microsserviços sem portas públicas.
+4. Supabase e MongoDB Atlas com allowlist do IP do servidor.
+
+### 10.3.4 Builds manuais
+
+&emsp;Quando necessário, as imagens podem ser construídas individualmente:
+
+```powershell
+docker build -f Dockerfile.frontend --target runtime -t spotlight-frontend:local .
+docker build -t spotlight-gateway:local src/backend/api-gateway
+docker build -t spotlight-catalogo:local src/backend/services/catalogo
+docker build -t spotlight-usuario:local src/backend/services/usuario
+docker build -t spotlight-recomendacao:local src/backend/services/recomendacao
+docker build -t spotlight-geolocalizacao:local src/backend/services/geolocalizacao
+```
+
+### 10.3.5 Estratégias de deploy
+
+&emsp;Para o estágio atual do projeto, a alternativa mais direta é uma VPS com Docker Compose, pois o repositório já contém a orquestração completa e depende de serviços gerenciados externos para banco relacional, autenticação, storage e telemetria. Em ambientes com maior exigência operacional, as imagens podem ser publicadas em registry e executadas em Render, Railway, Fly.io ou AWS ECS/Fargate. Em qualquer cenário, segredos devem ser configurados no provedor e não no repositório.
 
 # Referências
 _conteúdo_
