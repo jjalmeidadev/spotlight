@@ -102,6 +102,8 @@ publish:model-artifacts:
   script:
     - test -n "$SUPABASE_URL"
     - test -n "$SUPABASE_SERVICE_ROLE_KEY"
+    - echo "DEBUG SUPABASE_URL length=$(printf '%s' "$SUPABASE_URL" | wc -c)"
+    - printf 'DEBUG SUPABASE_URL bytes='; printf '%s' "$SUPABASE_URL" | od -An -c | tr -s ' '
     - test -f src/models/artifacts/recomendacao_incrementada_mlnet.zip
     - test -f src/models/artifacts/item_similarities.json
     - test -f src/dataset/recomendacao_balanceado.csv
