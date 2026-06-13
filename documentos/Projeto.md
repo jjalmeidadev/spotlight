@@ -5697,29 +5697,13 @@ _conteúdo_
 
 ---
 
-### 9.2.1.10 RNF09 — Processamento assíncrono com fila (Sprint 5)
+### 9.2.1.10 RNF09 — Processamento assíncrono
 
-**Identificador e nome:** RNF09 — Processamento assíncrono de eventos (aspecto: Desempenho).
+**Status:** Não aplicável nesta versão.
 
-**Objetivo do teste:** Validar, na Sprint 5, que o processamento via fila (RabbitMQ ou equivalente) não degrada a experiência síncrona do usuário além do limite e atinge a taxa mínima de eventos, condição para endurecer a telemetria e reduzir perda de sinais comportamentais (RF11 a RF14).
+O RNF09 não será executado porque a infraestrutura de processamento assíncrono prevista no planejamento, incluindo RabbitMQ ou mecanismo equivalente, não foi implementada no escopo atual do projeto.
 
-**Ferramenta(s):** k6 com cenário de eventos simultâneos.
-
-**Pré-condições:**
-
-- Sistema com fila configurada e consumidores ativos (ML Engine ou serviço de processamento).
-- Script k6 que publica interações de usuário e mede tempo de resposta das APIs síncronas em paralelo.
-- Baseline de tempo de resposta sem carga na fila estabelecida.
-
-**Cenário positivo:** Serão simulados **100 eventos simultâneos** na fila enquanto requisições síncronas de leitura são executadas. Considera-se sucesso quando o aumento médio do tempo de resposta for ≤ **500 ms** em relação à baseline e o processamento atingir ≥ **100 eventos/segundo** sem perda de mensagens.
-
-**Cenário negativo:** O consumidor da fila será pausado ou limitado artificialmente. Espera-se acúmulo de mensagens e possível aumento de latência; o sistema deve recuperar o processamento após retomada do consumidor, com registro de mensagens não processadas (dead letter ou equivalente), se houver.
-
-**Pós-condições:** Sistema estável após teste; métricas de fila e latência arquivadas. Evidências: `[INSERIR_RELATORIO_K6_FILA_RNF09]`.
-
-**Critério de aceitação:** Aumento de tempo ≤ **500 ms**; processamento ≥ **100 eventos/segundo** sem perda.
-
-**RFs associados (rastreabilidade):** RF11, RF12, RF13, RF14.
+Por esse motivo, não foram criados scripts, cenários de execução ou resultados simulados para este requisito. Caso a infraestrutura assíncrona seja implementada futuramente, o planejamento e os testes deste RNF deverão ser retomados.
 
 ---
 
@@ -5869,7 +5853,7 @@ _conteúdo_
 | RNF06 | Executado parcialmente | `src/database/load_test/resultados_pgbench.txt` | TPS, latência média, falhas e carga de leitura/escrita no PostgreSQL | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
 | RNF07 | A executar | Amostras de logs dos serviços | Campos obrigatórios e tempo de emissão | Pendente | Depende de ambiente com logs preservados |
 | RNF08 | A executar | Logs de deploy e health checks | Tempo de indisponibilidade por serviço | Pendente | Depende de pipeline/deploy isolado |
-| RNF09 | Planejado para Sprint 5 | k6/fila ou teste de broker | Eventos por segundo e impacto na latência | Não executado nesta sprint | RabbitMQ ainda tratado como evolução planejada |
+| RNF09 | Processamento assíncrono | Não aplicável | Infraestrutura assíncrona não implementada nesta versão |
 | RNF10 | A executar via seção 9.3.2 | Planilha SUS e tarefas T01 a T09 | Taxa de sucesso, toques e SUS | Pendente | Depende de consolidação dos participantes externos |
 | RNF11 | A executar | Matriz de dispositivos | Erros por plataforma e fluxo | Pendente | Amostra limitada de Android/iOS |
 | RNF12 | A executar | Docker/health checks | Tempo de reinicialização por container | Pendente | Depende de compose completo e ambiente local estável |
