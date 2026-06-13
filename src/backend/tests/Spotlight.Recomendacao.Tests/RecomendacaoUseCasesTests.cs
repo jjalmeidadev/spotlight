@@ -143,6 +143,59 @@ public class RecomendacaoUseCasesTests
             segundo => Assert.Equal("Hamlet", segundo.Espetaculo.Titulo));
     }
 
+    [Fact]
+    public async Task ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            EspetaculosPorId = new Dictionary<int, EspetaculoRecomendado>
+            {
+                [7] = Espetaculo(),
+                [8] = new()
+                {
+                    Id = 8,
+                    Titulo = "Elis, a Musical",
+                    Genero = "Musical",
+                    Status = "em_cartaz",
+                    NotaMedia = 4.8m
+                },
+                [9] = new()
+                {
+                    Id = 9,
+                    Titulo = "O Auto da Compadecida",
+                    Genero = "Comedia",
+                    Status = "em_cartaz",
+                    NotaMedia = 4.7m
+                }
+            }
+        };
+        var modelo = new FakeModeloRecomendacaoClient
+        {
+            Habilitado = true,
+            Predicoes =
+            [
+                new ModeloRecomendacaoPredicao(9, 0.98m, "hibrido_svd_knn", "Vizinho de item favorito"),
+                new ModeloRecomendacaoPredicao(8, 0.97m, "hibrido_svd_knn", "Perfil similar"),
+                new ModeloRecomendacaoPredicao(7, 0.96m, "hibrido_svd_knn", "Popular entre usuarios similares")
+            ]
+        };
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var strategy = new ModeloMlNetRecomendacaoStrategy(
+            repositorio,
+            modelo,
+            fallback,
+            NullLogger<ModeloMlNetRecomendacaoStrategy>.Instance);
+        var service = new RecomendacaoService(new FakeRecomendacaoStrategyFactory(strategy));
+        var useCase = new ListarRecomendacoesMeUseCase(service);
+
+        var resultado = await useCase.ExecutarAsync(Guid.NewGuid(), 2, Ct);
+
+        Assert.Equal([9, 8, 7], repositorio.LastEspetaculoIds);
+        Assert.Equal(2, resultado.Data.Count);
+        Assert.Equal(["O Auto da Compadecida", "Elis, a Musical"], resultado.Data.Select(item => item.Espetaculo.Titulo));
+        Assert.DoesNotContain(resultado.Data, item => item.Espetaculo.Titulo == "Hamlet");
+    }
+
     [Theory]
     [InlineData(null, 10)]
     [InlineData(0, 10)]

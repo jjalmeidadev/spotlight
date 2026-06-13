@@ -4692,6 +4692,7 @@ divergências entre o contrato negociado e o que está implementado.
 | Tipo | Papel no projeto | Seção de detalhamento |
 |------|------------------|------------------------|
 | **Testes funcionais (RFs)** | Verificam se o sistema realiza o comportamento especificado nos dezesseis requisitos funcionais (seção 3.1): cadastro, login, preferências, catálogo, busca, filtros, detalhes, avaliações e fluxos administrativos. | [9.1](#91-testes-funcionais) |
+| **Testes automatizados de regras de negócio** | Validam regras críticas diretamente nos UseCases/Services do backend, cobrindo cenários positivos, negativos e casos de borda sem depender de banco real ou serviços externos. | [9.1.2](#912-resultados) |
 | **Testes de RNFs** | Avaliam características de qualidade — desempenho, disponibilidade, segurança, escalabilidade, usabilidade mobile e manutenibilidade — conforme os doze RNFs da seção 3.2. | [9.2](#92-testes-de-rnfs) |
 | **Testes de usabilidade** | Validam a experiência com usuários reais no aplicativo mobile, mensurando conclusão de tarefas, número de toques e percepção global via **System Usability Scale (SUS)**. | [9.3](#93-testes-de-usabilidade) |
 | **Testes de APIs externas** | Exercitam contratos e respostas dos serviços terceiros integrados ao Spotlight — **Supabase Auth**, **API da Ticketeira** e, no escopo de geolocalização, **OpenStreetMap/Nominatim** (seções 5.3 e 8.1) — com cenários positivos e negativos de indisponibilidade, autenticação e formato de payload. | Integrados ao planejamento da seção [9.4](#94-testes-de-integração) (IT-02, IT-06 e fluxos de geocodificação) |
@@ -4704,6 +4705,7 @@ divergências entre o contrato negociado e o que está implementado.
 | Tipo de teste | Ferramentas / artefatos | Observação |
 |---------------|-------------------------|------------|
 | Testes funcionais | `xUnit`, `Microsoft.AspNetCore.Mvc.Testing`, `Bogus` | Validação de comportamento via API e cenários derivados da tabela de RFs (seção 3.1); complementada por execução manual no app Expo |
+| Testes automatizados de regras de negócio | `xUnit`, fakes de repositório, testes unitários de UseCases/Services | Cobrem validações de domínio, limites de entrada, tratamento de erros e decisões de fallback/ranking sem depender de infraestrutura externa |
 | Testes de RNFs | Lighthouse (mobile), k6, UptimeRobot, OWASP ZAP, Postman, dispositivos físicos Android/iOS, inspeção manual de logs, scripts shell, pipeline CI/CD | Detalhamento por RNF na seção 9.2.1 |
 | Testes de usabilidade | Roteiro estruturado (T01–T09), planilha de campo, questionário **SUS** | Detalhamento na seção 9.3.1; resultados subsidiam RNF10 |
 | Testes de APIs externas | Módulo **VHS** (`VhsCachingHandler`), cassetes JSON em `tests/cassettes/supabase/` e `tests/cassettes/ticketeira/`, `xUnit` | Respostas gravadas garantem determinismo; modo `VHS_MODE=record` para geração inicial de cassetes |
@@ -5457,7 +5459,48 @@ cd src/admin-web && npx playwright test --grep "RF16"
 | Roteiro exploratório consome tempo manual | Limitado a 1 sessão por sprint, focado nos RFs com critério subjetivo (RF12, RF14, RF15, RF08); automatização adicional planejada conforme maturidade de bibliotecas de testes visuais |
 
 ## 9.1.2 Resultados
-_conteúdo_
+
+Na Sprint 5 foi executada uma rodada de testes automatizados de regras de negócio focada nos Services e UseCases do backend. O objetivo foi validar regras críticas em nível de aplicação, com cenários positivos, negativos e de borda, sem depender de banco real, autenticação externa ou serviços de terceiros. Essa abordagem complementa os testes funcionais planejados e reduz o risco de regressão em comportamentos centrais do sistema.
+
+### Escopo executado
+
+| Serviço | Regra de negócio validada | Cenários cobertos |
+|---|---|---|
+| Catálogo | Avaliações de espetáculo devem aceitar notas dentro do intervalo permitido, rejeitar notas inválidas e não criar avaliação para espetáculo inexistente. | Nota limite `5`, comentário nulo, nota `null`, nota menor que `0`, nota maior que `5`, espetáculo inexistente. |
+| Recomendação | A API deve respeitar o limite de recomendações solicitado mesmo quando o modelo ML.NET retorna mais predições do que o permitido. | Modelo retorna 3 predições; backend recebe limite `2`; resposta final preserva ranking e retorna apenas 2 itens. |
+
+### Casos adicionados ou reforçados
+
+| Caso | Arquivo | Resultado esperado |
+|---|---|---|
+| `CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio` | `src/backend/tests/Spotlight.Catalogo.Tests/CatalogoUseCasesTests.cs` | Nota `5` é aceita, comentário nulo é preservado e os dados corretos chegam ao repositório. |
+| `CriarAvaliacao_ComNotaInvalida_LancaValidation` | `src/backend/tests/Spotlight.Catalogo.Tests/CatalogoUseCasesTests.cs` | Notas inválidas geram `ValidationException` antes de consultar espetáculo ou chamar o repositório de avaliação. |
+| `CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao` | `src/backend/tests/Spotlight.Catalogo.Tests/CatalogoUseCasesTests.cs` | Espetáculo inexistente gera `NotFoundException` e nenhuma avaliação é persistida. |
+| `ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal` | `src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoUseCasesTests.cs` | Resultado final respeita o limite normalizado e mantém a ordem de ranking do modelo. |
+
+### Evidência de execução
+
+Os testes foram executados localmente em configuração `Release`, pois havia serviços do backend em execução usando os binários `Debug`.
+
+```powershell
+dotnet test src/backend/tests/Spotlight.Catalogo.Tests/Spotlight.Catalogo.Tests.csproj -c Release --no-restore
+dotnet test src/backend/tests/Spotlight.Recomendacao.Tests/Spotlight.Recomendacao.Tests.csproj -c Release --no-restore
+dotnet test src/backend/Spotlight.sln -c Release --no-restore
+```
+
+Resultado observado:
+
+| Comando | Aprovados | Ignorados | Falhas |
+|---|---:|---:|---:|
+| `Spotlight.Catalogo.Tests` | 22 | 0 | 0 |
+| `Spotlight.Recomendacao.Tests` | 39 | 0 | 0 |
+| `Spotlight.sln` | 103 | 5 | 0 |
+
+Os 5 testes ignorados pertencem aos testes de integração MongoDB condicionais do projeto `Spotlight.Usuario.Tests`, que dependem de configuração externa específica para execução. Eles não representam falha da suíte de regras de negócio executada nesta tarefa.
+
+### Abrangência e limitações
+
+Os testes cobrem regras críticas de validação de avaliação e recomendação personalizada, incluindo tratamento de erro e limite de resposta. A camada de persistência real, policies RLS e integração com Supabase/PostgreSQL continuam sendo responsabilidade dos testes de integração e das validações de banco descritas nas demais seções deste capítulo.
 
 ## 9.2 Testes de RNFs
 

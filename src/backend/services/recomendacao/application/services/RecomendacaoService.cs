@@ -98,6 +98,7 @@ public sealed class ModeloMlNetRecomendacaoStrategy(
 
             var recomendacoes = predicoes
                 .Where(predicao => espetaculos.ContainsKey(predicao.ItemId))
+                .Take(limite)
                 .Select(predicao => new RecomendacaoDto
                 {
                     Score = predicao.Score,
