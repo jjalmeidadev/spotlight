@@ -154,7 +154,7 @@
     - [4.3.4 Normalização do Modelo Relacional](#434-normalização-do-modelo-relacional)
     - [4.3.5 Tabelas Associativas dos Relacionamentos N:N](#435-tabelas-associativas-dos-relacionamentos-nn)
   - [4.4 Modelo Físico de Dados](#44-modelo-físico-de-dados)
-    - [4.4.6 Dockerização dos Serviços Backend (atualização)](#446-dockerização-dos-serviços-backend-atualização)
+    - [4.4.6 Dockerização da aplicação full-stack](#446-dockerização-da-aplicação-full-stack)
 - [5. Solução Técnica (Design)](#5-solução-técnica-design)
   - [5.1 Diagrama de Classes](#51-diagrama-de-classes)
   - [5.2 Diagrama de Componentes da UML](#52-diagrama-de-componentes-da-uml)
@@ -196,6 +196,7 @@
   - [10.2 Implantação do Protótipo para uso por equipe de desenvolvimento](#102-implantação-do-protótipo-para-uso-por-equipe-de-desenvolvimento)
     - [10.2.1 Modo de desenvolvimento para demonstração](#1021-modo-de-desenvolvimento-para-demonstração)
     - [10.2.2 Problemas comuns em execução local](#1022-problemas-comuns-em-execução-local)
+  - [10.3 Execução containerizada com Docker Compose](#103-execução-containerizada-com-docker-compose)
 - [Referências](#referências)
 
 # 1. Introdução
@@ -2624,82 +2625,88 @@ Os scripts mapeados em `docker-entrypoint-initdb.d/` são executados automaticam
 
 Para instruções completas de execução, variáveis de ambiente necessárias e procedimentos de rollback, consulte [`src/database/README.md`](../src/database/README.md).
 
-# 4.4.6 Dockerização dos Serviços Backend
+# 4.4.6 Dockerização da aplicação full-stack
 
-A equipe introduziu uma dockerização focalizada nos microsserviços backend (`catalogo`, `usuario`, `recomendacao`, `geolocalizacao`) com o objetivo de padronizar execução, isolar dependências e preparar a solução para integração contínua. Esta seção documenta as alterações, padrões aplicados e instruções de uso.
+A aplicação Spotlight foi dockerizada de forma full-stack, com foco em paridade entre desenvolvimento e produção, isolamento dos serviços, redução da superfície de ataque e preparação para deploy em ambiente de nuvem ou VPS. A solução mantém Supabase e MongoDB Atlas como dependências externas em nuvem; portanto, esses bancos não são provisionados pelo Compose de produção.
 
-Objetivo
-- Padronizar a execução dos serviços backend em containers Docker.
-- Manter o banco de dados transacional (PostgreSQL/Supabase) como serviço remoto (Supabase cloud) conforme arquivo de configuração `.env` do ambiente, evitando duplicação de dados locais.
+### Arquitetura containerizada
 
-O que foi adicionado / modificado
-- Dockerfiles multi-stage para cada serviço (compilação + runtime) — localizados em:
-  - `src/backend/services/catalogo/Dockerfile`
-  - `src/backend/services/usuario/Dockerfile`
-  - `src/backend/services/recomendacao/Dockerfile`
-  - `src/backend/services/geolocalizacao/Dockerfile`
+| Componente | Tecnologia | Artefato Docker | Papel no ambiente |
+|---|---|---|---|
+| Frontend | Expo SDK 54, React Native Web e React 19 | `Dockerfile.frontend` + Nginx | Build web estático e publicação da interface |
+| API Gateway | ASP.NET Core .NET 9 + YARP | `src/backend/api-gateway/Dockerfile` | Entrada única para os serviços backend |
+| Catálogo | ASP.NET Core .NET 9 | `src/backend/services/catalogo/Dockerfile` | Consulta e gestão de dados de catálogo |
+| Usuário | ASP.NET Core .NET 9 | `src/backend/services/usuario/Dockerfile` | Perfil, preferências, localização e telemetria |
+| Recomendação | ASP.NET Core .NET 9 | `src/backend/services/recomendacao/Dockerfile` | Recomendações e itens similares |
+| Geolocalização | ASP.NET Core .NET 9 | `src/backend/services/geolocalizacao/Dockerfile` | Integração com OpenStreetMap/Nominatim |
 
-- `.dockerignore` para cada serviço para reduzir contexto de build e excluir artefatos:
-  - `src/backend/services/*/.dockerignore`
+O frontend se comunica com o backend por meio da variável `EXPO_PUBLIC_API_BASE_URL`. Em desenvolvimento, o valor usual é `http://localhost:5000`, apontando para o API Gateway. Em produção web, o build usa `PROD_EXPO_PUBLIC_API_BASE_URL=/api`; o Nginx recebe chamadas em `/api/*` e encaminha internamente para `gateway:8080/*`.
 
-- `docker-compose.yml` na raiz foi atualizado para orquestrar os quatro serviços backend como containers independentes e mapear portas locais: 5001 (`catalogo`), 5002 (`usuario`), 5003 (`recomendacao`) e 5004 (`geolocalizacao`). Neste fluxo o PostgreSQL não é mais levantado pelo compose (a aplicação usa a connection string do Supabase remoto definida em `.env`).
+### Arquivos de infraestrutura
 
-- Healthchecks: cada serviço ganhou `healthcheck` no `docker-compose.yml`, apontando para os endpoints `/health` ou `/health/ready` expostos pela aplicação ASP.NET Core, para permitir verificação de readiness a partir do orquestrador local.
+- `Dockerfile.frontend`: Dockerfile multi-stage do frontend, com estágios de desenvolvimento, build web e runtime Nginx. Ele fica na raiz porque o projeto Expo também tem seus arquivos de entrada na raiz (`package.json`, `package-lock.json`, `App.js`, `app.json`, `assets/`) e consome código em `src/frontend/`; assim, o contexto de build inclui todos os arquivos necessários sem cópias artificiais.
+- `deploy/nginx/default.conf`: configuração do Nginx para SPA fallback, cache de assets e proxy reverso de `/api` para o gateway.
+- `docker-compose.dev.yml`: ambiente de desenvolvimento com hot reload, volumes, portas locais e `dotnet watch`.
+- `docker-compose.prod.yml`: ambiente de produção com apenas o frontend exposto ao host e serviços backend em rede interna do Compose.
+- `.dockerignore`: exclusão de dependências, artefatos de build e arquivos sensíveis do contexto Docker.
+- `src/backend/api-gateway/appsettings.DockerDevelopment.json`: destinos do YARP resolvidos por DNS interno do Compose para desenvolvimento.
+- `src/backend/api-gateway/appsettings.Production.json`: destinos do YARP resolvidos por DNS interno do Compose para produção.
+- `src/backend/services/*/.dockerignore`: exclusão de `bin/`, `obj/`, arquivos temporários e `.env` nos builds de cada serviço.
 
-- Segurança e qualidade nas imagens:
-  - Labels de imagem (`org.opencontainers.image.*`) adicionadas aos Dockerfiles.
-  - Criação de usuário não-root (`appuser`) no runtime image e mudança do `USER` para reduzir riscos de execução como root.
+### Estratégia dos Dockerfiles
 
-Padrões aplicados
-- Dockerfiles multi-stage (SDK -> publish -> ASP.NET runtime) para minimizar tamanho da imagem e velocidade de start.
-- Isolamento do contexto de build via `.dockerignore` para evitar inclusão de bin/obj, .git e arquivos sensíveis.
-- Uso de variáveis de ambiente para `DATABASE_CONNECTION_STRING` e `SUPABASE_JWT_SECRET` (lidas pelo `DotNetEnv` no startup dos serviços).
-- Healthchecks no compose para automação de dependência e monitoramento local.
+Os Dockerfiles backend usam multi-stage build: o estágio `build` usa `mcr.microsoft.com/dotnet/sdk:9.0-alpine` para restaurar dependências e publicar a aplicação; o estágio `runtime` usa `mcr.microsoft.com/dotnet/aspnet:9.0-alpine`, contém apenas os binários publicados e executa como usuário não-root `spotlight`.
 
-Variáveis e segurança
-- O compose espera que exista um `.env` na raiz com, no mínimo, as variáveis de conexão e segredos (ex.: `DATABASE_CONNECTION_STRING`, `SUPABASE_JWT_SECRET`, `NOMINATIM_*`).
-- IMPORTANT: Não versionar arquivos `.env` com credenciais. Remover do histórico do Git e usar GitLab/GitHub CI variables, Docker secrets ou um vault para ambientes compartilhados.
+O frontend também usa multi-stage build. O estágio de build usa `node:22-alpine` para executar `npm ci` e `expo export --platform web`; o runtime usa `nginxinc/nginx-unprivileged:1.27-alpine`, que já é preparado para rodar Nginx sem privilégios de root na porta `8080`.
 
-Como executar localmente (resumo)
-1. Colocar o `.env` (com as variáveis finais do ambiente) na raiz do repositório.
-2. Abrir Docker Desktop (Windows) e garantir que o daemon esteja ativo.
-3. Na raiz do projeto executar:
+As imagens Alpine foram escolhidas por reduzirem tamanho e superfície de ataque. A contrapartida é que dependências nativas devem ser compatíveis com musl libc; os builds locais dos serviços .NET e do frontend foram validados com essa base. O `curl` foi mantido nas imagens .NET runtime apenas para viabilizar os healthchecks definidos no Compose.
 
-```bash
-docker compose up -d --build
+### Segurança e isolamento
+
+- Os containers de aplicação executam como usuário não-root.
+- Em produção, o Compose aplica `read_only`, `tmpfs`, `cap_drop: ALL` e `security_opt: no-new-privileges:true`.
+- Apenas o frontend publica porta no host em produção (`FRONTEND_PORT:8080`).
+- Gateway e serviços backend ficam acessíveis somente pela rede Docker.
+- A rede backend continua com saída para a internet, pois os serviços precisam acessar Supabase, MongoDB Atlas e Nominatim.
+- Segredos permanecem no `.env` local, variáveis de ambiente do provedor ou vault/secret manager. O arquivo `.env` não deve ser versionado.
+
+### Cache e performance de build
+
+Os builds .NET usam BuildKit cache para pacotes NuGet com `id` por serviço e `sharing=locked`. Essa configuração acelera builds repetidos e evita corrupção de cache quando o CI executa builds em paralelo. O frontend usa `npm ci` com cache de npm, mantendo instalação reprodutível a partir do `package-lock.json`.
+
+### Variáveis de ambiente relevantes
+
+| Variável | Uso |
+|---|---|
+| `DATABASE_CONNECTION_STRING` | Conexão dos serviços .NET com Supabase/PostgreSQL |
+| `SUPABASE_JWT_SECRET` | Validação de JWT emitido pelo Supabase Auth |
+| `SUPABASE_URL` | Acesso backend a APIs do Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Uso backend restrito; nunca deve ir para o frontend |
+| `MONGODB_CONNECTION_STRING` | Conexão do serviço de usuário com MongoDB Atlas |
+| `MONGODB_DATABASE` | Database de telemetria no MongoDB |
+| `MONGODB_TELEMETRY_COLLECTION` | Collection de eventos comportamentais |
+| `NOMINATIM_BASE_URL` | URL base do serviço de geolocalização |
+| `NOMINATIM_USER_AGENT` | User-Agent obrigatório para Nominatim |
+| `EXPO_PUBLIC_SUPABASE_URL` | URL pública do Supabase usada no frontend |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Chave pública do Supabase usada no frontend |
+| `EXPO_PUBLIC_API_BASE_URL` | URL da API no desenvolvimento |
+| `PROD_EXPO_PUBLIC_API_BASE_URL` | URL da API injetada no build web de produção |
+
+### Validação realizada
+
+Foram validados o export web do Expo, a sintaxe dos Compose de desenvolvimento e produção e os builds das imagens do frontend, gateway e quatro serviços backend. Os comandos usados foram:
+
+```powershell
+npm.cmd run build:web
+docker compose -f docker-compose.dev.yml config --quiet
+docker compose -f docker-compose.prod.yml config --quiet
+docker build -f Dockerfile.frontend --target runtime ...
+docker build -t spotlight-gateway:local src/backend/api-gateway
+docker build -t spotlight-catalogo:local src/backend/services/catalogo
+docker build -t spotlight-usuario:local src/backend/services/usuario
+docker build -t spotlight-recomendacao:local src/backend/services/recomendacao
+docker build -t spotlight-geolocalizacao:local src/backend/services/geolocalizacao
 ```
-
-4. Conferir que os containers estão `running`:
-
-```bash
-docker compose ps
-docker compose logs -f catalogo usuario recomendacao geolocalizacao
-```
-
-5. Validar endpoints (exemplos):
-
-```bash
-curl -i http://localhost:5001/health
-curl -i http://localhost:5001/health/ready
-curl -i http://localhost:5002/health
-curl -i http://localhost:5003/health
-curl -i http://localhost:5004/health
-```
-
-Observações operacionais
-- Os serviços fazem leitura do `DATABASE_CONNECTION_STRING` no ambiente; quando apontados para o Supabase remoto, as checagens de readiness dependem da disponibilidade do Supabase.
-
-Boa prática
-- Remover/arquivar o `.env` sensível do repositório e documentar no README onde armazenar/como fornecer as variáveis em CI.
-
-
-Referências e arquivos afetados
-- `docker-compose.yml` (raiz) — orquestração dos serviços backend.
-- `src/backend/services/*/Dockerfile` — build e runtime das aplicações.
-- `src/backend/services/*/.dockerignore` — exclusões de contexto de build.
-- `src/backend/README.md` — instruções atualizadas de execução e validação.
-
-Esta documentação descreve a configuração aplicada em 2026-06-02 e deve ser revisada caso o fluxo de deploy (local vs. cloud) mude ou se a equipe optar por containerizar também o API Gateway ou o banco localmente.
 
 # 5. Solução Técnica (Design)
 _conteúdo_
@@ -6714,6 +6721,102 @@ npx expo start --lan --clear
 | Falha ao resolver localização | Serviço de geolocalização indisponível ou bloqueio de rede externa | Prosseguir com o fluxo; a localização é tratada como recurso opcional na demonstração |
 
 &emsp;Na Sprint 3, a geolocalização foi implementada como integração adicional via OpenStreetMap/Nominatim. Para evitar que instabilidades externas ou bloqueios locais interrompam o fluxo principal de autenticação, a aplicação mobile trata a localização como recurso opcional: quando ela falha, o erro é registrado em console, mas login e cadastro continuam funcionando.
+
+## 10.3 Execução containerizada com Docker Compose
+
+&emsp;Além da execução manual via `run-all.ps1` e Expo, o projeto possui uma estratégia de execução containerizada separando desenvolvimento e produção. Essa separação evita misturar hot reload, volumes e portas de debug com uma configuração mais restrita de produção.
+
+### 10.3.1 Preparação do ambiente
+
+&emsp;O arquivo `.env.example` deve ser copiado para `.env` e preenchido com os valores reais do ambiente. O `.env` não deve ser versionado, pois contém connection strings e segredos.
+
+```powershell
+Copy-Item .env.example .env
+```
+
+&emsp;As variáveis mínimas para o funcionamento integrado são:
+
+```env
+DATABASE_CONNECTION_STRING=
+SUPABASE_JWT_SECRET=
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_API_BASE_URL=http://localhost:5000
+PROD_EXPO_PUBLIC_API_BASE_URL=/api
+MONGODB_CONNECTION_STRING=
+MONGODB_DATABASE=spotlight_telemetry
+MONGODB_TELEMETRY_COLLECTION=interacoes
+NOMINATIM_BASE_URL=https://nominatim.openstreetmap.org
+NOMINATIM_USER_AGENT=spotlight-inteli-g04/1.0
+```
+
+### 10.3.2 Desenvolvimento com hot reload
+
+&emsp;Para desenvolvimento, o Compose monta volumes do código fonte, preserva `node_modules` e pacotes NuGet em volumes Docker e executa os serviços .NET com `dotnet watch`. O frontend roda pelo Expo/Metro.
+
+```powershell
+docker compose -f docker-compose.dev.yml up --build
+```
+
+&emsp;Portas locais esperadas:
+
+| Serviço | Porta local | URL |
+|---|---:|---|
+| Frontend Expo Web | 8081 | `http://localhost:8081` |
+| API Gateway | 5000 | `http://localhost:5000` |
+| Catálogo | 5001 | `http://localhost:5001` |
+| Usuário | 5002 | `http://localhost:5002` |
+| Recomendação | 5003 | `http://localhost:5003` |
+| Geolocalização | 5004 | `http://localhost:5004` |
+
+### 10.3.3 Produção local ou VPS
+
+&emsp;Para produção, o Compose publica apenas o frontend. O frontend servido por Nginx encaminha `/api/*` para o gateway interno, e o gateway distribui as requisições aos serviços `catalogo`, `usuario`, `recomendacao` e `geolocalizacao`.
+
+```powershell
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+&emsp;Comandos de verificação:
+
+```powershell
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f gateway
+docker compose -f docker-compose.prod.yml logs -f frontend
+```
+
+&emsp;A aplicação web fica disponível em:
+
+```txt
+http://localhost:8080
+```
+
+&emsp;Em um servidor, a porta `8080` pode ser colocada atrás de um proxy reverso com TLS, como Caddy, Traefik ou Nginx. Para um deploy simples em VPS, o desenho recomendado é:
+
+1. Proxy reverso externo nas portas 80/443.
+2. Serviço `frontend` acessível apenas pelo proxy ou pela porta local configurada.
+3. API Gateway e microsserviços sem portas públicas.
+4. Supabase e MongoDB Atlas com allowlist do IP do servidor.
+
+### 10.3.4 Builds manuais
+
+&emsp;Quando necessário, as imagens podem ser construídas individualmente:
+
+```powershell
+docker build -f Dockerfile.frontend --target runtime -t spotlight-frontend:local .
+docker build -t spotlight-gateway:local src/backend/api-gateway
+docker build -t spotlight-catalogo:local src/backend/services/catalogo
+docker build -t spotlight-usuario:local src/backend/services/usuario
+docker build -t spotlight-recomendacao:local src/backend/services/recomendacao
+docker build -t spotlight-geolocalizacao:local src/backend/services/geolocalizacao
+```
+
+### 10.3.5 Estratégias de deploy
+
+&emsp;Para o estágio atual do projeto, a alternativa mais direta é uma VPS com Docker Compose, pois o repositório já contém a orquestração completa e depende de serviços gerenciados externos para banco relacional, autenticação, storage e telemetria. Em ambientes com maior exigência operacional, as imagens podem ser publicadas em registry e executadas em Render, Railway, Fly.io ou AWS ECS/Fargate. Em qualquer cenário, segredos devem ser configurados no provedor e não no repositório.
 
 # Referências
 _conteúdo_
