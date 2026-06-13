@@ -4561,6 +4561,12 @@ melhorar o treinamento nas próximas iterações.
 - O fluxo completo está funcional localmente, mas a evidência em ambiente
   publicado no servidor Inteli deve ser registrada separadamente.
 
+### Evidência de execução da aplicação
+
+Como evidência do progresso incremental da Sprint 4, foi gravado um vídeo demonstrativo da aplicação.
+
+**Link do vídeo demonstrativo:** [Vídeo Demonstrativo Sprint 4](https://drive.google.com/drive/folders/1Cwcd_nm-zFCijOIywWhobz_m0UwTmE5t?usp=sharing)
+
 ## 8.3.3 Sprint 5
 _conteúdo_
 
