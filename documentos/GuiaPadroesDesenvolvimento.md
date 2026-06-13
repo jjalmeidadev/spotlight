@@ -31,27 +31,27 @@ g04/
 │   │   ├── Spotlight.sln                 # Solution: gateway + 4 serviços + projetos de teste
 │   │   ├── api-gateway/                  # Spotlight.Gateway (porta 5000) — YARP
 │   │   ├── services/
-│   │   │   ├── catalogo/                 # Spotlight.Catalogo        (5001)
-│   │   │   ├── usuario/                  # Spotlight.Usuario         (5002) + telemetria Mongo
-│   │   │   ├── recomendacao/             # Spotlight.Recomendacao    (5003) + ML.NET strategy
-│   │   │   └── geolocalizacao/           # Spotlight.Geolocalizacao  (5004) — Nominatim
-│   │   ├── contracts/                    # Contratos de API/eventos e docs operacionais
-│   │   ├── ml-engine/                    # Bindings / wrappers para o motor de ML
-│   │   ├── scripts/                      # Scripts auxiliares (PowerShell)
-│   │   └── tests/                        # Projetos xUnit por serviço
-│   ├── frontend/                         # App Expo / React Native em arquitetura MVVM
-│   │   ├── components/                   # Componentes visuais reutilizáveis
-│   │   ├── screens/                      # Telas (Views)
-│   │   ├── viewmodels/                   # ViewModels (hooks de tela)
-│   │   ├── repositories/                 # Acesso aos serviços backend
-│   │   ├── models/                       # Tipos/entidades de UI
-│   │   ├── hooks/, theme/, config/       # Suporte (sessão, paleta, endpoints)
-│   ├── database/                         # Scripts SQL (PostgreSQL/Supabase)
-│   │   ├── 0X_*.sql                      # Bootstrap (criação, seed, rollback)
-│   │   ├── migrations/                   # Migrations numeradas (04+) com rollback
-│   │   └── load_test/{,pgbench/}         # Massa sintética e cenários de carga
-│   ├── dataset/                          # Datasets processados (input do training)
-│   └── models/                           # Notebooks + treino ML.NET + artefatos publicados
+│   │   │   ├── catalogo/                # Spotlight.Catalogo        (5001)
+│   │   │   ├── usuario/                 # Spotlight.Usuario         (5002) + telemetria Mongo
+│   │   │   ├── recomendacao/            # Spotlight.Recomendacao    (5003) + ML.NET strategy
+│   │   │   └── geolocalizacao/          # Spotlight.Geolocalizacao  (5004) — Nominatim
+│   │   ├── contracts/                   # Contratos de API/eventos e docs operacionais
+│   │   ├── ml-engine/                   # Adapters de inferência/treino consumidos pelos serviços
+│   │   ├── scripts/                     # Scripts auxiliares (PowerShell)
+│   │   └── tests/                       # Projetos xUnit por serviço (Spotlight.<Servico>.Tests)
+│   ├── frontend/                        # App Expo / React Native em arquitetura MVVM
+│   │   ├── components/                  # Componentes visuais reutilizáveis
+│   │   ├── screens/                     # Telas (Views)
+│   │   ├── viewmodels/                  # ViewModels (hooks de tela)
+│   │   ├── repositories/                # Acesso aos serviços backend
+│   │   ├── models/                      # Tipos/entidades de UI
+│   │   ├── hooks/, theme/, config/      # Suporte (sessão, paleta, endpoints)
+│   ├── database/                        # Scripts SQL (PostgreSQL/Supabase)
+│   │   ├── 0X_*.sql                     # Bootstrap (criação, seed, rollback)
+│   │   ├── migrations/                  # Migrations numeradas (04+) com rollback
+│   │   └── load_test/{,pgbench/}        # Massa sintética e cenários de carga
+│   ├── dataset/                         # Datasets processados (input do training)
+│   └── models/                          # Notebooks + treino ML.NET + artefatos publicados
 │       ├── Spotlight.Recomendacao.ModelTraining/   # Projeto .NET de treino
 │       ├── artifacts/                              # Modelo .zip e similaridades
 │       └── reports/                                # Métricas e exemplos do modelo
@@ -171,199 +171,46 @@ services/<servico>/
 └── Program.cs           # Composition Root (DI, pipeline, Swagger, health)
 ```
 
-Regras de dependência (clean architecture):
+### 2.3 Padrões SQL (PostgreSQL / Supabase)
 
-- `presentation` depende de `application` e `infrastructure`.
-- `application` depende apenas de `domain`.
-- `infrastructure` implementa interfaces declaradas em `application/usecases` e `application/services`.
-- `domain` não depende de nada.
-
-#### 2.3.2 Convenções de Nomenclatura
-
-| Elemento | Convenção | Exemplo |
-|----------|-----------|---------|
-| Namespace | `Spotlight.<Servico>.<Camada>` | `Spotlight.Recomendacao.Application.Services` |
-| Interface | Prefixo `I` | `IRecomendacaoRepository`, `IRecomendacaoStrategy` |
-| Caso de uso | `<Verbo><Sujeito>UseCase` | `ListarRecomendacoesMeUseCase` |
-| DTO | sufixo `Dto` | `RecomendacaoDto`, `ListaDto<T>` |
-| Strategy | sufixo `Strategy` | `ModeloMlNetRecomendacaoStrategy` |
-| Factory | sufixo `Factory` | `RecomendacaoStrategyFactory` |
-| Repositório | sufixo `Repository` | `RecomendacaoRepository` |
-
-#### 2.3.3 Estilo de Código
-
-- **C# 12 / nullable enabled** em todos os projetos.
-- **Primary constructors** para injeção (preferir a construtores explícitos):
-
-  ```csharp
-  public sealed class RecomendacaoService(IRecomendacaoStrategyFactory factory) : IRecomendacaoService
-  {
-      // ...
-  }
-  ```
-
-- **Records** para DTOs e VOs imutáveis (`public sealed record ModeloRecomendacaoPredicao(int ItemId, decimal Score, ...)`).
-- **`sealed`** por padrão em classes concretas que não foram desenhadas para herança.
-- **Async/await** em toda IO; sempre propagar `CancellationToken`.
-- **Comentários XML** apenas em tipos/membros públicos não-óbvios. Evitar comentários redundantes que repetem o nome do método.
-- **Logging** via `ILogger<T>` (Serilog). Mensagens em português, parâmetros estruturados:
-
-  ```csharp
-  logger.LogWarning(ex, "Falha ao executar strategy ML.NET; usando strategy PostgreSQL.");
-  ```
-
-#### 2.3.4 Acesso a Dados (sem ORM)
-
-O acesso ao PostgreSQL é feito **exclusivamente com Npgsql** + SQL puro. Nada de Entity Framework Core.
-
-- Sempre usar `NpgsqlDataSource` registrado como singleton no `Program.cs`.
-- Parâmetros nomeados (`@usuario`, `@limite`) — nunca interpolar valores na string SQL.
-- Mapear manualmente o `DataReader` para entidades de domínio.
-- Repositórios ficam em `infrastructure/persistence` e implementam interfaces declaradas em `application/usecases`.
-
-```csharp
-public class RecomendacaoRepository(NpgsqlDataSource dataSource) : IRecomendacaoRepository
-{
-    public async Task<IReadOnlyList<Recomendacao>> ListarPorUsuarioAsync(
-        Guid usuarioId, int limite, CancellationToken cancellationToken)
-    {
-        await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
-        await using var cmd = conexao.CreateCommand();
-        cmd.CommandText = """
-            SELECT r.score_recomendacao, r.tipo_algoritmo, r.motivo_recomendacao, ...
-            FROM recomendacao r
-            JOIN espetaculo e ON e.id_espetaculo = r.id_espetaculo
-            WHERE r.id_usuario = @usuario
-            ORDER BY r.score_recomendacao DESC
-            LIMIT @limite;
-            """;
-        cmd.Parameters.AddWithValue("usuario", usuarioId);
-        cmd.Parameters.AddWithValue("limite", limite);
-
-        var itens = new List<Recomendacao>();
-        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
-        while (await reader.ReadAsync(cancellationToken))
-        {
-            itens.Add(/* mapeamento manual */);
-        }
-        return itens;
-    }
-}
-```
-
-### 2.4 Padrões TypeScript / React Native (Frontend)
-
-#### 2.4.1 Arquitetura MVVM
-
-O app segue **MVVM** com três responsabilidades bem separadas:
-
-| Camada | Diretório | Responsabilidade |
-|--------|-----------|------------------|
-| **Model** | `src/frontend/models/` | Tipos de domínio do app (interfaces/types puros, sem React). |
-| **View** | `src/frontend/screens/` | Componentes de tela (`.tsx`) — apenas JSX + binding com o ViewModel. |
-| **ViewModel** | `src/frontend/viewmodels/` | Hooks `useXxxViewModel` que encapsulam estado, efeitos e regra de apresentação. |
-| **Repository** | `src/frontend/repositories/` | Acesso a APIs (`fetch`), Supabase Storage e fontes externas. |
-
-A View **não** chama `fetch` direto — sempre via ViewModel, que por sua vez delega ao Repository.
-
-```ts
-// repositories/CatalogRepository.ts
-export async function listarRecomendacoesUsuario(
-  accessToken: string,
-  limite = 10,
-): Promise<RecomendacaoUsuarioApi[]> {
-  const payload = await fetchJson<Lista<RecomendacaoUsuarioApi>>(
-    `${API_BASE_URL}/recomendacao/me?limite=${limite}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } },
-  );
-  return payload.data ?? [];
-}
-
-// viewmodels/useCatalogViewModel.ts
-export function useCatalogViewModel(accessToken?: string | null) {
-  const [recomendacoes, setRecomendacoes] = useState<EspetaculoResumoApi[]>([]);
-  // ... estado + efeitos ...
-
-  useEffect(() => {
-    if (!accessToken) return;
-    listarRecomendacoesUsuario(accessToken)
-      .then((itens) => setRecomendacoes(itens.map((item) => item.espetaculo)))
-      .catch(() => setRecomendacoes([]));
-  }, [accessToken]);
-
-  return { recomendacoes, /* ... */ };
-}
-
-// screens/CatalogView.tsx
-export function CatalogView() {
-  const vm = useCatalogViewModel(session?.access_token);
-  return <CatalogList items={vm.recomendacoes} />;
-}
-```
-
-#### 2.4.2 Convenções TypeScript
-
-- **`strict: true`** no `tsconfig.json`; nunca `any` sem comentário justificando.
-- **Tipos de API** com sufixo `Api` (`EspetaculoResumoApi`) para diferenciar do modelo de domínio.
-- Funções utilitárias e helpers em `lowerCamelCase` (`obterUrlMidia`, `normalizarTitulo`).
-- Componentes React em `PascalCase`.
-- Hooks sempre começam com `use` (regra do React).
-- Tratamento de erro **explícito** no ViewModel: estado `error: string | null` + flag `loading`. A View renderiza o estado, não o `try/catch`.
-- Cleanup de efeitos com a flag `ativo` para evitar `setState` após unmount em `fetch` assíncrono.
-
-### 2.5 Padrões SQL (PostgreSQL / Supabase)
-
-#### 2.5.1 Estrutura de Scripts
-
-Os scripts ficam em `src/database/` com numeração sequencial e arquivo de rollback espelhado para migrations:
-
-```text
-src/database/
-├── 00_supabase_compat.sql            # Compatibilidade com Supabase (schema auth, etc.)
-├── 01_create_database.sql            # DDL principal
-├── 02_initial_data.sql               # Seed
-├── 03_rollback.sql                   # Rollback do DDL inicial
-└── migrations/
-    ├── 04_trigger_updated_at_espetaculo.sql
-    ├── 04_trigger_updated_at_espetaculo_rollback.sql
-    └── ...
-```
-
-#### 2.5.2 Convenções SQL
-
-- **Palavras-chave em MAIÚSCULAS** (`SELECT`, `WHERE`, `JOIN`, `LATERAL`).
-- **Tabelas no singular** (convenção adotada no schema atual: `usuario`, `espetaculo`, `recomendacao`).
-- **Colunas em `snake_case`**, prefixadas pela tabela quando significativo (`id_usuario`, `id_espetaculo`, `score_recomendacao`).
-- **Chaves primárias** UUID quando referenciam `auth.users` do Supabase, `SERIAL`/`INT` para entidades internas.
-- **Enums tipados** (`tipo_usuario_enum`, `status_espetaculo_enum`) ao invés de strings livres.
-- **Row Level Security (RLS)** habilitado para tabelas com dados de usuário; políticas declaradas no mesmo arquivo da tabela.
-- **Migrations** sempre acompanhadas de script de rollback.
-- **`TIMESTAMPTZ`** em todas as colunas de data/hora (timezone-aware).
+#### 2.3.1 Estrutura de Scripts
+Os scripts em `src/database/` usam PostgreSQL (Supabase) com `auth.users` como fonte da identidade. Cada entidade do domínio tem RLS habilitado e políticas explícitas.
 
 ```sql
-CREATE TYPE status_espetaculo_enum AS ENUM (
-    'em_cartaz',
-    'em_breve',
-    'encerrado'
+-- 01_create_database.sql
+-- Descrição: Criação da estrutura do banco de dados
+
+CREATE TYPE tipo_usuario_enum AS ENUM (
+    'visitante', 'cadastrado', 'administrador'
 );
 
-CREATE TABLE espetaculo (
-    id_espetaculo  SERIAL                  PRIMARY KEY,
-    titulo         VARCHAR(200)            NOT NULL,
-    genero         VARCHAR(80),
-    status         status_espetaculo_enum  NOT NULL DEFAULT 'em_breve',
-    nota_media     NUMERIC(3,2)            NOT NULL DEFAULT 0,
-    criado_em      TIMESTAMPTZ             NOT NULL DEFAULT NOW()
+CREATE TABLE usuario (
+    id_usuario      UUID              PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    nome            VARCHAR(150)      NOT NULL,
+    email           VARCHAR(255)      NOT NULL UNIQUE,
+    data_cadastro   TIMESTAMP         NOT NULL DEFAULT NOW(),
+    tipo_usuario    tipo_usuario_enum NOT NULL DEFAULT 'cadastrado',
+
+    CONSTRAINT chk_email_formato CHECK (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$')
 );
 
-ALTER TABLE espetaculo ENABLE ROW LEVEL SECURITY;
+ALTER TABLE usuario ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "espetaculo: leitura pública"
-    ON espetaculo FOR SELECT
-    USING (true);
+CREATE POLICY "usuario: leitura do próprio perfil"
+    ON usuario FOR SELECT
+    USING (auth.uid() = id_usuario);
 ```
 
-### 2.6 Padrões de Documentação
+#### 2.3.2 Convenções SQL
+- **Palavras-chave**: MAIÚSCULAS (`SELECT`, `WHERE`, `JOIN`).
+- **Nomes de tabelas**: `snake_case` no **singular** (`usuario`, `espetaculo`, `sessao`) — alinha com a nomenclatura de entidades C#.
+- **Nomes de colunas**: `snake_case` (`nota_media`, `data_cadastro`).
+- **Chaves primárias**: `id_<entidade>` (`id_usuario`, `id_espetaculo`) — torna o JOIN auto-documentado.
+- **Chaves estrangeiras**: nome igual ao da PK referenciada (`id_usuario` em `avaliacao` referencia `usuario.id_usuario`).
+- **Tipos**: `UUID` quando vinculado a `auth.users`; `SERIAL`/`INT` para entidades sem identidade externa.
+- **Enums**: ENUMs nativos (`CREATE TYPE ..._enum`) em vez de `VARCHAR + CHECK`.
+- **Migrations**: `src/database/migrations/NN_descricao.sql` numeradas; cada migration deve ter rollback equivalente em `src/database/03_rollback.sql` ou arquivo `NN_descricao_rollback.sql`.
+- **RLS**: toda tabela com dado de usuário final tem `ENABLE ROW LEVEL SECURITY` + política nomeada (`"<tabela>: <ação descrita>"`).
 
 #### 2.6.1 Estrutura de Markdown
 
@@ -423,6 +270,69 @@ Para desabilitar:
 ```bash
 git config --unset core.hooksPath
 ```
+
+### 2.6 Padrões Frontend (React Native / TypeScript)
+
+O app em `src/frontend/` segue arquitetura **MVVM**: a View (componente da tela) consome um ViewModel (hook) que orquestra estado e chamadas aos Repositories. Componentes visuais são puros e não tocam em rede.
+
+#### 2.6.1 Camadas e nomenclatura
+| Camada | Diretório | Convenção de arquivo | Exemplo |
+|--------|-----------|----------------------|---------|
+| View (tela) | `screens/` | `<Nome>View.tsx` ou `<Nome>Screen.tsx` | `CatalogView.tsx`, `LoadingScreen.tsx` |
+| Componente visual | `components/` | `<Nome>.tsx` (PascalCase) | `CatalogRail.tsx`, `SearchBar.tsx` |
+| ViewModel | `viewmodels/` | `use<Nome>ViewModel.ts` | `useCatalogViewModel.ts` |
+| Repository | `repositories/` | `<Nome>Repository.ts` | `CatalogRepository.ts` |
+| Model/Tipo | `models/` | `<Nome>.ts` (PascalCase) | `CatalogItem.ts`, `Usuario.ts` |
+| Configuração | `config/`, `theme/`, `hooks/` | `camelCase.ts` | `api.ts`, `catalogImages.ts` |
+
+#### 2.6.2 Convenções de Código
+- **Linguagem**: TypeScript com tipagem explícita em props e retornos de função pública. `any` é proibido fora de adaptadores de terceiros.
+- **Componentes**: `function ComponentName() {}` (sem `React.FC`). Props tipadas em `type <Componente>Props`.
+- **Hooks (ViewModels)**: sempre prefixados com `use`. Devem retornar um objeto nomeado (não tupla) para que a View desestruture por nome.
+- **Acesso a backend**: somente nos Repositories. Views e ViewModels nunca chamam `fetch`/axios diretamente.
+- **Tipos de API**: sufixo `Api` para o contrato bruto vindo do backend (`EspetaculoResumoApi`), separado dos modelos de UI.
+- **Identificadores**: `camelCase` para variáveis/funções, `PascalCase` para tipos/componentes, `UPPER_SNAKE_CASE` para constantes de módulo.
+- **Estilos**: `StyleSheet.create` no fim do arquivo da View; tokens compartilhados em `theme/`.
+- **Cleanup de efeitos**: useEffect com dado assíncrono deve usar flag local (`let ativo = true`) e cancelar setState após unmount.
+
+### 2.7 Padrões Backend (C# / .NET 9 / Clean Architecture)
+
+Cada microsserviço sob `src/backend/services/<servico>/` segue a mesma divisão em quatro camadas. Dependências apontam **sempre para dentro** (presentation → application → domain; infrastructure implementa contratos de domain/application).
+
+#### 2.7.1 Camadas e nomenclatura
+| Camada | Diretório | Responsabilidade | Sufixo |
+|--------|-----------|------------------|--------|
+| `domain/` | `entities/`, `value-objects/` | Entidades, exceções de domínio, contratos de repositório | `<Entidade>`, `I<Entidade>Repository`, `NotFoundException` |
+| `application/` | `usecases/`, `dtos/` | Casos de uso e DTOs de entrada/saída | `<Acao><Entidade>UseCase`, `<Entidade>Dto` |
+| `infrastructure/` | `persistence/`, `auth/`, ... | Implementação de repositórios (Npgsql), autenticação, integrações | `<Entidade>Repository`, `AuthSetup` |
+| `presentation/` | `controllers/`, `middleware/` | Controllers HTTP, pipeline de exceções | `<Entidade>sController`, `ErrorHandlingMiddleware` |
+
+#### 2.7.2 Convenções de Código
+- **Namespaces**: refletem a camada — `Spotlight.<Servico>.<Camada>.<Subpasta>` (ex.: `Spotlight.Catalogo.Application.UseCases`).
+- **Nomes**: `PascalCase` para classes/métodos/propriedades; `_camelCase` para campos privados; constantes em `PascalCase` (ex.: `PageSizeMaximo`).
+- **Métodos assíncronos**: sufixo `Async` e parâmetro `CancellationToken` obrigatório em todo método público que faz I/O.
+- **Use cases**: classe única por caso de uso, ponto de entrada `ExecutarAsync(...)`, validação/normalização em método `private static`.
+- **Injeção de dependência**: por **construtor primário** (C# 12) — `public class X(IDep d)`. Sem property injection, sem service locator.
+- **DTOs**: classes anêmicas com `{ get; set; }`; `record` somente quando o DTO precisa de igualdade estrutural (eventos de domínio).
+- **Acesso a dados**: SQL puro via `NpgsqlDataSource` injetado (singleton). **Não usar EF Core** — o padrão do projeto é Npgsql/ADO.NET.
+- **Exceções de domínio**: lançar `NotFoundException`/`ValidationException` próprias do serviço; o `ErrorHandlingMiddleware` traduz para `ErroDto` + status HTTP.
+- **Comentários XML**: `///` em controllers, use cases e contratos públicos (alimenta Swagger).
+
+#### 2.7.3 Convenções de API REST
+- **Idioma**: rotas e DTOs em português (`/espetaculos`, `EspetaculoResumoDto`).
+- **Rotas**: substantivos no plural em `kebab-case` (`/espetaculos/{id}/avaliacoes`). O prefixo do serviço (`/catalogo`, `/usuario`, etc.) é adicionado pelo gateway YARP e **não** aparece na rota interna do controller.
+- **Verbos HTTP**: GET (consulta), POST (criação), PUT (atualização completa), DELETE (remoção). `204 No Content` para DELETE bem-sucedido.
+- **Envelope de resposta**: listagens retornam `ListaDto<T>` (`{ data }`) ou `ListaPaginadaDto<T>` (`{ data, pagination }`). Erros retornam `ErroDto`.
+- **Autorização**: `[Authorize(Policy = AuthSetup.Policy<Papel>)]` nas rotas protegidas; rotas públicas marcadas com `<summary>` explícito.
+- **OpenAPI**: todo endpoint declara `[ProducesResponseType]` para 200/201 e cada status de erro relevante.
+
+### 2.8 Padrões de Testes
+
+- **Framework**: xUnit por serviço, em `src/backend/tests/Spotlight.<Servico>.Tests/`.
+- **Nomenclatura de teste**: `<Sujeito>_<Cenario>_<ResultadoEsperado>` — exemplo: `ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado`.
+- **Fakes**: implementações in-memory dos repositórios (`FakeEspetaculoRepository`), no mesmo arquivo do teste ou em `Fakes/` quando reutilizadas.
+- **Categorias**: testes que dependem de banco/HTTP real recebem `[Trait("Category", "Integration")]` — o pipeline CI roda apenas `Category!=Integration` na etapa `test:unit`.
+- **Cobertura**: cada use case deve ter ao menos um caminho feliz e um caminho de exceção (`NotFoundException`/`ValidationException`).
 
 ## 3. Padrões de Projeto
 
@@ -721,43 +631,58 @@ Padrões considerados e **não** adotados:
 
 ## 5. Checklist de Verificação
 
-### 5.1 Antes do Commit
+### Antes do Commit
+- [ ] Código segue convenções de nomenclatura da camada/linguagem
+- [ ] Mensagem de commit segue Conventional Commits + `#<issue>`
+- [ ] Notebooks: seções numeradas, paths com `pathlib`, seeds fixadas
+- [ ] Backend C#: método público assíncrono recebe `CancellationToken` e tem sufixo `Async`
+- [ ] Backend C#: novos use cases/repositórios registrados no `Program.cs`
+- [ ] Frontend TS: acesso a backend permanece no Repository (View/ViewModel não chamam `fetch`)
+- [ ] SQL: PostgreSQL puro, tabelas no singular, PK `id_<entidade>`, RLS habilitado se houver dado de usuário
 
-- [ ] Código segue convenções de nomenclatura da seção 2.
-- [ ] Funções públicas e tipos não-óbvios têm documentação (XML/JSDoc/docstring).
-- [ ] Paths em Python usam `pathlib`; paths em C# usam `Path.Combine`.
-- [ ] Seeds aleatórias estão fixadas em notebooks.
-- [ ] Migrations SQL têm script de rollback espelhado.
-- [ ] Sem `Console.WriteLine`/`console.log` esquecidos — usar `ILogger`/erro tratado.
-- [ ] Mensagem de commit segue Conventional Commits com `#issue`.
+### Review de Código
+- [ ] Builder Pattern para construções complexas (modelo de ML)
+- [ ] Strategy Pattern para algoritmos intercambiáveis (KNN/ML.NET/Postgres fallback)
+- [ ] Camadas da Clean Architecture preservadas (dependências apontam para dentro)
+- [ ] MVVM no frontend: View renderiza, ViewModel orquestra, Repository acessa rede
+- [ ] DTOs separados das entidades de domínio e dos tipos `Api` do frontend
+- [ ] Tratamento de erro via `NotFoundException`/`ValidationException` + `ErrorHandlingMiddleware`
+- [ ] Cobertura mínima de testes xUnit no caminho feliz e no caminho de exceção
 
-### 5.2 Code Review — Backend C#
+## 6. Revisão de Padrões — Lacunas e Recomendações
 
-- [ ] Camadas respeitam Clean Architecture (sem `infrastructure` dentro de `application`).
-- [ ] Controllers só fazem binding e delegam ao use case.
-- [ ] SQL parametrizado, nunca interpolado.
-- [ ] `CancellationToken` propagado em toda chamada assíncrona.
-- [ ] `await using` em conexões/comandos/readers do Npgsql.
-- [ ] Novos algoritmos de recomendação são adicionados como novas **strategies** + ajuste na **factory**.
-- [ ] Exceções de domínio (`NotFoundException`, etc.) são lançadas em vez de retornar `null`/códigos HTTP no use case.
+Esta seção registra a auditoria dos padrões em uso no repositório, comparando o que estava documentado no guia com o que foi observado no código (backend C#, frontend RN/TS, SQL e testes). As lacunas marcadas como **aplicado** já estão incorporadas nas seções acima; as **pendentes** ficam como recomendações para próximas iterações.
 
-### 5.3 Code Review — Frontend RN
+### 7.1 Resumo das Lacunas
 
-- [ ] Tela (`.tsx`) não contém `fetch` nem lógica de negócio — apenas binding.
-- [ ] ViewModel tem `loading`, `error` e cleanup com flag `ativo`.
-- [ ] Acesso a API/Storage está em `repositories/`.
-- [ ] Tipos de API (`*Api`) separados dos modelos de domínio.
-- [ ] Sem `any` sem comentário justificando.
+| # | Lacuna identificada | Severidade | Recomendação | Status |
+|---|---------------------|------------|--------------|--------|
+| 1 | Seção SQL exemplificava sintaxe MySQL (`AUTO_INCREMENT`, `USE`, `IF NOT EXISTS` no `CREATE DATABASE`) e tabelas no plural, divergindo do banco real (PostgreSQL/Supabase, singular, UUID, RLS). | Alta | Reescrever 2.3 com PostgreSQL e refletir a convenção `id_<entidade>` usada em `src/database/`. | Aplicado (2.3) |
+| 2 | Padrões do frontend (React Native + TypeScript) não estavam documentados, embora o Index já citasse cobertura de TS. | Alta | Adicionar seção 2.6 com camadas MVVM, nomenclatura de arquivos e regras de acesso a rede. | Aplicado (2.6) |
+| 3 | Backend C# tinha apenas os padrões de projeto descritos (3.3); faltavam as convenções gerais (camadas Clean Architecture, sufixos `UseCase`/`Dto`/`Repository`, construtor primário, `Async` + `CancellationToken`). | Alta | Adicionar seção 2.7 cobrindo camadas, código e API REST. | Aplicado (2.7) |
+| 4 | Testes xUnit por serviço não tinham convenção registrada (nome do teste, `Trait("Category", "Integration")` usado no CI). | Média | Adicionar seção 2.8 com nomenclatura e categorias. | Aplicado (2.8) |
+| 5 | Diagrama de diretórios não incluía `src/backend/ml-engine/`, que já existe e é consumido pelos serviços. | Baixa | Atualizar 2.1.1. | Aplicado (2.1.1) |
+| 6 | Não há configuração compartilhada de linter/formatter no repositório (`.editorconfig`/ESLint/Prettier). Atualmente o estilo é mantido manualmente. | Média | Adicionar `.editorconfig` na raiz (indentação, finais de linha) e ESLint + Prettier para `src/frontend/`. Para o backend, adotar `dotnet format` como passo opcional no pipeline. | Pendente |
+| 7 | Não há análise estática de C# (`dotnet format --verify-no-changes`, analyzers) no pipeline `build`/`test:unit`. | Média | Acrescentar `dotnet format --verify-no-changes` ao job `build` do `.gitlab-ci.yml`. | Pendente |
+| 8 | Não há padrão documentado para tratamento de configuração sensível (apenas `.env.example` na raiz). Variáveis novas tendem a se espalhar pelo `appsettings.json` e pelo `Program.cs`. | Baixa | Padronizar leitura via `Environment.GetEnvironmentVariable(...)` + fallback em `appsettings.json`, conforme já praticado no `catalogo/Program.cs`. | Pendente (documentar como ADR) |
+| 9 | Mensagens de log seguem formato livre — Serilog já está configurado, mas não há convenção sobre quais propriedades enriquecer (`UserId`, `RequestId`, `Servico`). | Baixa | Definir conjunto mínimo de propriedades em um documento operacional separado. | Pendente |
 
-### 5.4 Code Review — SQL
+### 7.2 Pontos Aderentes (sem ajuste necessário)
 
-- [ ] Tabela nova: nome no singular, `snake_case`.
-- [ ] PKs/FKs com nome explícito (`id_<tabela>`).
-- [ ] Datas em `TIMESTAMPTZ`.
-- [ ] RLS habilitado para tabelas com dados de usuário, com políticas declaradas.
-- [ ] Enums tipados para campos com valores fechados.
+- **Estrutura de diretórios** dos quatro microsserviços é homogênea (`application/`, `domain/`, `infrastructure/`, `presentation/`).
+- **Convenção de commit** (`<type>: <descrição> #<issue>`) está implementada via Git Hook e respeitada no histórico recente.
+- **Padrões de projeto** Builder/Strategy/Factory estão aplicados no código real (notebooks de ML e `Spotlight.Recomendacao`) e cobertos por testes.
+- **Separação de DTOs** entre `application/dtos` (backend) e `models/`+sufixo `Api` (frontend) está consistente.
+- **RLS no banco** está habilitado nas tabelas de usuário, em linha com a recomendação do Supabase.
 
-## 6. Conclusão
+### 7.3 Próximos Passos Recomendados
+
+1. Adicionar `.editorconfig` na raiz e ESLint/Prettier ao frontend (item 6).
+2. Plugar `dotnet format --verify-no-changes` no job `build` do GitLab CI (item 7).
+3. Registrar como ADR a estratégia de configuração por `.env` + `appsettings.json` (item 8).
+4. Definir o vocabulário mínimo de log estruturado no documento operacional (item 9).
+
+## 7. Conclusão
 
 Os padrões deste guia refletem o estado atual do Portal Aventura:
 
