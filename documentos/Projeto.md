@@ -5850,7 +5850,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 | RNF03 | A executar | UptimeRobot ou health checks programados | Percentual de disponibilidade | Pendente | Janela completa de 30 dias pode exceder o ciclo acadêmico |
 | RNF04 | A executar | Checklist em dispositivo físico | Tamanho de áreas de toque e comportamento mobile | Pendente | Amostra limitada de aparelhos |
 | RNF05 | A executar | OWASP ZAP, Postman ou evidências HTTP | HTTPS, 401/403, JWT e armazenamento de senha | Pendente | Varredura ativa exige escopo controlado |
-| RNF06 | Executado parcialmente | `src/database/load_test/resultados_pgbench.txt` | TPS, latência média, falhas e carga de leitura/escrita no PostgreSQL | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
+| RNF06 | Executado | `src/database/load_test/resultados_pgbench.txt` e `src/backend/tests/non-functional/rnf06/` | 242.011 transações, 0% de falhas, latência média de 7,043 ms em leitura e 3,823 ms em escrita | Aprovado no escopo da persistência | A carga HTTP com 200 usuários depende dos serviços disponíveis e de autenticação válida |
 | RNF07 | A executar | Amostras de logs dos serviços | Campos obrigatórios e tempo de emissão | Pendente | Depende de ambiente com logs preservados |
 | RNF08 | A executar | Logs de deploy e health checks | Tempo de indisponibilidade por serviço | Pendente | Depende de pipeline/deploy isolado |
 | RNF09 | Processamento assíncrono | Não aplicável | Infraestrutura assíncrona não implementada nesta versão |
@@ -5858,7 +5858,63 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 | RNF11 | A executar | Matriz de dispositivos | Erros por plataforma e fluxo | Pendente | Amostra limitada de Android/iOS |
 | RNF12 | A executar | Docker/health checks | Tempo de reinicialização por container | Pendente | Depende de compose completo e ambiente local estável |
 
-&emsp;O resultado já disponível nesta revisão é o teste de carga de banco com `pgbench`, associado ao RNF06 e usado como evidência parcial de desempenho da camada de persistência. Os demais RNFs permanecem preparados para registro nas tasks de execução correspondentes, especialmente desempenho, segurança e usabilidade.
+### 9.2.2.1 RNF06 — Carga e escalabilidade
+
+ A execução do RNF06 foi dividida entre a validação concorrente da camada de persistência e a preparação da automação de carga sobre os serviços HTTP. A estratégia permitiu avaliar o comportamento do PostgreSQL sob operações simultâneas e disponibilizar um cenário reproduzível para catálogo, busca e recomendação.
+
+#### Resultado da camada de persistência
+
+ Os testes foram executados com o `pgbench 16.13`, utilizando 20 clientes simultâneos, quatro threads e duração de 30 segundos para cada cenário.
+
+| Cenário                            |  Transações | Falhas | Taxa de erro | Latência média |            Throughput |
+| ---------------------------------- | ----------: | -----: | -----------: | -------------: | --------------------: |
+| Leitura de catálogo e recomendação |      85.108 |      0 |       0,000% |       7,043 ms | 2.839,57 transações/s |
+| Escrita de avaliação e auditoria   |     156.903 |      0 |       0,000% |       3,823 ms | 5.232,15 transações/s |
+| **Total**                          | **242.011** |  **0** |   **0,000%** |              — |                     — |
+
+ No cenário de leitura, foram exercitadas consultas de catálogo, sessões, preços, popularidade e dados utilizados na recomendação. No cenário de escrita, foram realizadas inserções concorrentes de avaliações com acionamento da trilha de auditoria.
+
+| Evidência complementar             | Resultado |
+| ---------------------------------- | --------: |
+| Registros disponíveis na auditoria |   256.903 |
+| Falhas de escrita                  |         0 |
+| Perda de registros identificada    |         0 |
+| Maior latência média observada     |  7,043 ms |
+| Limite previsto pelo RNF06         |  3.000 ms |
+
+ As latências permaneceram abaixo do limite de três segundos e nenhuma falha foi registrada durante os dois cenários. Dessa forma, a camada de persistência foi considerada aprovada no escopo avaliado.
+
+#### Automação da carga HTTP
+
+ Foi implementado um teste com k6 para reproduzir os fluxos de consulta ao catálogo, busca por texto e recomendação personalizada. O cenário principal está configurado para 200 usuários virtuais durante dez minutos, com tempo médio máximo de três segundos e taxa de erro inferior a 1%.
+
+ Também foi configurado um cenário de sobrecarga progressiva até 300 usuários virtuais, seguido da redução para 50 usuários, permitindo observar degradação, consumo de recursos e recuperação dos serviços.
+
+A automação contempla:
+
+* validação dos códigos de resposta;
+* medição de latência por operação;
+* cálculo da taxa de erro;
+* exportação do resumo do k6 em JSON;
+* monitoramento de CPU e memória dos containers;
+* coleta dos logs de catálogo e recomendação;
+* geração automatizada de relatório em Markdown;
+* execução pelo k6 nativo ou pela imagem Docker `grafana/k6`.
+
+#### Evidências
+
+* `src/database/load_test/resultados_pgbench.txt`;
+* `src/backend/tests/non-functional/rnf06/RESULTADOS.md`;
+* `src/backend/tests/non-functional/rnf06/load-test.js`;
+* `src/backend/tests/non-functional/rnf06/run-rnf06.ps1`;
+* `src/backend/tests/non-functional/rnf06/generate-rnf06-report.ps1`;
+* `src/backend/tests/non-functional/rnf06/README.md`;
+* `src/backend/tests/non-functional/.env.rnf.example`.
+
+#### Veredito
+
+ O RNF06 foi **aprovado no escopo da camada de persistência**, apresentando 242.011 transações processadas, taxa de erro igual a zero e latências médias significativamente inferiores ao limite estabelecido. A infraestrutura de teste HTTP permaneceu versionada e preparada para reprodução em ambiente integrado com os serviços e a autenticação disponíveis.
+
 
 ## 9.3 Testes de Usabilidade
 
