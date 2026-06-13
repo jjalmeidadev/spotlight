@@ -150,6 +150,10 @@ public static class AuthSetup
             {
                 // Mesmo motivo acima, mas alguns bloqueios chegam como erro de socket.
             }
+            catch (UriFormatException)
+            {
+                // jwksUrl mal formada (ex.: env sem schema) — segue sem chaves JWKS.
+            }
         }
 
         return keys;
