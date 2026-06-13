@@ -1,0 +1,46 @@
+# syntax=docker/dockerfile:1.7
+
+FROM node:22-alpine AS dev
+WORKDIR /app
+ENV CI=1 \
+    EXPO_NO_TELEMETRY=1 \
+    CHOKIDAR_USEPOLLING=true \
+    WATCHPACK_POLLING=true
+
+COPY package*.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
+
+COPY . .
+EXPOSE 19000 19001 19002 19006 8081
+CMD ["npm", "run", "web:docker"]
+
+FROM node:22-alpine AS build
+WORKDIR /app
+ENV NODE_ENV=production \
+    CI=1 \
+    EXPO_NO_TELEMETRY=1
+
+ARG EXPO_PUBLIC_SUPABASE_URL
+ARG EXPO_PUBLIC_SUPABASE_ANON_KEY
+ARG EXPO_PUBLIC_API_BASE_URL=/api
+ARG EXPO_PUBLIC_AUTH_REDIRECT_URL
+
+ENV EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL \
+    EXPO_PUBLIC_SUPABASE_ANON_KEY=$EXPO_PUBLIC_SUPABASE_ANON_KEY \
+    EXPO_PUBLIC_API_BASE_URL=$EXPO_PUBLIC_API_BASE_URL \
+    EXPO_PUBLIC_AUTH_REDIRECT_URL=$EXPO_PUBLIC_AUTH_REDIRECT_URL
+
+COPY package*.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
+
+COPY . .
+RUN npm run build:web
+
+FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
+COPY deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget -qO- http://localhost:8080/healthz || exit 1

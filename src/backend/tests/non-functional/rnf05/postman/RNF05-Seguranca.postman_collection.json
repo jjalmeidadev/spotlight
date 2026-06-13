@@ -1,0 +1,349 @@
+{
+  "info": {
+    "_postman_id": "b1cd36ab-c78a-4f1a-8bd6-rnf05spotlight",
+    "name": "Spotlight — RNF05 Segurança",
+    "description": "Cenários reproduzíveis para validar autenticação JWT, rejeição de tokens inválidos e autorização por papel. Tokens reais são fornecidos apenas em tempo de execução.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "catalog_base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "recommendation_base_url",
+      "value": "http://localhost:5003",
+      "type": "string"
+    },
+    {
+      "key": "user_base_url",
+      "value": "http://localhost:5002",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "common_user_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Cenários negativos obrigatórios",
+      "item": [
+        {
+          "name": "RNF05-N01 — Recomendação sem token retorna 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{recommendation_base_url}}/me?limite=10",
+              "host": [
+                "{{recommendation_base_url}}"
+              ],
+              "path": [
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 para token ausente', () => pm.response.to.have.status(401));",
+                  "pm.test('Resposta não expõe segredo', () => { const body = pm.response.text().toLowerCase(); pm.expect(body).to.not.include('supabase_jwt_secret'); pm.expect(body).to.not.include('password='); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RNF05-N02 — Token malformado retorna 401",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer token-invalido-sem-formato-jwt",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{recommendation_base_url}}/me?limite=10",
+              "host": [
+                "{{recommendation_base_url}}"
+              ],
+              "path": [
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 para token malformado', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RNF05-N03 — Token expirado/adulterado retorna 401",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer REDACTED_FOR_PUBLIC_RELEASE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{recommendation_base_url}}/me?limite=10",
+              "host": [
+                "{{recommendation_base_url}}"
+              ],
+              "path": [
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 para token expirado ou adulterado', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RNF05-N04 — Perfil sem token retorna 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{user_base_url}}/me",
+              "host": [
+                "{{user_base_url}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 em rota protegida de usuário', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RNF05-N05 — Criação de espetáculo sem token retorna 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{catalog_base_url}}/espetaculos",
+              "host": [
+                "{{catalog_base_url}}"
+              ],
+              "path": [
+                "espetaculos"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 em rota administrativa sem token', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cenários com credenciais fornecidas em runtime",
+      "item": [
+        {
+          "name": "RNF05-P01 — Token válido é aceito na recomendação",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{recommendation_base_url}}/me?limite=10",
+              "host": [
+                "{{recommendation_base_url}}"
+              ],
+              "path": [
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const value = pm.variables.get('access_token') || pm.environment.get('access_token');",
+                  "if (!value || value.trim().length === 0) { console.warn('ACCESS_TOKEN não informado; cenário positivo ignorado.'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token válido não é rejeitado por autenticação', () => { pm.expect(pm.response.code).to.not.eql(401); pm.expect(pm.response.code).to.not.eql(403); });",
+                  "pm.test('Resposta não expõe segredos', () => { const body = pm.response.text().toLowerCase(); pm.expect(body).to.not.include('supabase_jwt_secret'); pm.expect(body).to.not.include('service_role_key'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RNF05-N06 — Usuário comum não acessa rota administrativa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{common_user_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{catalog_base_url}}/espetaculos",
+              "host": [
+                "{{catalog_base_url}}"
+              ],
+              "path": [
+                "espetaculos"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const value = pm.variables.get('common_user_token') || pm.environment.get('common_user_token');",
+                  "if (!value || value.trim().length === 0) { console.warn('COMMON_USER_TOKEN não informado; cenário 403 ignorado.'); pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Usuário cadastrado sem papel de administrador recebe 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

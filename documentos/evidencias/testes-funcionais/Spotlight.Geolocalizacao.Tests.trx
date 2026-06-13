@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="3093075c-d8a3-423c-ba9b-365cf88d0c1a" name="Inteli@NOTEBOOK-0479 2026-06-12 19:14:22" runUser="NOTEBOOK-0479\Inteli" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-12T19:14:22.7805678-03:00" queuing="2026-06-12T19:14:22.7805685-03:00" start="2026-06-12T19:14:21.2293808-03:00" finish="2026-06-12T19:14:22.8008207-03:00" />
+  <TestSettings name="default" id="13e61091-b5f1-4ad1-b127-a032fe845436">
+    <Deployment runDeploymentRoot="Inteli_NOTEBOOK-0479_2026-06-12_19_14_22" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="97d8de9b-057b-4519-b31f-173d2f6e8da0" testId="2cc39375-1492-17b3-cce9-d75755ba07d2" testName="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComCoordenadasInvalidas_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0007276" startTime="2026-06-12T19:14:22.5358567-03:00" endTime="2026-06-12T19:14:22.5358571-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="97d8de9b-057b-4519-b31f-173d2f6e8da0" />
+    <UnitTestResult executionId="e64784e0-fdcc-4a61-b6ca-199a76dc8bae" testId="37d144a8-4db1-0f44-41b0-db7a773f5044" testName="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_NormalizaEnderecoEUsaCache" computerName="NOTEBOOK-0479" duration="00:00:00.0032536" startTime="2026-06-12T19:14:22.5350250-03:00" endTime="2026-06-12T19:14:22.5350255-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e64784e0-fdcc-4a61-b6ca-199a76dc8bae" />
+    <UnitTestResult executionId="1284a92c-e85e-4746-8b15-ac87c7fc5c23" testId="5cb660bb-cf10-4617-c1a3-94aa6a58d218" testName="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiFalha_LancaConflict" computerName="NOTEBOOK-0479" duration="00:00:00.0006989" startTime="2026-06-12T19:14:22.5366046-03:00" endTime="2026-06-12T19:14:22.5366048-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1284a92c-e85e-4746-8b15-ac87c7fc5c23" />
+    <UnitTestResult executionId="7de0c180-45da-48a1-8da4-04ca3c72215b" testId="f85b03fa-6b91-6eb1-e7d2-fd69e793e9b6" testName="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiNaoRetornaLugar_LancaNotFound" computerName="NOTEBOOK-0479" duration="00:00:00.0848294" startTime="2026-06-12T19:14:22.4845695-03:00" endTime="2026-06-12T19:14:22.4846175-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7de0c180-45da-48a1-8da4-04ca3c72215b" />
+    <UnitTestResult executionId="f7a6d2ce-48fd-42d6-983f-6a03ce516f77" testId="b2974f9f-81a8-0863-c40e-1d32a467143b" testName="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComDisplayNameVazio_LancaNotFound" computerName="NOTEBOOK-0479" duration="00:00:00.0010887" startTime="2026-06-12T19:14:22.5273472-03:00" endTime="2026-06-12T19:14:22.5273476-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f7a6d2ce-48fd-42d6-983f-6a03ce516f77" />
+    <UnitTestResult executionId="af810c0e-a1b7-4d2b-9189-339dde586c8d" testId="70adde35-abbe-8793-b1fb-325e27185a3d" testName="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ArredondaCoordenadasEUsaCache" computerName="NOTEBOOK-0479" duration="00:00:00.0432513" startTime="2026-06-12T19:14:22.5262677-03:00" endTime="2026-06-12T19:14:22.5262687-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af810c0e-a1b7-4d2b-9189-339dde586c8d" />
+    <UnitTestResult executionId="9bb2d8c8-d199-4059-813d-55446fc1f361" testId="789d435c-139a-f60d-aec3-95f70c9f211e" testName="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_ComEnderecoVazio_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0041882" startTime="2026-06-12T19:14:22.5316947-03:00" endTime="2026-06-12T19:14:22.5316952-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9bb2d8c8-d199-4059-813d-55446fc1f361" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiNaoRetornaLugar_LancaNotFound" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.geolocalizacao.tests\bin\debug\net9.0\spotlight.geolocalizacao.tests.dll" id="f85b03fa-6b91-6eb1-e7d2-fd69e793e9b6">
+      <Execution id="7de0c180-45da-48a1-8da4-04ca3c72215b" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests" name="Geocode_QuandoApiNaoRetornaLugar_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_NormalizaEnderecoEUsaCache" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.geolocalizacao.tests\bin\debug\net9.0\spotlight.geolocalizacao.tests.dll" id="37d144a8-4db1-0f44-41b0-db7a773f5044">
+      <Execution id="e64784e0-fdcc-4a61-b6ca-199a76dc8bae" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests" name="Geocode_NormalizaEnderecoEUsaCache" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_ComEnderecoVazio_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.geolocalizacao.tests\bin\debug\net9.0\spotlight.geolocalizacao.tests.dll" id="789d435c-139a-f60d-aec3-95f70c9f211e">
+      <Execution id="9bb2d8c8-d199-4059-813d-55446fc1f361" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests" name="Geocode_ComEnderecoVazio_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComCoordenadasInvalidas_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.geolocalizacao.tests\bin\debug\net9.0\spotlight.geolocalizacao.tests.dll" id="2cc39375-1492-17b3-cce9-d75755ba07d2">
+      <Execution id="97d8de9b-057b-4519-b31f-173d2f6e8da0" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests" name="ReverseGeocode_ComCoordenadasInvalidas_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ArredondaCoordenadasEUsaCache" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.geolocalizacao.tests\bin\debug\net9.0\spotlight.geolocalizacao.tests.dll" id="70adde35-abbe-8793-b1fb-325e27185a3d">
+      <Execution id="af810c0e-a1b7-4d2b-9189-339dde586c8d" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests" name="ReverseGeocode_ArredondaCoordenadasEUsaCache" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComDisplayNameVazio_LancaNotFound" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.geolocalizacao.tests\bin\debug\net9.0\spotlight.geolocalizacao.tests.dll" id="b2974f9f-81a8-0863-c40e-1d32a467143b">
+      <Execution id="f7a6d2ce-48fd-42d6-983f-6a03ce516f77" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests" name="ReverseGeocode_ComDisplayNameVazio_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiFalha_LancaConflict" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.geolocalizacao.tests\bin\debug\net9.0\spotlight.geolocalizacao.tests.dll" id="5cb660bb-cf10-4617-c1a3-94aa6a58d218">
+      <Execution id="1284a92c-e85e-4746-8b15-ac87c7fc5c23" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests" name="Geocode_QuandoApiFalha_LancaConflict" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="2cc39375-1492-17b3-cce9-d75755ba07d2" executionId="97d8de9b-057b-4519-b31f-173d2f6e8da0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="37d144a8-4db1-0f44-41b0-db7a773f5044" executionId="e64784e0-fdcc-4a61-b6ca-199a76dc8bae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5cb660bb-cf10-4617-c1a3-94aa6a58d218" executionId="1284a92c-e85e-4746-8b15-ac87c7fc5c23" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f85b03fa-6b91-6eb1-e7d2-fd69e793e9b6" executionId="7de0c180-45da-48a1-8da4-04ca3c72215b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b2974f9f-81a8-0863-c40e-1d32a467143b" executionId="f7a6d2ce-48fd-42d6-983f-6a03ce516f77" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="70adde35-abbe-8793-b1fb-325e27185a3d" executionId="af810c0e-a1b7-4d2b-9189-339dde586c8d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="789d435c-139a-f60d-aec3-95f70c9f211e" executionId="9bb2d8c8-d199-4059-813d-55446fc1f361" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados que não estão em uma lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos os resultados carregados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="7" executed="7" passed="7" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)&#xD;
+[xUnit.net 00:00:00.13]   Discovering: Spotlight.Geolocalizacao.Tests&#xD;
+[xUnit.net 00:00:00.19]   Discovered:  Spotlight.Geolocalizacao.Tests&#xD;
+[xUnit.net 00:00:00.19]   Starting:    Spotlight.Geolocalizacao.Tests&#xD;
+[xUnit.net 00:00:00.38]   Finished:    Spotlight.Geolocalizacao.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
