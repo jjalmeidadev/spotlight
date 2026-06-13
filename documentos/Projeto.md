@@ -6079,19 +6079,80 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 ## 9.3.2 Resultados
 
-&emsp;Esta subseção será preenchida após a execução da rodada de usabilidade com participantes externos. Para manter coerência, os dados abaixo devem registrar apenas resultados efetivamente coletados na planilha de campo e no questionário SUS.
+&emsp;Esta subseção consolida os resultados da rodada de testes de usabilidade realizada com cinco participantes, identificados como P1, P2, P3, P4 e P5. A análise combina os comportamentos observados durante a execução das tarefas com as pontuações obtidas por meio do System Usability Scale (SUS), permitindo avaliar a efetividade dos fluxos principais e a percepção global de facilidade de uso do aplicativo.
 
 | Métrica | Resultado observado | Critério de aceitação | Veredito |
 |---------|---------------------|-----------------------|----------|
-| Quantidade de participantes externos | A preencher | Mínimo de 5 participantes | Pendente |
-| Participante 60+ com baixa familiaridade tecnológica | A preencher | Pelo menos 1 participante | Pendente |
-| Média SUS | A preencher | SUS médio ≥ 68 | Pendente |
-| Taxa média de conclusão das tarefas | A preencher | ≥ 85% | Pendente |
-| Tarefas concluídas em até 3 toques | A preencher | ≥ 85% das execuções bem-sucedidas | Pendente |
-| Principais dificuldades observadas | A preencher | Registro qualitativo | Pendente |
-| Melhorias priorizadas | A preencher | Backlog de ajustes | Pendente |
+| Quantidade de participantes externos | 5 participantes | Mínimo de 5 participantes | Atendido |
+| Participante 60+ com baixa familiaridade tecnológica | Não informado nos dados consolidados | Pelo menos 1 participante | Não conclusivo |
+| Média SUS | 79,5 | SUS médio ≥ 68 | Atendido |
+| Taxa média de conclusão das tarefas | 100% | ≥ 85% | Atendido |
+| Tarefas concluídas em até 3 toques | Não informado nos dados consolidados | ≥ 85% das execuções bem-sucedidas | Não conclusivo |
+| Principais dificuldades observadas | Filtros, navegação horizontal, faixa de preço, destaque do botão de compra e ausência de sugestões na busca | Registro qualitativo | Registrado |
+| Melhorias priorizadas | Refinar filtros, carrosséis, busca, faixa de preço e botão de compra | Backlog de ajustes | Definido |
 
-&emsp;As evidências esperadas são a planilha de anotações, os tempos por tarefa, a contagem de toques, a indicação de auxílio, as respostas SUS e os comentários espontâneos dos participantes. Esses registros serão usados para validar principalmente RNF04, RNF10 e RNF11.
+&emsp;As evidências consideradas nesta análise são os registros de conclusão das tarefas, as dificuldades observadas durante as sessões e as pontuações individuais do questionário SUS. Não foram disponibilizados dados consolidados de tempo, número de toques ou perfil etário dos participantes; portanto, não é possível emitir veredito sobre esses critérios específicos sem extrapolar as informações coletadas.
+
+### 9.3.2.1 Resultados gerais dos testes
+
+&emsp;A rodada foi efetivamente realizada com cinco participantes externos, e todos concluíram todas as tarefas propostas no roteiro, resultando em taxa observada de conclusão de 100%. Esse resultado supera o critério quantitativo de 85% definido no planejamento e comprova boa efetividade geral dos fluxos avaliados, uma vez que os participantes conseguiram alcançar os objetivos estabelecidos sem ocorrência de bloqueios. Entretanto, a conclusão integral não significa ausência de dificuldades: P4 necessitou de ajuda leve nas etapas de preferências e filtros, enquanto P5 apresentou maior dificuldade na seleção da faixa de preço, na utilização dos filtros e na navegação horizontal.
+
+&emsp;Como o critério de sucesso do RNF10 também considera a conclusão sem auxílio verbal que revele o caminho na interface e a eficiência em até três toques, os dados disponíveis não permitem afirmar que todas as execuções atenderam integralmente a esse requisito. A natureza exata da ajuda fornecida a P4 não foi detalhada, e as quantidades de toques por tarefa não foram consolidadas. Assim, confirma-se o atendimento ao critério de conclusão, mas a eficiência por toques permanece não conclusiva. As dificuldades de P4 e P5 devem ser tratadas como prioridade de melhoria, pois indicam menor autonomia na interação com determinados componentes.
+
+### 9.3.2.2 Análise dos comportamentos observados
+
+&emsp;Os comportamentos observados demonstram variação relevante entre os participantes. P3 apresentou o melhor desempenho geral e percorreu os fluxos sem dificuldades relevantes, indicando que a organização da interface é adequada para usuários capazes de reconhecer os padrões de interação adotados. P1 também apresentou bom desempenho, com pequena dificuldade apenas para perceber a possibilidade de deslocamento horizontal nos carrosséis de espetáculos.
+
+&emsp;P2 esperava receber sugestões automáticas durante a busca, comportamento compatível com padrões recorrentes em aplicações digitais. Além disso, considerou os filtros e o botão de compra pouco destacados, o que evidencia limitações de visibilidade e hierarquia visual em elementos importantes para descoberta e conversão. P4 precisou de ajuda leve nas etapas de definição de preferências e aplicação de filtros, sugerindo que os controles dessas telas não comunicam de forma plenamente autônoma seu estado ou a ação necessária para prosseguir.
+
+&emsp;P5 concentrou o maior número de dificuldades, especialmente na seleção da faixa de preço, no uso dos filtros e na navegação horizontal. A recorrência desses pontos em mais de um participante indica que não se trata apenas de uma dificuldade isolada. A navegação horizontal foi pouco percebida por P1 e P5, enquanto os filtros geraram observações para P2, P4 e P5. Esses padrões apontam para problemas de descobribilidade, destaque visual e clareza dos mecanismos de refinamento do catálogo. Embora não tenham impedido a conclusão das tarefas, as dificuldades de P4 e P5 reduziram a autonomia de uso e, por isso, representam os achados de maior prioridade para refinamento.
+
+### 9.3.2.3 Análise dos resultados SUS
+
+| Participante | Pontuação SUS | Interpretação |
+|--------------|--------------:|---------------|
+| P1 | 85 | Acima da média e classificação A |
+| P2 | 85 | Acima da média e classificação A |
+| P3 | 85 | Acima da média e classificação A |
+| P4 | 85 | Acima da média e classificação A |
+| P5 | 57,5 | Abaixo da média de usabilidade |
+| **Média** | **79,5** | **Acima da média de usabilidade** |
+
+&emsp;A média SUS do grupo foi de 79,5 pontos, valor superior ao referencial de 68 pontos e, portanto, indicativo de usabilidade global acima da média. O resultado atende ao critério de aceitação estabelecido no planejamento. Contudo, a média permanece abaixo do limiar de 80,3 pontos adotado para a classificação A, não permitindo atribuir essa classificação ao resultado agregado da rodada.
+
+&emsp;Individualmente, P1, P2, P3 e P4 obtiveram 85 pontos, superando tanto a média de 68 quanto o limiar de 80,3 para classificação A. P5 obteve 57,5 pontos, resultado abaixo da média de usabilidade. A diferença de 27,5 pontos entre P5 e os demais participantes demonstra que a percepção positiva predominante não foi uniforme. Esse resultado é coerente com as dificuldades observadas por P5 e reforça a necessidade de aprimorar os componentes de faixa de preço, filtros e navegação horizontal, de modo a reduzir a dependência de familiaridade prévia com padrões de interação mobile.
+
+### 9.3.2.4 Pontos positivos
+
+- Conclusão de todas as tarefas por todos os participantes, sem ocorrência de bloqueios que impedissem o término dos fluxos.
+- Média SUS de 79,5 pontos, superior ao referencial de 68 e compatível com usabilidade global acima da média.
+- Pontuação SUS de 85 para quatro dos cinco participantes, correspondente à classificação A na interpretação adotada.
+- Desempenho de P3 sem dificuldades relevantes, evidenciando que a interface permite navegação fluida quando seus padrões de interação são prontamente reconhecidos.
+- Capacidade dos participantes de concluir os fluxos de preferências, catálogo, busca, filtros, detalhes e intenção de compra, ainda que com diferentes níveis de dificuldade.
+
+### 9.3.2.5 Problemas identificados
+
+- Baixa percepção da navegação horizontal nos carrosséis, observada em P1 e P5.
+- Ausência de sugestões automáticas na busca, recurso esperado por P2.
+- Baixo destaque visual dos filtros, apontado por P2 e associado às dificuldades de P4 e P5.
+- Baixo destaque do botão de compra, reduzindo a visibilidade da principal ação de conversão para P2.
+- Dificuldade de P5 na seleção da faixa de preço.
+- Necessidade de ajuda leve para P4 nas etapas de preferências e filtros.
+- Experiência menos satisfatória para P5, refletida tanto nas dificuldades observadas quanto na pontuação SUS de 57,5.
+
+### 9.3.2.6 Recomendações de melhoria
+
+&emsp;Recomenda-se tornar os carrosséis horizontais mais descobríveis por meio da exibição parcial do próximo card, de indicadores visuais de continuidade ou de orientação breve no primeiro contato, sem alterar a simplicidade do catálogo. Para a busca, recomenda-se avaliar a inclusão de sugestões automáticas relacionadas aos espetáculos disponíveis, mantendo comunicação clara quando não houver correspondências.
+
+&emsp;Os filtros devem receber maior destaque na hierarquia visual e apresentar estados de seleção mais evidentes, incluindo retorno perceptível após a aplicação. A seleção de faixa de preço deve ser revisada quanto à clareza dos rótulos, área de toque e representação do valor escolhido. Também se recomenda reforçar visualmente o botão de compra, assegurando contraste, posicionamento e identificação compatíveis com sua relevância no fluxo.
+
+&emsp;Após a implementação dos ajustes, recomenda-se repetir as tarefas T03, T05, T06, T08 e T09 com o mesmo roteiro, pois elas abrangem os elementos que concentraram as dificuldades observadas. Uma nova aplicação do SUS permitirá verificar se as alterações reduzem a diferença entre participantes e elevam a média do grupo acima do limiar de 80,3 pontos.
+
+### 9.3.2.7 Conclusão
+
+&emsp;Os resultados indicam que o Spotlight atendeu aos critérios de aceitação relativos à pontuação SUS e à conclusão das tarefas. A média SUS de 79,5 superou o critério mínimo de 68 pontos, e a taxa de conclusão de 100% superou o limiar de 85%. O resultado agregado permanece abaixo de 80,3 e, portanto, não recebe classificação A. Além disso, não é possível concluir o atendimento ao critério de eficiência em até três toques nem confirmar a participação do perfil 60+ com baixa familiaridade tecnológica, pois essas informações não constam nos dados consolidados.
+
+&emsp;Conclui-se que a solução possui uma base de interação funcional e compreensível. Os pontos críticos identificados não impediram o uso, mas afetaram a descobribilidade, a hierarquia visual e a autonomia em componentes de busca, filtros, faixa de preço, carrosséis e compra. Após a implementação dos ajustes, recomenda-se realizar nova rodada de validação com ênfase nas tarefas T03, T05, T06, T08 e T09, preservando o roteiro sempre que possível para permitir a comparação dos resultados.
 
 ## 9.4 Testes de Integração
 
