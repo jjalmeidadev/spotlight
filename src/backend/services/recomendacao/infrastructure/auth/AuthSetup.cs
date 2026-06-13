@@ -141,6 +141,10 @@ public static class AuthSetup
             {
                 // Same fallback for socket-level network failures.
             }
+            catch (UriFormatException)
+            {
+                // jwksUrl mal formada (ex.: env sem schema) — segue sem chaves JWKS.
+            }
         }
 
         return keys;
