@@ -5973,24 +5973,338 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 ## 9.2.2 Resultados
 
-&emsp;Esta subseção consolida a execução dos testes de RNF. Cada resultado deve indicar data de execução, ambiente, ferramenta utilizada, métricas observadas, evidência gerada, veredito e limitação. Essa estrutura evita tratar planejamento como resultado executado e permite evolução incremental conforme demais verificações de RNF forem concluídas.
+ Esta subseção consolida os artefatos, auditorias e execuções relacionadas aos requisitos não funcionais do Spotlight. A análise foi estruturada para distinguir três situações: testes efetivamente executados com métricas disponíveis, auditorias estáticas baseadas no código e na infraestrutura versionada, e suítes automatizadas cuja execução integrada depende de ambiente, credenciais, dispositivos ou período de observação ainda não disponíveis. Dessa forma, o documento preserva a rastreabilidade sem confundir implementação da automação com aprovação do requisito.
 
-| RNF | Status da execução | Ferramenta/evidência | Métricas registradas | Veredito | Limitações |
-|-----|--------------------|----------------------|----------------------|----------|------------|
-| RNF01 | A executar | Lighthouse mobile ou medição equivalente | FCP, TTI e tempo total por tela | Pendente | Depende de build acessível em dispositivo ou URL auditável |
-| RNF02 | A executar | Logs/timestamps do fluxo de recomendação | Tempo entre interação e exibição da recomendação | Pendente | Depende de perfil de teste com histórico e recomendação operacional |
-| RNF03 | A executar | UptimeRobot ou health checks programados | Percentual de disponibilidade | Pendente | Janela completa de 30 dias pode exceder o ciclo acadêmico |
-| RNF04 | A executar | Checklist em dispositivo físico | Tamanho de áreas de toque e comportamento mobile | Pendente | Amostra limitada de aparelhos |
-| RNF05 | A executar | OWASP ZAP, Postman ou evidências HTTP | HTTPS, 401/403, JWT e armazenamento de senha | Pendente | Varredura ativa exige escopo controlado |
-| RNF06 | Executado parcialmente | `src/database/load_test/resultados_pgbench.txt` | TPS, latência média, falhas e carga de leitura/escrita no PostgreSQL | Aprovado no escopo de banco | Não substitui k6 contra API completa com 200 usuários |
-| RNF07 | A executar | Amostras de logs dos serviços | Campos obrigatórios e tempo de emissão | Pendente | Depende de ambiente com logs preservados |
-| RNF08 | A executar | Logs de deploy e health checks | Tempo de indisponibilidade por serviço | Pendente | Depende de pipeline/deploy isolado |
-| RNF09 | Processamento assíncrono | Não aplicável | Infraestrutura assíncrona não implementada nesta versão |
-| RNF10 | A executar via seção 9.3.2 | Planilha SUS e tarefas T01 a T09 | Taxa de sucesso, toques e SUS | Pendente | Depende de consolidação dos participantes externos |
-| RNF11 | A executar | Matriz de dispositivos | Erros por plataforma e fluxo | Pendente | Amostra limitada de Android/iOS |
-| RNF12 | A executar | Docker/health checks | Tempo de reinicialização por container | Pendente | Depende de compose completo e ambiente local estável |
+ Os scripts e instrumentos foram centralizados em `src/backend/tests/non-functional`, com uma pasta por RNF. Os artefatos temporários produzidos em futuras execuções permanecem fora do versionamento, enquanto os arquivos `README.md` e `RESULTADOS.md` de cada pasta registram os critérios, comandos e limitações.
 
-&emsp;O resultado já disponível nesta revisão é o teste de carga de banco com `pgbench`, associado ao RNF06 e usado como evidência parcial de desempenho da camada de persistência. Os demais RNFs permanecem preparados para registro nas tasks de execução correspondentes, especialmente desempenho, segurança e usabilidade.
+### 9.2.2.1 Visão consolidada
+
+| RNF   | Estado da execução                 | Evidência principal                                                                         | Resultado consolidado                                                                                                                               | Veredito                            |
+| ----- | ---------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| RNF01 | Instrumentação concluída           | `src/backend/tests/non-functional/rnf01/`                                                   | Lighthouse mobile, planilha de cinco execuções por tela e analisador implementados; medições finais dependem da aplicação acessível                 | Pendente de execução integrada      |
+| RNF02 | Instrumentação concluída           | `src/backend/tests/non-functional/rnf02/`                                                   | Cenário k6 com três perfis e 30 medições implementado; depende de três JWTs válidos e serviço de recomendação disponível                            | Pendente de execução integrada      |
+| RNF03 | Monitor implementado               | `src/backend/tests/non-functional/rnf03/`                                                   | Monitor HTTP, cálculo de disponibilidade e simulação de indisponibilidade entregues; período mensal não concluído                                   | Pendente de janela de observação    |
+| RNF04 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf04/RESULTADOS.md`                                      | Seis alvos interativos com altura declarada inferior a 44 foram identificados                                                                       | Não conforme na auditoria estática  |
+| RNF05 | Suíte de segurança implementada    | `src/backend/tests/non-functional/rnf05/`                                                   | Newman, ZAP, inspeção estática, HTTPS e verificação agregada de bcrypt preparados; execução completa exige homologação autorizada e segredos locais | Pendente de execução integrada      |
+| RNF06 | Banco executado; API instrumentada | `src/database/load_test/resultados_pgbench.txt` e `src/backend/tests/non-functional/rnf06/` | 242.011 transações no PostgreSQL, sem falhas; carga HTTP com 200 VUs implementada, mas bloqueada por health checks HTTP 503 no ambiente local       | Aprovado no banco e pendente na API |
+| RNF07 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf07/RESULTADOS.md`                                      | Serilog presente, porém sem comprovação de saída JSON e enriquecimento padronizado com os cinco campos obrigatórios                                 | Parcialmente conforme               |
+| RNF08 | Automação concluída                | `src/backend/tests/non-functional/rnf08/`                                                   | Atualização isolada com `--no-deps`, monitoramento e rollback documentados; Gateway não integra o Compose atual                                     | Pendente de deploy controlado       |
+| RNF09 | Não aplicável                      | Registro documental                                                                         | Infraestrutura assíncrona não implementada e removida do escopo de execução                                                                         | Não aplicável nesta versão          |
+| RNF10 | Instrumentos concluídos            | `src/backend/tests/non-functional/rnf10/`                                                   | Roteiro T01–T09, planilha e analisador entregues; depende de cinco participantes externos                                                           | Pendente de sessões com usuários    |
+| RNF11 | Matriz concluída                   | `src/backend/tests/non-functional/rnf11/`                                                   | Matriz com quatro dispositivos, dez fluxos e 200 execuções planejadas; depende de dispositivos físicos                                              | Pendente de validação física        |
+| RNF12 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf12/RESULTADOS.md`                                      | Quatro serviços possuem Dockerfile, health check, política de reinício e rede; Gateway não está containerizado no Compose                           | Parcialmente conforme               |
+
+### 9.2.2.2 RNF01 — Tempo de carregamento das telas
+
+ Foi criada uma suíte para medir o carregamento das telas principais em até 2.000 ms. A estratégia combina Lighthouse em modo mobile para a versão Expo Web com uma planilha de medições percebidas em Android e iOS. O analisador calcula mínimo, média, máximo, percentil 95 e percentual de execuções aprovadas.
+
+ O executor realiza cinco rodadas do Lighthouse, atendendo à quantidade de repetições prevista. Como o aplicativo utiliza navegação por estado, a entrada web pode ser auditada automaticamente, enquanto as demais telas exigem navegação real e preenchimento da planilha.
+
+| Item verificado                        | Estado                              |
+| -------------------------------------- | ----------------------------------- |
+| Executor Lighthouse mobile             | Implementado                        |
+| Cinco execuções por tela               | Suportadas pelo executor            |
+| Registro mobile Android/iOS            | Modelo de planilha disponível       |
+| Cálculo de média, mínimo, máximo e p95 | Implementado                        |
+| Cenário de rede degradada              | Campo e procedimento documentados   |
+| Métricas finais                        | Não coletadas em ambiente integrado |
+
+**Critério:** 100% das cinco execuções de cada tela em até 2.000 ms, com feedback visual em condição degradada.
+
+**Veredito:** pendente de execução com o frontend acessível e preenchimento das medições das telas.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf01/run-rnf01.ps1`;
+* `src/backend/tests/non-functional/rnf01/analyze-rnf01.py`;
+* `src/backend/tests/non-functional/rnf01/measurements.template.csv`;
+* `src/backend/tests/non-functional/rnf01/RESULTADOS.md`.
+
+### 9.2.2.3 RNF02 — Latência das recomendações
+
+ Foi implementado um cenário k6 para três perfis distintos, com dez execuções por perfil e total de 30 medições HTTP. A automação valida status 2xx, presença de conteúdo e tempo máximo de 2.000 ms. Uma planilha complementar registra o tempo percebido entre o início da solicitação e a renderização da recomendação na interface, incluindo a presença de spinner ou feedback de carregamento.
+
+| Item verificado          | Estado                              |
+| ------------------------ | ----------------------------------- |
+| Três perfis de teste     | Parametrizados por variáveis locais |
+| Dez execuções por perfil | Configuradas                        |
+| Total de 30 medições     | Configurado                         |
+| Threshold de 2.000 ms    | Implementado                        |
+| Medição da interface     | Modelo de planilha disponível       |
+| Tokens JWT válidos       | Necessários e não versionados       |
+| Resultado integrado      | Não coletado                        |
+
+**Critério:** 100% das 30 medições em até 2.000 ms, com feedback visual quando houver atraso.
+
+**Veredito:** pendente de execução integrada com três perfis autenticados e serviço de recomendação operacional.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf02/recommendation-latency.js`;
+* `src/backend/tests/non-functional/rnf02/run-rnf02.ps1`;
+* `src/backend/tests/non-functional/rnf02/interface-measurements.template.csv`;
+* `src/backend/tests/non-functional/rnf02/analyze-rnf02.py`.
+
+### 9.2.2.4 RNF03 — Disponibilidade
+
+ Foi entregue um monitor HTTP configurável para os endpoints críticos, com registro de timestamp, código HTTP, latência e disponibilidade. O analisador calcula o percentual de uptime por endpoint e identifica incidentes com início, fim e duração. Também foi criado um script de indisponibilidade controlada para validar detecção e recuperação em homologação.
+
+ O critério mensal de 99% exige janela de observação prolongada. Portanto, a existência do monitor e de uma execução curta não substitui o acompanhamento do período real. A documentação orienta que datas exatas sejam informadas e que o resultado seja classificado como parcial quando 30 dias não tiverem sido concluídos.
+
+| Item verificado                | Estado                                 |
+| ------------------------------ | -------------------------------------- |
+| Monitor de endpoints           | Implementado                           |
+| Intervalo configurável         | Implementado                           |
+| Registro de incidentes         | Implementado                           |
+| Simulação de indisponibilidade | Implementada com confirmação explícita |
+| Cálculo de uptime              | Implementado                           |
+| Período mensal completo        | Não concluído                          |
+
+**Critério:** disponibilidade igual ou superior a 99%, equivalente a no máximo 7h18min de indisponibilidade em um mês de 30 dias.
+
+**Veredito:** pendente de janela representativa de monitoramento.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf03/run-rnf03.ps1`;
+* `src/backend/tests/non-functional/rnf03/simulate-outage.ps1`;
+* `src/backend/tests/non-functional/rnf03/analyze-rnf03.py`;
+* `src/backend/tests/non-functional/rnf03/endpoints.example.json`.
+
+### 9.2.2.5 RNF04 — Mobile first e áreas de toque
+
+ A auditoria estática identificou elementos interativos com altura explicitamente inferior ao mínimo de 44 unidades de layout. A existência da constante `spacing.touchMin = 44` e sua utilização em componentes como `Chip` não garante a conformidade integral da interface, pois outros estilos possuem dimensões menores.
+
+| Local identificado                   | Dimensão declarada | Resultado    |
+| ------------------------------------ | -----------------: | ------------ |
+| `FilterDropdown.button`              |    `minHeight: 34` | Não conforme |
+| `FilterDropdown.menuItem`            |    `minHeight: 30` | Não conforme |
+| `CatalogHero.cta`                    |    `minHeight: 28` | Não conforme |
+| ação secundária em `DetalhesView`    |    `minHeight: 36` | Não conforme |
+| botão de confirmação em `App.js`     |    `minHeight: 36` | Não conforme |
+| opção em `PreferenceSelectionScreen` |    `minHeight: 42` | Não conforme |
+
+ Também foram entregues um checklist de componentes e um analisador para calcular a conformidade geral e por plataforma após validação física em Android e iOS.
+
+**Critério:** 100% dos elementos interativos com largura e altura mínimas de 44 unidades e funcionamento por toque em Android e iOS.
+
+**Veredito:** não conforme na auditoria estática; validação física ainda necessária para completar a cobertura.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf04/run-static-touch-audit.ps1`;
+* `src/backend/tests/non-functional/rnf04/touch-target-checklist.csv`;
+* `src/backend/tests/non-functional/rnf04/analyze-rnf04.py`;
+* `src/backend/tests/non-functional/rnf04/RESULTADOS.md`.
+
+### 9.2.2.6 RNF05 — Segurança
+
+ Foi criada uma suíte reproduzível para autenticação JWT, autorização, transporte HTTPS, armazenamento de senha e varredura web. Os cenários HTTP são executados por Newman e produzem relatórios JSON e JUnit. A inspeção de transporte verifica se o acesso HTTP é bloqueado ou redirecionado para HTTPS. A consulta de senha trabalha apenas com métricas agregadas, sem exportar hashes. O OWASP ZAP Baseline foi configurado como verificação passiva, enquanto a análise ativa exige habilitação explícita e ambiente autorizado.
+
+| Controle                                          | Evidência gerada                | Critério                                                       |
+| ------------------------------------------------- | ------------------------------- | -------------------------------------------------------------- |
+| Token ausente, malformado, adulterado ou expirado | Newman JSON/JUnit               | HTTP 401                                                       |
+| Usuário sem papel necessário                      | Newman JSON/JUnit               | HTTP 403                                                       |
+| Token válido                                      | Newman JSON/JUnit               | Não retornar 401/403                                           |
+| Transporte                                        | `transport-results.json`        | HTTP bloqueado ou redirecionado para HTTPS                     |
+| Armazenamento de senha                            | `password-storage-results.json` | 100% bcrypt, custo mínimo 10 e nenhuma suspeita de texto plano |
+| Configuração JWT e segredos                       | `static-security-results.json`  | Assinatura e expiração configuradas; zero segredos confirmados |
+| Vulnerabilidades web                              | Relatórios ZAP                  | Zero alerta alto sem tratamento                                |
+
+ Tokens, credenciais e connection strings são recebidos apenas por variáveis do processo e não são versionados.
+
+**Veredito:** suíte implementada; resultado integrado pendente de ambiente autorizado, URL HTTPS e credenciais locais válidas.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf05/postman/RNF05-Seguranca.postman_collection.json`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-rnf05.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-static-security-check.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-transport-check.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-password-storage-check.ps1`;
+* `src/backend/tests/non-functional/rnf05/scripts/run-zap.ps1`;
+* `src/backend/tests/non-functional/rnf05/RESULTADOS.md`.
+
+### 9.2.2.7 RNF06 — Carga e escalabilidade
+
+#### Evidência complementar da camada de persistência
+
+ O teste de banco disponível no repositório foi executado em PostgreSQL 16 Alpine, em Docker local, utilizando aproximadamente 208 mil registros, 20 clientes, quatro threads e duração de 30 segundos por cenário. Essa execução é complementar e não substitui a carga HTTP completa das APIs.
+
+| Cenário                            |  Transações | Falhas | Taxa de erro | Latência média |            Throughput |
+| ---------------------------------- | ----------: | -----: | -----------: | -------------: | --------------------: |
+| Leitura de catálogo e recomendação |      85.108 |      0 |       0,000% |       7,043 ms | 2.839,57 transações/s |
+| Escrita de avaliação e auditoria   |     156.903 |      0 |       0,000% |       3,823 ms | 5.232,15 transações/s |
+| **Total**                          | **242.011** |  **0** |   **0,000%** |              — |                     — |
+
+ A execução também registrou 256.903 linhas na auditoria de avaliações, sem transações com falha. As duas latências médias ficaram muito abaixo do limite de 3.000 ms definido para o RNF06.
+
+#### Automação HTTP
+
+ Foi implementado um cenário k6 com catálogo, busca e recomendação, configurado para 200 usuários virtuais durante dez minutos. Os thresholds exigem tempo médio inferior a 3.000 ms e taxa de erro inferior a 1%. Um segundo cenário aumenta a carga até 300 usuários e depois reduz para 50, permitindo observar degradação e recuperação. O executor coleta resumo JSON, console, CPU, memória e logs dos serviços.
+
+ Durante a preparação local, os health checks de catálogo e recomendação responderam HTTP 503. Por essa razão, não foi registrada aprovação da camada HTTP sem uma execução confiável. O script permanece pronto para reprodução assim que as dependências do ambiente estiverem saudáveis e houver JWT válido para a recomendação.
+
+**Critério:** 200 usuários simultâneos por dez minutos, tempo médio inferior a 3.000 ms, taxa de erro inferior a 1% e ausência de queda crítica.
+
+**Veredito:** camada de persistência aprovada no escopo executado; carga HTTP pendente por indisponibilidade das dependências locais.
+
+**Evidências:**
+
+* `src/database/load_test/resultados_pgbench.txt`;
+* `src/backend/tests/non-functional/rnf06/load-test.js`;
+* `src/backend/tests/non-functional/rnf06/run-rnf06.ps1`;
+* `src/backend/tests/non-functional/rnf06/generate-rnf06-report.ps1`;
+* `src/backend/tests/non-functional/rnf06/RESULTADOS.md`.
+
+### 9.2.2.8 RNF07 — Logs estruturados
+
+ A auditoria do código identificou uso de Serilog e `UseSerilogRequestLogging` nos serviços. Entretanto, os arquivos de configuração analisados definem principalmente níveis mínimos e não comprovam saída JSON nem enriquecimento padronizado com timestamp, nível, serviço, sessão ou correlation ID e dispositivo.
+
+ Foi implementado um executor que envia `X-Correlation-ID`, `X-Session-ID` e `X-Device-ID`, coleta os logs dos quatro containers e utiliza um validador para verificar os cinco campos obrigatórios, latência de emissão e possível exposição de dados sensíveis.
+
+| Requisito                 | Resultado da auditoria                                                  |
+| ------------------------- | ----------------------------------------------------------------------- |
+| Infraestrutura de logging | Serilog presente                                                        |
+| Timestamp e nível         | Disponíveis no formato atual, sujeitos à validação do registro coletado |
+| Nome do serviço           | Não comprovado de forma padronizada                                     |
+| Sessão ou correlation ID  | Não comprovado de forma padronizada                                     |
+| Dispositivo               | Não comprovado de forma padronizada                                     |
+| Saída JSON estruturada    | Não identificada explicitamente                                         |
+| Busca por segredos        | Implementada no validador                                               |
+
+**Critério:** 100% dos eventos registrados em até 1.000 ms, com timestamp, nível, serviço, sessão/correlation ID e dispositivo, sem segredos.
+
+**Veredito:** parcialmente conforme; a infraestrutura existe, mas os campos obrigatórios e a saída estruturada precisam ser comprovados ou implementados.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf07/run-rnf07.ps1`;
+* `src/backend/tests/non-functional/rnf07/validate-logs.py`;
+* `src/backend/tests/non-functional/rnf07/events.example.json`;
+* `src/backend/tests/non-functional/rnf07/RESULTADOS.md`.
+
+### 9.2.2.9 RNF08 — Deploy independente
+
+ Foi implementado um executor de deploy isolado que realiza o build do serviço alvo, aplica `docker compose up -d --no-deps`, monitora seu health check e confirma a continuidade dos demais serviços. O script inicia em modo seguro e somente executa a alteração real quando recebe confirmação explícita. Também registra o tempo até recuperação, falhas externas ao alvo e instrução de rollback.
+
+ O Compose analisado contém catálogo, usuário, recomendação e geolocalização. O API Gateway possui projeto próprio, porém não integra o `docker-compose.yml` atual; por isso, não está coberto pelo deploy containerizado.
+
+| Item verificado                 | Estado                       |
+| ------------------------------- | ---------------------------- |
+| Build isolado                   | Automatizado                 |
+| Atualização sem dependências    | Automatizada com `--no-deps` |
+| Monitoramento do alvo           | Automatizado                 |
+| Verificação dos demais serviços | Automatizada                 |
+| Limite de cinco minutos         | Configurado                  |
+| Rollback                        | Documentado                  |
+| Gateway no Compose              | Ausente                      |
+| Deploy controlado executado     | Pendente                     |
+
+**Critério:** serviço alvo recuperado em até 300 segundos e 100% dos demais serviços operacionais durante a atualização.
+
+**Veredito:** automação concluída; resultado final pendente de execução em ambiente de deploy autorizado.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf08/run-rnf08.ps1`;
+* `src/backend/tests/non-functional/rnf08/services.json`;
+* `src/backend/tests/non-functional/rnf08/RESULTADOS.md`.
+
+### 9.2.2.10 RNF09 — Processamento assíncrono
+
+ O RNF09 foi classificado como **não aplicável nesta versão**. A infraestrutura de processamento assíncrono com RabbitMQ ou mecanismo equivalente não foi implementada e foi removida do escopo de execução dos testes. Não foram criados scripts, métricas ou evidências artificiais para esse requisito.
+
+**Veredito:** não aplicável nesta versão.
+
+### 9.2.2.11 RNF10 — Usabilidade
+
+ Foram preparados o roteiro T01–T09, a planilha de sessões e o analisador de resultados. A matriz prevê cinco participantes externos e 45 execuções, uma por participante e tarefa. O cálculo considera conclusão sem ajuda, quantidade de toques, tempo e observações qualitativas, identificando automaticamente tarefas abaixo de 85% de sucesso ou acima de três toques.
+
+| Item verificado                             | Estado       |
+| ------------------------------------------- | ------------ |
+| Roteiro T01–T09                             | Implementado |
+| Planilha de cinco participantes             | Implementada |
+| Anonimização por identificadores como `P01` | Documentada  |
+| Cálculo por tarefa e consolidado            | Implementado |
+| Registro de toques e ajuda                  | Implementado |
+| Sessões externas realizadas                 | Pendente     |
+
+**Critério:** pelo menos 85% de sucesso sem ajuda e média de até três toques nas execuções bem-sucedidas.
+
+**Veredito:** pendente de aplicação das sessões com participantes externos. Os resultados devem ser relacionados também à seção 9.3.2.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf10/tasks.csv`;
+* `src/backend/tests/non-functional/rnf10/sessions.template.csv`;
+* `src/backend/tests/non-functional/rnf10/analyze-rnf10.py`;
+* `src/backend/tests/non-functional/rnf10/RESULTADOS.md`.
+
+### 9.2.2.12 RNF11 — Compatibilidade Android e iOS
+
+ Foi criada uma matriz para dois dispositivos Android 10+ e dois dispositivos iOS 15+, cobrindo dez fluxos e cinco repetições por fluxo e dispositivo. Isso totaliza 200 execuções, sendo 100 por plataforma, e permite calcular a taxa de erro em incrementos de 1%.
+
+ O analisador consolida erros por plataforma, dispositivo e fluxo, incluindo crash, falha visual e comportamento funcional incorreto. A exigência de dispositivos físicos foi mantida; emuladores não substituem essa validação sem que a limitação seja declarada.
+
+| Item verificado                        | Estado             |
+| -------------------------------------- | ------------------ |
+| Dois Android e dois iOS                | Matriz preparada   |
+| Dez fluxos principais                  | Mapeados           |
+| Cinco repetições por fluxo/dispositivo | Planejadas         |
+| Total de 200 execuções                 | Planilha preparada |
+| Cálculo de erro por plataforma         | Implementado       |
+| Execução em dispositivos físicos       | Pendente           |
+
+**Critério:** taxa de erro igual ou inferior a 1% em Android e iOS.
+
+**Veredito:** pendente de validação nos quatro dispositivos físicos.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf11/devices.template.csv`;
+* `src/backend/tests/non-functional/rnf11/executions.template.csv`;
+* `src/backend/tests/non-functional/rnf11/analyze-rnf11.py`;
+* `src/backend/tests/non-functional/rnf11/RESULTADOS.md`.
+
+### 9.2.2.13 RNF12 — Containers e recuperação
+
+ A auditoria estática do repositório identificou quatro serviços no Compose: catálogo, usuário, recomendação e geolocalização. Todos possuem Dockerfile, health check, política `restart: unless-stopped` e participação na rede `spotlight_network`. O API Gateway possui projeto .NET, porém não possui Dockerfile nem entrada no Compose analisado.
+
+ Também foi criado um executor que reinicia cada serviço de forma controlada, mede o tempo até o health check positivo e verifica se os demais containers permanecem disponíveis. Operações destrutivas exigem o parâmetro explícito `-Execute`.
+
+| Item verificado                | Resultado estático                   |
+| ------------------------------ | ------------------------------------ |
+| Catálogo containerizado        | Conforme                             |
+| Usuário containerizado         | Conforme                             |
+| Recomendação containerizada    | Conforme                             |
+| Geolocalização containerizada  | Conforme                             |
+| Health checks                  | Presentes nos quatro serviços        |
+| Política de reinício           | `unless-stopped` nos quatro serviços |
+| Rede isolada                   | `spotlight_network`                  |
+| API Gateway containerizado     | Não conforme / fora do Compose       |
+| Recuperação em até 30 segundos | Pendente de execução controlada      |
+
+**Critério:** 100% dos serviços do escopo em containers isolados e retorno ao health check em até 30 segundos, sem indisponibilizar os demais.
+
+**Veredito:** parcialmente conforme na auditoria estática; os quatro serviços do Compose atendem à estrutura prevista, mas o Gateway não está containerizado e a recuperação temporal depende de execução controlada.
+
+**Evidências:**
+
+* `src/backend/tests/non-functional/rnf12/audit-containers.ps1`;
+* `src/backend/tests/non-functional/rnf12/run-rnf12.ps1`;
+* `src/backend/tests/non-functional/rnf12/services.json`;
+* `src/backend/tests/non-functional/rnf12/RESULTADOS.md`.
+
+### 9.2.2.14 Síntese dos achados
+
+ A execução dos cards resultou em uma base reproduzível para todos os RNFs aplicáveis. A maior parte dos requisitos possui executor, modelo de evidência, critérios automatizados e relatório associado. As auditorias estáticas permitiram identificar não conformidades concretas antes das execuções externas: alvos de toque inferiores a 44 unidades no RNF04, ausência de comprovação de cinco campos estruturados no RNF07 e ausência do API Gateway no Compose nos RNF08 e RNF12.
+
+ O RNF06 possui evidência quantitativa da camada de persistência, com 242.011 transações processadas sem falhas. A validação de carga HTTP permanece pendente porque os serviços responderam HTTP 503 nos health checks do ambiente local. Os RNFs dependentes de usuários, dispositivos, credenciais ou períodos prolongados foram mantidos como pendentes, com os instrumentos necessários para execução posterior.
+
+ Como próximos passos técnicos, recomenda-se priorizar: correção dos alvos de toque subdimensionados; enriquecimento estruturado dos logs; inclusão do API Gateway na estratégia de containerização; estabilização das dependências para execução do k6; disponibilização de ambiente HTTPS de homologação; e realização das sessões com usuários e dispositivos físicos.
+
+---
 
 ## 9.3 Testes de Usabilidade
 
