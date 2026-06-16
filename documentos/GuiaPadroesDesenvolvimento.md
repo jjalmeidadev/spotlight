@@ -21,9 +21,12 @@ O guia serve como referência rápida para novas implementações e como ponto d
 g04/
 ├── App.js                                # Bootstrap do app Expo (delegado para src/frontend)
 ├── app.json, package.json                # Configuração do Expo / Node
-├── docker-compose.yml                    # Orquestração local dos serviços backend
+├── docker-compose.yml                    # Orquestração local dos serviços backend (+ .dev/.prod)
+├── Dockerfile.frontend                   # Imagem do frontend para build/serve web
+├── deploy/nginx/                         # Proxy reverso (nginx) do deploy
 ├── documentos/                           # Documentação do projeto (markdowns + imagens)
 │   ├── img/                              # Imagens, diagramas, mockups, wireframes
+│   ├── evidencias/                       # Evidências de teste (TRX, saídas de execução)
 │   └── *.md                              # Projeto, Manual de instalação, padrões, SOA, etc.
 ├── src/
 │   ├── aad/                              # Notebooks de análise e tratamento de dados
@@ -31,14 +34,15 @@ g04/
 │   │   ├── Spotlight.sln                 # Solution: gateway + 4 serviços + projetos de teste
 │   │   ├── api-gateway/                  # Spotlight.Gateway (porta 5000) — YARP
 │   │   ├── services/
-│   │   │   ├── catalogo/                # Spotlight.Catalogo        (5001)
-│   │   │   ├── usuario/                 # Spotlight.Usuario         (5002) + telemetria Mongo
-│   │   │   ├── recomendacao/            # Spotlight.Recomendacao    (5003) + ML.NET strategy
-│   │   │   └── geolocalizacao/          # Spotlight.Geolocalizacao  (5004) — Nominatim
+│   │   │   ├── catalog/                 # Spotlight.Catalog         (5001)
+│   │   │   ├── user/                    # Spotlight.User            (5002) + telemetria Mongo
+│   │   │   ├── recommendation/          # Spotlight.Recommendation  (5003) + ML.NET strategy
+│   │   │   └── geolocation/             # Spotlight.Geolocation     (5004) — Nominatim
 │   │   ├── contracts/                   # Contratos de API/eventos e docs operacionais
-│   │   ├── ml-engine/                   # Adapters de inferência/treino consumidos pelos serviços
+│   │   ├── ml-engine/                   # Motor de ML; training/ contém o projeto de treino ML.NET
+│   │   │   └── training/Spotlight.Recommendation.ModelTraining/  # Projeto .NET de treino
 │   │   ├── scripts/                     # Scripts auxiliares (PowerShell)
-│   │   └── tests/                       # Projetos xUnit por serviço (Spotlight.<Servico>.Tests)
+│   │   └── tests/                       # Projetos xUnit por serviço (Spotlight.<Servico>.Tests) + non-functional/
 │   ├── frontend/                        # App Expo / React Native em arquitetura MVVM
 │   │   ├── components/                  # Componentes visuais reutilizáveis
 │   │   ├── screens/                     # Telas (Views)
@@ -51,11 +55,9 @@ g04/
 │   │   ├── migrations/                  # Migrations numeradas (04+) com rollback
 │   │   └── load_test/{,pgbench/}        # Massa sintética e cenários de carga
 │   ├── dataset/                         # Datasets processados (input do training)
-│   └── models/                          # Notebooks + treino ML.NET + artefatos publicados
-│       ├── Spotlight.Recomendacao.ModelTraining/   # Projeto .NET de treino
+│   └── models/                          # Notebooks + artefatos de ML publicados
 │       ├── artifacts/                              # Modelo .zip e similaridades
 │       └── reports/                                # Métricas e exemplos do modelo
-└── colab_csv_utf8/                       # Datasets originais (CSV bruto, read-only)
 ```
 
 #### 2.1.2 Nomenclatura de Arquivos
@@ -593,7 +595,7 @@ Padrões considerados e **não** adotados:
 
 ### 4.1 Gestão de Dados
 
-- Datasets originais em `colab_csv_utf8/` (somente leitura), processados em `src/dataset/`.
+- Datasets de apoio e amostras versionados em `src/dataset/`, consumidos pelos notebooks de `src/aad/` e pelo treino do modelo.
 - Seeds fixas (`random_state=42`) para todos os experimentos.
 - Migrations versionadas em `src/database/migrations/` com rollback espelhado.
 - Tabelas com dados de usuário **sempre** com RLS habilitado.
