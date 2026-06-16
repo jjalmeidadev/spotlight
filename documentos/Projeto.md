@@ -3681,13 +3681,16 @@ g04/
 ├─ babel.config.js              # transpiler
 ├─ tsconfig.json                # config TypeScript do frontend
 ├─ package.json                 # deps e scripts do frontend Expo
-├─ docker-compose.yml           # orquestração local dos serviços backend
+├─ docker-compose.yml           # orquestração local dos serviços backend (+ .dev/.prod)
+├─ Dockerfile.frontend          # imagem do frontend para build/serve web
+├─ deploy/nginx/                # configuração de proxy reverso (nginx) do deploy
 ├─ .env.example                 # variáveis de ambiente de referência
 ├─ .gitlab-ci.yml               # pipeline de CI (lint, build, testes)
 ├─ README.md                    # visão geral do repositório
 ├─ assets/                      # imagens, ícones e fontes do app
 ├─ documentos/                  # documentação do produto e do projeto
 │  ├─ img/                      # imagens, diagramas, mockups e wireframes
+│  ├─ evidencias/               # evidências de teste (TRX, saídas de execução)
 │  ├─ Projeto.md
 │  ├─ ProjetoVisual.md
 │  ├─ GestaoProjeto.md
@@ -3696,7 +3699,6 @@ g04/
 │  ├─ Documentacao_soa.md
 │  ├─ Manual-instalacao.md
 │  └─ Index.md
-├─ colab_csv_utf8/              # datasets originais em CSV bruto (pré-AAD)
 └─ src/
    ├─ frontend/                 # app React Native + TypeScript (MVVM)
    │  ├─ screens/               # Views (telas) — *.tsx
@@ -3721,21 +3723,22 @@ g04/
    │  │  ├─ telemetria.md       # contrato dos eventos de telemetria
    │  │  └─ supabase-storage.md # contrato de armazenamento de mídia
    │  ├─ services/              # microsserviços de negócio (SOA)
-   │  │  ├─ catalogo/           # Spotlight.Catalogo (5001) — ICatalog
-   │  │  ├─ usuario/            # Spotlight.Usuario (5002) — IUserPrefs + telemetria Mongo
-   │  │  ├─ recomendacao/       # Spotlight.Recomendacao (5003) — IRecommendation (ML.NET)
-   │  │  └─ geolocalizacao/     # Spotlight.Geolocalizacao (5004) — IGeolocation (Nominatim)
-   │  ├─ ml-engine/             # placeholder do motor de ML (treino real em src/models/)
-   │  │  ├─ data-preparation/
-   │  │  ├─ training/
-   │  │  └─ inference/
+   │  │  ├─ catalog/            # Spotlight.Catalog (5001) — ICatalog
+   │  │  ├─ user/               # Spotlight.User (5002) — IUserPrefs + telemetria Mongo
+   │  │  ├─ recommendation/     # Spotlight.Recommendation (5003) — IRecommendation (ML.NET)
+   │  │  └─ geolocation/        # Spotlight.Geolocation (5004) — IGeolocation (Nominatim)
+   │  ├─ ml-engine/             # motor de ML do backend
+   │  │  ├─ data-preparation/   # reservado (placeholder)
+   │  │  ├─ training/           # Spotlight.Recommendation.ModelTraining — treino ML.NET
+   │  │  └─ inference/          # reservado (placeholder)
    │  ├─ scripts/               # scripts utilitários (ex.: E2E telemetria)
-   │  └─ tests/                 # projetos de testes por serviço
-   │     ├─ Spotlight.Catalogo.Tests/
-   │     ├─ Spotlight.Recomendacao.Tests/
-   │     ├─ Spotlight.Usuario.Tests/
-   │     ├─ Spotlight.Geolocalizacao.Tests/
-   │     └─ Spotlight.Gateway.Tests/
+   │  └─ tests/                 # projetos de testes por serviço + RNF
+   │     ├─ Spotlight.Catalog.Tests/
+   │     ├─ Spotlight.Recommendation.Tests/
+   │     ├─ Spotlight.User.Tests/
+   │     ├─ Spotlight.Geolocation.Tests/
+   │     ├─ Spotlight.Gateway.Tests/
+   │     └─ non-functional/     # testes de requisitos não funcionais (rnf01..rnf12)
    ├─ database/                 # provisão e evolução do banco
    │  ├─ 00_supabase_compat.sql
    │  ├─ 01_create_database.sql
@@ -3749,8 +3752,7 @@ g04/
    │  ├─ recomendacao.csv
    │  ├─ recomendacao_balanceado.csv
    │  └─ interacoes_mongo_exemplo.jsonl
-   ├─ models/                   # experimentos e artefatos de ML
-   │  ├─ Spotlight.Recomendacao.ModelTraining/  # projeto C# de treino ML.NET
+   ├─ models/                   # experimentos e artefatos de ML (notebooks)
    │  ├─ artifacts/             # modelo serializado (.zip) e similaridades
    │  ├─ reports/               # métricas e exemplos do modelo
    │  ├─ sistema_recomendacao_knn.ipynb
@@ -3791,7 +3793,6 @@ flowchart TB
   Root --> Infra[Infra local<br/>docker-compose.yml · .env.example · .gitlab-ci.yml]
   Root --> Assets[assets/<br/>recursos estáticos]
   Root --> Docs[documentos/<br/>documentação + img/]
-  Root --> Colab[colab_csv_utf8/<br/>datasets originais CSV]
   Root --> Src[src/]
 
   Src --> Frontend[frontend/<br/>App React Native em MVVM]
@@ -3814,18 +3815,18 @@ flowchart TB
   Backend --> Gateway[api-gateway/<br/>YARP · porta única]
   Backend --> Contracts[contracts/<br/>DTOs, eventos e OpenAPI]
   Backend --> Services[services/<br/>microsserviços de negócio]
-  Backend --> MLEngine[ml-engine/<br/>placeholder · treino em src/models/]
+  Backend --> MLEngine[ml-engine/<br/>training: Spotlight.Recommendation.ModelTraining]
   Backend --> Scripts[scripts/<br/>utilitários operacionais]
-  Backend --> Tests[tests/<br/>um projeto xUnit por serviço]
+  Backend --> Tests[tests/<br/>um projeto xUnit por serviço + RNF]
 
-  Services --> Catalogo[catalogo/<br/>ICatalog]
-  Services --> Recomendacao[recomendacao/<br/>IRecommendation]
-  Services --> Usuario[usuario/<br/>IUserPrefs · telemetria]
-  Services --> Geo[geolocalizacao/<br/>IGeolocation]
+  Services --> Catalog[catalog/<br/>ICatalog]
+  Services --> Recommendation[recommendation/<br/>IRecommendation]
+  Services --> User[user/<br/>IUserPrefs · telemetria]
+  Services --> Geo[geolocation/<br/>IGeolocation]
 
-  Catalogo --> Layers[presentation · application · domain · infrastructure]
-  Recomendacao --> Layers
-  Usuario --> Layers
+  Catalog --> Layers[presentation · application · domain · infrastructure]
+  Recommendation --> Layers
+  User --> Layers
   Geo --> Layers
 ```
 
@@ -3836,9 +3837,9 @@ flowchart TB
 - Os arquivos `App.js`, `app.json`, `babel.config.js`, `tsconfig.json` e `package.json` na raiz são exigidos pelo Expo e mantidos junto à raiz para que o app móvel seja executável sem configuração adicional.
 - `docker-compose.yml` orquestra os serviços do backend, banco e Mongo em ambiente local, mantendo a infraestrutura de execução fora do código de aplicação.
 - `.env.example` documenta o conjunto mínimo de variáveis de ambiente; `.gitlab-ci.yml` define o pipeline de CI (lint, build, testes e publicação de artefatos).
+- `Dockerfile.frontend` e `deploy/nginx/` cobrem o empacotamento e o proxy reverso do frontend para os ambientes de deploy, mantendo a configuração de publicação fora do código de aplicação.
 - `assets/` guarda imagens e ícones do app, separando conteúdo visual do código-fonte.
-- `documentos/` centraliza a documentação do produto e do projeto, com `img/` para diagramas, mockups e wireframes referenciados pelos `.md`.
-- `colab_csv_utf8/` preserva os datasets originais em CSV bruto que alimentam os notebooks em `src/aad/`; manter o dado bruto separado do dado tratado e do código facilita reprocessamento.
+- `documentos/` centraliza a documentação do produto e do projeto, com `img/` para diagramas, mockups e wireframes e `evidencias/` para os artefatos de teste referenciados pelos `.md`.
 
 **`src/frontend/` — padrão MVVM**
 
@@ -3856,28 +3857,28 @@ flowchart TB
 - `Spotlight.sln` na raiz do backend agrupa o Gateway, os quatro serviços e os cinco projetos de teste em uma única solution, facilitando build e debug pelo Visual Studio/Rider.
 - `api-gateway/` é a porta única de entrada (`Spotlight.Gateway`, porta 5000): implementado com YARP, valida o JWT do Supabase, faz roteamento e expõe Swagger. `Controllers/` e `Middleware/` ficam internos ao próprio Gateway.
 - `contracts/` materializa os contratos do backend. `dtos/` e `events/` ficam versionados como código; `openapi.json` consolida o contrato REST do sistema; `api-contracts.md`, `telemetria.md` e `supabase-storage.md` descrevem o uso dos contratos em prosa. Manter os contratos fora dos serviços evita acoplamento entre emissores e consumidores.
-- `services/` contém quatro microsserviços, um por domínio, cada um expondo sua própria API ASP.NET Core com `Dockerfile` e `appsettings*.json` próprios: `catalogo/` (`Spotlight.Catalogo`, 5001), `usuario/` (`Spotlight.Usuario`, 5002, com telemetria no MongoDB), `recomendacao/` (`Spotlight.Recomendacao`, 5003, com strategy ML.NET) e `geolocalizacao/` (`Spotlight.Geolocalizacao`, 5004, integrando OpenStreetMap/Nominatim). Todos seguem a mesma estrutura em quatro camadas (`presentation`, `application`, `domain`, `infrastructure`).
-- `ml-engine/` é um placeholder com as três fases canônicas (`data-preparation/`, `training/`, `inference/`) reservadas para quando o motor de ML for migrado para dentro do backend. Hoje o treino e os artefatos do modelo vivem em `src/models/`, que é o que o `Serviço de Recomendação` consome.
+- `services/` contém quatro microsserviços, um por domínio, cada um expondo sua própria API ASP.NET Core com `Dockerfile` e `appsettings*.json` próprios: `catalog/` (`Spotlight.Catalog`, 5001), `user/` (`Spotlight.User`, 5002, com telemetria no MongoDB), `recommendation/` (`Spotlight.Recommendation`, 5003, com strategy ML.NET) e `geolocation/` (`Spotlight.Geolocation`, 5004, integrando OpenStreetMap/Nominatim). Todos seguem a mesma estrutura em quatro camadas (`presentation`, `application`, `domain`, `infrastructure`).
+- `ml-engine/` concentra o motor de ML do backend nas três fases canônicas (`data-preparation/`, `training/`, `inference/`); hoje `training/` hospeda o projeto C# `Spotlight.Recommendation.ModelTraining`, que treina o modelo ML.NET consumido pelo `Serviço de Recomendação`, enquanto `data-preparation/` e `inference/` permanecem reservadas para evolução. Os artefatos gerados e os notebooks exploratórios ficam em `src/models/`.
 - `scripts/` guarda utilitários operacionais auxiliares (por exemplo, `Test-TelemetriaAtlasE2E.ps1` para validar o fluxo de telemetria fim a fim).
-- `tests/` mantém um projeto xUnit por serviço (`Spotlight.<Dominio>.Tests`), espelhando a fronteira de cada microsserviço; isso garante que cada serviço seja testado de forma isolada.
+- `tests/` mantém um projeto xUnit por serviço (`Spotlight.<Dominio>.Tests`), espelhando a fronteira de cada microsserviço, além de `non-functional/` com os testes de requisitos não funcionais (rnf01..rnf12); isso garante que cada serviço seja testado de forma isolada.
 
 **Camadas internas de cada serviço**
 
 - `presentation/controllers/` expõe os endpoints REST do serviço e adapta a requisição em chamadas a casos de uso. `presentation/middleware/` cuida de autenticação, logging e tratamento de erro.
 - `application/usecases/` concentra a regra de aplicação — uma classe por operação do serviço — coordenando o domínio e a infraestrutura. `application/dtos/` define os formatos de entrada e saída dos casos de uso, protegendo o domínio de formatos externos.
 - `domain/entities/` guarda as entidades e as regras críticas do negócio; `domain/value-objects/` mantém valores imutáveis e validados (ex.: identificadores, faixas de preço, coordenadas). Essa camada é independente de framework, banco ou interface.
-- `infrastructure/persistence/` implementa o acesso a dados em Supabase/PostgreSQL via Npgsql (SQL puro, sem ORM). `infrastructure/auth/` valida o JWT do Supabase. Integrações específicas do domínio ficam em subpastas dedicadas (por exemplo, `usuario/infrastructure/geolocalizacao/` quando o serviço de usuário consome `IGeolocation`). Trocar tecnologia de armazenamento ou provedor de identidade fica restrito a essa camada.
+- `infrastructure/persistence/` implementa o acesso a dados em Supabase/PostgreSQL via Npgsql (SQL puro, sem ORM). `infrastructure/auth/` valida o JWT do Supabase. Integrações específicas do domínio ficam em subpastas dedicadas (por exemplo, `user/infrastructure/geolocation/` quando o serviço de usuário consome `IGeolocation`). Trocar tecnologia de armazenamento ou provedor de identidade fica restrito a essa camada.
 
 **Dados e modelos**
 
 - `src/database/` torna o banco reproduzível: os scripts `00_*` a `03_*` na raiz fazem provisão inicial e rollback; `migrations/` versiona as mudanças incrementais com seus respectivos `*_rollback.sql`; `load_test/pgbench/` reúne as queries usadas no teste de carga descrito mais adiante.
 - `src/dataset/` armazena amostras de dados (`itens_metadata.csv`, `recomendacao*.csv`, `interacoes_mongo_exemplo.jsonl`) que alimentam o ciclo de ML e demonstrações. Separar dado de código facilita versionamento e reprocessamento.
-- `src/models/` é hoje onde o ciclo de modelagem efetivamente acontece, e por isso fica fora de `src/backend/`. `Spotlight.Recomendacao.ModelTraining/` é o projeto C# que treina o modelo ML.NET consumido pelo `Serviço de Recomendação`; `artifacts/` guarda o modelo serializado (`recomendacao_incrementada_mlnet.zip`) e as similaridades pré-calculadas (`item_similarities.json`); `reports/` traz métricas e exemplos de saída. Os notebooks `sistema_recomendacao_knn.ipynb` e `sistema_recomendacao_svd.ipynb` e o `svd_model.pkl` preservam os experimentos exploratórios que precederam o modelo final.
+- `src/models/` guarda os experimentos e os artefatos do ciclo de modelagem, separados do código de aplicação. `artifacts/` guarda o modelo serializado (`recomendacao_incrementada_mlnet.zip`) e as similaridades pré-calculadas (`item_similarities.json`); `reports/` traz métricas e exemplos de saída. Os notebooks `sistema_recomendacao_knn.ipynb` e `sistema_recomendacao_svd.ipynb` e o `svd_model.pkl` preservam os experimentos exploratórios que precederam o modelo final. O projeto C# que efetivamente treina o modelo ML.NET vive em `src/backend/ml-engine/training/Spotlight.Recommendation.ModelTraining/`.
 - `src/aad/` mantém os notebooks de Análise e Apoio a Decisão; manter essa pasta separada impede que código de estudo se confunda com a aplicação principal.
 
 ### Relação com a solução
 
-&emsp;A estrutura espelha diretamente as decisões arquiteturais detalhadas em [5.2 Diagrama de Componentes UML](#52-diagrama-de-componentes-uml) e em [8.1.2 Arquitetura de Codificação — Spotlight](#812-arquitetura-de-codificação--spotlight): cada componente lógico do diagrama tem um diretório correspondente no código. O `Spotlight App` está em `src/frontend/`; o `API Gateway` em `src/backend/api-gateway/`; os serviços SOA `IUserPrefs`, `ICatalog`, `IRecommendation` e `IGeolocation` ficam em `src/backend/services/usuario/`, `catalogo/`, `recomendacao/` e `geolocalizacao/`; o `ML Engine` em `src/backend/ml-engine/` (execução) e em `src/models/` (treino e artefatos); a camada de dados é provisionada por `src/database/`. Os contratos de comunicação descritos nas interfaces (`ISpotlightAPI`, `IUserPrefs`, `ICatalog`, `IRecommendation`, `IGeolocation`) são materializados em `src/backend/contracts/` e consumidos pelos `repositories/` do frontend.
+&emsp;A estrutura espelha diretamente as decisões arquiteturais detalhadas em [5.2 Diagrama de Componentes UML](#52-diagrama-de-componentes-uml) e em [8.1.2 Arquitetura de Codificação — Spotlight](#812-arquitetura-de-codificação--spotlight): cada componente lógico do diagrama tem um diretório correspondente no código. O `Spotlight App` está em `src/frontend/`; o `API Gateway` em `src/backend/api-gateway/`; os serviços SOA `IUserPrefs`, `ICatalog`, `IRecommendation` e `IGeolocation` ficam em `src/backend/services/user/`, `catalog/`, `recommendation/` e `geolocation/`; o `ML Engine` em `src/backend/ml-engine/` (treino do modelo) e os artefatos e notebooks em `src/models/`; a camada de dados é provisionada por `src/database/`. Os contratos de comunicação descritos nas interfaces (`ISpotlightAPI`, `IUserPrefs`, `ICatalog`, `IRecommendation`, `IGeolocation`) são materializados em `src/backend/contracts/` e consumidos pelos `repositories/` do frontend.
 
 ### Justificativa da arquitetura
 
