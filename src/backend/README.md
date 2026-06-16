@@ -15,10 +15,10 @@ se for chamado diretamente (sem passar pelo gateway), continua funcionando.
 | Projeto | Pasta | Porta | Responsabilidade |
 |---|---|---|---|
 | **Spotlight.Gateway** | `api-gateway/` | 5000 | Ponto único de entrada; roteia para os serviços (YARP) e validará JWT |
-| **Spotlight.Catalogo** | `services/catalogo/` | 5001 | Espetáculos, teatros, gêneros e precificação |
-| **Spotlight.Usuario** | `services/usuario/` | 5002 | Perfis, preferências declaradas, histórico e telemetria (MongoDB) |
-| **Spotlight.Recomendacao** | `services/recomendacao/` | 5003 | Orquestra sugestões via strategy ML.NET / PostgreSQL pré-processado |
-| **Spotlight.Geolocalizacao** | `services/geolocalizacao/` | 5004 | Geocodificação de endereços (Nominatim/OpenStreetMap) |
+| **Spotlight.Catalog** | `services/catalog/` | 5001 | Espetáculos, teatros, gêneros e precificação |
+| **Spotlight.User** | `services/user/` | 5002 | Perfis, preferências declaradas, histórico e telemetria (MongoDB) |
+| **Spotlight.Recommendation** | `services/recommendation/` | 5003 | Orquestra sugestões via strategy ML.NET / PostgreSQL pré-processado |
+| **Spotlight.Geolocation** | `services/geolocation/` | 5004 | Geocodificação de endereços (Nominatim/OpenStreetMap) |
 
 Cada serviço tem um projeto de teste correspondente em `tests/`.
 
@@ -51,16 +51,16 @@ src/backend/
 │   ├── appsettings.json / appsettings.Development.json   # rotas/clusters do YARP
 │   └── Properties/launchSettings.json
 ├── services/
-│   ├── catalogo/                     # Spotlight.Catalogo (porta 5001)
-│   │   ├── Spotlight.Catalogo.csproj
+│   ├── catalog/                     # Spotlight.Catalog (porta 5001)
+│   │   ├── Spotlight.Catalog.csproj
 │   │   ├── Program.cs
 │   │   ├── application/{dtos,usecases}/        # DTOs e Services
 │   │   ├── domain/{entities,value-objects}/    # Models do domínio
 │   │   ├── infrastructure/persistence/         # Repositórios SQL puro
 │   │   └── presentation/{controllers,middleware}/
-│   ├── usuario/                      # Spotlight.Usuario (porta 5002) — mesma estrutura + telemetria Mongo
-│   ├── recomendacao/                 # Spotlight.Recomendacao (porta 5003) — strategy ML.NET / Postgres
-│   └── geolocalizacao/               # Spotlight.Geolocalizacao (porta 5004) — Nominatim
+│   ├── user/                      # Spotlight.User (porta 5002) — mesma estrutura + telemetria Mongo
+│   ├── recommendation/                 # Spotlight.Recommendation (porta 5003) — strategy ML.NET / Postgres
+│   └── geolocation/               # Spotlight.Geolocation (porta 5004) — Nominatim
 ├── ml-engine/                        # Placeholder para motor de ML (hoje o treino vive em src/models/)
 ├── contracts/                        # Contratos de API/eventos e docs operacionais
 │   ├── dtos/, events/
@@ -71,10 +71,10 @@ src/backend/
 ├── scripts/                          # Scripts auxiliares (PowerShell)
 └── tests/
     ├── Spotlight.Gateway.Tests/
-    ├── Spotlight.Catalogo.Tests/
-    ├── Spotlight.Usuario.Tests/
-    ├── Spotlight.Recomendacao.Tests/
-    └── Spotlight.Geolocalizacao.Tests/
+    ├── Spotlight.Catalog.Tests/
+    ├── Spotlight.User.Tests/
+    ├── Spotlight.Recommendation.Tests/
+    └── Spotlight.Geolocation.Tests/
 ```
 
 ## Pré-requisitos
@@ -98,9 +98,9 @@ cp .env.example .env
 dotnet restore src/backend/Spotlight.sln
 
 # 3. Subir um serviço (cada um numa porta — ver tabela de Projetos)
-dotnet run --project src/backend/services/catalogo        # http://localhost:5001/swagger
-dotnet run --project src/backend/services/usuario         # http://localhost:5002/swagger
-dotnet run --project src/backend/services/recomendacao    # http://localhost:5003/swagger
+dotnet run --project src/backend/services/catalog        # http://localhost:5001/swagger
+dotnet run --project src/backend/services/user         # http://localhost:5002/swagger
+dotnet run --project src/backend/services/recommendation    # http://localhost:5003/swagger
 dotnet run --project src/backend/api-gateway              # http://localhost:5000  (roteia p/ os serviços)
 ```
 
@@ -170,7 +170,7 @@ Se você for validar o app mobile junto com esses containers, mantenha o API Gat
 
 ```bash
 # Sobe sem erros (ex.: catálogo, a partir da raiz)
-dotnet run --project src/backend/services/catalogo
+dotnet run --project src/backend/services/catalog
 
 # GET /health retorna 200 (em outro terminal)
 curl -i http://localhost:5001/health

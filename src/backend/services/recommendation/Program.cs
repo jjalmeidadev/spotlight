@@ -1,0 +1,162 @@
+using DotNetEnv;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
+using Npgsql;
+using Serilog;
+using Spotlight.Recomendacao.Application.Services;
+using Spotlight.Recomendacao.Application.UseCases;
+using Spotlight.Recomendacao.Infrastructure.Auth;
+using Spotlight.Recomendacao.Infrastructure.Model;
+using Spotlight.Recomendacao.Infrastructure.Persistence;
+using Spotlight.Recomendacao.Infrastructure.Storage;
+using Spotlight.Recomendacao.Presentation.Middleware;
+
+// Carrega variáveis do arquivo .env (se existir) para o ambiente do processo.
+if (!AppContext.BaseDirectory.Contains("Spotlight.Recommendation.Tests", StringComparison.OrdinalIgnoreCase))
+{
+    Env.NoClobber().TraversePath().Load();
+}
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ---------------------------------------------------------------------------
+// Logger (Serilog)
+// ---------------------------------------------------------------------------
+builder.Host.UseSerilog((context, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .WriteTo.Console());
+
+// ---------------------------------------------------------------------------
+// Configuração / variáveis de ambiente
+// ---------------------------------------------------------------------------
+var connectionString =
+    Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("Default")
+    ?? string.Empty;
+
+// ---------------------------------------------------------------------------
+// Banco de dados (Npgsql / ADO.NET — sem ORM — PostgreSQL/Supabase)
+// ---------------------------------------------------------------------------
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
+
+    builder.Services.AddScoped<IRecomendacaoRepository, RecomendacaoRepository>();
+    builder.Services.AddScoped<ISimilaridadeRepository, SimilaridadeRepository>();
+    builder.Services.AddSingleton<IModeloRecomendacaoClient, MlNetModeloRecomendacaoClient>();
+    builder.Services.AddScoped<ModeloMlNetRecomendacaoStrategy>();
+    builder.Services.AddScoped<PostgresPreProcessadoRecomendacaoStrategy>();
+    builder.Services.AddScoped<IRecomendacaoStrategyFactory, RecomendacaoStrategyFactory>();
+    builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
+    builder.Services.AddScoped<ListarRecomendacoesMeUseCase>();
+    builder.Services.AddScoped<ListarSimilaresUseCase>();
+}
+
+// ---------------------------------------------------------------------------
+// Autenticação JWT (Supabase) + autorização por papel.
+// ---------------------------------------------------------------------------
+builder.AdicionarAutenticacaoESupabase();
+
+// ---------------------------------------------------------------------------
+// Health checks: liveness (sempre 200) + readiness (checa o Postgres)
+// ---------------------------------------------------------------------------
+var healthChecks = builder.Services.AddHealthChecks();
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    healthChecks.AddNpgSql(connectionString, name: "postgres", tags: ["ready"]);
+}
+else
+{
+    // Sem connection string o serviço NÃO está pronto para tráfego —
+    // readiness deve falhar (evita falso positivo no /health/ready).
+    healthChecks.AddCheck("postgres", () =>
+        HealthCheckResult.Unhealthy("Connection string do banco não configurada."),
+        tags: ["ready"]);
+}
+
+// ---------------------------------------------------------------------------
+// CORS
+// ---------------------------------------------------------------------------
+const string CorsPolicy = "SpotlightCors";
+builder.Services.AddCors(options =>
+    options.AddPolicy(CorsPolicy, policy =>
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+
+// ---------------------------------------------------------------------------
+// Controllers + Swagger / OpenAPI
+// ---------------------------------------------------------------------------
+builder.Services.AddControllers();
+builder.Services.AddHttpClient();
+builder.Services.AddHostedService<SupabaseModelArtifactsSyncHostedService>();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "Spotlight — Serviço de Recomendação",
+        Version = "v1",
+        Description =
+            "Orquestra o fluxo de sugestões, consultando predições do Motor de ML.\n\n" +
+            "**Endpoints públicos** (prefixo `/recomendacao` é adicionado pelo API Gateway):\n" +
+            "- `GET /recomendacao` — catálogo dos endpoints expostos (descoberta).\n" +
+            "- `GET /recomendacao/me` — recomendações personalizadas (requer JWT do Supabase com papel `cadastrado`).\n" +
+            "- `GET /recomendacao/espetaculos/{id}/similares` — similares item-item (público).\n\n" +
+            "O parâmetro `limite` (quando aplicável) aceita 1..50; valores fora do intervalo caem no padrão 10."
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT do Supabase Auth. Informe: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    // Aplica o requirement apenas em operações com [Authorize] — rotas públicas
+    // (ex.: /espetaculos/{id}/similares) ficam sem cadeado na UI.
+    options.OperationFilter<Spotlight.Recomendacao.Infrastructure.Auth.AuthorizeOperationFilter>();
+
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
+});
+
+var app = builder.Build();
+
+// ---------------------------------------------------------------------------
+// Pipeline de middlewares
+// ---------------------------------------------------------------------------
+app.UseMiddleware<ErrorHandlingMiddleware>(); // error handler global (primeiro)
+app.UseSerilogRequestLogging();
+app.UseCors(CorsPolicy);
+
+// Swagger sempre habilitado: o gateway agrega as specs dos serviços em /swagger.
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// Auth: precisa vir antes do MapControllers para que [Authorize] funcione.
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+// ---------------------------------------------------------------------------
+// Rotas de health check
+// ---------------------------------------------------------------------------
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    Predicate = _ => false
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
+app.Run();
+
+// Expõe a classe Program para o WebApplicationFactory dos testes de integração.
+public partial class Program;
