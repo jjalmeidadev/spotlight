@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { loginUsuario, Usuario } from '../models/Usuario';
+import { loginUsuario, Usuario } from '../models/User';
 import { obterLocalizacaoAtual, salvarLocalizacaoUsuario } from '../repositories/LocationRepository';
 
 export function useLoginViewModel(onSuccess?: (usuario: Usuario) => void) {

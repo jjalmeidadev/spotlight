@@ -3,9 +3,9 @@ import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } 
 import { useFonts } from 'expo-font';
 
 import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
-import CadastroView from './src/frontend/screens/CadastroView';
+import SignupView from './src/frontend/screens/SignupView';
 import CatalogView from './src/frontend/screens/CatalogView';
-import DetalhesView from './src/frontend/screens/DetalhesView';
+import DetailsView from './src/frontend/screens/DetailsView';
 import LoadingScreen from './src/frontend/screens/LoadingScreen';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
@@ -101,7 +101,7 @@ export default function App() {
 
 	if (screen === 'cadastro') {
 		return (
-			<CadastroView
+			<SignupView
 				onBackPress={() => setScreen('login')}
 				onCadastro={async (usuario) => {
 					if (usuario.requerConfirmacaoEmail) {
@@ -150,7 +150,7 @@ export default function App() {
 
 	if (screen === 'detalhes') {
 		return (
-			<DetalhesView
+			<DetailsView
 				accessToken={accessToken}
 				espetaculoId={espetaculoId}
 				onClose={() => setScreen('catalogo')}

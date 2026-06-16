@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Usuario } from '../models/Usuario';
+import type { Usuario } from '../models/User';
 
 /**
  * Estado da verificacao de sessao no boot.

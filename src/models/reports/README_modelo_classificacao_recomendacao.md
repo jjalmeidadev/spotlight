@@ -51,10 +51,10 @@ A versao incrementada passa a gerar um modelo ML.NET em `.zip`, que pode ser car
 - Similaridades item-item: `src/models/artifacts/item_similarities.json`
 - Metricas JSON: `src/models/reports/recomendacao_mlnet_metrics.json`
 - Exemplos CSV: `src/models/reports/recomendacao_mlnet_exemplos.csv`
-- Projeto de treino: `src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining`
+- Projeto de treino: `src/backend/ml-engine/training/Spotlight.Recommendation.ModelTraining`
 
 ## Como reproduzir
 
 ```powershell
-dotnet run --project src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
+dotnet run --project src/backend/ml-engine/training/Spotlight.Recommendation.ModelTraining/Spotlight.Recommendation.ModelTraining.csproj
 ```

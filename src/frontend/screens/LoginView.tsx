@@ -11,7 +11,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Usuario } from '../models/Usuario';
+import { Usuario } from '../models/User';
 import { useLoginViewModel } from '../viewmodels/useLoginViewModel';
 
 type LoginViewProps = {

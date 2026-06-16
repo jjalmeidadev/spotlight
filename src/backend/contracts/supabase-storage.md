@@ -77,7 +77,7 @@ O job `train:model-artifacts` gera os artefatos do modelo dentro da propria CI
 com o projeto:
 
 ```text
-src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining/Spotlight.Recomendacao.ModelTraining.csproj
+src/backend/ml-engine/training/Spotlight.Recommendation.ModelTraining/Spotlight.Recommendation.ModelTraining.csproj
 ```
 
 Ele usa como entrada:
