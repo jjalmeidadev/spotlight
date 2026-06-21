@@ -348,7 +348,14 @@ Cada microsserviço segue Clean Architecture (ver 2.3.1). Os benefícios concret
 - **Substituibilidade**: a camada `infrastructure` pode ser trocada (ex.: Npgsql → outra biblioteca) sem tocar nos casos de uso.
 - **Limites claros**: controllers ficam finos — só fazem binding de request e delegam ao caso de uso correspondente.
 
-### 3.2 Strategy Pattern (Backend C#)
+### 3.2 Strategy Pattern — Padrão Comportamental (Backend C#)
+
+O **Strategy** é o **padrão comportamental** (classificação GoF — *Behavioral Patterns*) aplicado no backend C#. Padrões comportamentais tratam de **como objetos colaboram e distribuem responsabilidades em tempo de execução**; o Strategy, especificamente, **encapsula uma família de algoritmos intercambiáveis atrás de uma interface comum**, permitindo trocar o algoritmo usado sem alterar o código que o consome.
+
+No Portal Aventura ele resolve a seleção do algoritmo de recomendação personalizada: a regra de negócio (`RecomendacaoService`) depende apenas da abstração `IRecomendacaoStrategy` e nunca sabe qual algoritmo concreto está rodando.
+
+- **Implementação real:** [`RecomendacaoService.cs`](../src/backend/services/recommendation/application/services/RecomendacaoService.cs) — interface `IRecomendacaoStrategy` (linhas 45–55) e as estratégias concretas `ModeloMlNetRecomendacaoStrategy` (linhas 76–132) e `PostgresPreProcessadoRecomendacaoStrategy` (linhas 134–162).
+- **Cobertura de testes:** `Spotlight.Recommendation.Tests/RecomendacaoServiceTests.cs` e `RecomendacaoUseCasesTests.cs`.
 
 #### 3.2.1 Problema
 
@@ -357,19 +364,30 @@ O endpoint `GET /recomendacao/me` pode atender o usuário de duas formas:
 1. Usando o modelo incrementado ML.NET, quando o artefato está presente e habilitado.
 2. Usando as recomendações pré-processadas no PostgreSQL, como fallback.
 
-A escolha do algoritmo não pode vazar para o controller nem para o caso de uso.
+A escolha e a execução do algoritmo não podem vazar para o controller nem para o caso de uso — esses só conhecem o contrato `IRecomendacaoStrategy`.
 
-#### 3.2.2 Implementação
+#### 3.2.2 Participantes (mapeamento GoF → projeto)
+
+| Papel no Strategy (GoF) | Classe no projeto |
+|-------------------------|-------------------|
+| `Strategy` (interface) | `IRecomendacaoStrategy` |
+| `ConcreteStrategy` A | `ModeloMlNetRecomendacaoStrategy` (algoritmo ML.NET) |
+| `ConcreteStrategy` B | `PostgresPreProcessadoRecomendacaoStrategy` (fallback pré-processado) |
+| `Context` | `RecomendacaoService` (consome a strategy via `IRecomendacaoStrategyFactory`) |
+
+#### 3.2.3 Implementação
 
 ```csharp
-// application/services/RecomendacaoService.cs
+// src/backend/services/recommendation/application/services/RecomendacaoService.cs
 
+// Strategy: contrato comum que torna os algoritmos intercambiáveis.
 public interface IRecomendacaoStrategy
 {
     Task<IReadOnlyList<RecomendacaoDto>> ListarAsync(
         Guid usuarioId, int limite, CancellationToken cancellationToken);
 }
 
+// ConcreteStrategy A: algoritmo ML.NET, com fallback controlado.
 public sealed class ModeloMlNetRecomendacaoStrategy(
     IRecomendacaoRepository repositorio,
     IModeloRecomendacaoClient modeloClient,
@@ -395,6 +413,7 @@ public sealed class ModeloMlNetRecomendacaoStrategy(
     }
 }
 
+// ConcreteStrategy B: recomendações pré-processadas no PostgreSQL.
 public sealed class PostgresPreProcessadoRecomendacaoStrategy(
     IRecomendacaoRepository repositorio) : IRecomendacaoStrategy
 {
@@ -407,11 +426,30 @@ public sealed class PostgresPreProcessadoRecomendacaoStrategy(
 }
 ```
 
-#### 3.2.3 Justificativa
+O `Context` consome a strategy sem conhecer a implementação concreta — a seleção é delegada à factory (ver 3.3):
 
-- **Open/Closed**: novas estratégias (ex.: motor remoto via HTTP) podem ser adicionadas sem alterar o `RecomendacaoService` nem o controller.
-- **Fallback explícito**: a strategy ML.NET delega de forma controlada para a strategy PostgreSQL.
-- **Testabilidade**: cada strategy é coberta isoladamente em `Spotlight.Recomendacao.Tests/RecomendacaoUseCasesTests.cs`.
+```csharp
+public sealed class RecomendacaoService(
+    IRecomendacaoStrategyFactory strategyFactory) : IRecomendacaoService
+{
+    public async Task<ListaDto<RecomendacaoDto>> ListarPersonalizadasAsync(
+        Guid usuarioId, int? limite, CancellationToken cancellationToken)
+    {
+        var strategy = strategyFactory.Criar();              // qual algoritmo? o service não sabe
+        var recomendacoes = await strategy.ListarAsync(
+            usuarioId, NormalizarLimite(limite), cancellationToken);
+        return new ListaDto<RecomendacaoDto> { Data = recomendacoes };
+    }
+}
+```
+
+#### 3.2.4 Decisão de design justificada
+
+- **Por que comportamental (Strategy) e não condicional inline:** a alternativa ingênua seria um `if (modeloHabilitado) { ... } else { ... }` dentro do service, misturando duas lógicas de recomendação numa só classe. O Strategy isola cada algoritmo na sua própria classe, com responsabilidade única, e mantém o `RecomendacaoService` agnóstico ao algoritmo.
+- **Open/Closed Principle:** novas estratégias (ex.: motor remoto via HTTP, modelo A/B) entram como novas implementações de `IRecomendacaoStrategy`, sem alterar `RecomendacaoService` nem o controller.
+- **Fallback explícito e resiliente:** a strategy ML.NET delega de forma controlada para a strategy PostgreSQL quando o modelo não retorna predições ou lança exceção — a degradação é uma decisão de design, não um efeito colateral.
+- **Testabilidade:** cada strategy depende apenas de interfaces (`IRecomendacaoRepository`, `IModeloRecomendacaoClient`) e é coberta isoladamente com fakes em xUnit, sem subir banco nem HTTP.
+- **Complementaridade com o padrão criacional:** o Strategy responde *"como o algoritmo é executado"*; o **Factory Method** (3.3) responde *"qual algoritmo escolher"*. A separação evita que a regra de seleção contamine as estratégias.
 
 ### 3.3 Factory Method (Backend C#)
 

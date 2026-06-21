@@ -120,7 +120,7 @@ Esta documentação está organizada em diferentes arquivos conforme apresentado
 ### Processo de Desenvolvimento de Software
 
 - **Gestao_Projeto_Configuracao.md**: políticas de versionamento, branches, hooks de commit e configuração do repositório.
-- **GuiaPadroesDesenvolvimento.md**: convenções de codificação (Python/SQL/C#/TS), estrutura de diretórios e padrões de projeto adotados (Builder, Strategy, Factory).
+- **GuiaPadroesDesenvolvimento.md**: convenções de codificação (Python/SQL/C#/TS), estrutura de diretórios e padrões de projeto adotados — criacionais (Builder, Factory Method) e comportamental (Strategy no backend C#).
 
 ### Desenvolvimento do Produto
 
