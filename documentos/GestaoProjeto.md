@@ -119,8 +119,9 @@
   - [2.4 Sprint 4](#24-sprint-4)
   - [2.5 Sprint 5](#25-sprint-5)
 - [3. Análise de Riscos](#3-análise-de-riscos)
-  - [3.1 Riscos identificados](#31-riscos-identificados)
-  - [3.2 Mitigação de Riscos](#32-mitigação-de-riscos)
+  - [3.1 Riscos Identificados](#31-riscos-identificados)
+  - [3.2 Mitigação de Riscos e Resultados](#32-mitigação-de-riscos-e-resultados)
+  - [3.3 Novos Riscos Identificados na Sprint 5](#33-novos-riscos-identificados-na-sprint-5)
 - [4. Análise Post Mortem](#4-análise-post-mortem)
   - [4.1 Sucessos do Projeto](#41-sucessos-do-projeto)
   - [4.2 Oportunidades de Melhoria](#42-oportunidades-de-melhoria)
@@ -989,22 +990,74 @@ Para esta sprint, ficam estabelecidas as seguintes diretrizes:
 
 O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a cada sprint como parte das cerimônias de retrospectiva e planejamento. Os riscos são classificados por probabilidade e impacto, com estratégias de mitigação definidas e responsáveis atribuídos.
 
+Diferentemente de um registro estático, esta seção consolida os riscos **reais** que se materializaram ou foram monitorados ao longo das Sprints 1 a 5. Cada risco está vinculado à sprint em que foi identificado, à evidência que o originou e ao resultado observado após a aplicação da estratégia de mitigação. Essa abordagem reflete diretamente o ciclo de melhoria contínua adotado pela equipe, no qual os pontos negativos de cada retrospectiva alimentaram o registro de riscos da sprint seguinte.
+
+### Critérios de Classificação
+
+| Dimensão | Níveis | Significado |
+|---|---|---|
+| Probabilidade | Baixa / Média / Alta | Chance de o risco se materializar no contexto do ciclo. |
+| Impacto | Baixo / Médio / Alto | Efeito sobre prazo, qualidade do produto ou da entrega documental. |
+| Status | Mitigado / Controlado / Monitorado / Materializado | Situação do risco após a aplicação das ações de tratamento. |
+
 ## 3.1 Riscos Identificados
+
+Os riscos abaixo foram extraídos das retrospectivas reais de cada ciclo. A coluna "Origem" indica a sprint em que o risco foi identificado pela primeira vez; riscos recorrentes são tratados como evolutivos e acompanhados nos ciclos seguintes.
+
+| ID | Risco | Origem | Probabilidade | Impacto | Responsável |
+|----|------|--------|--------------|---------|-------------|
+| R1 | Atraso na preparação e revisão dos slides de apresentação | Sprint 1 | Alta | Alto | Responsável pelos slides / Scrum Master |
+| R2 | Atraso na condução e no encerramento das cerimônias (review/fechamento) | Sprint 1 | Média | Médio | Scrum Master |
+| R3 | Ausência de priorização e de mapeamento de dependências entre tasks | Sprint 2 | Alta | Alto | Scrum Master |
+| R4 | Inconsistência no fluxo de cards do Kanban e no padrão de commits | Sprint 2 | Alta | Médio | Equipe |
+| R5 | Acúmulo de revisões de Merge Requests no fim do ciclo | Sprint 2 | Alta | Alto | Equipe |
+| R6 | Tarefas estagnadas no estado "Doing" sem progressão | Sprint 2 | Média | Médio | Scrum Master |
+| R7 | Centralização de entregas críticas em poucos integrantes | Sprint 3 | Alta | Alto | Scrum Master |
+| R8 | Distribuição desbalanceada de carga de trabalho entre os membros | Sprint 3 | Alta | Médio | Scrum Master |
+| R9 | Divergência de detalhamento entre o documento de gestão e os cards do Kanban | Sprint 3 | Média | Médio | Equipe |
+| R10 | Atraso no início da produção após interrupção (feriado/pausa) | Sprint 4 | Alta | Alto | Scrum Master |
+| R11 | Conflitos de merge por branches críticas em desenvolvimento simultâneo | Sprint 4 | Média | Alto | Tech Lead |
+| R12 | Concentração de documentação no último dia da sprint | Sprint 4 | Média | Médio | Equipe |
+
+## 3.2 Mitigação de Riscos e Resultados
+
+A tabela a seguir registra, para cada risco, a estratégia de mitigação efetivamente aplicada e o resultado observado nas sprints subsequentes. O resultado é a evidência de que o registro de riscos cumpriu seu papel de instrumento de melhoria contínua, e não apenas de documentação formal.
+
+| Risco | Estratégia de Mitigação Aplicada | Resultado Observado | Status |
+|------|----------------------------------|---------------------|--------|
+| R1 | Criação de checkpoint antecipado para revisão de materiais não-técnicos e task específica de apresentação desde o Dia 1 da sprint, com roteiro, versão preliminar e ensaio. | Reincidência na Sprint 3 (slides montados um dia antes), corrigida de forma consolidada nas Sprints 4 e 5: estrutura completa pronta com dois dias de antecedência por dois ciclos consecutivos (issues #251–#253). | Mitigado |
+| R2 | Maior atenção ao planejamento das cerimônias e definição de ritual de fechamento mais estruturado, com responsabilidades claras de revisão e consolidação. | Ritual de fechamento tornou-se mais previsível a partir da Sprint 3, com a equipe chegando ao encerramento com clareza sobre o que validar e revisar. | Mitigado |
+| R3 | Construção de matriz de dependências críticas formalizando precedências técnicas antes da execução, adotada a partir da Sprint 3. | Sequenciamento técnico respeitado nas Sprints 3 e 4 (banco antes de backend, rotas antes de frontend). Na Sprint 4 a matriz perdeu força como instrumento de acompanhamento diário, motivando ação corretiva na Sprint 5. | Controlado |
+| R4 | Reforço do padrão de mensagens de commit com verificação amostral pelo Scrum Master e definição de movimentação consistente de cards (Doing → Review → Closed). | Aderência ao padrão melhorou progressivamente; o fluxo de cards tornou-se mais consistente a partir da Sprint 3, embora ainda exija checagem cruzada entre Kanban e documentação. | Controlado |
+| R5 | Estabelecimento de SLA interno de revisão de Merge Requests em até 24 horas após a abertura, evitando concentração no fim do ciclo. | Maior evolução do projeto: na Sprint 4 as revisões foram distribuídas ao longo do ciclo (Celso reviewer em 6 MRs, Mariana Reis em 3, Jaime em 2, Rafael em 1), eliminando o gargalo recorrente das Sprints 2 e 3. | Mitigado |
+| R6 | Definição de limite de WIP (máximo de duas tasks simultâneas em "Doing") e verificação diária nas dailys de tarefas estagnadas há mais de 48 horas. | Tarefas passaram a fluir com maior regularidade a partir da Sprint 3; as dailys passaram a tratar impedimentos de forma objetiva e conectada ao estado real do Kanban. | Mitigado |
+| R7 | Definição de limite de carga por integrante e exigência de dupla de apoio para entregas críticas (tasks M e G). | Reduzido na Sprint 4 (toda entrega crítica com responsável principal e apoio designado), mas persistiu desbalanceamento residual de volume (3:1 entre o membro mais e o menos ativo), exigindo reequilíbrio na Sprint 5. | Controlado |
+| R8 | Criação de tabela de alocação por pessoa relacionando responsável, apoio, tamanho da task e dependências, considerando capacidade individual no planning. | Distribuição por frentes técnicas na Sprint 4 deu responsável claro a cada frente, mas Celso e Mariana Pereira ficaram 48% e 58% abaixo da média do grupo, mantendo o risco ativo para o ciclo final. | Monitorado |
+| R9 | Expansão da descrição das tasks no documento de gestão (objetivo, entrega esperada, DoR e DoD resumidos) e checagem entre Kanban e documentação ao final das dailys. | Rastreabilidade documental melhorou a partir da Sprint 4, com planejamento compreensível fora do card. A checagem cruzada foi reforçada como rotina diária (T47) na Sprint 5. | Controlado |
+| R10 | Realização de daily de retomada no primeiro dia útil pós-interrupção, com checklist explícito garantindo ao menos uma task em "Doing" por membro. | Risco materializado na Sprint 4 (produção concentrada na segunda semana, 13 MRs nos últimos 3 dias). Ação de retomada planejada e incorporada formalmente ao planejamento da Sprint 5. | Materializado / em tratamento |
+| R11 | Mapeamento na matriz de dependências de branches que não devem evoluir em paralelo e comunicação ativa da ordem de integração no início de cada dia. | Conflitos gerenciados sem comprometer a entrega na Sprint 4, mas o risco evidenciou a necessidade de tornar a dependência entre branches um controle operacional, adotado na Sprint 5 (registro antes de entrar em Review). | Monitorado |
+| R12 | Distribuição das tasks de documentação final (post mortem, retrospectiva, atualização de artefatos) ao longo de todos os dias úteis, desde o Dia 1. | Cronograma da Sprint 5 distribui placeholders, guias, README, riscos e manual de deploy entre os três primeiros dias, evitando concentração no fechamento. | Monitorado |
+
+## 3.3 Novos Riscos Identificados na Sprint 5
+
+A Sprint 5, por ser o ciclo de encerramento, introduziu riscos próprios relacionados a acabamento, consolidação documental e preparação da entrega final ao parceiro. Esses riscos foram identificados durante o planning do ciclo e estão sob monitoramento ativo.
 
 | ID | Risco | Probabilidade | Impacto | Responsável |
 |----|------|--------------|---------|-------------|
-| R1 | Atraso na entrega de apresentações | Média | Alto | Scrum Master |
-| R2 | Falta de revisão de materiais | Alta | Médio | Equipe |
-| R3 | Desorganização no Kanban | Média | Médio | Scrum Master |
+| R13 | Crescimento de escopo na sprint de encerramento (novas issues sem teto definido) | Alta | Médio | Scrum Master |
+| R14 | Permanência de placeholders e inconsistências formais na documentação final | Média | Alto | Equipe |
+| R15 | Falha ou instabilidade no deploy do ambiente final (servidor Inteli e nuvem comercial) | Média | Alto | Tech Lead |
+| R16 | Evidências de testes incompletas ou não registradas antes da entrega final | Média | Alto | Equipe de Testes |
 
+| Risco | Estratégia de Mitigação Planejada | Status |
+|------|-----------------------------------|--------|
+| R13 | Tratar o recorte inicial de 47 issues como base, não como teto; exigir que toda nova issue entre no Kanban com DoR, DoD, tamanho e dependências, preservando rastreabilidade mesmo com expansão do backlog. | Monitorado |
+| R14 | Concentrar a limpeza de placeholders nos três primeiros dias (T4, T5, T6, T18), com revisão completa da documentação antes da entrega (T35) e checagem dos critérios do Escritório de Projetos (T40). | Monitorado |
+| R15 | Validar o ambiente final dockerizado no servidor Inteli (T22) e tratar a nuvem comercial como diferencial não bloqueante (T21); elaborar manual de deploy a partir de um processo de implantação já validado (T32). | Monitorado |
+| R16 | Executar a rodada final de testes nos primeiros dias (T10–T15), organizar logs e evidências (T25) e consolidar a seção de testes no `Projeto.md` (T27) antes do fechamento, evitando entrega sem comprovação de validação. | Monitorado |
 
-## 3.2 Mitigação de Riscos
+A gestão evolutiva de riscos demonstra que o projeto tratou os pontos negativos das retrospectivas como insumo direto para o planejamento seguinte. Riscos críticos das Sprints 1 e 2 — atraso de slides, acúmulo de revisões e estagnação de tasks — foram efetivamente mitigados ao longo dos ciclos, enquanto riscos estruturais de distribuição de carga e dependências permaneceram sob monitoramento até a entrega final, refletindo a natureza recorrente e evolutiva desses desafios em um time de sete integrantes.
 
-| Risco | Estratégia de Mitigação |
-|------|------------------------|
-| R1 | Criar checkpoints antes das entregas |
-| R2 | Definir responsável por revisão |
-| R3 | Atualizar Kanban regularmente |
 ---
 
 # 4. Análise Post Mortem
