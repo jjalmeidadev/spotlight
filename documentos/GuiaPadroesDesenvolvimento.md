@@ -451,7 +451,14 @@ public sealed class RecomendacaoService(
 - **Testabilidade:** cada strategy depende apenas de interfaces (`IRecomendacaoRepository`, `IModeloRecomendacaoClient`) e é coberta isoladamente com fakes em xUnit, sem subir banco nem HTTP.
 - **Complementaridade com o padrão criacional:** o Strategy responde *"como o algoritmo é executado"*; o **Factory Method** (3.3) responde *"qual algoritmo escolher"*. A separação evita que a regra de seleção contamine as estratégias.
 
-### 3.3 Factory Method (Backend C#)
+### 3.3 Factory Method — Padrão Criacional (Backend C#)
+
+O **Factory Method** é o **padrão criacional** (classificação GoF — *Creational Patterns*) aplicado no backend C#. Padrões criacionais tratam de **como objetos são instanciados, abstraindo o processo de criação** de quem os consome; o Factory Method, especificamente, **define uma operação responsável por criar um objeto, deixando que a regra de qual implementação concreta retornar fique encapsulada na fábrica**.
+
+No Portal Aventura ele resolve a **seleção da strategy** de recomendação: o `RecomendacaoService` precisa de uma `IRecomendacaoStrategy`, mas a decisão de *qual* instanciar depende de configuração e da disponibilidade de artefatos — detalhes que não devem vazar para o service nem para o controller. Esse padrão é o complemento criacional do Strategy comportamental documentado em 3.2.
+
+- **Implementação real:** [`RecomendacaoService.cs`](../src/backend/services/recommendation/application/services/RecomendacaoService.cs) — interface `IRecomendacaoStrategyFactory` (linhas 57–64) e a fábrica concreta `RecomendacaoStrategyFactory` (linhas 66–74).
+- **Composição/registro no DI:** [`Program.cs`](../src/backend/services/recommendation/Program.cs) (linhas 49–53).
 
 #### 3.3.1 Problema
 
@@ -460,16 +467,30 @@ O `RecomendacaoService` precisa de uma strategy, mas a escolha entre ML.NET e Po
 - flag `RecommendationModel:Enabled` em configuração;
 - presença dos artefatos no disco (modelo ZIP, CSV de candidatos).
 
-Não queremos que o service nem o controller conheçam esses detalhes.
+Não queremos que o service nem o controller conheçam esses detalhes — eles devem apenas *pedir* uma strategy pronta para uso.
 
-#### 3.3.2 Implementação
+#### 3.3.2 Participantes (mapeamento GoF → projeto)
+
+| Papel no Factory Method (GoF) | Classe no projeto |
+|-------------------------------|-------------------|
+| `Creator` (interface da fábrica) | `IRecomendacaoStrategyFactory` |
+| `ConcreteCreator` | `RecomendacaoStrategyFactory` |
+| `Product` (interface do objeto criado) | `IRecomendacaoStrategy` |
+| `ConcreteProduct` | `ModeloMlNetRecomendacaoStrategy` / `PostgresPreProcessadoRecomendacaoStrategy` |
+| `Client` | `RecomendacaoService` |
+
+#### 3.3.3 Implementação
 
 ```csharp
+// src/backend/services/recommendation/application/services/RecomendacaoService.cs
+
+// Creator: contrato da fábrica — esconde a regra de seleção do produto.
 public interface IRecomendacaoStrategyFactory
 {
     IRecomendacaoStrategy Criar();
 }
 
+// ConcreteCreator: encapsula a decisão de qual strategy entregar.
 public sealed class RecomendacaoStrategyFactory(
     IModeloRecomendacaoClient modeloClient,
     ModeloMlNetRecomendacaoStrategy modeloStrategy,
@@ -481,12 +502,30 @@ public sealed class RecomendacaoStrategyFactory(
 }
 ```
 
-O `RecomendacaoService` apenas pede uma strategy:
+O `RecomendacaoService` (Client) apenas pede uma strategy, sem saber qual será criada:
 
 ```csharp
 var strategy = strategyFactory.Criar();
 var recomendacoes = await strategy.ListarAsync(usuarioId, limiteNormalizado, cancellationToken);
 ```
+
+A composição das dependências (instâncias concretas das strategies e da própria fábrica) é feita no `Program.cs`, mantendo a fábrica livre de `new` manual:
+
+```csharp
+// src/backend/services/recommendation/Program.cs
+builder.Services.AddScoped<ModeloMlNetRecomendacaoStrategy>();
+builder.Services.AddScoped<PostgresPreProcessadoRecomendacaoStrategy>();
+builder.Services.AddScoped<IRecomendacaoStrategyFactory, RecomendacaoStrategyFactory>();
+builder.Services.AddScoped<IRecomendacaoService, RecomendacaoService>();
+```
+
+#### 3.3.4 Decisão de design justificada
+
+- **Por que separar a criação (Factory) da execução (Strategy):** o Strategy responde *"como o algoritmo roda"*; o Factory Method responde *"qual algoritmo escolher"*. Misturar as duas responsabilidades faria cada strategy conhecer a flag de configuração e a existência dos artefatos — acoplamento que o padrão criacional remove ao concentrar a decisão num único ponto.
+- **Single Responsibility:** a regra de seleção (`modeloClient.Habilitado ? ... : ...`) vive só na fábrica. Service e controller permanecem agnósticos.
+- **Open/Closed Principle:** acrescentar uma nova fonte de recomendação significa registrar a nova `ConcreteProduct` e ajustar a fábrica, sem tocar no `RecomendacaoService` nem no endpoint.
+- **Integração com o DI (composição):** a fábrica recebe as strategies já resolvidas pelo container (`AddScoped`), então não usa `new` nem service locator — a criação dos produtos respeita o ciclo de vida *scoped* (uma instância por request).
+- **Testabilidade:** como a fábrica depende apenas de abstrações (`IModeloRecomendacaoClient`), é possível testar a regra de seleção alternando o flag `Habilitado` com um fake, sem subir modelo nem banco.
 
 ### 3.4 Repository Pattern
 
