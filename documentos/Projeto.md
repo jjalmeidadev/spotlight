@@ -1464,6 +1464,26 @@ _conteúdo_
 | RNF12 | Cada serviço deve executar em container Docker com tempo de reinicialização ≤ **30 segundos** após falha. | Ambiente Docker configurado. | Derrubar container e medir tempo de recuperação. | Reinicialização ≤ **30s** e 100% dos serviços isolados. | Infraestrutura documentada. | Manutenibilidade |
 </div>
 
+&emsp;A seguir, os mesmos requisitos não funcionais são reescritos em formato de **user story** (*"Como..., eu quero..., para..."*), mantendo as métricas e o aspecto de qualidade (ISO/IEC 25010) de cada um. Essa visão complementa a especificação declarativa acima, alinhando os RNFs ao mesmo padrão adotado nos requisitos funcionais (seção 3.1) e facilitando a rastreabilidade com os casos de teste (seção 9.2).
+
+<div align="center"> <sub>Tabela X - Requisitos não funcionais em formato user story</sub>
+
+| RNF   | Requisito Não Funcional (user story) | Aspecto de Qualidade |
+| ----- | ------------------------------------ | -------------------- |
+| RNF01 | Como usuário, eu quero que todas as telas principais (home, detalhes de espetáculo, categorias e calendário) carreguem em no máximo **2 segundos** em dispositivo mobile com conexão 4G (mínimo 20 Mbps de download), para que eu navegue de forma fluida e sem esperas que prejudiquem minha experiência. | Desempenho |
+| RNF02 | Como usuário, eu quero receber e visualizar recomendações personalizadas em no máximo **2 segundos** após minha interação em dispositivo mobile com conexão 4G, para que as sugestões apareçam rapidamente e mantenham meu engajamento. | Desempenho |
+| RNF03 | Como usuário, eu quero que a plataforma esteja disponível no mínimo **99% do tempo mensal** (no máximo **7h18min de indisponibilidade**), para que eu consiga acessá-la sempre que precisar. | Confiabilidade |
+| RNF04 | Como usuário mobile, eu quero uma interface mobile first com elementos interativos de tamanho mínimo de **44x44px**, para que eu consiga tocar nos controles com precisão e conforto no smartphone. | Usabilidade |
+| RNF05 | Como usuário, eu quero que minhas credenciais sejam protegidas com autenticação JWT, senhas com bcrypt (custo ≥ **10**) e uso obrigatório de HTTPS (**100% das requisições**), para que meus dados pessoais permaneçam seguros contra acessos indevidos. | Segurança |
+| RNF06 | Como usuário, eu quero que a plataforma suporte no mínimo **200 usuários simultâneos** com tempo médio de resposta ≤ **3 segundos** e taxa de erro ≤ **1%**, para que ela permaneça estável e responsiva mesmo em momentos de grande acesso. | Escalabilidade |
+| RNF07 | Como time de desenvolvimento, eu quero que o sistema gere logs estruturados em até **1 segundo** após cada evento, contendo no mínimo **5 campos obrigatórios** (timestamp, nível, serviço, sessão, dispositivo), para que possamos diagnosticar problemas e rastrear o comportamento do sistema com agilidade. | Manutenibilidade |
+| RNF08 | Como time de desenvolvimento, eu quero atualizar cada serviço SOA de forma independente com no máximo **5 minutos de indisponibilidade** por serviço, para que possamos evoluir partes do sistema sem paralisar toda a plataforma. | Manutenibilidade |
+| RNF09 | Como time de desenvolvimento, eu quero que o sistema processe eventos de forma assíncrona sem aumentar o tempo de resposta em mais de **500ms** e com taxa de processamento ≥ **100 eventos/segundo**, para que a coleta de telemetria não comprometa a experiência síncrona do usuário. | Desempenho |
+| RNF10 | Como usuário, eu quero executar as ações principais em no máximo **3 toques** com taxa de sucesso ≥ **85%**, para que eu conclua minhas tarefas de forma simples e rápida. | Usabilidade |
+| RNF11 | Como usuário, eu quero que a plataforma funcione corretamente em **Android 10+ e iOS 15+** com taxa de erro ≤ **1%** nos fluxos principais, para que eu consiga usá-la no meu dispositivo independentemente da plataforma. | Compatibilidade |
+| RNF12 | Como time de desenvolvimento, eu quero que cada serviço execute em container Docker com tempo de reinicialização ≤ **30 segundos** após falha, para que a infraestrutura seja reprodutível e se recupere rapidamente de falhas. | Manutenibilidade |
+</div>
+
 ## 3.3 Correlação RFs e RNFs
 
 A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNFs) com os requisitos funcionais (RFs) que possuem dependência direta ou impacto relevante.
@@ -1471,7 +1491,7 @@ A seguir, apresenta-se a tabela que relaciona os requisitos não funcionais (RNF
 | ID RNF | Requisito Não Funcional | RFs Associados | Relação |
 |--------|--------------------------|----------------|----------|
 | RNF01 | Tempo de carregamento das telas em até 2 segundos | RF04, RF05, RF06, RF07, RF08 | A experiência de navegação e acesso às funcionalidades principais depende diretamente da performance das telas. |
-| RNF02 | Geração de recomendações em até 3 segundos | RF04, RF12, RF13, RF14, RF15 | A exibição e atualização das recomendações depende do tempo de processamento do sistema de recomendação. |
+| RNF02 | Geração de recomendações em até 2 segundos | RF04, RF12, RF13, RF14, RF15 | A exibição e atualização das recomendações depende do tempo de processamento do sistema de recomendação. |
 | RNF03 | Disponibilidade mínima de 99% | RF01, RF02, RF04, RF05, RF06, RF07, RF08 | Todas as funcionalidades do sistema dependem da disponibilidade contínua da aplicação. |
 | RNF04 | Abordagem mobile first | RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10 | A definição de preferências, navegação, visualização e interação são impactadas pela experiência mobile. |
 | RNF05 | Segurança com JWT, bcrypt e HTTPS | RF01, RF02, RF09, RF10, RF11 | Cadastro, autenticação e interações do usuário dependem da proteção de dados e controle de acesso seguro. |
