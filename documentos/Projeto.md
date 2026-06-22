@@ -4741,6 +4741,29 @@ divergências entre o contrato negociado e o que está implementado.
 | Testes de APIs externas | Módulo **VHS** (`VhsCachingHandler`), cassetes JSON em `tests/cassettes/supabase/` e `tests/cassettes/ticketeira/`, `xUnit` | Respostas gravadas garantem determinismo; modo `VHS_MODE=record` para geração inicial de cassetes |
 | Testes de integração | `xUnit`, `Testcontainers` (PostgreSQL, MongoDB e, futuramente, RabbitMQ), `Microsoft.AspNetCore.Mvc.Testing`, `Respawn`, **VHS**, `docker compose` | Seis fronteiras IT-01 a IT-06 documentadas na seção 9.4.1 |
 
+&emsp;A tabela abaixo justifica cada ferramenta em relação ao tipo de teste e à stack (seções 5.3 e 8.1) e distingue, com honestidade, o que já é **usado de fato** do que está **planejado/não versionado**. A situação reflete o estado descrito nas seções 8.3, 8.4 e 9.2.2.
+
+| Ferramenta | Tipo de teste | Justificativa (amarração à stack) | Situação |
+|---|---|---|---|
+| `xUnit` | Unitário, funcional, integração | Framework de testes padrão do .NET 9, stack do backend SOA; base de toda a automação backend | **Usado** (60 testes verdes, seção 8.4) |
+| `Microsoft.AspNetCore.Mvc.Testing` | Funcional, integração | Hospeda a API ASP.NET Core in-memory (`WebApplicationFactory`), exercitando middlewares, autorização e roteamento reais sem subir containers | **Usado** parcial (health endpoints) / expansão planejada |
+| `FluentAssertions` | Funcional, integração | Asserções expressivas sobre respostas HTTP/BSON, legíveis na revisão dos contratos de API | Planejado nas suítes de integração |
+| `Bogus` | Funcional | Geração de massa fictícia (usuários, tokens) para cenários de contrato sem dados reais | Planejado |
+| `Respawn` | Integração (PostgreSQL) | Reset do banco entre testes garantindo isolamento sobre o PostgreSQL/Supabase | Planejado (IT-03) |
+| `Testcontainers` | Integração (PostgreSQL, MongoDB, RabbitMQ) | Sobe instâncias efêmeras dos bancos da stack em Docker, dispensando ambiente compartilhado | Planejado (IT-03/IT-04; RabbitMQ na Sprint 5) |
+| **VHS** (`VhsCachingHandler`) | APIs externas | Intercepta o `HttpClient` e grava/repete respostas de Supabase Auth e Ticketeira em cassetes, garantindo determinismo em CI | **Planejado** (mecanismo ainda a versionar — IT-02/IT-06) |
+| `k6` | RNF06 (carga) | Gera carga HTTP scriptável contra a topologia SOA para medir latência/erro sob concorrência | Instrumentado; execução HTTP pendente (health check 503, seção 9.2.2) |
+| Lighthouse (mobile) | RNF01, RNF02 | Audita FCP/TTI em emulação mobile, coerente com o alvo 4G do app React Native/Expo | Instrumentado; medição final pendente de app acessível |
+| UptimeRobot | RNF03 | Monitor externo de disponibilidade com ping periódico aos endpoints do Gateway/serviços | Monitor implementado; janela de 30 dias pendente |
+| OWASP ZAP | RNF05 (segurança) | Varredura passiva/ativa sobre os endpoints expostos para validar transporte e autenticação | Preparado; execução em homologação pendente |
+| Newman/Postman | RNF05, APIs externas | Coleção executável de rotas protegidas (token válido/ inválido) via CLI Newman em CI | Preparado; execução pendente |
+| SUS | Usabilidade (RNF10) | Instrumento padrão de percepção global (0–100), aplicado após o roteiro T01–T09 | **Usado** (média 79,5, seção 9.3.2) |
+| Detox | Funcional E2E (mobile) | E2E em emulador/dispositivo para fluxos React Native (RF01–RF08) | **Planejado** (sem suíte no `package.json`) |
+| Playwright | Funcional E2E (painel admin web) | E2E do painel administrativo web (RF16), fora do escopo do Detox mobile | **Planejado** |
+| MSW | Componentes (frontend) | Mock de rede para testar componentes React Native isoladamente | **Planejado** |
+| React Native Testing Library | Componentes (frontend) | Testes de componente/render no app React Native | **Planejado** |
+| `coverlet` (collector) | Cobertura | Coleta cobertura de linhas/branches da solution .NET (`XPlat Code Coverage`) | **Usado** (43,16% geral, seção 8.4) |
+
 ### Organização dos arquivos de teste
 
 &emsp;A estrutura de testes automatizados segue a organização do repositório descrita na seção 8.1, concentrando a automação backend em projetos `xUnit` espelhando os serviços SOA:
@@ -4774,6 +4797,8 @@ tests/
 ### Abordagem TDD
 
 &emsp;O desenvolvimento incremental por sprints (seção 8.3) prevê a adoção de **Test-Driven Development (TDD)** nos componentes de maior criticidade e risco de regressão: casos de uso do serviço de recomendação, persistência de telemetria no MongoDB, futura fila RabbitMQ da Sprint 5, validação JWT no API Gateway e fluxos de geolocalização via `IGeocoding`. A prática consiste em definir cenários de teste a partir dos RFs e RNFs associados, implementar o teste automatizado com `xUnit` antes ou em paralelo à implementação, e refatorar mantendo a suíte verde. A seção 8.4 reserva o detalhamento da estratégia unitária; o capítulo 9 operacionaliza essa visão no planejamento e na execução formal das rodadas.
+
+&emsp;Como evidência do ciclo TDD, recomenda-se versionar o par **RED → GREEN** dos componentes críticos: o commit (ou trecho de log/print) com o teste falhando antes da implementação e o commit subsequente com o teste passando. Esse registro torna auditável a ordem "teste antes da implementação" e fica como evidência planejada nas respectivas subseções de resultados.
 
 ### Critérios de cobertura
 
@@ -4892,6 +4917,14 @@ detox test --testNamePattern "RF01"
 
 **Pós-condições gerais:** Usuário cadastrado fica imediatamente apto a realizar login (RF02). Em falha, o formulário preserva os valores válidos preenchidos para evitar retrabalho.
 
+**Ferramenta(s):** `xUnit` + `Microsoft.AspNetCore.Mvc.Testing` (contrato de API in-memory); `Detox` para o fluxo mobile (planejado). Justificativas na tabela de ferramentas (seção 9).
+
+**Critério de aceitação:** todos os cenários TF-RF01-P/N listados produzem o resultado esperado da respectiva linha; nenhum cenário negativo cria registro em `auth.users`/`public.usuario`.
+
+**Rastreabilidade:** RF01 (RNF05 quanto ao hash bcrypt).
+
+**Status:** backend parcialmente executado (perfil pós-signup e contrato de DTO — ver 9.1.2); cenários de UI via Detox planejados / pendentes de execução.
+
 ---
 
 #### TF-RF02 — Login
@@ -4929,6 +4962,14 @@ detox test --testNamePattern "RF02"
 
 **Pós-condições gerais:** Após login bem-sucedido, todas as próximas chamadas ao API Gateway são enviadas com o header `Authorization: Bearer <access_token>`. Sessões expiradas disparam tela de login.
 
+**Ferramenta(s):** `xUnit` + `Microsoft.AspNetCore.Mvc.Testing` (smoke do Gateway); contract test contra `auth/v1/token` e `Detox` (planejados).
+
+**Critério de aceitação:** todos os cenários TF-RF02-P/N listados produzem o resultado esperado da respectiva linha; nenhuma sessão é criada nos cenários negativos.
+
+**Rastreabilidade:** RF02 (RNF05 quanto a JWT/HTTPS).
+
+**Status:** apenas smoke do Gateway executado (`/health`, `/api/ping` — ver 9.1.2); fluxo de autenticação (Supabase Auth) e UI planejados / pendentes de execução.
+
 ---
 
 #### TF-RF03 — Definir Preferências de Perfil
@@ -4964,6 +5005,14 @@ detox test --testNamePattern "RF03"
 | TF-RF03-N03 | Categoria inexistente | Forjar chamada com `categoria_id=99999` | HTTP 400; mensagem "Categoria inválida" | Nenhuma alteração |
 
 **Pós-condições gerais:** Após salvar, as preferências ficam persistidas no PostgreSQL e disponíveis para o serviço de recomendação. A publicação assíncrona de eventos de preferência fica reservada à evolução com fila na Sprint 5.
+
+**Ferramenta(s):** `xUnit` (UseCases de preferências/localização); `Detox` para a UI de onboarding (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF03-P/N listados produzem o resultado esperado da respectiva linha; nenhum cenário negativo altera `usuario_preferencia`.
+
+**Rastreabilidade:** RF03 (RNF04 quanto à experiência mobile).
+
+**Status:** backend executado (gravação/edição de preferências e validação de localização — ver 9.1.2); cenários de UI (skip, categoria inexistente) planejados / pendentes de execução.
 
 ---
 
@@ -5002,6 +5051,14 @@ detox test --testNamePattern "RF04"
 
 **Pós-condições gerais:** O `id` de cada recomendação exibida é registrado em `recomendacao_exibida` para futura análise de CTR.
 
+**Ferramenta(s):** `xUnit` (contrato da rota de recomendação); `Detox` para a Home (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF04-P/N listados produzem o resultado esperado da respectiva linha; o fallback de cold start não quebra a interface.
+
+**Rastreabilidade:** RF04 (RNF02 quanto ao tempo de recomendação).
+
+**Status:** backend executado (lista ranqueada e fallback — ver 9.1.2); cenários de UI (labels, interseção de listas, banners) planejados / pendentes de execução.
+
 ---
 
 #### TF-RF05 — Pesquisar Espetáculos
@@ -5038,6 +5095,14 @@ detox test --testNamePattern "RF05"
 
 **Pós-condições gerais:** Cada busca é registrada em telemetria (RF11) para análise futura de termos mais buscados.
 
+**Ferramenta(s):** `xUnit` (normalização/paginação da busca); `Detox` para a barra de busca (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF05-P/N listados produzem o resultado esperado da respectiva linha; termos maliciosos não geram erro 500 nem expõem schema.
+
+**Rastreabilidade:** RF05 (RNF01 quanto ao tempo de resposta).
+
+**Status:** backend executado (normalização e paginação — ver 9.1.2); case-insensitive, debounce e injeção contra repositório real planejados / pendentes de execução.
+
 ---
 
 #### TF-RF06 — Filtrar Espetáculos
@@ -5073,6 +5138,14 @@ detox test --testNamePattern "RF06"
 | TF-RF06-N03 | Data passada selecionada | Selecionar data anterior a hoje | Date picker bloqueia datas no passado | — |
 
 **Pós-condições gerais:** Filtros aplicados persistem ao navegar para detalhes e voltar (RF07). Eventos de filtro são telemetrados (RF11).
+
+**Ferramenta(s):** `xUnit` (filtros/paginação e geocodificação Nominatim); `Detox` para os controles de filtro (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF06-P/N listados produzem o resultado esperado da respectiva linha; combinações sem resultado exibem mensagem clara sem quebra.
+
+**Rastreabilidade:** RF06 (RNF01).
+
+**Status:** backend executado (filtros, listas e geocodificação por cidade — ver 9.1.2); cenários de UI (combinação, slider, date picker) planejados / pendentes de execução.
 
 ---
 
@@ -5111,6 +5184,14 @@ detox test --testNamePattern "RF07"
 
 **Pós-condições gerais:** Toda visualização de detalhe é registrada em telemetria (RF11) e influencia recomendações futuras (RF13).
 
+**Ferramenta(s):** `xUnit` (mapeamento do detalhe e sessões); `Detox` para a tela de detalhes (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF07-P/N listados produzem o resultado esperado da respectiva linha; dados ausentes não quebram o layout.
+
+**Rastreabilidade:** RF07 (RNF01, RNF04).
+
+**Status:** backend executado (detalhe completo, sessões, id inexistente — ver 9.1.2); cenários de UI (compartilhamento, descrição nula, sem sessões) planejados / pendentes de execução.
+
 ---
 
 #### TF-RF08 — Visualizar Avaliações de Outros Usuários
@@ -5145,6 +5226,14 @@ detox test --testNamePattern "RF08"
 | TF-RF08-N03 | Privacidade do autor | Avaliação de usuário com `perfil_publico=false` | Autor exibido como "Anônimo" | — |
 
 **Pós-condições gerais:** Acesso à seção de avaliações é telemetrado (RF11).
+
+**Ferramenta(s):** `xUnit` (listagem/paginação de avaliações); `Detox` para a seção de avaliações (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF08-P/N listados produzem o resultado esperado da respectiva linha; avaliações moderadas/privadas respeitam as regras de visibilidade.
+
+**Rastreabilidade:** RF08 (RNF04).
+
+**Status:** backend parcialmente executado (listagem e ordenação — ver 9.1.2); regras de moderação e privacidade do autor planejadas / pendentes de execução.
 
 ---
 
@@ -5184,6 +5273,14 @@ detox test --testNamePattern "RF09"
 
 **Pós-condições gerais:** Avaliação é considerada sinal forte para o ML Engine recalcular recomendações (RF13).
 
+**Ferramenta(s):** `xUnit` (validação de nota e histórico); `Detox` para o fluxo de avaliação (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF09-P/N listados produzem o resultado esperado da respectiva linha; notas fora de 1–5 e chamadas sem autenticação são rejeitadas sem persistir.
+
+**Rastreabilidade:** RF09 (RNF05 quanto à autorização).
+
+**Status:** backend executado (nota válida/inválida e histórico — ver 9.1.2); edição, recálculo de média e 401/404 via UI planejados / pendentes de execução.
+
 ---
 
 #### TF-RF10 — Comentar Espetáculo
@@ -5219,6 +5316,14 @@ detox test --testNamePattern "RF10"
 | TF-RF10-N04 | Excluir comentário de outro usuário | Forjar chamada `DELETE /api/avaliacao/<id>` de outro usuário | HTTP 403 | Nenhuma alteração |
 
 **Pós-condições gerais:** Comentários ficam imediatamente visíveis em RF08 e contam para o motor de recomendação como sinal de engajamento.
+
+**Ferramenta(s):** `xUnit` (sanitização e limites do comentário); `Detox` para o campo de comentário (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF10-P/N listados produzem o resultado esperado da respectiva linha; conteúdo malicioso é renderizado como texto literal e exclusão de terceiros retorna 403.
+
+**Rastreabilidade:** RF10 (RNF05).
+
+**Status:** planejado / pendente de execução (sanitização XSS, limite de 500 caracteres e edição ainda não cobertos por método versionado — ver 9.1.2).
 
 ---
 
@@ -5264,6 +5369,14 @@ mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE'
 
 **Pós-condições gerais:** Documentos persistidos alimentam a base de dados comportamental que o ML Engine usa para recomputar recomendações (RF13, RF14).
 
+**Ferramenta(s):** `xUnit` + `Testcontainers.MongoDb` (persistência de telemetria); `Detox` para gerar as interações na UI (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF11-P/N listados produzem o resultado esperado da respectiva linha; payloads inválidos não geram documento e a UX não é bloqueada quando o MongoDB está indisponível.
+
+**Rastreabilidade:** RF11 (RNF07 logs, RNF02 UX não bloqueada).
+
+**Status:** integração MongoDB executada (ver 9.1.2 e IT-04); cenários disparados pela UI mobile planejados / pendentes de execução.
+
 ---
 
 ### Grupo 6 — Recomendação (RF12, RF13, RF14, RF15)
@@ -5302,6 +5415,14 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 
 **Pós-condições gerais:** Itens recomendados são gravados em `recomendacao_exibida` para fechar o ciclo de feedback.
 
+**Ferramenta(s):** `xUnit` (contrato/normalização da recomendação) + roteiro exploratório para relevância subjetiva; `Detox` (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF12-P/N listados produzem o resultado esperado da respectiva linha; degradação/timeout recorrem ao fallback de popularidade sem violar o RNF02 para o usuário.
+
+**Rastreabilidade:** RF12 (RNF02).
+
+**Status:** backend executado (normalização de limite e mapeamento — ver 9.1.2); coerência subjetiva e cenários de degradação planejados / pendentes de execução.
+
 ---
 
 #### TF-RF13 — Atualizar Recomendações Após Novas Interações
@@ -5336,6 +5457,14 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 
 **Pós-condições gerais:** Recomputo é assíncrono e não impacta a latência da requisição original.
 
+**Ferramenta(s):** `xUnit` (contrato da recomendação) + roteiro exploratório; medição de propagação depende de ambiente integrado.
+
+**Critério de aceitação:** todos os cenários TF-RF13-P/N listados produzem o resultado esperado da respectiva linha; interações irrelevantes não distorcem a lista (Jaccard ≥ 0,8).
+
+**Rastreabilidade:** RF13 (RNF02, RNF07).
+
+**Status:** planejado / pendente de execução (exige histórico controlado e recomputo integrado, ainda não versionados como caso automatizado).
+
 ---
 
 #### TF-RF14 — Recomendação por Filtragem Colaborativa
@@ -5367,6 +5496,14 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 | TF-RF14-N02 | Item já consumido pelo alvo | Verificar que itens com interação prévia do alvo não aparecem | Lista não contém itens já em `interacoes` do usuário | — |
 
 **Pós-condições gerais:** Justificativa "Quem gostou disso também gostou de..." pode ser exibida (a critério da UX).
+
+**Ferramenta(s):** `xUnit` (contrato da recomendação) + inspeção de trace do ML Engine (k-NN).
+
+**Critério de aceitação:** todos os cenários TF-RF14-P/N listados produzem o resultado esperado da respectiva linha; itens já consumidos pelo alvo não aparecem e a ausência de vizinhos recorre ao fallback.
+
+**Rastreabilidade:** RF14 (RNF02).
+
+**Status:** planejado / pendente de execução (depende de matriz de interações com vizinhos e modelo k-NN treinado em ambiente integrado).
 
 ---
 
@@ -5400,6 +5537,14 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 | TF-RF15-N02 | Job de popularidade não executado | Métricas com `updated_at` > 24 h | Fallback para `data_estreia DESC`; alerta gerado para SRE | — |
 
 **Pós-condições gerais:** Assim que o usuário acumular ≥ 3 interações, a lógica passa para RF12 (personalizada) automaticamente.
+
+**Ferramenta(s):** `xUnit` (ordenação por popularidade e fallback); `Detox` para a Home de cold start (planejado).
+
+**Critério de aceitação:** todos os cenários TF-RF15-P/N listados produzem o resultado esperado da respectiva linha; catálogo vazio ou job desatualizado não quebram a interface e acionam o fallback previsto.
+
+**Rastreabilidade:** RF15 (RNF02).
+
+**Status:** planejado / pendente de execução (exige métricas de popularidade calculadas por job batch em ambiente integrado).
 
 ---
 
@@ -5442,6 +5587,14 @@ cd src/admin-web && npx playwright test --grep "RF16"
 | TF-RF16-N04 | Duplicidade de categoria | Criar categoria com nome existente | HTTP 422; mensagem "Categoria já existe" | Nenhuma alteração |
 
 **Pós-condições gerais:** Toda operação administrativa é registrada em `audit_log` com `admin_id`, `acao`, `entidade_id`, `payload_antes`, `payload_depois` e `timestamp`, atendendo ao RNF07.
+
+**Ferramenta(s):** `xUnit` (regras do serviço admin) e **`Playwright`** para o E2E do painel administrativo web (planejado, fechando a lacuna funcional de UI declarada).
+
+**Critério de aceitação:** todos os cenários TF-RF16-P/N listados produzem o resultado esperado da respectiva linha; apenas `tipo_usuario=admin` executa as operações e usuário comum recebe 403.
+
+**Rastreabilidade:** RF16 (RNF05 autorização, RNF07 auditoria).
+
+**Status:** planejado / pendente de execução (serviço admin e painel web Playwright ainda não versionados como suíte — ver 9.1.2).
 
 ---
 
@@ -5671,7 +5824,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Validar que as telas principais do aplicativo mobile (home, detalhes de espetáculo, categorias e calendário) atingem tempo de carregamento compatível com o uso em 4G, garantindo fluidez na navegação e no acesso às funcionalidades de catálogo e detalhes (RF04 a RF08).
 
-**Ferramenta(s):** Lighthouse no modo mobile.
+**Ferramenta(s):** Lighthouse no modo mobile — audita FCP/TTI sob emulação mobile, coerente com o alvo 4G do app React Native/Expo (seção 5.3).
 
 **Pré-condições:**
 
@@ -5680,7 +5833,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Lista das telas principais definida e URLs ou rotas de acesso documentadas.
 - Ferramenta Lighthouse configurada para emulação ou auditoria mobile conforme o canal de acesso (navegador WebView ou PWA, quando aplicável).
 
-**Cenário positivo:** Cada tela principal será acessada em condições normais de rede 4G. Serão registrados FCP (First Contentful Paint) e TTI (Time to Interactive). O teste será repetido **5 vezes por tela**, em horários distintos. Considera-se sucesso quando todas as execuções apresentarem carregamento completo em até **2 segundos**.
+**Cenário positivo:** Cada tela principal será acessada em condições normais de rede 4G. Serão registrados FCP (First Contentful Paint) e TTI (Time to Interactive). O teste será repetido **5 vezes por tela**, em horários distintos.
 
 **Cenário negativo:** Será aplicada limitação artificial de largura de banda (throttling) ou condição de rede degradada, de modo a simular conexão instável. Espera-se que o sistema sinalize carregamento ao usuário (indicador de progresso ou equivalente) e não apresente tela em branco indefinida; o desfecho será registrado como não conformidade de tempo quando o limite de 2 segundos for ultrapassado.
 
@@ -5690,6 +5843,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07, RF08.
 
+**Status:** planejado / pendente de execução (instrumentação concluída — seção 9.2.2).
+
 ---
 
 ### 9.2.1.3 RNF02 — Tempo de geração de recomendações personalizadas
@@ -5698,7 +5853,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Validar que a atualização das recomendações após interação do usuário ocorre dentro do tempo máximo definido, assegurando responsividade do motor de recomendação no fluxo de descoberta (RF04, RF12 a RF15).
 
-**Ferramenta(s):** Lighthouse no modo mobile (medição de tempo percebido na interface); complementarmente, registro de timestamps em logs do cliente ou backend quando disponível.
+**Ferramenta(s):** Lighthouse no modo mobile (medição de tempo percebido na interface) e `k6` para disparar a interação e cronometrar a resposta do serviço de recomendação; complementarmente, registro de timestamps em logs do cliente ou backend quando disponível. As ferramentas cobrem o tempo percebido na UI mobile e a latência do motor de recomendação da stack (seção 5.3).
 
 **Pré-condições:**
 
@@ -5707,7 +5862,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Três perfis de usuário de teste definidos (variação de preferências e histórico).
 - Dispositivo mobile com conexão 4G ativa.
 
-**Cenário positivo:** Para cada perfil, será registrado o timestamp da interação que dispara atualização de recomendações e o timestamp da exibição do novo conteúdo na interface. O procedimento será repetido **10 vezes por perfil**. Considera-se sucesso quando a diferença entre timestamps for ≤ **2 segundos em 100% das execuções**.
+**Cenário positivo:** Para cada perfil, será registrado o timestamp da interação que dispara atualização de recomendações e o timestamp da exibição do novo conteúdo na interface. O procedimento será repetido **10 vezes por perfil**.
 
 **Cenário negativo:** Será simulada latência elevada no serviço de recomendação ou indisponibilidade momentânea de dependências de dados. Espera-se exibição de spinner ou feedback de carregamento em caso de atraso; tempos acima de 2 segundos serão registrados como não conformidade.
 
@@ -5717,6 +5872,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF04, RF12, RF13, RF14, RF15.
 
+**Status:** planejado / pendente de execução (cenário k6 com três perfis instrumentado — seção 9.2.2).
+
 ---
 
 ### 9.2.1.4 RNF03 — Disponibilidade mensal do sistema
@@ -5725,7 +5882,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Verificar que o sistema permanece acessível aos usuários finais e aos serviços integrados dentro do limite mensal de indisponibilidade, condição necessária para login, catálogo e recomendações (RF01, RF02, RF04 a RF08).
 
-**Ferramenta(s):** UptimeRobot.
+**Ferramenta(s):** UptimeRobot — monitor externo de disponibilidade com ping periódico aos endpoints do Gateway e dos serviços SOA (seção 5.2).
 
 **Pré-condições:**
 
@@ -5733,7 +5890,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Monitor configurado no UptimeRobot com intervalo de verificação de **5 minutos**.
 - Endpoints críticos cadastrados (API Gateway, health checks dos serviços SOA e rota principal do app, conforme escopo acordado).
 
-**Cenário positivo:** O monitoramento permanecerá ativo por **30 dias** consecutivos (ou período representativo acordado com a equipe). Cada verificação bem-sucedida incrementa a disponibilidade. Considera-se sucesso quando a disponibilidade mensal for ≥ **99%**, com incidentes documentados.
+**Cenário positivo:** O monitoramento permanecerá ativo por **30 dias** consecutivos (ou período representativo acordado com a equipe). Cada verificação bem-sucedida incrementa a disponibilidade; incidentes detectados são documentados no relatório.
 
 **Cenário negativo:** Será simulada indisponibilidade controlada (manutenção programada ou parada de um serviço) para validar detecção pelo monitor e registro de incidente. Espera-se alerta configurado e registro do intervalo de indisponibilidade no relatório, sem perda de dados de monitoramento.
 
@@ -5743,6 +5900,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF01, RF02, RF04, RF05, RF06, RF07, RF08.
 
+**Status:** planejado / pendente de janela de observação (monitor implementado; período mensal não concluído — seção 9.2.2).
+
 ---
 
 ### 9.2.1.5 RNF04 — Abordagem mobile first
@@ -5751,7 +5910,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Confirmar que a interface do aplicativo atende ao desenho mobile first, com elementos interativos dimensionados para toque confortável em smartphones, impactando preferências, navegação e interações (RF03 a RF10).
 
-**Ferramenta(s):** Dispositivos físicos Android e iOS.
+**Ferramenta(s):** Dispositivos físicos Android e iOS — únicos meios de verificar áreas de toque reais no app mobile first (RNF04/RNF11); complementados por auditoria estática das dimensões declaradas na UI React Native.
 
 **Pré-condições:**
 
@@ -5759,7 +5918,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Roteiro de telas principais definido (login, preferências, catálogo, busca, filtro, detalhes).
 - Método de inspeção de dimensões documentado (ferramentas de desenvolvedor do sistema ou overlay de layout, quando disponível).
 
-**Cenário positivo:** A interface será percorrida nos dispositivos físicos. Serão verificadas dimensões e funcionamento dos elementos interativos críticos (botões, links, cartazes, filtros). Considera-se sucesso quando **100%** dos elementos interativos avaliados apresentarem no mínimo **44×44 px** e operação completa em mobile.
+**Cenário positivo:** A interface será percorrida nos dispositivos físicos. Serão verificadas dimensões e funcionamento dos elementos interativos críticos (botões, links, cartazes, filtros).
 
 **Cenário negativo:** Será identificado elemento abaixo do tamanho mínimo ou inacessível por toque (sobreposição, área morta). O achado será registrado com captura de tela e referência à tela, classificando-se como não conformidade até correção.
 
@@ -5769,6 +5928,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF03, RF04, RF05, RF06, RF07, RF08, RF09, RF10.
 
+**Status:** auditoria estática executada (não conforme: seis alvos abaixo de 44 px — seção 9.2.2); validação em dispositivo físico pendente.
+
 ---
 
 ### 9.2.1.6 RNF05 — Segurança (JWT, bcrypt e HTTPS)
@@ -5777,7 +5938,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Assegurar que autenticação, transporte e armazenamento de credenciais atendem aos controles definidos, protegendo cadastro, login e interações do usuário (RF01, RF02, RF09 a RF11).
 
-**Ferramenta(s):** OWASP ZAP e Postman.
+**Ferramenta(s):** OWASP ZAP (varredura passiva/ativa de transporte e autenticação nos endpoints expostos) e Postman/Newman (coleção executável de rotas protegidas com tokens válidos e inválidos), aderentes ao API Gateway e ao Supabase Auth da stack (seções 5.3 e 6.3).
 
 **Pré-condições:**
 
@@ -5786,7 +5947,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Coleção Postman com rotas protegidas e credenciais de teste válidas e inválidas.
 - Acesso ao repositório ou banco de dados de homologação apenas para verificação de hash de senha (ambiente controlado).
 
-**Cenário positivo:** Requisições autenticadas via HTTPS com token JWT válido retornarão respostas esperadas. Senhas de usuários de teste serão verificadas quanto ao uso de bcrypt com custo ≥ **10**. Considera-se sucesso quando **100%** das requisições analisadas utilizarem HTTPS e não houver senha em texto plano.
+**Cenário positivo:** Requisições autenticadas via HTTPS com token JWT válido retornarão respostas esperadas. Senhas de usuários de teste serão verificadas quanto ao uso de bcrypt com custo ≥ **10**.
 
 **Cenário negativo:** Serão enviadas requisições HTTP sem TLS, requisições sem token e com token expirado ou adulterado. Também será tentado acesso a rotas protegidas sem autenticação. Espera-se rejeição com **HTTP 401** (ou código adequado de não autorizado) e redirecionamento ou bloqueio de tráfego não criptografado.
 
@@ -5796,6 +5957,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF01, RF02, RF09, RF10, RF11.
 
+**Status:** planejado / pendente de execução (suíte ZAP/Newman/HTTPS preparada; exige homologação autorizada e segredos locais — seção 9.2.2).
+
 ---
 
 ### 9.2.1.7 RNF06 — Carga e escalabilidade
@@ -5804,7 +5967,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Verificar que o sistema sustenta carga representativa de uso concorrente nas funcionalidades de navegação e recomendação, mantendo tempo de resposta e taxa de erro dentro dos limites (RF04 a RF07, RF12).
 
-**Ferramenta(s):** k6.
+**Ferramenta(s):** k6 — gera carga HTTP scriptável contra a topologia SOA (Gateway + serviços) para medir latência e taxa de erro sob concorrência; complementado por `pgbench` na camada de persistência PostgreSQL.
 
 **Pré-condições:**
 
@@ -5812,7 +5975,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Scripts k6 versionados no repositório, simulando fluxos de leitura de catálogo, busca e obtenção de recomendações.
 - Ferramenta de carga autorizada a executar contra o ambiente alvo sem impacto em produção real de usuários.
 
-**Cenário positivo:** Serão simulados **200 usuários simultâneos** por **10 minutos contínuos**, executando scripts que representam os fluxos principais. Considera-se sucesso quando o tempo médio de resposta for ≤ **3 segundos**, a taxa de erro ≤ **1%** e não houver falhas críticas (queda total de serviço).
+**Cenário positivo:** Serão simulados **200 usuários simultâneos** por **10 minutos contínuos**, executando scripts que representam os fluxos principais.
 
 **Cenário negativo:** Será aplicada carga acima de 200 usuários (ex.: 250) ou duração estendida para observar degradação. Espera-se aumento de latência e taxa de erro registrados; o sistema deve manter recuperação após redução da carga, sem corrupção de dados.
 
@@ -5822,6 +5985,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07, RF12.
 
+**Status:** parcial — banco aprovado (242.011 transações no PostgreSQL, sem falhas); carga HTTP com 200 VUs instrumentada, mas bloqueada por health checks HTTP 503 no ambiente local (seção 9.2.2).
+
 ---
 
 ### 9.2.1.8 RNF07 — Logs estruturados
@@ -5830,7 +5995,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Validar que eventos relevantes do sistema geram logs estruturados no prazo e com campos obrigatórios, suportando rastreabilidade do algoritmo de recomendação e das interações (RF11 a RF13).
 
-**Ferramenta(s):** Inspeção manual dos logs gerados.
+**Ferramenta(s):** Inspeção manual dos logs gerados (com apoio do Serilog configurado no backend .NET) — verifica presença, prazo e campos obrigatórios diretamente na saída de log dos serviços SOA.
 
 **Pré-condições:**
 
@@ -5838,7 +6003,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Acesso de leitura aos agregadores ou arquivos de log do ambiente de teste.
 - Lista de ações disparadoras definida (login, busca, interação com recomendação e emissão de telemetria).
 
-**Cenário positivo:** Serão executadas ações representativas no sistema. Para cada evento, será verificada a presença do log em até **1 segundo**, contendo os **5 campos obrigatórios**: timestamp, nível, serviço, sessão e dispositivo. Considera-se sucesso em **100%** dos eventos amostrados.
+**Cenário positivo:** Serão executadas ações representativas no sistema. Para cada evento, será verificada a presença do log e seus campos: timestamp, nível, serviço, sessão e dispositivo.
 
 **Cenário negativo:** Será provocada falha em um serviço ou requisição inválida. Espera-se log de erro estruturado com os mesmos campos obrigatórios; ausência de log ou atraso superior a 1 segundo será registrado como não conformidade.
 
@@ -5848,6 +6013,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF11, RF12, RF13.
 
+**Status:** parcialmente conforme — Serilog presente, sem comprovação de saída JSON e enriquecimento padronizado com os cinco campos obrigatórios (seção 9.2.2).
+
 ---
 
 ### 9.2.1.9 RNF08 — Deploy independente de serviços SOA
@@ -5856,7 +6023,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **Objetivo do teste:** Confirmar que a arquitetura SOA permite atualização de um serviço sem indisponibilizar o ecossistema completo, preservando catálogo, busca e recomendações durante deploys (RF04 a RF06, RF12).
 
-**Ferramenta(s):** Scripts shell e pipeline CI/CD.
+**Ferramenta(s):** Scripts shell e pipeline CI/CD (GitLab) — automatizam deploy isolado por serviço e health checks, refletindo o fluxo de entrega da arquitetura SOA em containers (seção 8.1).
 
 **Pré-condições:**
 
@@ -5864,7 +6031,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 - Scripts shell de deploy e health check versionados.
 - Ambiente de homologação com monitoramento de disponibilidade dos demais serviços durante o deploy.
 
-**Cenário positivo:** Será executado deploy de **um serviço isolado** (ex.: Serviço de Catálogo), medindo o intervalo de instabilidade apenas desse componente. Os demais serviços permanecerão sob verificação contínua. Considera-se sucesso quando a instabilidade do serviço alvo for ≤ **5 minutos** e **100%** dos demais serviços permanecerem operacionais.
+**Cenário positivo:** Será executado deploy de **um serviço isolado** (ex.: Serviço de Catálogo), medindo o intervalo de instabilidade apenas desse componente. Os demais serviços permanecerão sob verificação contínua durante o deploy.
 
 **Cenário negativo:** Será simulada falha no script de deploy (rollback necessário). Espera-se acionamento de rollback pelo pipeline ou procedimento manual documentado; o tempo de indisponibilidade e o impacto nos demais serviços serão registrados.
 
@@ -5873,6 +6040,8 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 **Critério de aceitação:** Instabilidade ≤ **5 minutos** por serviço; **100%** dos demais serviços operacionais durante o deploy.
 
 **RFs associados (rastreabilidade):** RF04, RF05, RF06, RF12.
+
+**Status:** planejado / pendente de deploy controlado (atualização isolada com `--no-deps`, monitoramento e rollback documentados; Gateway ainda fora do Compose atual — seção 9.2.2).
 
 ---
 
@@ -5892,7 +6061,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 **Objetivo do teste:** Validar que as ações principais do aplicativo mobile podem ser concluídas com poucos toques e alta taxa de sucesso por usuários reais, requisito central para descoberta e navegação (RF04 a RF07).
 
-**Ferramenta(s):** Resultados dos testes de usabilidade (seção [9.3](#93-testes-de-usabilidade)).
+**Ferramenta(s):** Resultados dos testes de usabilidade (seção [9.3](#93-testes-de-usabilidade)) — reaproveita a planilha de campo (toques/conclusão) e o SUS, evitando duplicar execução com métricas divergentes.
 
 **Pré-condições:**
 
@@ -5900,7 +6069,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 - Mínimo de **5 participantes externos** ao grupo.
 - Planilha de campo com tarefas T01 a T09 e métricas de toques e conclusão.
 
-**Cenário positivo:** Os dados consolidados da seção 9.3 indicarão, por tarefa, percentual de conclusão sem auxílio que revele o caminho na interface e número de toques nas execuções bem-sucedidas. Considera-se sucesso quando **≥ 85%** dos participantes concluírem cada tarefa principal com **≤ 3 toques**.
+**Cenário positivo:** Os dados consolidados da seção 9.3 indicarão, por tarefa, percentual de conclusão sem auxílio que revele o caminho na interface e número de toques nas execuções bem-sucedidas.
 
 **Cenário negativo:** Tarefas com taxa de sucesso inferior a 85% ou média de toques superior a 3 serão classificadas como não conformes, com problemas de usabilidade priorizados no backlog de interface.
 
@@ -5910,6 +6079,8 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 **RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07.
 
+**Status:** planejado / pendente de sessões com usuários (instrumentos T01–T09 e analisador prontos; toques por tarefa e a vaga 60+ ficaram não conclusivos na rodada de 9.3.2 e devem ser registrados na próxima execução).
+
 ---
 
 ### 9.2.1.12 RNF11 — Compatibilidade mobile (Android e iOS)
@@ -5918,7 +6089,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 **Objetivo do teste:** Assegurar que os fluxos principais do Spotlight operam corretamente nas plataformas mobile alvo, cobrindo todo o escopo funcional exposto no app (RF01 a RF10).
 
-**Ferramenta(s):** Dispositivos físicos Android e iOS.
+**Ferramenta(s):** Dispositivos físicos Android e iOS — execução do fluxo completo nas plataformas-alvo do app React Native/Expo, cobrindo comportamento real de renderização e gestos (RNF11).
 
 **Pré-condições:**
 
@@ -5926,7 +6097,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 - **2 dispositivos por plataforma** (Android 10+ e iOS 15+), com variação de fabricante ou versão quando possível.
 - Roteiro de fluxo completo: splash, login, preferências, catálogo, busca, filtro, detalhes e ação de compra.
 
-**Cenário positivo:** O fluxo completo será executado em cada dispositivo. Falhas serão contabilizadas em relação ao total de passos ou requisições do roteiro. Considera-se sucesso quando a taxa de erro for ≤ **1%** em cada plataforma.
+**Cenário positivo:** O fluxo completo será executado em cada dispositivo. Falhas serão contabilizadas em relação ao total de passos ou requisições do roteiro.
 
 **Cenário negativo:** Serão registrados crashes, telas não renderizadas, gestos não reconhecidos ou erros de API exibidos ao usuário. Cada ocorrência incrementará a taxa de erro; padrões repetidos por plataforma serão sinalizados para correção específica (Android ou iOS).
 
@@ -5936,6 +6107,8 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 **RFs associados (rastreabilidade):** RF01, RF02, RF04, RF05, RF06, RF07, RF08, RF09, RF10.
 
+**Status:** planejado / pendente de execução (depende de build instalável e dois dispositivos por plataforma).
+
 ---
 
 ### 9.2.1.13 RNF12 — Containers Docker e tempo de reinicialização
@@ -5944,7 +6117,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 **Objetivo do teste:** Validar que cada serviço SOA executa em container isolado e recupera-se dentro do tempo máximo após falha, garantindo resiliência da infraestrutura transversal ao projeto.
 
-**Ferramenta(s):** Scripts shell e pipeline CI/CD.
+**Ferramenta(s):** Scripts shell e pipeline CI/CD — derrubam containers (`docker stop`/`kill`) e medem o tempo até health check positivo, validando a resiliência da infraestrutura Docker da stack (seção 4.4.6).
 
 **Pré-condições:**
 
@@ -5952,7 +6125,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 - Scripts shell para parada forçada de container (`docker stop` / `kill`) e medição de tempo até health check positivo.
 - Health checks HTTP configurados por serviço.
 
-**Cenário positivo:** O container de um serviço será derrubado e o tempo até retorno do health check será medido. O procedimento será repetido para cada serviço SOA. Considera-se sucesso quando a reinicialização for ≤ **30 segundos** e os demais containers permanecerem isolados e operacionais.
+**Cenário positivo:** O container de um serviço será derrubado e o tempo até retorno do health check será medido. O procedimento será repetido para cada serviço SOA.
 
 **Cenário negativo:** Será simulada falha de imagem incorreta ou variável de ambiente ausente no deploy via pipeline. Espera-se falha detectada pelo CI/CD sem propagação para outros serviços; o tempo de recuperação após correção será registrado.
 
@@ -5961,6 +6134,10 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 **Critério de aceitação:** Reinicialização ≤ **30 s** após falha; **100%** dos serviços executando em containers isolados.
 
 **RFs associados (rastreabilidade):** RF01 a RF16 (transversal).
+
+**Status:** planejado / pendente de execução (depende de ambiente Docker com health checks por serviço).
+
+&emsp;**Nota sobre a estrutura dos casos (9.2.x):** os cenários positivos e negativos descrevem apenas **o que é exercido**; o limiar mensurável de aprovação fica **exclusivamente** no campo **Critério de aceitação** de cada RNF, sem repetição dentro dos cenários.
 
 ---
 
@@ -6514,6 +6691,8 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 &emsp;Considera-se **conclusão bem-sucedida** o atendimento ao critério da tarefa (seção 9.3.1.6) sem auxílio verbal que indique o elemento correto da interface. Desvios serão classificados na análise (seção 9.3.2) como problema de usabilidade, defeito do protótipo ou limitação do escopo mockado.
 
+&emsp;**Registro obrigatório (lacunas da rodada anterior).** Para que o veredito do RNF10 seja conclusivo, são de preenchimento obrigatório na planilha de campo (seção 9.3.1.10), por participante e por tarefa: (i) o **número de toques** em cada execução bem-sucedida, base do critério "≤ 3 toques em ≥ 85% das execuções"; e (ii) a **identificação do participante 60+ com baixa familiaridade tecnológica** (vaga obrigatória da seção 9.3.1.4), com suas observações de acessibilidade. Esses dois campos ficaram "não conclusivos" na rodada consolidada em 9.3.2 e devem ser capturados na próxima execução para fechar a rastreabilidade ao RNF10 e à persona Carlos Nóbrega.
+
 ### 9.3.1.9 Pós-condições
 
 &emsp;Ao término da rodada, espera-se dispor dos seguintes resultados:
@@ -6753,6 +6932,9 @@ Os testes cobrem seis fronteiras de integração definidas pela arquitetura do S
 | IT-04 | Serviços SOA → MongoDB (telemetria) | Interno | Não |
 | IT-05 | Serviço do Usuário → Fila de Telemetria → MongoDB/Motor de Recomendação (Sprint 5) | Interno | Não |
 | IT-06 | App Mobile → API Ticketeira (link de compra) | Externo | **Sim** |
+| IT-07 | Serviço de Geolocalização → OpenStreetMap/Nominatim (contrato) | Externo | Não (contrato real em sandbox; complementa o fake unitário) |
+
+&emsp;As fronteiras IT-01 a IT-06 compõem o núcleo arquitetural do MVP; o **IT-07** é uma fronteira complementar planejada para validar o contrato de geocodificação contra o serviço real, além do `HttpMessageHandler` fake já usado nos testes unitários (seção 8.4).
 
 ---
 
@@ -6811,6 +6993,12 @@ dotnet test src/backend/api-gateway --filter "Category=Integration" --logger "co
 2. Validar estrutura do body de resposta via `JsonSchema`
 3. Inspecionar logs do container do API Gateway com `docker logs api-gateway | grep ERROR`
 4. Confirmar que nenhum token inválido passou para os serviços internos via análise dos logs dos serviços
+
+**Critério de aceitação:** o caso é aprovado quando todos os cenários IT-01-P/N produzem o resultado esperado da respectiva linha e nenhuma requisição rejeitada altera estado nos serviços internos.
+
+**Rastreabilidade:** RF01, RF02, RF04, RF05, RF06, RF07, RF16 · RNF05 (segurança JWT), RNF08 (deploy independente).
+
+**Status:** planejado / pendente de execução (o Gateway sobe via `WebApplicationFactory` para smoke checks; os cenários de roteamento autenticado ainda não estão versionados como suíte de integração).
 
 ---
 
@@ -6875,6 +7063,12 @@ ls tests/cassettes/supabase/
 3. Validar assinatura do JWT retornado com `jose-jwt` ou `System.IdentityModel.Tokens.Jwt`
 4. Comparar body de resposta com o cassete JSON armazenado usando `DeepEqual`
 
+**Critério de aceitação:** o caso é aprovado quando todos os cenários IT-02-P/N produzem o resultado esperado da respectiva linha, a segunda chamada idêntica é servida do cache VHS (`cache_hit=true`) e nenhuma chamada real ao Supabase ocorre fora de `VHS_MODE=record`.
+
+**Rastreabilidade:** RF01, RF02 · RNF05 (JWT, HTTPS), RNF03 (disponibilidade).
+
+**Status:** planejado / pendente de execução — depende do módulo **VHS** (mecanismo ainda a versionar) e de cassetes pré-gravados em `tests/cassettes/supabase/`. A §9.4.2 será preenchida na execução.
+
 ---
 
 #### IT-03 — Serviços SOA ↔ Supabase PostgreSQL: Persistência e Leitura
@@ -6933,6 +7127,12 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" 
 3. Validar que constraints do banco (NOT NULL, FK, UNIQUE) foram aplicadas corretamente
 4. Conferir que nenhum dado de teste persiste após `Respawn`
 
+**Critério de aceitação:** o caso é aprovado quando todos os cenários IT-03-P/N produzem o resultado esperado da respectiva linha, as constraints (NOT NULL, FK, UNIQUE) são aplicadas e nenhum dado persiste após o `Respawn`.
+
+**Rastreabilidade:** RF03, RF04, RF07, RF08, RF09, RF10, RF12, RF16 · RNF01 (tempo de carregamento), RNF06 (carga).
+
+**Status:** planejado / pendente de execução (`Testcontainers.PostgreSql` + `Respawn` ainda não versionados como suíte de integração).
+
 ---
 
 #### IT-04 — Serviços SOA ↔ MongoDB: Registro de Telemetria Comportamental
@@ -6986,6 +7186,12 @@ dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.cs
 2. Listar índices da coleção e comparar com os nomes esperados
 3. Confirmar que payloads inválidos não chegam à coleção MongoDB
 4. Confirmar que duplicidades por `event_id` não geram documentos repetidos
+
+**Critério de aceitação:** o caso é aprovado quando todos os cenários IT-04-P/N produzem o resultado esperado da respectiva linha, os índices esperados existem, payloads inválidos não geram documento e duplicidades por `event_id` mantêm count = 1.
+
+**Rastreabilidade:** RF11, RF12, RF13, RF14 · RNF07 (logs), RNF02 (UX não bloqueada).
+
+**Status:** executado — cinco testes de integração MongoDB via `Testcontainers.MongoDb` (`TelemetriaMongoIntegrationTests`) verdes nesta data (ver 9.1.2).
 
 ---
 
@@ -7041,6 +7247,12 @@ dotnet test src/backend/tests --filter "Category=Integration&Tag=RabbitMQ"
 2. Confirmar documentos no MongoDB via `CountDocumentsAsync`
 3. Confirmar idempotência via consulta por `event_id`
 4. Verificar DLQ após cenários negativos
+
+**Critério de aceitação:** o caso é aprovado quando todos os cenários IT-05-P/N produzem o resultado esperado da respectiva linha, reentregas mantêm idempotência (count por `event_id` = 1) e mensagens inválidas vão para a DLQ.
+
+**Rastreabilidade:** RF12, RF13, RF14, RF15 · RNF09 (100 eventos/s), RNF02 (recomendações em 2 s).
+
+**Status:** planejado para a Sprint 5 — a fila RabbitMQ e os consumidores não fazem parte da implementação corrente da Sprint 4.
 
 ---
 
@@ -7100,6 +7312,49 @@ dotnet test src/backend/services/catalogo \
 2. Confirmar que URL no campo `link_compra` passa na validação de formato `Uri.IsWellFormedUriString`
 3. Verificar header `Location` no `HEAD` da URL com regex `^https://[a-zA-Z0-9.-]+\.(sympla|blueticket|ingresso)\.com\.br`
 4. Confirmar que nenhuma chamada HTTP real foi gerada para a ticketeira nos logs de rede (exceto quando `VHS_MODE=record`)
+
+**Critério de aceitação:** o caso é aprovado quando todos os cenários IT-06-P/N produzem o resultado esperado da respectiva linha, a segunda chamada idêntica é servida do cache VHS (`cache_hit=true`) e o erro da ticketeira não invalida o `link_compra` preservado.
+
+**Rastreabilidade:** RF07 · RNF01, RNF03.
+
+**Status:** planejado / pendente de execução — depende do módulo **VHS** (a versionar) e de cassetes em `tests/cassettes/ticketeira/`. A §9.4.2 será preenchida na execução.
+
+---
+
+#### IT-07 — Serviço de Geolocalização ↔ OpenStreetMap/Nominatim: Contrato de Geocodificação (planejado)
+
+**Descrição:** Valida o contrato real entre o Serviço de Geolocalização e a API OpenStreetMap/Nominatim (`IGeocoding`), confirmando que o payload de resposta mantém o formato esperado e é corretamente normalizado para o objeto JSONB `localizacao` (`formattedAddress`, `latitude`, `longitude`, `placeId`, `provider`). Este caso **complementa** os testes unitários atuais, que isolam a integração com um `HttpMessageHandler` fake (seção 8.4): aqui o objetivo é exercer o contrato contra o serviço real em ambiente de sandbox, detectando mudanças de formato que o fake não captura.
+
+**Ferramentas utilizadas:**
+- `xUnit` com `Microsoft.AspNetCore.Mvc.Testing`
+- `HttpClient` real apontando para a instância pública/sandbox do Nominatim, respeitando `NOMINATIM_BASE_URL` e o cabeçalho obrigatório `NOMINATIM_USER_AGENT`
+- `FluentAssertions` para validação do shape da resposta e do mapeamento
+
+**Pré-condições:**
+
+- Conectividade com a instância Nominatim de sandbox e `NOMINATIM_USER_AGENT` definido (política de uso do OpenStreetMap exige User-Agent identificável e ~1 req/s).
+- Endereço de referência conhecido em São Paulo/SP para geocodificação direta e par de coordenadas conhecido para geocodificação reversa.
+- Teste marcado para execução opt-in (ex.: variável `RUN_NOMINATIM_CONTRACT_TESTS=true`) para não acoplar a suíte padrão à rede externa.
+
+**Cenários Positivos:**
+
+| ID | Cenário exercitado | Procedimento (passos) | Observável esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-07-P01 | Geocodificação direta de endereço válido | Consultar endereço de referência via `IGeocoding` | Resposta contém endereço normalizado e coordenadas; mapeamento preenche as 5 chaves do JSONB `localizacao` com `provider="openstreetmap_nominatim"` | Nenhuma alteração de estado |
+| IT-07-P02 | Geocodificação reversa de coordenadas válidas | Consultar par de coordenadas conhecido | Resposta retorna `formattedAddress` coerente com a região consultada | Nenhuma alteração de estado |
+
+**Cenários Negativos:**
+
+| ID | Cenário exercitado | Procedimento (passos) | Observável esperado | Pós-condição |
+|---|---|---|---|---|
+| IT-07-N01 | Endereço sem correspondência | Consultar string sem resultado | Serviço trata resposta vazia e retorna resultado vazio sem exceção não tratada | Nenhuma alteração de estado |
+| IT-07-N02 | Upstream indisponível ou timeout | Simular indisponibilidade/timeout do Nominatim | Serviço retorna erro controlado (sem vazar detalhe de infraestrutura) e registra log | Nenhuma alteração de estado |
+
+**Critério de aceitação:** `[DEFINIR]` — não há limiar mensurável versionado hoje. Em nível de contrato, o caso é aprovado quando todos os cenários IT-07-P/N produzem o observável esperado e o mapeamento para o JSONB `localizacao` permanece íntegro; tolerância de coordenadas e tempo de resposta devem ser definidos antes da execução.
+
+**Rastreabilidade:** RF03, RF06 · RNF01 (tempo de resposta da geocodificação).
+
+**Status:** planejado / pendente de execução — complementa o `HttpMessageHandler` fake atual (seção 8.4) com contrato real em sandbox; ainda não versionado.
 
 ---
 
