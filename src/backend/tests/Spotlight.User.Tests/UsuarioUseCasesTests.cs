@@ -149,6 +149,14 @@ public class UsuarioUseCasesTests
     }
 
     [Fact]
+    public async Task ObterPreferencias_QuandoNaoExiste_LancaNotFound()
+    {
+        var useCase = new ObterPreferenciasUseCase(new FakeUsuarioRepository { Preferencias = null });
+
+        await Assert.ThrowsAsync<UsuarioNotFoundException>(() => useCase.ExecutarAsync(Guid.NewGuid(), Ct));
+    }
+
+    [Fact]
     public async Task AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias()
     {
         var repositorio = new FakeUsuarioRepository { AtualizarPreferenciasResult = true };
@@ -168,6 +176,30 @@ public class UsuarioUseCasesTests
         Assert.Empty(resultado.CategoriasFavoritas);
         Assert.Empty(repositorio.LastPreferencias?.GenerosFavoritos ?? ["sentinel"]);
         Assert.Equal(0, resultado.FaixaPrecoMax);
+    }
+
+    [Fact]
+    public async Task AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias()
+    {
+        var repositorio = new FakeUsuarioRepository { AtualizarPreferenciasResult = true };
+        var useCase = new AtualizarPreferenciasUseCase(repositorio);
+        var usuarioId = Guid.NewGuid();
+
+        var resultado = await useCase.ExecutarAsync(
+            usuarioId,
+            new PreferenciasDto
+            {
+                GenerosFavoritos = ["Drama", "Musical"],
+                CategoriasFavoritas = [2, 5],
+                FaixaPrecoMax = 180
+            },
+            Ct);
+
+        Assert.True(repositorio.AtualizarPreferenciasCalled);
+        Assert.Equal(usuarioId, repositorio.LastAtualizarPreferenciasId);
+        Assert.Equal(["Drama", "Musical"], repositorio.LastPreferencias?.GenerosFavoritos);
+        Assert.Equal([2, 5], repositorio.LastPreferencias?.CategoriasFavoritas);
+        Assert.Equal(180, resultado.FaixaPrecoMax);
     }
 
     [Fact]
@@ -287,6 +319,92 @@ public class UsuarioUseCasesTests
         Assert.Equal("show_viewed", repositorio.LastEvento.EventType);
         Assert.Equal("detalhes", repositorio.LastEvento.Screen);
         Assert.Equal("show-1", repositorio.LastEvento.Entity?.Id);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+        var route = JsonDocument.Parse("""{"routeName":"Catalogo"}""").RootElement.Clone();
+
+        var eventId = await service.RegistrarAsync(
+            usuarioId: null,
+            new RegistrarTelemetriaRequest(
+                EventId: " evt-123 ",
+                EventType: " screen_viewed ",
+                Source: " mobile ",
+                SessionId: " session-123 ",
+                OccurredAt: null,
+                Screen: " Catalogo ",
+                Entity: null,
+                Properties: route,
+                Device: null,
+                AnonymousId: " anon-123 "),
+            Ct);
+
+        Assert.Equal("evt-123", eventId);
+        Assert.NotNull(repositorio.LastEvento);
+        Assert.Equal("anon-123", repositorio.LastEvento.AnonymousId);
+        Assert.Equal("session-123", repositorio.LastEvento.SessionId);
+        Assert.Equal("screen_viewed", repositorio.LastEvento.EventType);
+        Assert.Equal("mobile", repositorio.LastEvento.Source);
+        Assert.Equal("Catalogo", repositorio.LastEvento.Screen);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComPropertiesNaoObjeto_LancaValidation()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+        var properties = JsonDocument.Parse("""["invalido"]""").RootElement.Clone();
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: Guid.NewGuid(),
+            new RegistrarTelemetriaRequest(
+                EventId: null,
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: "session-123",
+                OccurredAt: null,
+                Screen: null,
+                Entity: new TelemetriaEntityDto("espetaculo", "show-1"),
+                Properties: properties,
+                Device: null,
+                AnonymousId: null),
+            Ct));
+
+        Assert.Contains("properties", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
+    }
+
+    [Fact]
+    public async Task TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros()
+    {
+        var repositorio = new FakeTelemetriaRepository();
+        var service = new TelemetriaService(repositorio);
+
+        var ex = await Assert.ThrowsAsync<UsuarioValidationException>(() => service.RegistrarAsync(
+            usuarioId: null,
+            new RegistrarTelemetriaRequest(
+                EventId: new string('e', 129),
+                EventType: "show_viewed",
+                Source: "mobile",
+                SessionId: new string('s', 129),
+                OccurredAt: null,
+                Screen: new string('t', 101),
+                Entity: new TelemetriaEntityDto("espetaculo", new string('i', 129)),
+                Properties: null,
+                Device: null,
+                AnonymousId: new string('a', 129)),
+            Ct));
+
+        Assert.Contains("eventId", ex.Details.Keys);
+        Assert.Contains("anonymousId", ex.Details.Keys);
+        Assert.Contains("sessionId", ex.Details.Keys);
+        Assert.Contains("screen", ex.Details.Keys);
+        Assert.Contains("entity.id", ex.Details.Keys);
+        Assert.Null(repositorio.LastEvento);
     }
 
     [Fact]
@@ -598,6 +716,7 @@ public class UsuarioUseCasesTests
         public bool AtualizarCalled { get; private set; }
         public bool AtualizarPreferenciasCalled { get; private set; }
         public Guid LastAtualizarId { get; private set; }
+        public Guid LastAtualizarPreferenciasId { get; private set; }
         public Preferencias? LastPreferencias { get; private set; }
 
         public Task<Domain.Entities.Usuario?> ObterAsync(Guid id, CancellationToken cancellationToken) =>
@@ -627,6 +746,7 @@ public class UsuarioUseCasesTests
             CancellationToken cancellationToken)
         {
             AtualizarPreferenciasCalled = true;
+            LastAtualizarPreferenciasId = id;
             LastPreferencias = dados;
             return Task.FromResult(AtualizarPreferenciasResult);
         }
