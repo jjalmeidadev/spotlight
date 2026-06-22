@@ -736,19 +736,21 @@ Das seis ações de melhoria propostas na Sprint 3, cinco foram cumpridas ou mel
 
 | Problema endereçado | Ação de melhoria | Responsável | Prazo de aplicação | Critério de sucesso | Task vinculada |
 |---|---|---|---|---|---|
-| Atraso no início da produção após interrupção | Realizar daily de retomada no primeiro dia útil da sprint com checklist explícito: cada membro sai da daily com ao menos uma task em Doing. | Scrum Master | Primeiro dia útil da Sprint 5 | 100% dos membros com ao menos uma task em Doing até o fim do primeiro dia. | A definir no planning |
-| Desbalanceamento residual, com 2 membros abaixo da média de contribuição do grupo | Alocar issues adicionais a Celso e Mariana Pereira no planning da Sprint 5, priorizando tasks de documentação final e validação. | Scrum Master | Planning da Sprint 5 | Nenhum membro com volume abaixo de 70% da média do grupo; diferença máxima entre o mais e o menos ativo de 2:1. | A definir no planning |
-| Dependências pouco claras durante a execução | Revisar, em cada daily, quais MRs estão bloqueando outras entregas e registrar explicitamente dependências entre branches abertas. | Tech Lead + Scrum Master | Ao longo da Sprint 5 | Todas as branches críticas devem ter dependência registrada antes de entrar em Review; nenhum integrante deve avançar integração sem saber a branch base esperada. | A definir no planning |
-| Risco de conflito técnico por branches simultâneas | Mapear na matriz de dependências quais branches não devem estar em desenvolvimento paralelo; comunicar ativamente no início de cada dia de trabalho. | Tech Lead | Antes do início do desenvolvimento | Zero conflitos de merge críticos que atrasem entrega final. | A definir no planning |
-| Documentação acumulada no fechamento | Distribuir tasks de documentação final (post mortem, retrospectiva, atualização de artefatos) ao longo dos dias úteis desde o primeiro dia. | Equipe | Ao longo da Sprint 5 | Nenhum documento obrigatório iniciado no último dia útil da sprint. | A definir no planning |
+| Atraso no início da produção após interrupção | Realizar daily de retomada no primeiro dia útil da sprint com checklist explícito: cada membro sai da daily com ao menos uma task em Doing. | Scrum Master | Primeiro dia útil da Sprint 5 | 100% dos membros com ao menos uma task em Doing até o fim do primeiro dia. | T37, T40 |
+| Desbalanceamento residual, com 2 membros abaixo da média de contribuição do grupo | Alocar issues adicionais a Celso e Mariana Pereira no planning da Sprint 5, priorizando tasks de documentação final e validação. | Scrum Master | Planning da Sprint 5 | Nenhum membro com volume abaixo de 70% da média do grupo; diferença máxima entre o mais e o menos ativo de 2:1. | T37, T40, T44, T52 |
+| Dependências pouco claras durante a execução | Revisar, em cada daily, quais MRs estão bloqueando outras entregas e registrar explicitamente dependências entre branches abertas. | Tech Lead + Scrum Master | Ao longo da Sprint 5 | Todas as branches críticas devem ter dependência registrada antes de entrar em Review; nenhum integrante deve avançar integração sem saber a branch base esperada. | T40, matriz de dependências da seção 2.5.1 |
+| Risco de conflito técnico por branches simultâneas | Mapear na matriz de dependências quais branches não devem estar em desenvolvimento paralelo; comunicar ativamente no início de cada dia de trabalho. | Tech Lead | Antes do início do desenvolvimento | Zero conflitos de merge críticos que atrasem entrega final. | T10, T11, T12, T14, T40 |
+| Documentação acumulada no fechamento | Distribuir tasks de documentação final (post mortem, retrospectiva, atualização de artefatos) ao longo dos dias úteis desde o primeiro dia. | Equipe | Ao longo da Sprint 5 | Nenhum documento obrigatório iniciado no último dia útil da sprint. | T38, T41, T42, T43, T44-T59 |
 
-Além das ações específicas, a equipe deve manter as práticas consolidadas nas Sprints 3 e 4: revisões contínuas de PR com SLA de 24h, matriz de dependências críticas, dailys objetivas com foco em impedimentos e ritual de fechamento com checagem cruzada entre Kanban e documentação. A coluna "Task vinculada" será preenchida com os números de issue correspondentes após o planning da Sprint 5.
+Além das ações específicas, a equipe deve manter as práticas consolidadas nas Sprints 3 e 4: revisões contínuas de PR com SLA de 24h, matriz de dependências críticas, dailys objetivas com foco em impedimentos e ritual de fechamento com checagem cruzada entre Kanban e documentação. A vinculação com tasks do board já foi preenchida nesta seção para permitir rastreabilidade entre feedback da retrospectiva, ação planejada e execução no Kanban.
 
 ---
 
 ### 2.4.5 Planejamento da Sprint 5
 
-> O planejamento detalhado da Sprint 5, com backlog completo de tasks, capacidade planejada, estratégia de priorização por dia e matriz de dependências críticas, será incluído em task própria após o planning do ciclo, conforme as políticas de gestão de configuração do projeto.
+O planejamento da Sprint 5 está registrado no board do GitLab, com as issues criadas antes do início do ciclo e organizadas conforme as políticas de gestão de configuração do projeto. A estratégia de priorização por dia, a capacidade planejada, o backlog sequenciado, o cronograma detalhado e a matriz de dependências críticas estão documentados na seção 2.5 deste documento.
+
+Esta atualização atende ao card [#383](https://git.inteli.edu.br/graduacao/2026-1b/t17/g04/-/issues/383), responsável por consolidar o planejamento detalhado da Sprint 5 no `GestaoProjeto.md`.
 
 ---
 
@@ -758,230 +760,310 @@ Além das ações específicas, a equipe deve manter as práticas consolidadas n
 
 #### Objetivo da Sprint 5
 
-A Sprint 5 tem como objetivo consolidar a versão final do Spotlight, corrigindo pendências identificadas nas sprints anteriores, finalizando documentação, testes, deploy, apresentação e evidências de funcionamento do produto. Diferentemente da Sprint 4, que concentrou a evolução funcional do MVP, a Sprint 5 deve priorizar estabilidade, acabamento, rastreabilidade, validação final e preparação da solução para entrega ao parceiro.
+A Sprint 5 representa o encerramento do projeto Spotlight. O ciclo tem como objetivo consolidar a solução final com backend e frontend funcionais, ambiente dockerizado no servidor Inteli, cobertura de testes abrangente, documentação completa e apresentação final estruturada com técnica narrativa definida. Esta sprint também contempla a análise post mortem do projeto e a consolidação da gestão evolutiva ao longo de todas as sprints.
 
-O foco do ciclo é garantir que a aplicação esteja demonstrável de ponta a ponta, com backend e frontend integrados, recomendação funcionando, telemetria validada, testes executados e documentação final sem placeholders. A sprint também deve incorporar os feedbacks recebidos nas Sprints 1 a 4, principalmente os pontos relacionados à documentação do Escritório de Projetos, planejamento de testes, usabilidade, manual de implantação e consistência entre Kanban, branches e Merge Requests.
+A Sprint 5 tem uma restrição de capacidade relevante: a primeira semana coincide com período de provas, reduzindo os dias produtivos a tasks de menor complexidade, principalmente `SIZE_P` e `SIZE_M`. A segunda semana concentra as entregas técnicas e documentais mais pesadas, com quatro dias úteis efetivos de alta produtividade.
 
 #### Capacidade Planejada
 
-O planejamento inicial da Sprint 5 foi estruturado a partir das issues já cadastradas no Kanban no momento do planning. O recorte inicial exportado para esta documentação contém 47 itens, mas esse número não é tratado como teto nem como valor final da sprint. Como se trata da sprint de encerramento, novas issues poderão ser adicionadas conforme surgirem pendências de revisão, ajustes finais, correções de deploy, evidências adicionais ou feedbacks de professores e revisores.
-
 Para fins de planejamento, a equipe manteve a escala de t-shirt sizing utilizada nas sprints anteriores:
 
-| Tamanho | Tempo estimado |
-|---|---|
-| PP | Até 15 minutos |
-| P | Até 30 minutos |
-| M | 30 a 60 minutos |
-| G | 60 a 120 minutos |
+| Tamanho | Tempo estimado | Quantidade de tasks | Carga considerada |
+|---|---:|---:|---:|
+| SIZE_PP | Até 15 minutos | 1 | 0,25h |
+| SIZE_P | Até 30 minutos | 17 | 8,5h |
+| SIZE_M | 30 a 60 minutos | 25 | 25h |
+| SIZE_G | 60 a 120 minutos | 18 | 36h |
+| **Total** |  | **61** | **~70h** |
 
-No recorte inicial, a distribuição de esforço ficou organizada da seguinte forma:
+Com sete integrantes e sete dias úteis efetivos, cada membro deve assumir ao menos nove issues ao longo da sprint, respeitando o equilíbrio de complexidade entre os membros. O planejamento considera, em especial, a necessidade de reequilibrar o volume de Celso e Mariana Pereira, que ficaram abaixo da média de contribuição na Sprint 4.
 
-| Tamanho | Quantidade no recorte inicial | Leitura para planejamento |
-|---|---:|---|
-| PP | 1 | Atividade rápida de acompanhamento e controle |
-| P | 6 | Ajustes pontuais de documentação, índice, README e scripts |
-| M | 24 | Revisões estruturais, documentação final, validações e melhorias incrementais |
-| G | 16 | Entregas críticas de testes, deploy, documentação extensa e apresentação |
+#### Estratégia de Priorização por Dia
 
-Essa distribuição mostra que a Sprint 5 ainda possui carga relevante de execução, não apenas tarefas administrativas. Por isso, o grupo deve evitar concentrar todo o fechamento documental no último dia e manter revisão diária entre Kanban, documentação e branches abertas.
-
-#### Estratégia de Priorização
-
-A Sprint 5 foi organizada em quatro frentes principais:
-
-| Frente | Objetivo | Risco principal tratado |
-|---|---|---|
-| Desenvolvimento | Finalizar features pendentes, validar integração final, ajustar performance, Swagger, deploy e documentação técnica. | Entregar uma versão final que funcione de ponta a ponta. |
-| Testes | Executar a rodada final de testes funcionais, integração, regras de negócio, RNFs e usabilidade. | Evitar entrega sem evidências claras de validação. |
-| Versão Final | Remover placeholders, revisar documentos, preparar manual de deploy, slides e critérios do Escritório de Projetos. | Perder pontos por documentação incompleta ou inconsistência formal. |
-| Gestão | Planejar a sprint, acompanhar Kanban, atualizar riscos, métricas, post mortem e retrospectiva final. | Repetir problemas de dependência pouco visível e concentração no fechamento. |
-
-A priorização segue três critérios:
-
-1. Primeiro, destravar documentação e organização básica, removendo placeholders e alinhando guias, índice, README e planejamento.
-2. Depois, executar validações finais de produto e testes, com evidências registradas no `Projeto.md`.
-3. Por fim, consolidar apresentação, post mortem, revisão final e entrega ao parceiro.
+| Dia | Data | Semana | Foco principal | Objetivo operacional |
+|---|---|---|---|---|
+| 1 | 17/06 (Ter) | Prova | Fundação e limpeza documental | Resolver pendências do EP, definir técnica de apresentação, iniciar planejamento no `GestaoProjeto.md` e agendar usuários de usabilidade |
+| 2 | 18/06 (Qua) | Prova | Atualização de documentação técnica | Atualizar guia de padrões, seções do `Projeto.md`, `ProjetoVisual.md`, `Gestao_Projeto_Configuracao.md` e planejamento de testes |
+| 3 | 19/06 (Qui) | Prova | Revisão e preparação para semana final | Incorporar feedbacks pendentes, revisar RNFs, separar critérios de aceitação, detalhar casos de teste e iniciar estrutura dos slides |
+| 4 | 23/06 (Seg) | Final | Implementação e infraestrutura | Finalizar features pendentes, validar ambiente no servidor Inteli, iniciar execução de testes funcionais e de integração |
+| 5 | 24/06 (Ter) | Final | Testes e evidências técnicas | Executar rodada final de todos os tipos de teste, organizar logs e ampliar cobertura de testes unitários |
+| 6 | 25/06 (Qua) | Final | Documentação final e apresentação | Consolidar `Projeto.md`, gravar vídeo, avançar slides, criar `manual_deploy.md`, elaborar métricas e post mortem |
+| 7 | 26/06 (Qui) | Final | Fechamento e entrega | Ensaio final, revisão cruzada de documentação, retrospectiva da Sprint 5, validação dos critérios do EP e entrega |
 
 #### Backlog Priorizado e Sequenciado
 
-O backlog abaixo representa o recorte inicial da Sprint 5 no momento do planning. Ele poderá ser expandido ao longo do ciclo, desde que novas issues sejam registradas no Kanban com DoR, DoD, tamanho e dependências.
+O backlog abaixo representa o recorte inicial da Sprint 5 no momento do planning. Ele poderá ser expandido ao longo do ciclo, desde que novas issues sejam registradas no Kanban com DoR, DoD, tamanho, responsável, prioridade e dependências.
 
-##### Bloco 1 — Desenvolvimento
+##### Bloco 1 — Desenvolvimento do Projeto
 
-| Task | Descrição | Tamanho | Dia planejado | Prioridade |
-|---|---|---|---:|---|
-| T1 | Revisar e atualizar estrutura final de diretórios do projeto | M | 1 | Alta |
-| T2 | Atualizar diagrama de arquitetura de codificação para versão final | M | 1 | Alta |
-| T3 | Consolidar e atualizar `GuiaPadroesDesenvolvimento.md` para versão final | M | 1 | Alta |
-| T9 | Finalizar implementação de features pendentes da Sprint 4 | G | 2 | Alta |
-| T21 | Implementar implantação em nuvem comercial como diferencial | G | 4 | Média |
-| T22 | Validar ambiente final no servidor Inteli, dockerizado | G | 4 | Alta |
-| T23 | Atualizar Swagger com todas as rotas finais da API | M | 4 | Alta |
-| T24 | Gravar vídeo demonstrativo final da aplicação | M | 4 | Alta |
-| T38 | Atualizar `Projeto.md` com features implementadas na versão final | M | 5 | Alta |
-| T39 | Documentar TDD e cobertura de testes no `Projeto.md` | M | 5 | Alta |
-| T43 | Implementar melhorias de performance identificadas nos testes | M | 5 | Média |
-| T44 | Validar integração final frontend-backend-recomendação | M | 5 | Alta |
-| T45 | Atualizar README do banco de dados para versão final | P | 3 | Média |
+| Task | Descrição | Tamanho | Prioridade | Dia previsto |
+|---|---|---|---|---|
+| T01 | Revisar e documentar estrutura final de diretórios | SIZE_P | Alta | Dia 1 |
+| T02 | Atualizar diagrama de arquitetura de codificação — versão final | SIZE_M | Alta | Dia 2 |
+| T03 | Consolidar `GuiaPadroesDesenvolvimento.md` — versão final | SIZE_M | Alta | Dia 2 |
+| T04 | Documentar padrão criacional aplicado no backend C# | SIZE_P | Alta | Dia 2 |
+| T05 | Documentar padrão comportamental aplicado no backend C# | SIZE_P | Alta | Dia 2 |
+| T06 | Revisar e consolidar seção de arquitetura no `Projeto.md` | SIZE_M | Alta | Dia 3 |
+| T07 | Atualizar seção de features implementadas no `Projeto.md` — versão final | SIZE_M | Alta | Dia 3 |
+| T08 | Documentar TDD e cobertura de testes no `Projeto.md` | SIZE_M | Alta | Dia 3 |
+| T09 | Atualizar `README.md` do banco de dados — versão final | SIZE_P | Alta | Dia 3 |
+| T10 | Finalizar implementação de features pendentes | SIZE_G | Alta | Dia 4 |
+| T11 | Validar ambiente final no servidor Inteli — dockerizado | SIZE_G | Crítica | Dia 4 |
+| T12 | Validar integração final frontend-backend-recomendação | SIZE_M | Alta | Dia 4 |
+| T13 | Validar Swagger no ambiente final do servidor Inteli | SIZE_P | Alta | Dia 4 |
+| T14 | Revisar pipeline de CI no GitLab — versão final | SIZE_P | Média | Dia 4 |
+| T15 | Atualizar Swagger com todas as rotas finais da API | SIZE_M | Alta | Dia 5 |
+| T16 | Implementar melhorias de performance identificadas nos testes | SIZE_M | Média | Dia 5 |
+| T17 | Implementar implantação em nuvem comercial — diferencial | SIZE_G | Média | Dia 5 |
+| T18 | Documentar instruções de execução e configuração do ambiente | SIZE_M | Alta | Dia 6 |
+| T19 | Gravar vídeo demonstrativo final da aplicação | SIZE_M | Alta | Dia 6 |
+| T20 | Consolidar evidências finais no `Projeto.md` — todas as seções | SIZE_G | Alta | Dia 6 |
 
-##### Bloco 2 — Testes
+##### Bloco 2 — Execução de Testes
 
-| Task | Descrição | Tamanho | Dia planejado | Prioridade |
-|---|---|---|---:|---|
-| T7 | Atualizar planejamento de testes com base no feedback da Sprint 4 | M | 1 | Alta |
-| T10 | Implementar testes de funcionalidade, rodada final | G | 2 | Alta |
-| T11 | Implementar testes automatizados de integração, rodada final | G | 2 | Alta |
-| T12 | Implementar testes automatizados de regras de negócio, rodada final | G | 2 | Alta |
-| T13 | Executar testes de RNF de desempenho, rodada final | G | 2 | Média |
-| T14 | Executar testes de RNF de segurança, rodada final | G | 2 | Média |
-| T15 | Executar testes de usabilidade com usuários reais | G | 2 | Alta |
-| T25 | Organizar logs de execução e evidências dos testes | M | 4 | Alta |
-| T26 | Documentar abrangência e análise de resultados dos testes | M | 4 | Alta |
-| T27 | Consolidar seção de testes no `Projeto.md`, versão final | G | 4 | Alta |
-| T41 | Revisar scripts de teste conforme padrões de codificação | P | 5 | Média |
+| Task | Descrição | Tamanho | Prioridade | Dia previsto |
+|---|---|---|---|---|
+| T21 | Atualizar planejamento de testes com base no feedback da Sprint 4 | SIZE_M | Alta | Dia 1 |
+| T22 | Revisar e ajustar RNFs para formato de user story | SIZE_M | Alta | Dia 2 |
+| T23 | Separar critérios de aceitação de procedimentos de teste nos RFs | SIZE_M | Alta | Dia 3 |
+| T24 | Detalhar casos de teste para rodada final | SIZE_M | Alta | Dia 3 |
+| T25 | Agendar usuários externos para testes de usabilidade | SIZE_P | Crítica | Dia 1 |
+| T26 | Executar testes de funcionalidade — rodada final | SIZE_G | Alta | Dia 4 |
+| T27 | Executar testes automatizados de integração — rodada final | SIZE_G | Alta | Dia 4 |
+| T28 | Executar testes automatizados de regras de negócio — rodada final | SIZE_G | Alta | Dia 4 |
+| T29 | Implementar testes unitários adicionais nos services | SIZE_G | Alta | Dia 4 |
+| T30 | Executar testes de RNF de desempenho — rodada final | SIZE_G | Alta | Dia 5 |
+| T31 | Executar testes de RNF de segurança — rodada final | SIZE_G | Alta | Dia 5 |
+| T32 | Executar testes de usabilidade com usuários reais — rodada final | SIZE_G | Alta | Dia 5 |
+| T33 | Revisar scripts de teste conforme padrões de codificação | SIZE_P | Média | Dia 5 |
+| T34 | Organizar e consolidar logs de execução dos testes | SIZE_M | Alta | Dia 6 |
+| T35 | Documentar abrangência e análise de resultados dos testes | SIZE_M | Alta | Dia 6 |
+| T36 | Consolidar seção de testes no `Projeto.md` — versão final | SIZE_G | Alta | Dia 6 |
 
-##### Bloco 3 — Versão Final
+##### Bloco 3 — Gestão Evolutiva
 
-| Task | Descrição | Tamanho | Dia planejado | Prioridade |
-|---|---|---|---:|---|
-| T4 | Limpar placeholders do `Index.md` e indexar todos os documentos | P | 1 | Alta |
-| T5 | Limpar placeholders do `README.md` da raiz do projeto | P | 1 | Alta |
-| T6 | Limpar placeholders do `Manual-instalacao.md` e `Gestao_Projeto_Configuracao.md` | P | 1 | Alta |
-| T8 | Definir técnica de apresentação final e registrar no Slack | P | 1 | Alta |
-| T16 | Adicionar seção de feedback e iterações de usabilidade no `ProjetoVisual.md` | M | 2 | Alta |
-| T17 | Iniciar estrutura da apresentação final com técnica escolhida | M | 2 | Alta |
-| T18 | Atualizar `Projeto.md`, removendo "Tabela X" e placeholders `_conteúdo_` | M | 3 | Alta |
-| T19 | Revisar e ajustar RNFs para formato de user story | M | 3 | Alta |
-| T20 | Separar critérios de aceitação de procedimentos de teste nos RFs | M | 3 | Alta |
-| T32 | Criar `manual_deploy.md` para uso pelo parceiro | G | 4 | Alta |
-| T33 | Incorporar feedbacks das sprints anteriores na documentação | M | 3 | Alta |
-| T34 | Avançar conteúdo dos slides finais, seções técnicas | G | 5 | Alta |
-| T35 | Revisar documentação completa antes da entrega final | G | 6 | Alta |
-| T36 | Ensaio final da apresentação | G | 6 | Alta |
-| T37 | Finalizar apresentação final, versão de entrega | M | 7 | Alta |
-| T40 | Garantir critérios do Escritório de Projetos para entrega final | M | 6 | Alta |
-| T46 | Revisar e finalizar `Gestao_Projeto_Configuracao.md` | M | 2 | Alta |
+| Task | Descrição | Tamanho | Prioridade | Dia previsto |
+|---|---|---|---|---|
+| T37 | Realizar alinhamento de encerramento com o time — planning S5 | SIZE_P | Alta | Dia 1 |
+| T38 | Documentar planejamento da Sprint 5 no `GestaoProjeto.md` | SIZE_M | Alta | Dia 1 |
+| T39 | Atualizar análise de riscos no `GestaoProjeto.md` — versão final | SIZE_M | Média | Dia 2 |
+| T40 | Acompanhamento diário do Kanban e consistência com documentação | SIZE_PP | Alta | Dias 1–7 |
+| T41 | Elaborar análise de evolução de métricas ao longo das sprints | SIZE_G | Alta | Dia 6 |
+| T42 | Elaborar análise post mortem completa do projeto | SIZE_G | Alta | Dia 6 |
+| T43 | Realizar retrospectiva da Sprint 5 e atualizar `GestaoProjeto.md` | SIZE_M | Alta | Dia 7 |
 
-##### Bloco 4 — Gestão
+##### Bloco 4 — Versão Final
 
-| Task | Descrição | Tamanho | Dia planejado | Prioridade |
-|---|---|---|---:|---|
-| T28 | Elaborar análise de evolução de métricas ao longo das sprints | G | 4 | Alta |
-| T29 | Elaborar análise post mortem completa do projeto | G | 4 | Alta |
-| T30 | Atualizar análise de riscos no `GestaoProjeto.md` | M | 3 | Alta |
-| T31 | Realizar retrospectiva da Sprint 5 e atualizar `GestaoProjeto.md` | M | 7 | Alta |
-| T42 | Documentar planejamento da Sprint 5 no `GestaoProjeto.md` | M | 1 | Alta |
-| T47 | Criar task de acompanhamento diário do Kanban e documentação | PP | 1 | Alta |
+| Task | Descrição | Tamanho | Prioridade | Dia previsto |
+|---|---|---|---|---|
+| T44 | Limpar placeholders do `Index.md` e indexar todos os documentos | SIZE_P | Alta | Dia 1 |
+| T45 | Atualizar `README.md` da raiz do projeto — versão final | SIZE_P | Alta | Dia 1 |
+| T46 | Limpar placeholders do `Manual-instalacao.md` | SIZE_P | Alta | Dia 1 |
+| T47 | Finalizar `Gestao_Projeto_Configuracao.md` — cabeçalho e sumário | SIZE_P | Alta | Dia 1 |
+| T48 | Definir técnica de apresentação final e registrar no Slack | SIZE_P | Crítica | Dia 1 |
+| T49 | Criar task de apresentação no Kanban e montar roteiro preliminar | SIZE_P | Alta | Dia 1 |
+| T50 | Adicionar seção de feedback e iterações de usabilidade no `ProjetoVisual.md` | SIZE_M | Alta | Dia 2 |
+| T51 | Incorporar feedbacks pendentes das sprints anteriores na documentação | SIZE_M | Alta | Dia 2 |
+| T52 | Revisar e atualizar diagrama de implantação para versão final | SIZE_P | Alta | Dia 3 |
+| T53 | Limpar "Tabela X" e placeholders de conteúdo do `Projeto.md` | SIZE_M | Alta | Dia 3 |
+| T54 | Iniciar estrutura da apresentação final com técnica escolhida | SIZE_M | Alta | Dia 3 |
+| T55 | Organizar repositório conforme estrutura do Escritório de Projetos | SIZE_P | Alta | Dia 4 |
+| T56 | Criar `manual_deploy.md` para uso pelo parceiro | SIZE_G | Alta | Dia 5 |
+| T57 | Avançar conteúdo técnico dos slides finais | SIZE_G | Alta | Dia 5 |
+| T58 | Garantir atendimento aos critérios do EP — versão final | SIZE_M | Alta | Dia 6 |
+| T59 | Revisar documentação completa antes da entrega final | SIZE_G | Alta | Dia 7 |
+| T60 | Ensaio final da apresentação com todo o grupo | SIZE_G | Crítica | Dia 7 |
+| T61 | Finalizar apresentação final — versão de entrega | SIZE_M | Crítica | Dia 7 |
+
+#### Cronograma Detalhado por Dia
+
+##### Dia 1 — Terça 17/06 — Fundação e Limpeza Documental
+
+Objetivo do dia: resolver pendências documentais do EP, definir a técnica de apresentação, agendar usuários de usabilidade e iniciar o planejamento da sprint no `GestaoProjeto.md`. As tasks são predominantemente `SIZE_P` para respeitar a semana de prova.
+
+| Bloco | Tasks | Membro | Status inicial |
+|---|---|---|---|
+| Desenvolvimento | T01 — Revisar estrutura final de diretórios (`SIZE_P`) | Rafael | Aprovada |
+| Testes | T21 — Atualizar planejamento de testes (`SIZE_M`) | Rafael | Em análise |
+| Testes | T25 — Agendar usuários externos para usabilidade (`SIZE_P`) | Celso | Não iniciada |
+| Gestão | T37 — Planning S5 com o time (`SIZE_P`) | Mariana Lacerda | Aprovada |
+| Gestão | T38 — Documentar planejamento S5 no `GestaoProjeto.md` (`SIZE_M`) | Mariana Lacerda | Aprovada |
+| Versão Final | T44 — Limpar placeholders `Index.md` (`SIZE_P`) | Mariana Lacerda | Não iniciada |
+| Versão Final | T45 — Atualizar `README.md` da raiz (`SIZE_P`) | Leonardo | Aprovada |
+| Versão Final | T46 — Limpar placeholders `Manual-instalacao.md` (`SIZE_P`) | Jaime | Aprovada |
+| Versão Final | T47 — Finalizar `Gestao_Projeto_Configuracao.md` (`SIZE_P`) | Leonardo | Não iniciada |
+| Versão Final | T48 — Definir técnica de apresentação e registrar no Slack (`SIZE_P`) | Vitor | Não iniciada |
+| Versão Final | T49 — Criar task de apresentação e roteiro preliminar (`SIZE_P`) | Mariana Pereira | Não iniciada |
+
+Checkpoint do dia: T25, T44, T45, T46, T47 e T48 devem estar concluídas. Placeholders do EP resolvidos e técnica de apresentação registrada no Slack são os dois desbloqueadores mais importantes do Dia 1.
+
+##### Dia 2 — Quarta 18/06 — Atualização de Documentação Técnica
+
+Objetivo do dia: avançar nas atualizações de documentação técnica que não dependem de código pronto — guia de padrões, `ProjetoVisual.md`, `Gestao_Projeto_Configuracao.md`, riscos e RNFs.
+
+| Bloco | Tasks | Membro | Status inicial |
+|---|---|---|---|
+| Desenvolvimento | T02 — Atualizar diagrama de arquitetura (`SIZE_M`) | Rafael | Em análise |
+| Desenvolvimento | T03 — Consolidar `GuiaPadroesDesenvolvimento.md` (`SIZE_M`) | Não atribuído | Aprovada |
+| Desenvolvimento | T04 — Documentar padrão criacional C# (`SIZE_P`) | Rafael | Em análise |
+| Desenvolvimento | T05 — Documentar padrão comportamental C# (`SIZE_P`) | Rafael | Em análise |
+| Testes | T22 — Revisar RNFs para formato user story (`SIZE_M`) | Rafael | Em análise |
+| Gestão | T39 — Atualizar análise de riscos (`SIZE_M`) | Rafael | Em análise |
+| Versão Final | T50 — Adicionar seção feedback/iterações `ProjetoVisual.md` (`SIZE_M`) | Rafael | Em análise |
+| Versão Final | T51 — Incorporar feedbacks pendentes das sprints (`SIZE_M`) | Rafael | Não iniciada |
+
+Checkpoint do dia: T03, T04, T05 e T22 devem estar concluídas. O guia de padrões e os RNFs em formato user story desbloqueiam validações da semana final.
+
+##### Dia 3 — Quinta 19/06 — Revisão e Preparação para Semana Final
+
+Objetivo do dia: concluir ajustes documentais, detalhar casos de teste e iniciar a estrutura dos slides. Este é o último dia leve antes da semana final.
+
+| Bloco | Tasks | Membro | Status inicial |
+|---|---|---|---|
+| Desenvolvimento | T06 — Revisar seção de arquitetura no `Projeto.md` (`SIZE_M`) | Vitor | Não iniciada |
+| Desenvolvimento | T07 — Atualizar seção de features no `Projeto.md` (`SIZE_M`) | Mariana Pereira | Não iniciada |
+| Desenvolvimento | T08 — Documentar TDD e cobertura de testes (`SIZE_M`) | Não atribuído | Não iniciada |
+| Desenvolvimento | T09 — Atualizar `README.md` do banco (`SIZE_P`) | Celso | Não iniciada |
+| Testes | T23 — Separar critérios de aceitação de procedimentos (`SIZE_M`) | Não atribuído | Não iniciada |
+| Testes | T24 — Detalhar casos de teste para rodada final (`SIZE_M`) | Não atribuído | Não iniciada |
+| Versão Final | T52 — Atualizar diagrama de implantação (`SIZE_P`) | Celso | Não iniciada |
+| Versão Final | T53 — Limpar "Tabela X" e conteúdo do `Projeto.md` (`SIZE_M`) | Não atribuído | Não iniciada |
+| Versão Final | T54 — Iniciar estrutura da apresentação com técnica escolhida (`SIZE_M`) | Mariana Pereira | Não iniciada |
+
+Checkpoint do dia: T24 e T54 devem estar concluídas. Casos de teste detalhados e estrutura de slides definida são os dois desbloqueadores da semana final.
+
+##### Dia 4 — Segunda 23/06 — Implementação e Infraestrutura
+
+Objetivo do dia: garantir que o ambiente está funcionando no servidor Inteli, finalizar features pendentes e iniciar a execução dos testes. T11 é o ponto crítico do dia, pois há demérito se o servidor não estiver funcionando.
+
+| Bloco | Tasks | Membro | Status inicial |
+|---|---|---|---|
+| Desenvolvimento | T10 — Finalizar features pendentes (`SIZE_G`) | Não atribuído | Não iniciada |
+| Desenvolvimento | T11 — Validar ambiente no servidor Inteli (`SIZE_G`) | Leonardo | Não iniciada |
+| Desenvolvimento | T12 — Validar integração frontend-backend-recomendação (`SIZE_M`) | Não atribuído | Não iniciada |
+| Desenvolvimento | T13 — Validar Swagger no servidor Inteli (`SIZE_P`) | Vitor | Não iniciada |
+| Desenvolvimento | T14 — Revisar pipeline de CI (`SIZE_P`) | Não atribuído | Não iniciada |
+| Testes | T26 — Executar testes de funcionalidade (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T27 — Executar testes de integração (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T28 — Executar testes de regras de negócio (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T29 — Implementar testes unitários adicionais (`SIZE_G`) | Jaime | Em análise |
+| Versão Final | T55 — Organizar repositório conforme estrutura EP (`SIZE_P`) | Não atribuído | Não iniciada |
+
+Checkpoint do dia: T11 e T12 são inegociáveis. Sem o servidor funcionando e o fluxo integrado validado, os testes de RNF e o vídeo ficam comprometidos. A partir deste dia, novas features não devem ser iniciadas.
+
+##### Dia 5 — Terça 24/06 — Testes e Evidências Técnicas
+
+Objetivo do dia: executar a rodada final de testes de RNF, usabilidade e cobertura de unitários. O código deve ser congelado ao final do dia.
+
+| Bloco | Tasks | Membro | Status inicial |
+|---|---|---|---|
+| Desenvolvimento | T15 — Atualizar Swagger com rotas finais (`SIZE_M`) | Não atribuído | Não iniciada |
+| Desenvolvimento | T16 — Implementar melhorias de performance (`SIZE_M`) | Não atribuído | Não iniciada |
+| Desenvolvimento | T17 — Implantação em nuvem comercial — diferencial (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T30 — Executar testes RNF desempenho (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T31 — Executar testes RNF segurança (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T32 — Executar testes de usabilidade com usuários reais (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T33 — Revisar scripts de teste (`SIZE_P`) | Não atribuído | Não iniciada |
+| Versão Final | T56 — Criar `manual_deploy.md` (`SIZE_G`) | Não atribuído | Não iniciada |
+| Versão Final | T57 — Avançar conteúdo técnico dos slides (`SIZE_G`) | Não atribuído | Não iniciada |
+
+Checkpoint do dia: T30, T31 e T32 devem estar concluídas. Código congelado ao final do dia; a partir daqui, apenas correções críticas. T57 deve ter slides com seções técnicas preenchidas.
+
+##### Dia 6 — Quarta 25/06 — Documentação Final e Apresentação
+
+Objetivo do dia: consolidar toda a documentação final, gravar o vídeo demonstrativo, elaborar métricas e post mortem, e deixar os slides prontos para o ensaio.
+
+| Bloco | Tasks | Membro | Status inicial |
+|---|---|---|---|
+| Desenvolvimento | T18 — Documentar instruções de execução e configuração (`SIZE_M`) | Não atribuído | Não iniciada |
+| Desenvolvimento | T19 — Gravar vídeo demonstrativo final (`SIZE_M`) | Não atribuído | Não iniciada |
+| Desenvolvimento | T20 — Consolidar evidências finais no `Projeto.md` (`SIZE_G`) | Não atribuído | Não iniciada |
+| Testes | T34 — Organizar logs de execução dos testes (`SIZE_M`) | Não atribuído | Não iniciada |
+| Testes | T35 — Documentar abrangência e análise de resultados (`SIZE_M`) | Não atribuído | Não iniciada |
+| Testes | T36 — Consolidar seção de testes no `Projeto.md` (`SIZE_G`) | Não atribuído | Não iniciada |
+| Gestão | T41 — Elaborar análise de evolução de métricas (`SIZE_G`) | Não atribuído | Não iniciada |
+| Gestão | T42 — Elaborar análise post mortem do projeto (`SIZE_G`) | Não atribuído | Não iniciada |
+| Versão Final | T58 — Garantir critérios do EP — versão final (`SIZE_M`) | Não atribuído | Não iniciada |
+
+Checkpoint do dia: T19, T36, T41 e T42 devem estar concluídas. Vídeo gravado, seção de testes consolidada e post mortem escrito. Slides devem estar em versão apresentável para o ensaio do Dia 7.
+
+##### Dia 7 — Quinta 26/06 — Fechamento e Entrega
+
+Objetivo do dia: ensaio final, revisão cruzada de documentação, retrospectiva da Sprint 5 e entrega. Não deve haver implementação pesada neste dia.
+
+| Bloco | Tasks | Membro | Status inicial |
+|---|---|---|---|
+| Gestão | T43 — Realizar retrospectiva da Sprint 5 e atualizar `GestaoProjeto.md` (`SIZE_M`) | Não atribuído | Não iniciada |
+| Versão Final | T59 — Revisar documentação completa antes da entrega (`SIZE_G`) | Não atribuído | Não iniciada |
+| Versão Final | T60 — Ensaio final da apresentação (`SIZE_G`) | Não atribuído | Não iniciada |
+| Versão Final | T61 — Finalizar apresentação — versão de entrega (`SIZE_M`) | Não atribuído | Não iniciada |
+
+Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, Swagger acessível, servidor validado, testes documentados, retrospectiva registrada e slides aprovados pelo grupo.
 
 #### Matriz de Dependências Críticas
 
-| Entrega dependente | Depende de | Justificativa |
+| Task dependente | Depende de | Justificativa |
 |---|---|---|
-| T9, T44 | T1, T2, T3 | A finalização de features e validação integrada dependem da estrutura final, arquitetura documentada e padrões consolidados. |
-| T10, T11, T12 | T7 | A execução dos testes finais depende do planejamento atualizado com feedback da Sprint 4. |
-| T13, T43 | T22, T44 | Melhorias de performance só devem ser aplicadas após validação do ambiente final e do fluxo integrado. |
-| T15, T16 | T17 | Testes de usabilidade e documentação de iterações dependem de roteiro e narrativa definidos. |
-| T18, T19, T20, T33 | Feedbacks das Sprints 1 a 4 | A limpeza do `Projeto.md` e revisão de RF/RNF depende da lista consolidada de feedbacks pendentes. |
-| T23, T24, T38 | T9, T22, T44 | Swagger, vídeo e seção de features precisam refletir a versão final funcional. |
-| T25, T26, T27, T39 | T10, T11, T12, T13, T14, T15 | A documentação final de testes depende da execução e coleta de evidências. |
-| T32 | T22 | O manual de deploy deve ser baseado em um processo de implantação validado. |
-| T34, T35, T36, T37 | T24, T27, T28, T29, T38 | Slides e ensaio dependem das evidências finais, métricas, testes e documentação consolidada. |
-| T31 | Encerramento do ciclo | A retrospectiva da Sprint 5 depende do fechamento real das entregas, MRs e evidências. |
-| T47 | Todas as frentes | O acompanhamento diário reduz risco de divergência entre Kanban, documentação e branches. |
+| T02 — Diagrama de arquitetura | T01 | Diagrama depende da estrutura de diretórios revisada. |
+| T03 — `GuiaPadroesDesenvolvimento.md` | T04, T05 | Guia deve consolidar padrões criacional e comportamental já documentados. |
+| T06 — Seção de arquitetura no `Projeto.md` | T02 | Seção referencia o diagrama atualizado. |
+| T07 — Features no `Projeto.md` | T10 | Documentar features exige implementação estável. |
+| T08 — TDD e cobertura | T29 | Documentar cobertura exige testes unitários adicionais implementados. |
+| T10 — Finalizar features | T11 | Features devem ser finalizadas antes da validação do servidor. |
+| T12 — Integração final | T10, T11 | Validação integrada depende de features prontas e servidor funcionando. |
+| T13 — Swagger no servidor | T11, T15 | Swagger no servidor depende do ambiente funcionando e das rotas finalizadas. |
+| T15 — Swagger rotas finais | T10 | Swagger só pode ser atualizado com todas as rotas implementadas. |
+| T17 — Nuvem comercial | T11 | Deploy em nuvem depende do ambiente Inteli validado como referência. |
+| T19 — Vídeo demonstrativo | T11, T12 | Vídeo depende do ambiente funcionando e do fluxo integrado validado. |
+| T20 — Consolidar `Projeto.md` | T07, T08, T18, T19 | Consolidação final depende de todas as seções preenchidas. |
+| T23 — Separar critérios de aceitação | T22 | Separação depende dos RNFs revisados em formato user story. |
+| T24 — Casos de teste detalhados | T22, T23 | Detalhamento depende de RNFs e critérios de aceitação revisados. |
+| T26, T27, T28 — Testes funcionais, integração e negócio | T24, T12 | Execução depende de casos detalhados e fluxo integrado funcionando. |
+| T29 — Testes unitários adicionais | T10 | Testes unitários dependem de features finalizadas. |
+| T30, T31 — Testes RNF desempenho e segurança | T11, T26 | Testes de RNF dependem do ambiente no servidor e dos testes funcionais executados. |
+| T32 — Testes de usabilidade | T25, T12 | Usabilidade depende de usuários agendados e interface integrada. |
+| T33 — Revisar scripts de teste | T26, T27, T28 | Revisão de scripts ocorre após execução final. |
+| T34, T35 — Logs e abrangência | T26, T27, T28, T29, T30, T31, T32 | Logs e abrangência dependem de todos os tipos de teste executados. |
+| T36 — Seção de testes no `Projeto.md` | T34, T35 | Consolidação depende de logs organizados e análise de abrangência escrita. |
+| T41 — Métricas ao longo das sprints | T43 | Métricas devem ser finalizadas antes ou junto com a retrospectiva. |
+| T42 — Post mortem | T41 | Post mortem se beneficia da análise de métricas como base. |
+| T43 — Retrospectiva Sprint 5 | T36, T60, T61 | Retrospectiva consolida o que foi efetivamente realizado no ciclo. |
+| T54 — Estrutura dos slides | T48 | Estrutura depende da técnica de apresentação escolhida e registrada no Slack. |
+| T57 — Conteúdo técnico dos slides | T19, T36 | Slides técnicos dependem do vídeo demonstrativo e da seção de testes prontos. |
+| T58 — Critérios do EP | T44, T45, T46, T47, T53 | Validação do EP depende de todos os placeholders resolvidos. |
+| T59 — Revisão final da documentação | T20, T36, T42, T43, T58 | Revisão final depende de todos os documentos em versão final. |
+| T60 — Ensaio final | T57 | Ensaio depende dos slides em versão próxima do final. |
+| T61 — Apresentação versão de entrega | T57, T60 | Versão final incorpora os ajustes identificados no ensaio. |
 
-#### Cronograma Priorizado por Dia
+#### Caminhos Críticos
 
-##### Dia 1 — Fundação e limpeza documental
-
-| Frente | Tasks planejadas |
+| Frente | Caminho crítico |
 |---|---|
-| Desenvolvimento | T1, T2, T3 |
-| Testes | T7 |
-| Versão Final | T4, T5, T6, T8 |
-| Gestão | T42, T47 |
+| Desenvolvimento | T10 → T11 → T12 → T19 → T20 → T59 → Entrega |
+| Testes | T22 → T23 → T24 → T26–T32 → T34–T35 → T36 → T59 → Entrega |
+| Apresentação | T48 → T54 → T57 → T60 → T61 → Entrega |
 
-Checkpoint do dia: planejamento registrado, placeholders críticos iniciados, padrões e arquitetura em revisão, técnica de apresentação definida e rotina de acompanhamento diário ativada.
+#### Pontos Críticos do Cronograma
 
-##### Dia 2 — Testes finais e retomada de pendências funcionais
-
-| Frente | Tasks planejadas |
-|---|---|
-| Desenvolvimento | T9 |
-| Testes | T10, T11, T12, T13, T14, T15 |
-| Versão Final | T16, T17, T46 |
-
-Checkpoint do dia: rodada principal de testes iniciada, pendências funcionais mapeadas e apresentação com estrutura inicial.
-
-##### Dia 3 — Correções de documentação e riscos
-
-| Frente | Tasks planejadas |
-|---|---|
-| Desenvolvimento | T45 |
-| Versão Final | T18, T19, T20, T33 |
-| Gestão | T30 |
-
-Checkpoint do dia: `Projeto.md` revisado contra placeholders, RFs/RNFs corrigidos, feedbacks incorporados e riscos atualizados.
-
-##### Dia 4 — Deploy, evidências e consolidação técnica
-
-| Frente | Tasks planejadas |
-|---|---|
-| Desenvolvimento | T21, T22, T23, T24 |
-| Testes | T25, T26, T27 |
-| Versão Final | T32 |
-| Gestão | T28, T29 |
-
-Checkpoint do dia: ambiente final validado, Swagger e vídeo em andamento, logs de testes organizados, manual de deploy iniciado e análises de gestão avançadas.
-
-##### Dia 5 — Integração final e documentação de resultados
-
-| Frente | Tasks planejadas |
-|---|---|
-| Desenvolvimento | T38, T39, T43, T44 |
-| Testes | T41 |
-| Versão Final | T34 |
-
-Checkpoint do dia: integração final validada, TDD/cobertura documentados, performance ajustada quando necessário e slides técnicos preenchidos.
-
-##### Dia 6 — Revisão final e ensaio
-
-| Frente | Tasks planejadas |
-|---|---|
-| Versão Final | T35, T36, T40 |
-
-Checkpoint do dia: documentação revisada, critérios do Escritório de Projetos checados e ensaio final realizado.
-
-##### Dia 7 — Fechamento
-
-| Frente | Tasks planejadas |
-|---|---|
-| Gestão | T31 |
-| Versão Final | T37 |
-
-Checkpoint do dia: apresentação final pronta e retrospectiva da Sprint 5 documentada.
-
-#### Alinhamento com as Ações de Melhoria da Sprint 4
-
-| Ação proposta na Sprint 4 | Como aparece no planejamento da Sprint 5 |
-|---|---|
-| Daily de retomada com checklist explícito | T47 cria acompanhamento diário entre Kanban, documentação e branches. |
-| Reequilibrar carga entre integrantes | Backlog inicial distribuído em quatro frentes, permitindo alocação por capacidade e especialidade sem concentrar todo o fechamento em uma pessoa. |
-| Registrar dependências entre branches e MRs | Matriz de dependências críticas passa a ser instrumento de acompanhamento, não apenas planejamento estático. |
-| Evitar conflitos técnicos no fechamento | Deploy, testes, documentação e slides foram distribuídos por dias, com checkpoints antes do encerramento. |
-| Evitar documentação acumulada no último dia | Placeholders, guias, README, `Projeto.md`, riscos e manual de deploy aparecem desde os três primeiros dias. |
+- T11 — Validar servidor Inteli é o maior risco da sprint. Não deve ficar para depois do Dia 4.
+- T25 — Agendar usuários de usabilidade deve acontecer no Dia 1. Sem agendamento antecipado, não há como garantir cinco usuários externos na semana final.
+- T48 — Técnica de apresentação no Slack é obrigatória na primeira semana conforme o artefato Versão Final.
+- T10 e T12 são o caminho crítico do desenvolvimento. Se features ou integração não estiverem estáveis no Dia 4, testes, vídeo e Swagger atrasam em cascata.
+- O código deve ser congelado no Dia 5. A partir desse ponto, apenas correções críticas devem ser aceitas.
+- T41 e T42, métricas e post mortem, são entregáveis novos da Sprint 5 em relação às anteriores. Devem ser iniciados no Dia 6 com dados já consolidados.
 
 #### Alinhamento com a Gestão de Configuração
 
-Todas as tasks da Sprint 5 devem permanecer registradas no Kanban com descrição, DoR, DoD, tamanho, prioridade e dependências. Caso novas issues sejam adicionadas após este planejamento inicial, elas devem seguir o mesmo padrão de rastreabilidade e ser vinculadas ao artefato correspondente.
+Todas as tasks da Sprint 5 estão registradas no board do GitLab com descrição, DoR, DoD, tamanho e tipo preenchidos. Para esta sprint, ficam estabelecidas as seguintes diretrizes:
 
-Para esta sprint, ficam estabelecidas as seguintes diretrizes:
-
-- Nenhuma entrega crítica deve avançar para Review sem indicar se depende de outra branch ou MR.
-- O acompanhamento diário deve verificar se há divergência entre Kanban, documentação e estado real das branches.
-- Ajustes de documentação final devem ser feitos de forma incremental, evitando grandes blocos sem revisão.
-- Evidências de execução, logs, prints, links de Swagger, vídeo e resultados de testes devem ser registrados antes do fechamento da sprint.
-- O número de issues planejadas pode aumentar durante o ciclo, mas novas tasks devem preservar DoR, DoD, tamanho e vínculo com o artefato.
+- Daily de retomada no Dia 1 com cada membro saindo com ao menos uma task em Doing, conforme ação de melhoria da Sprint 4.
+- Nenhum membro deve ficar com volume abaixo de 70% da média do grupo, com atenção especial a Celso e Mariana Pereira.
+- Pull Requests devem manter SLA de revisão de 24h, conforme prática das Sprints 3 e 4.
+- A checagem diária de consistência entre Kanban e documentação deve ser executada pela T40.
+- Nenhum documento obrigatório deve ser iniciado no último dia útil da sprint.
+- Deploy deve ser tratado como entrega crítica do Dia 4, não do Dia 7.
+- Issues de documentação devem usar o tipo padronizado `DOCS`. Issues que hoje estejam como `DOCUMENTATION` devem ser revisadas para manter um padrão único no board.
+- O tipo da issue deve refletir o trabalho predominante: `DOCS` para documentação, `TEST` para execução ou automação de testes, `DEV` para implementação, `INFRA` para deploy/ambiente e `REVIEW` para revisão ou validação.
 
 ---
 
@@ -991,20 +1073,32 @@ O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a 
 
 ## 3.1 Riscos Identificados
 
-| ID | Risco | Probabilidade | Impacto | Responsável |
-|----|------|--------------|---------|-------------|
-| R1 | Atraso na entrega de apresentações | Média | Alto | Scrum Master |
-| R2 | Falta de revisão de materiais | Alta | Médio | Equipe |
-| R3 | Desorganização no Kanban | Média | Médio | Scrum Master |
+| ID | Risco | Probabilidade | Impacto | Frente afetada | Sinais de alerta | Ação de mitigação | Task vinculada | Responsável |
+|----|------|--------------|---------|---------------|------------------|-------------------|----------------|-------------|
+| R1 | Servidor Inteli indisponível ou instável no Dia 4 | Média | Alto | Deploy / Desenvolvimento | Health checks falhando, Swagger inacessível ou containers reiniciando | Validar ambiente no início do Dia 4, registrar evidências e priorizar correção antes de qualquer nova feature | T11, T13, T14 | Leonardo + Tech Lead |
+| R2 | Integração frontend-backend-recomendação não demonstrável de ponta a ponta | Média | Alto | Desenvolvimento / Testes | Fluxo principal sem resposta, recomendações ausentes ou divergência entre contrato e frontend | Congelar novas features após Dia 4 e priorizar validação integrada antes da execução de testes finais | T10, T12, T19 | Equipe técnica |
+| R3 | Usuários externos insuficientes para teste de usabilidade | Média | Alto | Testes / Produto | Menos de cinco participantes confirmados até o fim do Dia 1 | Agendar usuários no Dia 1, manter lista reserva e confirmar disponibilidade antes da rodada | T25, T32 | Celso |
+| R4 | Documentação final divergente do board ou com placeholders residuais | Média | Alto | Versão Final / Gestão | Itens no Kanban sem reflexo nos documentos, ocorrência de "Tabela X", placeholders ou seções incompletas | Executar revisão diária de consistência e priorizar limpeza documental nos três primeiros dias | T40, T44, T45, T46, T47, T53, T59 | Mariana Lacerda + equipe |
+| R5 | Cobertura de testes e evidências insuficientes para sustentar a entrega final | Média | Alto | Testes | Ausência de logs, TRX, prints, relatórios ou análise de abrangência | Organizar evidências logo após cada execução e consolidar seção de testes antes do Dia 6 | T26, T27, T28, T29, T34, T35, T36 | Jaime + responsáveis por testes |
+| R6 | Pipeline de CI falhar por ambiente, dependências ou testes de integração classificados incorretamente | Média | Médio | Qualidade / CI | Jobs falhando por Docker/Testcontainers, NuGet, filtros de categoria ou artefatos ausentes | Revisar CI no Dia 4, separar testes unitários e integração, e validar filtros antes do congelamento | T14, T27, T29, T33 | Tech Lead + Jaime |
+| R7 | Slides, vídeo ou técnica de apresentação atrasarem por dependência de evidências finais | Média | Alto | Apresentação | Slides sem conteúdo técnico até Dia 5 ou vídeo sem ambiente funcional | Definir técnica no Dia 1, iniciar estrutura no Dia 3 e reservar Dia 6 para consolidação final | T48, T54, T57, T60, T61 | Vitor + Mariana Pereira |
+| R8 | Conflitos de branches no fechamento atrasarem merge para develop | Média | Médio | Gestão de Configuração | Muitas branches abertas em paralelo, MRs sem reviewer ou dependências implícitas | Revisar dependências diariamente, evitar branches longas e manter SLA de revisão de 24h | T40, matriz de dependências da seção 2.5.1 | Tech Lead |
+| R9 | Tipo das issues ficar inconsistente, dificultando leitura de métricas e rastreabilidade | Alta | Médio | Gestão / Métricas | Uso simultâneo de `DOCUMENTATION`, `DOCS` e tipos genéricos para trabalhos diferentes | Padronizar `DOCS` para documentação e revisar tipos conforme trabalho predominante no board | T37, T40, T41 | Scrum Master |
 
 
 ## 3.2 Mitigação de Riscos
 
 | Risco | Estratégia de Mitigação |
 |------|------------------------|
-| R1 | Criar checkpoints antes das entregas |
-| R2 | Definir responsável por revisão |
-| R3 | Atualizar Kanban regularmente |
+| R1 | Validar servidor Inteli no início do Dia 4, registrar health checks e priorizar correção antes de vídeo, Swagger e testes de RNF. |
+| R2 | Usar T12 como gate para testes e vídeo: sem integração validada, o time deve interromper novas features e corrigir o fluxo principal. |
+| R3 | Confirmar usuários externos no Dia 1, manter lista reserva e registrar a agenda antes da rodada de usabilidade. |
+| R4 | Executar revisão diária entre Kanban e documentação, com varredura de placeholders antes da revisão final. |
+| R5 | Salvar logs, TRX, prints e relatórios imediatamente após cada execução de teste, evitando consolidação manual apenas no fechamento. |
+| R6 | Separar testes unitários e integração por categoria, revisar filtros do CI e validar dependências de ambiente antes do congelamento. |
+| R7 | Definir técnica de apresentação no Dia 1, iniciar roteiro no Dia 3 e reservar Dia 6 para evidências finais e ensaio. |
+| R8 | Registrar dependências entre branches/MRs nas dailys e impedir avanço de integração sem branch base definida. |
+| R9 | Revisar tipos das issues no board: `DOCS` para documentação, `TEST` para testes, `DEV` para implementação, `INFRA` para ambiente/deploy e `REVIEW` para revisão. |
 ---
 
 # 4. Análise Post Mortem
