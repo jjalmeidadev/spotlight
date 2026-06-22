@@ -37,6 +37,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         ConfigureEnvironment(string.Empty, string.Empty, string.Empty);
     }
 
+    [Trait("Category", "Integration")]
     [MongoIntegrationFact]
     public async Task PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo()
     {
@@ -70,6 +71,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.True(document.Contains("received_at"));
     }
 
+    [Trait("Category", "Integration")]
     [MongoIntegrationFact]
     public async Task Startup_ComMongoConfigurado_CriaIndicesOperacionais()
     {
@@ -86,6 +88,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.Contains("ix_session_time", indexNames);
     }
 
+    [Trait("Category", "Integration")]
     [MongoIntegrationFact]
     public async Task PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento()
     {
@@ -107,6 +110,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.Equal(before, await CountDocumentsAsync());
     }
 
+    [Trait("Category", "Integration")]
     [MongoIntegrationFact]
     public async Task PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento()
     {
@@ -132,6 +136,7 @@ public sealed class TelemetriaMongoIntegrationTests : IAsyncLifetime
         Assert.Equal(1, await CountByEventIdAsync(eventId));
     }
 
+    [Trait("Category", "Integration")]
     [MongoIntegrationFact]
     public async Task PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort()
     {
