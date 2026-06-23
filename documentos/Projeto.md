@@ -4566,7 +4566,9 @@ _conteúdo_
 
 ## 8.4 Testes Unitários e de Integração
 
-&emsp;Na Sprint 4, a cobertura automatizada do backend foi ampliada com testes unitários focados nos Services/UseCases entregues na Sprint 3. A motivação principal foi proteger a lógica de negócio contra regressões sem depender de banco de dados, rede, variáveis de ambiente ou serviços externos. Essa decisão torna a execução mais rápida, reproduzível e adequada à abordagem TDD, pois cada regra pode ser validada de forma isolada antes de sua integração com infraestrutura real.
+&emsp;Nas Sprints 4 e 5, a cobertura automatizada do backend foi ampliada com testes unitários focados nos Services/UseCases entregues nas iterações anteriores. A motivação principal foi proteger a lógica de negócio contra regressões sem depender de banco de dados, rede, variáveis de ambiente ou serviços externos. Essa decisão torna a execução mais rápida, reproduzível e adequada à abordagem TDD, pois cada regra pode ser validada de forma isolada antes de sua integração com infraestrutura real.
+
+&emsp;A metodologia adotada segue o ciclo **red-green-refactor**: primeiro são definidos cenários positivos, negativos e de borda a partir dos RFs/RNFs; em seguida o teste automatizado é escrito ou ajustado para representar o comportamento esperado; depois a implementação é evoluída até a suíte ficar verde; por fim, o código é refatorado mantendo os testes passando. Na prática, esse fluxo foi aplicado principalmente nas regras de Catálogo, Usuário, Recomendação e Geolocalização, com responsável pela consolidação e documentação: **Mariana Reis**.
 
 &emsp;A estratégia adotada foi isolar as dependências externas por meio de fakes locais para repositórios, contexto de usuário, `HttpMessageHandler` e cache em memória. Assim, os testes exercitam diretamente validações, normalização de parâmetros, mapeamento de DTOs, paginação, tratamento de erros e cenários de borda. Esse recorte é importante porque os UseCases concentram as regras de aplicação do backend; controllers e repositórios ficam em camadas diferentes e devem ser complementados por testes de integração.
 
@@ -4575,36 +4577,36 @@ _conteúdo_
 &emsp;Os testes usam xUnit e são executados pela solution .NET com o comando:
 
 ```bash
-dotnet test src/backend/Spotlight.sln
+dotnet test src/backend/Spotlight.sln --configuration Release --filter "Category!=Integration"
 ```
 
 &emsp;Para gerar métricas de cobertura, os projetos de teste foram configurados com `coverlet.collector`. A execução com coleta de cobertura é feita com:
 
 ```bash
-dotnet test src/backend/Spotlight.sln --collect:"XPlat Code Coverage"
+dotnet test src/backend/Spotlight.sln --configuration Release --collect:"XPlat Code Coverage" --filter "Category!=Integration"
 ```
 
 &emsp;Esse comando gera arquivos `coverage.cobertura.xml` dentro das pastas `TestResults/` de cada projeto de teste. A pasta `TestResults/` é ignorada pelo Git porque representa artefatos locais de execução, não código-fonte do produto.
 
-&emsp;A última execução local da suíte resultou em 60 testes aprovados e 0 falhas, distribuídos entre testes unitários dos Services/UseCases e testes de health endpoints já existentes. A cobertura geral do backend ficou em 43,16% de linhas, considerando todo o assembly medido pelo Coverlet. Esse percentual inclui `Program.cs`, controllers, middlewares, autenticação, repositórios SQL, DTOs e infraestrutura. Por isso, ele é útil como indicador global, mas não deve ser lido isoladamente como medida da qualidade dos testes unitários de regra de negócio.
+&emsp;A última execução local da suíte, realizada em **23/06/2026**, resultou em **100 testes aprovados**, **0 falhas** e **5 testes ignorados**. Os testes ignorados pertencem aos cenários de integração MongoDB, que dependem de ambiente externo configurado e não entram na medição unitária da pipeline. A cobertura geral do backend ficou em **45,54% de linhas**, considerando todo o assembly medido pelo Coverlet. Esse percentual inclui `Program.cs`, controllers, middlewares, autenticação, repositórios SQL, DTOs e infraestrutura. Por isso, ele é útil como indicador global, mas não deve ser lido isoladamente como medida da qualidade dos testes unitários de regra de negócio.
 
 | Projeto de teste | Cobertura de linhas geral | Cobertura de branches geral |
 |---|---:|---:|
-| `Spotlight.Catalogo.Tests` | 37,97% | 19,53% |
-| `Spotlight.Usuario.Tests` | 49,33% | 36,75% |
-| `Spotlight.Recomendacao.Tests` | 44,51% | 29,87% |
-| `Spotlight.Geolocalizacao.Tests` | 43,00% | 53,70% |
-| `Spotlight.Gateway.Tests` | 76,36% | 100,00% |
-| **Total ponderado por linhas** | **43,16%** | - |
+| `Spotlight.Catalogo.Tests` | 41,29% | 20,84% |
+| `Spotlight.Usuario.Tests` | 56,67% | 41,62% |
+| `Spotlight.Recomendacao.Tests` | 36,43% | 17,80% |
+| `Spotlight.Geolocalizacao.Tests` | 40,55% | 53,70% |
+| `Spotlight.Gateway.Tests` | 81,96% | 100,00% |
+| **Total ponderado por linhas** | **45,54%** | - |
 
 &emsp;O lado positivo das métricas aparece quando a análise é feita sobre o recorte correto para testes unitários: a camada `Application.UseCases`. Nessa camada, que concentra os Services e regras de aplicação desenvolvidos na Sprint 3, a cobertura de linhas é alta em todos os serviços.
 
 | Camada analisada | Cobertura de linhas dos UseCases |
 |---|---:|
-| `Catalogo.Application.UseCases` | 94,44% |
-| `Usuario.Application.UseCases` | 89,71% |
+| `Catalogo.Application.UseCases` | 91,08% |
+| `Usuario.Application.UseCases` | 84,93% |
 | `Recomendacao.Application.UseCases` | 100,00% |
-| `Geolocalizacao.Application.UseCases` | 96,25% |
+| `Geolocalizacao.Application.UseCases` | 96,97% |
 
 &emsp;Esses resultados indicam que os testes unitários cumprem bem o objetivo definido para os Services do backend: cobrem os fluxos principais, erros esperados e limites de entrada das regras de negócio. A diferença entre a cobertura geral e a cobertura dos UseCases é esperada, pois a suíte unitária substitui repositórios e integrações por fakes; consequentemente, código de infraestrutura, autenticação, controllers e persistência não são exercitados de forma significativa por esse tipo de teste.
 
@@ -4741,7 +4743,7 @@ tests/
 
 ### Abordagem TDD
 
-&emsp;O desenvolvimento incremental por sprints (seção 8.3) prevê a adoção de **Test-Driven Development (TDD)** nos componentes de maior criticidade e risco de regressão: casos de uso do serviço de recomendação, persistência de telemetria no MongoDB, futura fila RabbitMQ da Sprint 5, validação JWT no API Gateway e fluxos de geolocalização via `IGeocoding`. A prática consiste em definir cenários de teste a partir dos RFs e RNFs associados, implementar o teste automatizado com `xUnit` antes ou em paralelo à implementação, e refatorar mantendo a suíte verde. A seção 8.4 reserva o detalhamento da estratégia unitária; o capítulo 9 operacionaliza essa visão no planejamento e na execução formal das rodadas.
+&emsp;O desenvolvimento incremental por sprints (seção 8.3) adota **Test-Driven Development (TDD)** nos componentes de maior criticidade e risco de regressão: casos de uso do serviço de recomendação, regras de catálogo e usuário, persistência de telemetria no MongoDB, validação JWT no API Gateway e fluxos de geolocalização via `IGeocoding`. A prática consiste em definir cenários de teste a partir dos RFs e RNFs associados, implementar ou ajustar o teste automatizado com `xUnit`, evoluir o código até a suíte ficar verde e refatorar mantendo o comportamento protegido. A seção 8.4 detalha a estratégia unitária, os comandos executados, o percentual de cobertura e a evidência de testes passando; o capítulo 9 operacionaliza essa visão no planejamento e na execução formal das rodadas.
 
 ### Critérios de cobertura
 
