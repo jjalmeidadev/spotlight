@@ -41,7 +41,7 @@ $checks += [PSCustomObject]@{ id="PWD-01"; control="Backend não persiste senha 
 $httpsMiddleware = (Has-Pattern 'UseHttpsRedirection\(') -or (Has-Pattern 'UseHsts\(')
 $checks += [PSCustomObject]@{ id="TLS-01"; control="Redirecionamento/HSTS implementado no código ASP.NET"; passed=$httpsMiddleware; evidence=if($httpsMiddleware){"Middleware HTTPS/HSTS encontrado"}else{"Não encontrado; validar terminação TLS no proxy/homologação"} }
 
-$trackedFiles = @(& git -C $RepositoryRoot ls-files 2>$null)
+$trackedFiles = @(& git -C $RepositoryRoot -c core.quotePath=false ls-files 2>$null)
 $secretFindings = @()
 $secretPatterns = @(
     '(?i)SUPABASE_SERVICE_ROLE_KEY\s*[:=]\s*[A-Za-z0-9_-]{20,}',
