@@ -6,13 +6,14 @@ import {
 	listarEspetaculos,
 	listarEspetaculosEmCartaz,
 	listarEspetaculosPertoDe,
-	listarEspetaculosPopulares,
 	obterUrlMidiaConhecida,
 	obterUrlMidia,
 } from '../repositories/CatalogRepository';
 import {
+	listarEspetaculosSimilares,
 	listarRecomendacoesUsuario,
 	RecommendedShow,
+	SimilarShow,
 } from '../repositories/RecommendationRepository';
 import { CATALOG_IMAGE, normalizarTitulo } from '../config/catalogImages';
 
@@ -43,6 +44,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const [catalogReloadKey, setCatalogReloadKey] = useState(0);
 	const [recommendationsLoading, setRecommendationsLoading] = useState(false);
 	const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
+	const [similarShows, setSimilarShows] = useState<SimilarShow[]>([]);
 
 	useEffect(() => {
 		let active = true;
@@ -66,7 +68,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 				if (active) {
 					setRecommendations([]);
 					setRecommendationsError(
-						error instanceof Error ? error.message : 'Nao foi possivel carregar recomendacoes.',
+						error instanceof Error ? error.message : 'Não foi possível carregar recomendações.',
 					);
 				}
 			} finally {
@@ -91,11 +93,11 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 				setCatalogLoading(true);
 				setCatalogError(null);
 
-				const [popular, emCartaz, catalogo] = await Promise.all([
-					listarEspetaculosPopulares(10),
-					listarEspetaculosEmCartaz(20),
+				const [catalogo, emCartaz] = await Promise.all([
 					listarCatalogoCompleto(20),
+					listarEspetaculosEmCartaz(20),
 				]);
+				const popular = catalogo.slice(0, 10);
 
 				if (active) {
 					setPopularShows(popular);
@@ -110,7 +112,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 			} catch (error) {
 				if (active) {
 					setCatalogError(
-						error instanceof Error ? error.message : 'Nao foi possivel carregar o catalogo.',
+						error instanceof Error ? error.message : 'Não foi possível carregar o catálogo.',
 					);
 				}
 			} finally {
@@ -163,7 +165,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const recommendationItems = recommendations.map((item) => ({
 		id: item.id,
 		title: item.title,
-		subtitle: item.genre ?? 'Recomendado para voce',
+		subtitle: item.genre ?? 'Recomendado para você',
 		image: getRecommendationImage(item),
 		imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
 		recommendation: {
@@ -178,7 +180,7 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 	const popularItems = popularShows.map(toCatalogItem);
 	const nearbyItems = nearbyShows.map((item) => ({
 		...toCatalogItem(item),
-		subtitle: item.genre ?? 'Perto de voce',
+		subtitle: item.genre ?? 'Perto de você',
 	}));
 	const emCartazItems = emCartazShows.map(toCatalogItem);
 	const catalogItems = catalogShows.map(toCatalogItem);
@@ -190,15 +192,14 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		.slice(0, 8)
 		.map((item) => ({
 			...item,
-			subtitle: item.subtitle ?? 'Sugestao inicial',
+			subtitle: item.subtitle ?? 'Sugestão inicial',
 		}));
 	const recommendedSectionItems = recommendationItems.length > 0
 		? recommendationItems
 		: recommendationFallbackItems;
-	const watchedItems = catalogShows
-		.filter((item) => !popularShows.some((popular) => popular.id === item.id))
-		.slice(0, 10)
-		.map(toCatalogItem);
+	const recommendedSectionTitle = recommendationItems.length > 0
+		? 'Outras pessoas com gosto parecido curtiram:'
+		: 'Sugestões iniciais:';
 	const heroShow = useMemo(
 		() => catalogShows.find((item) => normalizarTitulo(item.title).includes('elis')) ?? popularShows[0] ?? null,
 		[catalogShows, popularShows],
@@ -224,28 +225,70 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 		() => (heroShow ? toCatalogItem(heroShow) : recommendationItems[0] ?? popularItems[0] ?? emCartazItems[0] ?? null),
 		[heroShow, recommendationItems, popularItems, emCartazItems],
 	);
+	const similarOriginId = recommendations[0]?.id ?? heroShow?.id ?? popularShows[0]?.id ?? null;
+	const similarOriginTitle = recommendations[0]?.title ?? heroShow?.title ?? popularShows[0]?.title ?? null;
+	const similarItems = similarShows
+		.filter((item) => item.id !== similarOriginId)
+		.map((item) => ({
+			id: item.id,
+			title: item.title,
+			subtitle: item.genre ?? 'Similaridade por item',
+			imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
+			recommendation: {
+				score: item.score,
+				algorithm: item.algorithm,
+			},
+		}));
+
+	useEffect(() => {
+		let active = true;
+
+		async function loadSimilarShows() {
+			if (!similarOriginId) {
+				setSimilarShows([]);
+				return;
+			}
+
+			try {
+				const data = await listarEspetaculosSimilares(similarOriginId, 8);
+				if (active) {
+					setSimilarShows(data);
+				}
+			} catch {
+				if (active) {
+					setSimilarShows([]);
+				}
+			}
+		}
+
+		loadSimilarShows();
+
+		return () => {
+			active = false;
+		};
+	}, [similarOriginId]);
 
 	const sections: CatalogRail[] = [
 		...(filteredItems.length > 0
 			? [{ id: 'search-results', title: 'Resultados encontrados:', items: filteredItems }]
 			: []),
 		...(recommendedSectionItems.length > 0
-			? [{ id: 'recommended', title: 'Recomendados para voce:', items: recommendedSectionItems }]
+			? [{ id: 'recommended', title: recommendedSectionTitle, items: recommendedSectionItems }]
+			: []),
+		...(similarItems.length > 0 && similarOriginTitle
+			? [{ id: 'similar-by-item', title: `Porque você gostou de ${similarOriginTitle}:`, items: similarItems }]
 			: []),
 		...(nearbyItems.length > 0
-			? [{ id: 'nearby', title: 'Perto de voce:', items: nearbyItems }]
+			? [{ id: 'nearby', title: 'Perto de você:', items: nearbyItems }]
 			: []),
 		...(popularItems.length > 0
 			? [{ id: 'popular', title: 'Os mais populares do momento:', items: popularItems }]
-			: []),
-		...(watchedItems.length > 0
-			? [{ id: 'watched', title: 'Outras pessoas tambem assistiram:', items: watchedItems }]
 			: []),
 		...(emCartazItems.length > 0
 			? [{ id: 'em-cartaz', title: 'Em cartaz:', items: emCartazItems }]
 			: []),
 		...(catalogItems.length > 0
-			? [{ id: 'catalogo-completo', title: 'Catalogo completo:', items: catalogItems }]
+			? [{ id: 'catalogo-completo', title: 'Catálogo completo:', items: catalogItems }]
 			: []),
 	];
 
@@ -268,11 +311,13 @@ export function useCatalogViewModel(options?: UseCatalogViewModelOptions) {
 }
 
 function toCatalogItem(item: CatalogShow) {
+	const catalogCardUrl = obterUrlMidia({ midias: item.media }, 'catalog_card');
+
 	return {
 		id: item.id,
 		title: item.title,
 		subtitle: item.genre ?? 'VER MAIS',
-		imageUri: item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
+		imageUri: catalogCardUrl ?? item.imageUrl ?? obterUrlMidiaConhecida(item.title, 'catalog_card'),
 	};
 }
 

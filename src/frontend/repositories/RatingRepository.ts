@@ -1,6 +1,6 @@
-import { getApiBaseUrl } from '@/frontend/config/api';
+import { fetchJson, getApiErrorMessage } from '@/frontend/repositories/http';
 
-const API_BASE_URL = getApiBaseUrl();
+const RATING_TIMEOUT_MS = 18000;
 
 type RatingResponse = {
   id?: number;
@@ -18,8 +18,8 @@ export async function avaliarEspetaculo(
     throw new Error('Entre na sua conta para avaliar o espetaculo.');
   }
 
-  const response = await fetch(
-    `${API_BASE_URL}/catalogo/espetaculos/${encodeURIComponent(espetaculoId)}/avaliacoes`,
+  const { response, payload } = await fetchJson<RatingResponse & { error?: string; message?: string; details?: string }>(
+    `/catalogo/espetaculos/${encodeURIComponent(espetaculoId)}/avaliacoes`,
     {
       method: 'POST',
       headers: {
@@ -28,25 +28,23 @@ export async function avaliarEspetaculo(
         Accept: 'application/json',
       },
       body: JSON.stringify({ nota }),
+      operation: 'registrar avaliacao',
+      retries: 1,
+      timeoutMs: RATING_TIMEOUT_MS,
     },
   );
 
-  const payload = await parseJsonResponse<RatingResponse & { error?: string; message?: string; details?: string }>(response);
-
   if (!response.ok) {
-    const details = payload.details ? ` (${payload.details})` : '';
-    throw new Error(`${payload.error ?? payload.message ?? 'Nao foi possivel registrar sua avaliacao.'}${details}`);
+    throw new Error(getApiErrorMessage(payload, 'Nao foi possivel registrar sua avaliacao.'));
+  }
+
+  if (__DEV__) {
+    console.log('Avaliacao registrada:', {
+      espetaculoId,
+      nota,
+      avaliacaoId: payload.id,
+    });
   }
 
   return payload;
-}
-
-async function parseJsonResponse<T>(response: Response): Promise<T> {
-  const text = await response.text();
-
-  if (!text.trim()) {
-    return {} as T;
-  }
-
-  return JSON.parse(text) as T;
 }
