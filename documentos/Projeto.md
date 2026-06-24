@@ -5480,22 +5480,32 @@ a UI com os `<summary>` das ações e DTOs.
 
 ### Documentação unificada (recomendado)
 
-Subindo o backend localmente (`src/backend/run-all.ps1`), a UI agregada fica em:
+A UI agregada do Swagger fica em:
 
-> **http://localhost:5000/swagger**
+> **Servidor (produção):** _URL pública do servidor Inteli — a registrar após o deploy_ → `https://<host>/swagger`
+> **Local:** `http://localhost:5000/swagger` (subindo o backend via `src/backend/run-all.ps1`)
 
 O dropdown "Select a definition" no canto superior direito alterna entre:
 
-| Definição | Fonte | Rotas |
-|---|---|---|
-| Gateway | gateway próprio | — |
-| Catálogo | proxy YARP → `/catalogo/swagger/v1/swagger.json` | 11 |
-| Usuário | proxy YARP → `/usuario/swagger/v1/swagger.json` | 6 |
-| Recomendação | proxy YARP → `/recomendacao/swagger/v1/swagger.json` | 2 |
-| Geolocalização | proxy YARP → `/geolocalizacao/swagger/v1/swagger.json` | 2 |
+| Definição | Fonte | Rotas de negócio | Descoberta (`GET /`) | Healthcheck (`GET /api/Ping`) | Total no Swagger |
+|---|---|---|---|---|---|
+| Gateway | gateway próprio | — | — | sim | 1 |
+| Catálogo | proxy YARP → `/catalogo/swagger/v1/swagger.json` | 11 | — | sim | 12 |
+| Usuário | proxy YARP → `/usuario/swagger/v1/swagger.json` | 8 | sim | sim | 10 |
+| Recomendação | proxy YARP → `/recomendacao/swagger/v1/swagger.json` | 2 | sim | sim | 4 |
+| Geolocalização | proxy YARP → `/geolocalizacao/swagger/v1/swagger.json` | 2 | sim | sim | 4 |
 
 Como o gateway proxia os `swagger.json` dos serviços, **não há problemas de
 CORS no navegador** — todas as requisições saem da mesma origem.
+
+Detalhamento das rotas de negócio expostas por cada serviço (os endpoints de
+descoberta `GET /{servico}` e o healthcheck `GET /api/Ping` aparecem listados
+no Swagger junto com as rotas abaixo):
+
+- **Catálogo (11):** `GET /catalogo/categorias`, `GET /catalogo/teatros`, `GET /catalogo/teatros/{id}`, `GET /catalogo/espetaculos`, `GET /catalogo/espetaculos/{id}`, `GET /catalogo/espetaculos/{id}/sessoes`, `GET /catalogo/espetaculos/{id}/avaliacoes`, `POST /catalogo/espetaculos/{id}/avaliacoes`, `POST /catalogo/espetaculos`, `PUT /catalogo/espetaculos/{id}`, `DELETE /catalogo/espetaculos/{id}`.
+- **Usuário (8):** `GET /usuario/me`, `PUT /usuario/me`, `PUT /usuario/me/localizacao`, `GET /usuario/me/preferencias`, `PUT /usuario/me/preferencias`, `GET /usuario/me/avaliacoes`, `POST /usuario/telemetria`, `POST /usuario/admin/usuarios/promover`.
+- **Recomendação (2):** `GET /recomendacao/me`, `GET /recomendacao/espetaculos/{id}/similares`.
+- **Geolocalização (2):** `GET /geolocalizacao/geocoding`, `GET /geolocalizacao/geocoding/reverse`.
 
 ### Documentação por serviço (acesso direto)
 

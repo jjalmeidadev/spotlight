@@ -869,6 +869,103 @@
         }
       }
     },
+    "/usuario/admin/usuarios/promover": {
+      "post": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Promover usuário ao papel administrador (administrador)",
+        "description": "Operação administrativa: promove um usuário (identificado por email) ao papel administrador. Requer JWT do papel administrador.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromoverAdministradorRequest"
+              },
+              "example": {
+                "email": "maria@exemplo.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário promovido (perfil atualizado).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/recomendacao": {
+      "get": {
+        "tags": [
+          "Recomendação"
+        ],
+        "summary": "Descoberta da API de recomendação (público)",
+        "description": "Retorna o catálogo de endpoints públicos da API de recomendação. Útil para clientes descobrirem dinamicamente as rotas e seus requisitos de autenticação sem consultar o Swagger.",
+        "responses": {
+          "200": {
+            "description": "Metadados do serviço e lista de endpoints expostos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecomendacaoBase"
+                },
+                "example": {
+                  "service": "recomendacao",
+                  "status": "ok",
+                  "version": "v1",
+                  "endpoints": [
+                    {
+                      "method": "GET",
+                      "path": "/recomendacao/me",
+                      "auth": "cadastrado",
+                      "description": "Lista recomendacoes personalizadas do usuario autenticado."
+                    },
+                    {
+                      "method": "GET",
+                      "path": "/recomendacao/espetaculos/{id}/similares",
+                      "auth": "publico",
+                      "description": "Lista espetaculos similares a um espetaculo de origem."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
     "/recomendacao/me": {
       "get": {
         "tags": [
@@ -1874,6 +1971,67 @@
           "dataNascimento": {
             "type": "string",
             "format": "date"
+          }
+        }
+      },
+      "PromoverAdministradorRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "description": "Body de POST /usuario/admin/usuarios/promover. Identifica o usuário-alvo da promoção pelo email.",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "maria@exemplo.com"
+          }
+        }
+      },
+      "RecomendacaoBase": {
+        "type": "object",
+        "description": "Resposta de GET /recomendacao — descoberta da API.",
+        "properties": {
+          "service": {
+            "type": "string",
+            "example": "recomendacao"
+          },
+          "status": {
+            "type": "string",
+            "example": "ok"
+          },
+          "version": {
+            "type": "string",
+            "example": "v1"
+          },
+          "endpoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecomendacaoEndpoint"
+            }
+          }
+        }
+      },
+      "RecomendacaoEndpoint": {
+        "type": "object",
+        "description": "Endpoint público da API de recomendação, listado em GET /recomendacao.",
+        "properties": {
+          "method": {
+            "type": "string",
+            "example": "GET"
+          },
+          "path": {
+            "type": "string",
+            "example": "/recomendacao/me"
+          },
+          "auth": {
+            "type": "string",
+            "description": "Nível de autenticação: 'publico' ou nome da policy (ex.: 'cadastrado').",
+            "example": "cadastrado"
+          },
+          "description": {
+            "type": "string",
+            "example": "Lista recomendacoes personalizadas do usuario autenticado."
           }
         }
       },
