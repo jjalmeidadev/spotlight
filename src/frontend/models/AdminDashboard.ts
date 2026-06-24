@@ -1,4 +1,4 @@
-export type DashboardMetricId = 'conversions' | 'avg-stay' | 'tickets-sold' | 'visits';
+export type DashboardMetricId = 'shows' | 'active-shows' | 'sessions' | 'avg-rating';
 
 export type DashboardMetricIcon = 'purchase-click' | 'stopwatch' | 'ticket' | 'portal';
 

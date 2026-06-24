@@ -251,11 +251,13 @@ public class RecomendacaoUseCasesTests
     private sealed class FakeRecomendacaoRepository : IRecomendacaoRepository
     {
         public IReadOnlyList<RecomendacaoEntity> Recomendacoes { get; set; } = [];
+        public IReadOnlyList<RecomendacaoEntity> RecomendacoesUserBased { get; set; } = [];
         public IReadOnlyDictionary<int, EspetaculoRecomendado> EspetaculosPorId { get; set; } =
             new Dictionary<int, EspetaculoRecomendado>();
         public Guid LastUsuarioId { get; private set; }
         public int LastLimite { get; private set; }
         public int ListarPorUsuarioCalls { get; private set; }
+        public int ListarUserBasedCalls { get; private set; }
         public int[] LastEspetaculoIds { get; private set; } = [];
 
         public Task<IReadOnlyList<RecomendacaoEntity>> ListarPorUsuarioAsync(
@@ -267,6 +269,15 @@ public class RecomendacaoUseCasesTests
             LastUsuarioId = usuarioId;
             LastLimite = limite;
             return Task.FromResult(Recomendacoes);
+        }
+
+        public Task<IReadOnlyList<RecomendacaoEntity>> ListarUserBasedPorAvaliacoesAsync(
+            Guid usuarioId,
+            int limite,
+            CancellationToken cancellationToken)
+        {
+            ListarUserBasedCalls++;
+            return Task.FromResult(RecomendacoesUserBased);
         }
 
         public Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(

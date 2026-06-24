@@ -140,6 +140,14 @@ public sealed class PostgresPreProcessadoRecomendacaoStrategy(
         CancellationToken cancellationToken)
     {
         var itens = await repositorio.ListarPorUsuarioAsync(usuarioId, limite, cancellationToken);
+        if (itens.Count == 0)
+        {
+            itens = await repositorio.ListarUserBasedPorAvaliacoesAsync(
+                usuarioId,
+                limite,
+                cancellationToken);
+        }
+
         return itens.Select(Mapear).ToList();
     }
 

@@ -1,14 +1,15 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   DashboardMetric,
@@ -22,8 +23,35 @@ import { useAdminDashboardViewModel } from '@/frontend/viewmodels/useAdminDashbo
 
 const adminAvatar = require('../../../documentos/img/celso.png');
 
-export default function AdminDashboardScreen() {
-  const viewModel = useAdminDashboardViewModel();
+type AdminDashboardScreenProps = {
+  profileName?: string;
+};
+
+export default function AdminDashboardScreen({ profileName }: AdminDashboardScreenProps) {
+  const viewModel = useAdminDashboardViewModel(profileName ?? 'Administrador');
+
+  if (viewModel.loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content" backgroundColor={dashboardColors.background} />
+        <View style={styles.centeredState}>
+          <ActivityIndicator color={dashboardColors.ink} />
+          <Text style={styles.stateText}>Carregando dashboard...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (viewModel.error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content" backgroundColor={dashboardColors.background} />
+        <View style={styles.centeredState}>
+          <Text style={styles.stateText}>{viewModel.error}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -48,7 +76,7 @@ export default function AdminDashboardScreen() {
         </View>
 
         <View style={styles.panel}>
-          <Text style={styles.sectionTitle}>Tipos de exibições</Text>
+          <Text style={styles.sectionTitle}>Gêneros no catálogo</Text>
           <DonutChart />
 
           <View style={styles.legendRow}>
@@ -62,7 +90,7 @@ export default function AdminDashboardScreen() {
         </View>
 
         <View style={styles.salesPanel}>
-          <Text style={styles.sectionTitle}>Vendas por período</Text>
+          <Text style={styles.sectionTitle}>Sessões por período</Text>
 
           <PeriodTabs
             options={viewModel.salesPeriodOptions}
@@ -241,6 +269,18 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: dashboardColors.background,
+  },
+  centeredState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+    rowGap: spacing.md,
+  },
+  stateText: {
+    color: dashboardColors.ink,
+    ...typography.body,
+    textAlign: 'center',
   },
   scrollContent: {
     flexGrow: 1,

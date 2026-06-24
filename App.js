@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
 import SignupView from './src/frontend/screens/SignupView';
@@ -16,6 +17,14 @@ import {
 } from './src/frontend/repositories/PreferenceRepository';
 
 export default function App() {
+	return (
+		<SafeAreaProvider>
+			<AppContent />
+		</SafeAreaProvider>
+	);
+}
+
+function AppContent() {
 	const [screen, setScreen] = React.useState('loading');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
 	const [userName, setUserName] = React.useState('Leonardo');
@@ -161,7 +170,7 @@ export default function App() {
 	}
 
 	if (screen === 'dashboard') {
-		return <AdminDashboardScreen />;
+		return <AdminDashboardScreen profileName={userName} />;
 	}
 
 	if (screen === 'email-confirmado') {
@@ -183,10 +192,6 @@ export default function App() {
 	return (
 		<LoginView
 			onCadastroPress={() => setScreen('cadastro')}
-			onDevModePress={() => {
-				setUserName('Professor');
-				setScreen('catalogo');
-			}}
 			onLogin={handleLogin}
 		/>
 	);
