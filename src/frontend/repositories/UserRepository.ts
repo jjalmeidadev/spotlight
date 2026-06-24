@@ -38,6 +38,25 @@ export async function atualizarPerfilUsuario(
   return responsePayload;
 }
 
+export async function obterPerfilUsuario(accessToken: string | null | undefined) {
+  if (!accessToken) {
+    throw new Error('Entre novamente para carregar o perfil.');
+  }
+
+  const { response, payload } = await fetchJson<UserProfileResponse>('/usuario/me', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    operation: 'carregar perfil',
+  });
+
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(payload, 'Nao foi possivel carregar o perfil.'));
+  }
+
+  return payload;
+}
+
 export async function promoverUsuarioAdministrador(
   accessToken: string | null | undefined,
   email: string,

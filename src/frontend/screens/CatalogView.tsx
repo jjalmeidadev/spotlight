@@ -16,8 +16,10 @@ type CatalogViewProps = {
 	accessToken?: string | null;
 	profileEmail?: string;
 	profileName?: string;
+	isAdmin?: boolean;
 	userLocationAddress?: string | null;
 	onItemPress?: (item: CatalogItem) => void;
+	onAdminPress?: () => void;
 	onLogout?: () => void;
 	onProfileUpdated?: (name: string) => void;
 };
@@ -31,8 +33,10 @@ export default function CatalogView({
 	accessToken,
 	profileEmail,
 	profileName,
+	isAdmin = false,
 	userLocationAddress,
 	onItemPress,
+	onAdminPress,
 	onLogout,
 	onProfileUpdated,
 }: CatalogViewProps) {
@@ -200,9 +204,11 @@ export default function CatalogView({
 				accessToken={accessToken}
 				email={profileEmail}
 				name={profileName ?? vm.userName}
+				onAdminPress={onAdminPress}
 				onClose={() => setProfileOpen(false)}
 				onLogout={onLogout ?? (() => undefined)}
 				onProfileUpdated={onProfileUpdated}
+				showAdminAction={isAdmin}
 				visible={profileOpen}
 			/>
 		</View>

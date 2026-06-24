@@ -15,3 +15,6 @@ public class ValidationException(IReadOnlyDictionary<string, string[]> details, 
 
 /// <summary>Lançada em violação de invariantes/uniqueness → middleware traduz para 409.</summary>
 public class ConflictException(string mensagem) : Exception(mensagem);
+
+/// <summary>Lancada quando o usuario autenticado nao tem permissao.</summary>
+public class ForbiddenException(string mensagem) : Exception(mensagem);

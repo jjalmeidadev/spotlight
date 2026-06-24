@@ -31,6 +31,10 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
         {
             await EscreverAsync(context, HttpStatusCode.Conflict, ex.Message);
         }
+        catch (ForbiddenException ex)
+        {
+            await EscreverAsync(context, HttpStatusCode.Forbidden, ex.Message);
+        }
         catch (Exception ex)
         {
             var statusCode = GetStatusCode(ex);
@@ -54,6 +58,7 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
     {
         ValidationException => HttpStatusCode.BadRequest,
         UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+        ForbiddenException => HttpStatusCode.Forbidden,
         NotFoundException => HttpStatusCode.NotFound,
         ConflictException => HttpStatusCode.Conflict,
         _ => HttpStatusCode.InternalServerError

@@ -3,14 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Application.UseCases;
 using Spotlight.Usuario.Domain.Entities;
-using Spotlight.Usuario.Infrastructure.Auth;
 
 namespace Spotlight.Usuario.Presentation.Controllers;
 
 /// <summary>Operacoes administrativas sobre usuarios.</summary>
 [ApiController]
 [Route("admin/usuarios")]
-[Authorize(Policy = AuthSetup.PolicyAdministrador)]
+[Authorize]
 public class AdminUsuariosController : ControllerBase
 {
     [HttpPost("promover")]
@@ -22,8 +21,16 @@ public class AdminUsuariosController : ControllerBase
     public async Task<IActionResult> PromoverAdministrador(
         [FromBody] PromoverAdministradorDto body,
         [FromServices] PromoverAdministradorUseCase promover,
+        [FromServices] IUsuarioContexto usuarioContexto,
         CancellationToken cancellationToken)
     {
-        return Ok(await promover.ExecutarAsync(body, cancellationToken));
+        return Ok(await promover.ExecutarAsync(
+            ExigirUsuario(usuarioContexto),
+            body,
+            cancellationToken));
     }
+
+    private static Guid ExigirUsuario(IUsuarioContexto ctx)
+        => ctx.UsuarioId ?? throw new ValidationException(new Dictionary<string, string[]>
+            { ["sub"] = ["Claim 'sub' ausente ou invalida no token."] });
 }

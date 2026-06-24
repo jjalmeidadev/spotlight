@@ -7,9 +7,18 @@ namespace Spotlight.Usuario.Application.UseCases;
 public class PromoverAdministradorUseCase(IUsuarioRepository repositorio)
 {
     public async Task<UsuarioDto> ExecutarAsync(
+        Guid administradorId,
         PromoverAdministradorDto dados,
         CancellationToken cancellationToken)
     {
+        var administrador = await repositorio.ObterAsync(administradorId, cancellationToken)
+            ?? throw new UnauthorizedAccessException("Perfil administrativo nao encontrado.");
+
+        if (administrador.TipoUsuario != "administrador")
+        {
+            throw new ForbiddenException("Usuario sem permissao para promover administradores.");
+        }
+
         var email = dados.Email.Trim();
         if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
         {

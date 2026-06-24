@@ -28,6 +28,7 @@ type AdminDashboardScreenProps = {
   accessToken?: string | null;
   profileEmail?: string;
   profileName?: string;
+  onOpenCatalog?: () => void;
   onLogout?: () => void;
   onProfileUpdated?: (name: string) => void;
 };
@@ -36,6 +37,7 @@ export default function AdminDashboardScreen({
   accessToken,
   profileEmail,
   profileName,
+  onOpenCatalog,
   onLogout,
   onProfileUpdated,
 }: AdminDashboardScreenProps) {
@@ -92,6 +94,13 @@ export default function AdminDashboardScreen({
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.welcomeRow}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onOpenCatalog}
+            style={({ pressed }) => [styles.catalogButton, pressed && styles.pressed]}
+          >
+            <Text style={styles.catalogButtonText}>Ver app</Text>
+          </Pressable>
           <Text style={styles.welcomeText}>Bem vindo, {viewModel.adminName}!</Text>
           <Pressable accessibilityRole="button" hitSlop={8} onPress={() => setProfileOpen(true)} style={styles.avatarFallback}>
             <Text style={styles.avatarInitial}>{getInitial(viewModel.adminName)}</Text>
@@ -388,6 +397,23 @@ const styles = StyleSheet.create({
     columnGap: spacing.xs,
     paddingHorizontal: spacing.xl,
     backgroundColor: '#eef4ef',
+  },
+  catalogButton: {
+    alignItems: 'center',
+    borderColor: dashboardColors.ink,
+    borderRadius: 999,
+    borderWidth: 1,
+    justifyContent: 'center',
+    marginRight: 'auto',
+    minHeight: 28,
+    paddingHorizontal: spacing.md,
+  },
+  catalogButtonText: {
+    color: dashboardColors.ink,
+    fontFamily: typography.fontFamily.bold,
+    fontSize: 11,
+    lineHeight: 14,
+    letterSpacing: 0,
   },
   welcomeText: {
     color: dashboardColors.ink,

@@ -18,8 +18,10 @@ type ProfileSheetProps = {
   name: string;
   visible: boolean;
   onClose: () => void;
+  onAdminPress?: () => void;
   onLogout: () => void;
   onProfileUpdated?: (name: string) => void;
+  showAdminAction?: boolean;
 };
 
 export function ProfileSheet({
@@ -28,8 +30,10 @@ export function ProfileSheet({
   name,
   visible,
   onClose,
+  onAdminPress,
   onLogout,
   onProfileUpdated,
+  showAdminAction = false,
 }: ProfileSheetProps) {
   const [editing, setEditing] = useState(false);
   const [draftName, setDraftName] = useState(name);
@@ -126,6 +130,23 @@ export function ProfileSheet({
             </View>
           ) : (
             <View style={styles.actions}>
+              {showAdminAction ? (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => {
+                    onClose();
+                    onAdminPress?.();
+                  }}
+                  style={({ pressed }) => [styles.actionItem, pressed && styles.pressed]}
+                >
+                  <View style={styles.iconBox}>
+                    <Text style={styles.iconText}>A</Text>
+                  </View>
+                  <Text style={styles.actionLabel}>Visão admin</Text>
+                  <Text style={styles.chevron}>{'>'}</Text>
+                </Pressable>
+              ) : null}
+
               <Pressable
                 accessibilityRole="button"
                 onPress={() => setEditing(true)}

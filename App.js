@@ -29,6 +29,7 @@ function AppContent() {
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
 	const [userName, setUserName] = React.useState('Leonardo');
 	const [userEmail, setUserEmail] = React.useState('');
+	const [userType, setUserType] = React.useState('cadastrado');
 	const [accessToken, setAccessToken] = React.useState(null);
 	const [userLocationAddress, setUserLocationAddress] = React.useState(null);
 
@@ -60,6 +61,7 @@ function AppContent() {
 	async function handleLogin(usuario) {
 		setUserName(usuario.nome);
 		setUserEmail(usuario.email);
+		setUserType(usuario.tipoUsuario ?? 'cadastrado');
 		setAccessToken(usuario.accessToken ?? null);
 		setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
 		await direcionarAposAutenticacao(usuario);
@@ -69,6 +71,7 @@ function AppContent() {
 		setAccessToken(null);
 		setUserName('');
 		setUserEmail('');
+		setUserType('cadastrado');
 		setUserLocationAddress(null);
 		setScreen('login');
 	}
@@ -134,6 +137,7 @@ function AppContent() {
 
 					setUserName(usuario.nome);
 					setUserEmail(usuario.email);
+					setUserType(usuario.tipoUsuario ?? 'cadastrado');
 					setAccessToken(usuario.accessToken ?? null);
 					setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
 					await direcionarAposAutenticacao(usuario);
@@ -160,7 +164,9 @@ function AppContent() {
 				accessToken={accessToken}
 				profileEmail={userEmail}
 				profileName={userName}
+				isAdmin={userType === 'administrador'}
 				userLocationAddress={userLocationAddress}
+				onAdminPress={() => setScreen('dashboard')}
 				onLogout={handleLogout}
 				onProfileUpdated={setUserName}
 				onItemPress={(item) => {
@@ -189,6 +195,7 @@ function AppContent() {
 				accessToken={accessToken}
 				profileEmail={userEmail}
 				profileName={userName}
+				onOpenCatalog={() => setScreen('catalogo')}
 				onLogout={handleLogout}
 				onProfileUpdated={setUserName}
 			/>
