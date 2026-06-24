@@ -2,13 +2,13 @@ import React from 'react';
 import {
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { usePreferenceSelectionViewModel } from '@/frontend/viewmodels/usePreferenceSelectionViewModel';
 

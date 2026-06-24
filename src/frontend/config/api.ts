@@ -2,20 +2,21 @@ import { NativeModules, Platform } from 'react-native';
 
 const GATEWAY_PORT = '5000';
 const LOCAL_API_BASE_URL = `http://localhost:${GATEWAY_PORT}`;
+let loggedApiBaseUrl = false;
 
 export function getApiBaseUrl() {
   const configuredUrl = firstNotBlank(process.env.EXPO_PUBLIC_API_BASE_URL);
   if (configuredUrl) {
-    return configuredUrl;
+    return logApiBaseUrl(configuredUrl);
   }
 
   const expoDevUrl = getExpoDevelopmentApiBaseUrl();
 
   if (expoDevUrl) {
-    return expoDevUrl;
+    return logApiBaseUrl(expoDevUrl);
   }
 
-  return LOCAL_API_BASE_URL;
+  return logApiBaseUrl(LOCAL_API_BASE_URL);
 }
 
 function getExpoDevelopmentApiBaseUrl() {
@@ -51,4 +52,13 @@ function isLoopbackHost(host: string) {
 
 function firstNotBlank(...values: Array<string | undefined>) {
   return values.find((value) => value && value.trim())?.trim();
+}
+
+function logApiBaseUrl(url: string) {
+  if (__DEV__ && !loggedApiBaseUrl) {
+    console.log('Backend API base URL:', url);
+    loggedApiBaseUrl = true;
+  }
+
+  return url;
 }
