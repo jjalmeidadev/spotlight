@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Spotlight.Geolocalizacao.Application.UseCases;
 using Xunit;
@@ -45,8 +46,8 @@ public class NominatimGeocodingServiceTests
         Assert.Equal(-23.56141, primeiro.Latitude);
         Assert.Equal("openstreetmap_nominatim", primeiro.Provider);
         Assert.Same(primeiro, segundo);
-        Assert.Equal(1, handler.Requests.Count);
-        Assert.Contains("/search?q=av%20paulista%201000", handler.Requests.Single());
+        var request = Assert.Single(handler.Requests);
+        Assert.Contains("/search?q=av%20paulista%201000", request);
     }
 
     [Fact]
@@ -90,8 +91,8 @@ public class NominatimGeocodingServiceTests
         Assert.Equal("Teatro Alfa, Sao Paulo", primeiro.FormattedAddress);
         Assert.Equal("456", primeiro.PlaceId);
         Assert.Same(primeiro, segundo);
-        Assert.Equal(1, handler.Requests.Count);
-        Assert.Contains("/reverse?lat=-23.55&lon=-46.63", handler.Requests.Single());
+        var request = Assert.Single(handler.Requests);
+        Assert.Contains("/reverse?lat=-23.55&lon=-46.63", request);
     }
 
     [Fact]
@@ -116,7 +117,25 @@ public class NominatimGeocodingServiceTests
         await Assert.ThrowsAsync<GeoConflictException>(() => service.GeocodeAsync("Rua A", Ct));
     }
 
-    private static NominatimGeocodingService CreateService(QueueHandler handler)
+    [Fact]
+    public async Task Geocode_QuandoRespostaVazia_PropagaJsonException()
+    {
+        var handler = new QueueHandler();
+        handler.Enqueue(HttpStatusCode.OK, "");
+        var service = CreateService(handler);
+
+        await Assert.ThrowsAsync<JsonException>(() => service.GeocodeAsync("Rua A", Ct));
+    }
+
+    [Fact]
+    public async Task Geocode_QuandoHttpClientFalha_LancaConflict()
+    {
+        var service = CreateService(new ThrowingHandler(new HttpRequestException("dns indisponivel")));
+
+        await Assert.ThrowsAsync<GeoConflictException>(() => service.GeocodeAsync("Rua A", Ct));
+    }
+
+    private static NominatimGeocodingService CreateService(HttpMessageHandler handler)
     {
         var client = new HttpClient(handler)
         {
@@ -150,5 +169,13 @@ public class NominatimGeocodingServiceTests
 
             return Task.FromResult(responses.Dequeue());
         }
+    }
+
+    private sealed class ThrowingHandler(Exception exception) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken) =>
+            Task.FromException<HttpResponseMessage>(exception);
     }
 }

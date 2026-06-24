@@ -167,6 +167,23 @@ public class RecomendacaoServiceTests
     }
 
     [Fact]
+    public async Task PostgresStrategy_QuandoPreProcessadoVazio_UsaFallbackUserBased()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            Recomendacoes = [],
+            RecomendacoesUserBased = [NovaRecomendacao(8, "Indicacao colaborativa", 0.82m)]
+        };
+        var strategy = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+
+        var resultado = await strategy.ListarAsync(Guid.NewGuid(), 10, Ct);
+
+        var item = Assert.Single(resultado);
+        Assert.Equal("Indicacao colaborativa", item.Espetaculo.Titulo);
+        Assert.Equal(1, repositorio.ListarUserBasedCalls);
+    }
+
+    [Fact]
     public async Task PostgresStrategy_PreservaOrdemDoRepositorio()
     {
         var repositorio = new FakeRecomendacaoRepository
@@ -231,6 +248,91 @@ public class RecomendacaoServiceTests
                 Assert.Equal("Hamlet", segundo.Espetaculo.Titulo);
                 Assert.Null(segundo.Motivo);
             });
+    }
+
+    [Fact]
+    public async Task MlNetStrategy_RepassaUsuarioLimiteECancellationTokenParaModelo()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            EspetaculosPorId = new Dictionary<int, EspetaculoRecomendado>
+            {
+                [10] = new() { Id = 10, Titulo = "Hamlet" }
+            }
+        };
+        var modelo = new FakeModeloRecomendacaoClient
+        {
+            Habilitado = true,
+            Predicoes = [new ModeloRecomendacaoPredicao(10, 0.80m, "mlnet", null)]
+        };
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var strategy = new ModeloMlNetRecomendacaoStrategy(
+            repositorio, modelo, fallback, NullLogger<ModeloMlNetRecomendacaoStrategy>.Instance);
+        var usuarioId = Guid.NewGuid();
+        using var cts = new CancellationTokenSource();
+
+        await strategy.ListarAsync(usuarioId, 3, cts.Token);
+
+        Assert.Equal(usuarioId, modelo.LastUsuarioId);
+        Assert.Equal(3, modelo.LastLimite);
+        Assert.Equal(cts.Token, modelo.LastCancellationToken);
+    }
+
+    [Fact]
+    public async Task MlNetStrategy_QuandoRepositorioFalhaAoEnriquecer_FazFallbackELogaWarning()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            ExcecaoAoObterEspetaculos = new InvalidOperationException("postgres indisponivel"),
+            Recomendacoes = [NovaRecomendacao(7, "Fallback apos falha no enriquecimento", 0.6m)]
+        };
+        var modelo = new FakeModeloRecomendacaoClient
+        {
+            Habilitado = true,
+            Predicoes = [new ModeloRecomendacaoPredicao(20, 0.91m, "mlnet", null)]
+        };
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var logger = new CapturingLogger<ModeloMlNetRecomendacaoStrategy>();
+        var strategy = new ModeloMlNetRecomendacaoStrategy(repositorio, modelo, fallback, logger);
+
+        var resultado = await strategy.ListarAsync(Guid.NewGuid(), 5, Ct);
+
+        Assert.Equal("Fallback apos falha no enriquecimento", Assert.Single(resultado).Espetaculo.Titulo);
+        Assert.Equal(1, repositorio.ListarPorUsuarioCalls);
+        var warning = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Warning, warning.Level);
+        Assert.IsType<InvalidOperationException>(warning.Exception);
+    }
+
+    [Fact]
+    public async Task MlNetStrategy_ComPredicoesDuplicadas_PreservaRankingDoModelo()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            EspetaculosPorId = new Dictionary<int, EspetaculoRecomendado>
+            {
+                [10] = new() { Id = 10, Titulo = "Hamlet" },
+                [11] = new() { Id = 11, Titulo = "Macbeth" }
+            }
+        };
+        var modelo = new FakeModeloRecomendacaoClient
+        {
+            Habilitado = true,
+            Predicoes =
+            [
+                new ModeloRecomendacaoPredicao(10, 0.95m, "mlnet", "primeira ocorrencia"),
+                new ModeloRecomendacaoPredicao(11, 0.90m, "mlnet", null),
+                new ModeloRecomendacaoPredicao(10, 0.70m, "mlnet", "segunda ocorrencia")
+            ]
+        };
+        var fallback = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+        var strategy = new ModeloMlNetRecomendacaoStrategy(
+            repositorio, modelo, fallback, NullLogger<ModeloMlNetRecomendacaoStrategy>.Instance);
+
+        var resultado = await strategy.ListarAsync(Guid.NewGuid(), 3, Ct);
+
+        Assert.Equal(["Hamlet", "Macbeth", "Hamlet"], resultado.Select(item => item.Espetaculo.Titulo));
+        Assert.Equal([0.95m, 0.90m, 0.70m], resultado.Select(item => item.Score));
     }
 
     [Fact]
@@ -397,9 +499,12 @@ public class RecomendacaoServiceTests
     private sealed class FakeRecomendacaoRepository : IRecomendacaoRepository
     {
         public IReadOnlyList<RecomendacaoEntity> Recomendacoes { get; set; } = [];
+        public IReadOnlyList<RecomendacaoEntity> RecomendacoesUserBased { get; set; } = [];
         public IReadOnlyDictionary<int, EspetaculoRecomendado> EspetaculosPorId { get; set; } =
             new Dictionary<int, EspetaculoRecomendado>();
+        public Exception? ExcecaoAoObterEspetaculos { get; init; }
         public int ListarPorUsuarioCalls { get; private set; }
+        public int ListarUserBasedCalls { get; private set; }
         public int[] LastEspetaculoIds { get; private set; } = [];
 
         public Task<IReadOnlyList<RecomendacaoEntity>> ListarPorUsuarioAsync(
@@ -409,9 +514,21 @@ public class RecomendacaoServiceTests
             return Task.FromResult(Recomendacoes);
         }
 
+        public Task<IReadOnlyList<RecomendacaoEntity>> ListarUserBasedPorAvaliacoesAsync(
+            Guid usuarioId, int limite, CancellationToken cancellationToken)
+        {
+            ListarUserBasedCalls++;
+            return Task.FromResult(RecomendacoesUserBased);
+        }
+
         public Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(
             IEnumerable<int> espetaculoIds, CancellationToken cancellationToken)
         {
+            if (ExcecaoAoObterEspetaculos is not null)
+            {
+                return Task.FromException<IReadOnlyDictionary<int, EspetaculoRecomendado>>(
+                    ExcecaoAoObterEspetaculos);
+            }
             LastEspetaculoIds = espetaculoIds.ToArray();
             return Task.FromResult(EspetaculosPorId);
         }
@@ -422,10 +539,16 @@ public class RecomendacaoServiceTests
         public bool Habilitado { get; init; }
         public IReadOnlyList<ModeloRecomendacaoPredicao> Predicoes { get; init; } = [];
         public Exception? ExcecaoAoPredizer { get; init; }
+        public Guid LastUsuarioId { get; private set; }
+        public int LastLimite { get; private set; }
+        public CancellationToken LastCancellationToken { get; private set; }
 
         public Task<IReadOnlyList<ModeloRecomendacaoPredicao>> PredizerAsync(
             Guid usuarioId, int limite, CancellationToken cancellationToken)
         {
+            LastUsuarioId = usuarioId;
+            LastLimite = limite;
+            LastCancellationToken = cancellationToken;
             if (ExcecaoAoPredizer is not null)
             {
                 return Task.FromException<IReadOnlyList<ModeloRecomendacaoPredicao>>(ExcecaoAoPredizer);

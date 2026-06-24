@@ -14,6 +14,7 @@ type CatalogHeroProps = {
 	overSource?: ImageSourcePropType;
 	profileLabel: string;
 	profileSource?: ImageSourcePropType | null;
+	onProfilePress?: () => void;
 };
 
 export function CatalogHero({
@@ -24,6 +25,7 @@ export function CatalogHero({
 	onActionPress,
 	profileLabel,
 	profileSource,
+	onProfilePress,
 }: CatalogHeroProps) {
 	return (
 		<View style={styles.hero}>
@@ -39,7 +41,9 @@ export function CatalogHero({
 					<Text style={styles.welcomeText} numberOfLines={1} ellipsizeMode="tail">
 						Bem vindo, {profileLabel}!
 					</Text>
-					<HeroProfileCircle imageSource={profileSource} fallbackLabel={profileLabel} size={38} />
+					<Pressable accessibilityRole="button" hitSlop={8} onPress={onProfilePress}>
+						<HeroProfileCircle imageSource={profileSource} fallbackLabel={profileLabel} size={38} />
+					</Pressable>
 				</View>
 			</View>
 

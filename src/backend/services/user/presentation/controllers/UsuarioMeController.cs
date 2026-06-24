@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Spotlight.Usuario.Application.Dtos;
 using Spotlight.Usuario.Application.UseCases;
 using Spotlight.Usuario.Domain.Entities;
-using Spotlight.Usuario.Infrastructure.Auth;
 
 namespace Spotlight.Usuario.Presentation.Controllers;
 
@@ -13,7 +12,7 @@ namespace Spotlight.Usuario.Presentation.Controllers;
 /// </summary>
 [ApiController]
 [Route("me")]
-[Authorize(Policy = AuthSetup.PolicyCadastrado)]
+[Authorize]
 public class UsuarioMeController : ControllerBase
 {
     [HttpGet]

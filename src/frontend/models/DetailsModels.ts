@@ -1,6 +1,5 @@
 import {
   obterDetalheEspetaculoCatalogo,
-  obterUrlMidiaConhecida,
 } from '../repositories/CatalogRepository';
 import { listarEspetaculosSimilares } from '../repositories/RecommendationRepository';
 
@@ -31,20 +30,6 @@ export type EspetaculoDetalhe = {
   teatro?: string | null;
   linkCompra?: string;
 };
-
-const MOCK_SEMELHANTES: EspetaculoSemelhante[] = [
-  {
-    id: '30',
-    titulo: 'Mamma Mia!',
-    imagemUrl: obterUrlMidiaConhecida('Mamma Mia!', 'catalog_card') ?? undefined,
-  },
-];
-
-function wait(ms = 250) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 export async function obterDetalhesEspetaculo(espetaculoId: string): Promise<EspetaculoDetalhe> {
   const detalhe = await obterDetalheEspetaculoCatalogo(espetaculoId);
@@ -99,8 +84,7 @@ export async function obterEspetaculosSemelhantes(
     // Mantem a tela navegavel quando o backend local nao estiver ativo.
   }
 
-  await wait();
-  return MOCK_SEMELHANTES;
+  return [];
 }
 
 function toApprovalPercent(rating: number) {

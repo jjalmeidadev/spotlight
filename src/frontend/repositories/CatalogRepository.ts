@@ -1,8 +1,8 @@
-import { getApiBaseUrl } from '@/frontend/config/api';
+import { fetchJson, getApiErrorMessage } from '@/frontend/repositories/http';
 
-const API_BASE_URL = getApiBaseUrl();
 const CATALOG_IMAGE_BASE_URL = process.env.EXPO_PUBLIC_CATALOG_IMAGE_BASE_URL;
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
+const CATALOG_TIMEOUT_MS = 22000;
 
 export type CatalogShow = {
   id: string;
@@ -112,10 +112,12 @@ export async function listarEspetaculos(options: ListCatalogShowsOptions = {}): 
     params.set('q', options.query.trim());
   }
 
-  const response = await fetch(`${API_BASE_URL}/catalogo/espetaculos?${params.toString()}`, {
+  const { response, payload } = await fetchJson<CatalogListEnvelope>(`/catalogo/espetaculos?${params.toString()}`, {
     headers: { Accept: 'application/json' },
+    operation: 'carregar catalogo',
+    retries: 1,
+    timeoutMs: CATALOG_TIMEOUT_MS,
   });
-  const payload = await parseJsonResponse<CatalogListEnvelope>(response);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(payload, 'Nao foi possivel carregar o catalogo.'));
@@ -160,10 +162,12 @@ export async function listarEspetaculosPertoDe(
 }
 
 export async function obterDetalheEspetaculoCatalogo(id: string): Promise<CatalogShowDetail> {
-  const response = await fetch(`${API_BASE_URL}/catalogo/espetaculos/${encodeURIComponent(id)}`, {
+  const { response, payload } = await fetchJson<CatalogDetailItem>(`/catalogo/espetaculos/${encodeURIComponent(id)}`, {
     headers: { Accept: 'application/json' },
+    operation: 'carregar detalhes do espetaculo',
+    retries: 1,
+    timeoutMs: CATALOG_TIMEOUT_MS,
   });
-  const payload = await parseJsonResponse<CatalogDetailItem>(response);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(payload, 'Nao foi possivel carregar o espetaculo.'));
@@ -332,18 +336,4 @@ function normalizeText(value: string | null | undefined) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
-}
-
-function getApiErrorMessage(payload: any, fallback: string) {
-  return payload?.error ?? payload?.message ?? fallback;
-}
-
-async function parseJsonResponse<T>(response: Response): Promise<T> {
-  const text = await response.text();
-
-  if (!text.trim()) {
-    return {} as T;
-  }
-
-  return JSON.parse(text) as T;
 }

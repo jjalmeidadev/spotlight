@@ -31,10 +31,11 @@ public static class AuthSetup
         void AddPolicies(AuthorizationOptions options)
         {
             options.AddPolicy(PolicyCadastrado, p => p.RequireAssertion(ctx =>
-                ctx.User.HasClaim(ClaimTipoUsuario, "cadastrado") ||
-                ctx.User.HasClaim(ClaimTipoUsuario, "administrador")));
+                TemTipoUsuario(ctx, "cadastrado") ||
+                TemTipoUsuario(ctx, "administrador")));
 
-            options.AddPolicy(PolicyAdministrador, p => p.RequireClaim(ClaimTipoUsuario, "administrador"));
+            options.AddPolicy(PolicyAdministrador, p => p.RequireAssertion(ctx =>
+                TemTipoUsuario(ctx, "administrador")));
         }
 
         if (string.IsNullOrWhiteSpace(jwtSecret) && string.IsNullOrWhiteSpace(jwksUrl))
@@ -163,5 +164,36 @@ public static class AuthSetup
     private static string? FirstNotBlank(params string?[] values)
     {
         return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+    }
+
+    private static bool TemTipoUsuario(AuthorizationHandlerContext ctx, string tipo)
+    {
+        if (ctx.User.HasClaim(ClaimTipoUsuario, tipo))
+        {
+            return true;
+        }
+
+        var raw = ctx.User.FindFirst("app_metadata")?.Value;
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(raw);
+            return TryGetString(document.RootElement, "tipoUsuario", out var tipoUsuario) && tipoUsuario == tipo
+                || TryGetString(document.RootElement, "tipo_usuario", out var tipoUsuarioSnake) && tipoUsuarioSnake == tipo;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    private static bool TryGetString(JsonElement element, string propertyName, out string? value)
+    {
+        value = element.TryGetProperty(propertyName, out var property) ? property.GetString() : null;
+        return !string.IsNullOrWhiteSpace(value);
     }
 }

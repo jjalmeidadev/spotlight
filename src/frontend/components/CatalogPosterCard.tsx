@@ -12,7 +12,13 @@ type CatalogPosterCardProps = {
 	onPress?: () => void;
 };
 
-export function CatalogPosterCard({ title, subtitle, imageSource, imageUri, onPress }: CatalogPosterCardProps) {
+export function CatalogPosterCard({
+	title,
+	subtitle,
+	imageSource,
+	imageUri,
+	onPress,
+}: CatalogPosterCardProps) {
 	const source = imageUri ? { uri: imageUri } : imageSource;
 	const [imageFailed, setImageFailed] = React.useState(false);
 	const shouldShowImage = Boolean(source) && !imageFailed;

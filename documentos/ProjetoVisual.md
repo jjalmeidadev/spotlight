@@ -125,6 +125,16 @@
   - [4.8 Tela 7 - Descrição do Espetáculo](#48-tela-7---descrição-do-espetáculo)
   - [4.9 Tela 8 - Dashboard Administrativo](#49-tela-8---dashboard-administrativo)
   - [4.10 Ajustes Aplicados no Frontend](#410-ajustes-aplicados-no-frontend)
+- [5. Feedback e Iterações Realizadas](#5-feedback-e-iterações-realizadas)
+  - [5.1 Origem dos Feedbacks](#51-origem-dos-feedbacks)
+  - [5.2 Iterações de Design (Antes/Depois)](#52-iterações-de-design-antesdepois)
+    - [5.2.1 Seleção de Preferências: Toggle Switch para Grade de Tags](#521-seleção-de-preferências-toggle-switch-para-grade-de-tags)
+    - [5.2.2 Seleção de Preferências: Inclusão da Faixa de Preço](#522-seleção-de-preferências-inclusão-da-faixa-de-preço)
+    - [5.2.3 Catálogo: Reordenação das Seções de Recomendação](#523-catálogo-reordenação-das-seções-de-recomendação)
+    - [5.2.4 Catálogo por Afinidade: Navegação Passiva para Ativa](#524-catálogo-por-afinidade-navegação-passiva-para-ativa)
+    - [5.2.5 Ajustes do Frontend sobre os Mockups](#525-ajustes-do-frontend-sobre-os-mockups)
+  - [5.3 Iterações a partir dos Testes de Usabilidade](#53-iterações-a-partir-dos-testes-de-usabilidade)
+  - [5.4 Rastreabilidade e Próximos Passos](#54-rastreabilidade-e-próximos-passos)
 
 ---
 
@@ -713,3 +723,119 @@ Fonte: Material produzido pelos autores (2026).
 &emsp;Na Seleção de Preferências, a tela foi alinhada ao mesmo sistema visual do Cadastro. As opções deixaram de usar chips arredondados e passaram a ser botões retangulares com raio de 6px, borda discreta e estado ativo em `#E8420A`. A distribuição em grade de duas colunas evita elementos isolados desalinhados e melhora a leitura do conjunto em telas estreitas.
 
 &emsp;Também foi adicionado um acesso discreto de modo desenvolvimento na tela de Login. Esse acesso não altera o fluxo oficial de autenticação, mas permite que professores e avaliadores naveguem pelo protótipo caso o backend local, Supabase ou serviço de geolocalização estejam indisponíveis durante uma demonstração.
+
+---
+
+# 5. Feedback e Iterações Realizadas
+
+&emsp;Esta seção consolida, de forma explícita, as iterações de design conduzidas a partir de feedback real coletado ao longo do projeto. As diretrizes de design (seção 2) — Atomic Design, safe areas e áreas de toque mínimas de 44 x 44px — foram validadas na avaliação de Sprint 4 e mantidas sem alteração. O ponto de atenção levantado nessa avaliação foi a ausência de um registro centralizado das iterações baseadas em feedback: as decisões existiam dispersas nas subseções de cada tela (3.5, 4.5, 4.6 e 4.10), mas não havia uma visão única que mostrasse a evolução do protótipo. Esta seção responde a essa lacuna, reunindo o histórico de iterações com registro de antes/depois quando aplicável e a justificativa de cada decisão.
+
+## 5.1 Origem dos Feedbacks
+
+&emsp;As iterações documentadas a seguir têm três fontes distintas, todas com registro rastreável no projeto:
+
+| Fonte | Natureza | Onde está registrado | O que originou |
+|---|---|---|---|
+| Revisões internas de design | Crítica de heurística e semântica de componentes durante a prototipação no Figma | Subseções de decisões de design das seções 3 e 4 | Substituição do toggle switch por grade de tags; reordenação das seções do Catálogo; inclusão da faixa de preço |
+| Avaliação de Sprint 4 | Feedback de orientação sobre o entregável de Projeto Visual | Issue de backlog da Sprint 5 (T16) e [GestaoProjeto.md](./GestaoProjeto.md) | Aprovação de Atomic Design, safe areas e áreas de toque; solicitação desta seção de iterações |
+| Testes de usabilidade (SUS) | Sessões com cinco participantes externos (P1–P5), com observação de comportamento e questionário System Usability Scale | [Projeto.md, seção 9.3](./Projeto.md) | Backlog de refinamento de carrosséis, busca, filtros, faixa de preço e botão de compra |
+
+&emsp;A distinção entre as fontes é relevante: as revisões internas e a avaliação de Sprint 4 atuaram sobre o protótipo no Figma (wireframe e mockup), enquanto os testes de usabilidade incidiram sobre a implementação navegável já integrada ao frontend. Por isso, parte das iterações aparece como mudança entre wireframe e mockup, e parte como backlog de ajustes posteriores à validação com usuários reais.
+
+## 5.2 Iterações de Design (Antes/Depois)
+
+### 5.2.1 Seleção de Preferências: Toggle Switch para Grade de Tags
+
+| | Antes | Depois |
+|---|---|---|
+| **Componente** | Toggle switch em lista vertical | Grade de tags (chips) com wrapping |
+| **Layout** | Um item por linha | Dois itens por linha |
+| **Altura estimada** | Acima de 500dp para 12 gêneros | Aproximadamente metade |
+| **Semântica** | Configuração binária persistente | Seleção exploratória de gosto |
+
+&emsp;**Feedback que originou:** revisão interna de design apontou dois problemas na versão inicial. A lista vertical de toggles era longa demais para a tela, exigindo scroll excessivo, e o toggle switch carrega a conotação semântica de uma configuração binária persistente (como ativar notificações), e não de uma escolha exploratória de preferências de gosto.
+
+&emsp;**Decisão e justificativa:** a substituição pela grade de tags resolveu os dois pontos de uma vez. A grade de 2 por linha com wrapping reduziu o comprimento de scroll pela metade e o chip comunica melhor a ideia de "escolher o que curto", deixando todas as tags alcançáveis com o polegar em dispositivos de até 6,5 polegadas. A iteração está descrita na seção [3.5](#35-tela-4---seleção-de-preferências).
+
+### 5.2.2 Seleção de Preferências: Inclusão da Faixa de Preço
+
+| | Antes (wireframe) | Depois (mockup) |
+|---|---|---|
+| **Critérios de preferência** | Apenas gênero artístico | Gênero artístico + faixa de preço |
+| **Controles** | Grade de tags de gênero | Linha de tags de faixa ("Até R$50", "R$50–100", "R$100–200") no topo + grade de gênero abaixo |
+| **Alcance do motor de recomendação** | Afinidade temática | Afinidade temática + acessibilidade financeira |
+
+&emsp;**Feedback que originou:** revisão de produto durante a passagem do wireframe para o mockup identificou que o perfil de preferências capturava apenas a dimensão temática, ignorando uma variável de decisão central para o público — o preço do ingresso.
+
+&emsp;**Decisão e justificativa:** a faixa de preço foi adicionada como extensão do perfil de preferências, permitindo que o motor de recomendação filtre também por acessibilidade financeira. A mudança está registrada como divergência intencional entre wireframe e mockup na seção [4.5](#45-tela-4---seleção-de-preferências).
+
+### 5.2.3 Catálogo: Reordenação das Seções de Recomendação
+
+| | Antes (wireframe) | Depois (mockup) |
+|---|---|---|
+| **1ª seção** | "Porque você gostou de 'Macacos':" (personalizada) | "Os mais populares do momento:" (popularidade) |
+| **2ª seção** | Sugestões temáticas | "Outras pessoas também assistiram:" (colaborativa) |
+| **Última seção** | Sugestões | "Porque você gostou de 'Macacos':" (personalizada) |
+
+&emsp;**Feedback que originou:** revisão de design considerou que abrir o Catálogo com a recomendação personalizada expunha o usuário com pouco histórico a uma "caixa preta" — uma sugestão personalizada sem que ele tivesse sido apresentado antes ao catálogo geral.
+
+&emsp;**Decisão e justificativa:** as seções foram reordenadas para priorizar o conteúdo de maior alcance (popularidade e colaborativo) antes do personalizado. Essa sequência posiciona a recomendação personalizada como destaque final do scroll, após o usuário já ter sido exposto ao catálogo, o que reduz a percepção de caixa preta para usuários em cold start. A mudança está descrita na seção [4.6](#46-tela-5---catálogo).
+
+### 5.2.4 Catálogo por Afinidade: Navegação Passiva para Ativa
+
+| | Antes (wireframe) | Depois (mockup) |
+|---|---|---|
+| **Acionamento** | Visualização passiva ativada pelo sistema a partir de item de referência | Navegação ativa e explorável a partir de gênero selecionado pelo usuário |
+| **Seções** | Mudança apenas semântica sobre a estrutura da Tela 5 | Múltiplas afinidades temáticas simultâneas ("Porque você gostou de 'Macacos':", "Porque você gostou de Stand-Up:", "Para ver com a família:") |
+
+&emsp;**Feedback que originou:** a versão do wireframe tratava a visão por afinidade como mudança apenas semântica, sem oferecer ao usuário controle explícito sobre o critério de afinidade.
+
+&emsp;**Decisão e justificativa:** o mockup tornou a navegação por afinidade mais ativa, exibindo simultaneamente várias afinidades temáticas reflexo do gênero selecionado, sem alterar a estrutura de carrosséis horizontais. A iteração está descrita na seção [4.7](#47-tela-6---catálogo---visão-por-afinidade).
+
+### 5.2.5 Ajustes do Frontend sobre os Mockups
+
+&emsp;Durante a implementação mobile integrada ao backend, alguns mockups foram ajustados para manter consistência entre telas e melhorar a legibilidade no dispositivo real. Esses ajustes estão detalhados na seção [4.10](#410-ajustes-aplicados-no-frontend) e resumidos abaixo:
+
+| Tela | Antes (mockup) | Depois (frontend) | Motivo |
+|---|---|---|---|
+| Login | Fundo vermelho-alaranjado com ilustração de elenco | Imagem `login-bg.png` em `cover` com gradiente vertical até preto no rodapé | Preservar a arte sem comprometer a leitura dos campos |
+| Cadastro | Área de formulário em superfície clara sobre fundo preto | Fundo padronizado em Preto Aventura com cabeçalho em acento `#E8420A` e safe area ampliada | Consistência visual e respeito à safe area em celulares |
+| Preferências | Chips arredondados (border-radius ~20dp) | Botões retangulares (raio 6px) com estado ativo em `#E8420A`, grade de duas colunas | Alinhamento ao sistema visual do Cadastro e melhor leitura em telas estreitas |
+| Login (acesso) | — | Acesso discreto de modo desenvolvimento | Permitir demonstração caso backend, Supabase ou geolocalização estejam indisponíveis |
+
+## 5.3 Iterações a partir dos Testes de Usabilidade
+
+&emsp;A rodada de testes de usabilidade foi realizada com cinco participantes externos (P1–P5), combinando observação de comportamento durante a execução das tarefas com o questionário System Usability Scale (SUS). O detalhamento completo da metodologia, dos participantes e dos resultados está na seção [9.3 do Projeto.md](./Projeto.md). O resultado agregado validou a base de interação — média SUS de **79,5** (acima do referencial de 68) e **100%** de conclusão das tarefas —, mas expôs problemas de descobribilidade e hierarquia visual concentrados em componentes específicos.
+
+&emsp;A tabela a seguir traduz cada problema observado em uma ação de refinamento priorizada para o protótipo visual:
+
+| Problema observado | Participantes afetados | Ação de melhoria priorizada |
+|---|---|---|
+| Baixa percepção da navegação horizontal nos carrosséis | P1, P5 | Reforçar a affordance de continuidade: exibição parcial do próximo card, indicador visual de continuidade ou orientação breve no primeiro contato |
+| Ausência de sugestões automáticas na busca | P2 | Avaliar inclusão de sugestões relacionadas aos espetáculos disponíveis, com mensagem clara quando não houver correspondências |
+| Baixo destaque visual dos filtros | P2, P4, P5 | Elevar os filtros na hierarquia visual e tornar os estados de seleção mais evidentes, com retorno perceptível após a aplicação |
+| Dificuldade na seleção da faixa de preço | P5 | Revisar clareza dos rótulos, área de toque e representação do valor escolhido |
+| Baixo destaque do botão de compra | P2 | Reforçar contraste, posicionamento e identificação compatíveis com a relevância da ação de conversão |
+
+&emsp;O participante P5 concentrou as maiores dificuldades e foi o único com pontuação SUS abaixo da média (57,5 contra 85 dos demais), o que confirma que os achados acima não são ruído isolado: a recorrência dos mesmos pontos em mais de um participante (filtros em P2, P4 e P5; carrosséis em P1 e P5) indica problemas reais de descobribilidade, e não preferência individual. Por isso, esses itens compõem o backlog de refinamento visual de maior prioridade.
+
+&emsp;As ações acima incidem diretamente sobre decisões de design já tomadas nas seções 3 e 4 — em particular sobre a affordance de carrossel descrita em [3.6](#36-tela-5---catálogo) e sobre a faixa de preço introduzida em [4.5](#45-tela-4---seleção-de-preferências) — e devem ser validadas em nova rodada de testes repetindo as tarefas que concentraram as dificuldades (T03, T05, T06, T08 e T09), conforme recomendado na seção 9.3.2.6 do Projeto.md.
+
+## 5.4 Rastreabilidade e Próximos Passos
+
+&emsp;O quadro abaixo consolida a rastreabilidade entre cada iteração, sua origem e seu estado atual no projeto:
+
+| Iteração | Origem | Estado | Referência |
+|---|---|---|---|
+| Toggle switch → grade de tags | Revisão interna de design | Aplicada (mockup) | [3.5](#35-tela-4---seleção-de-preferências) |
+| Inclusão da faixa de preço | Revisão de produto | Aplicada (mockup) | [4.5](#45-tela-4---seleção-de-preferências) |
+| Reordenação das seções do Catálogo | Revisão de design | Aplicada (mockup) | [4.6](#46-tela-5---catálogo) |
+| Navegação por afinidade passiva → ativa | Revisão de design | Aplicada (mockup) | [4.7](#47-tela-6---catálogo---visão-por-afinidade) |
+| Ajustes de Login, Cadastro e Preferências | Implementação mobile | Aplicada (frontend) | [4.10](#410-ajustes-aplicados-no-frontend) |
+| Descobribilidade de carrosséis | Teste de usabilidade (P1, P5) | Backlog priorizado | [9.3 Projeto.md](./Projeto.md) |
+| Sugestões automáticas na busca | Teste de usabilidade (P2) | Backlog priorizado | [9.3 Projeto.md](./Projeto.md) |
+| Destaque de filtros | Teste de usabilidade (P2, P4, P5) | Backlog priorizado | [9.3 Projeto.md](./Projeto.md) |
+| Clareza da faixa de preço | Teste de usabilidade (P5) | Backlog priorizado | [9.3 Projeto.md](./Projeto.md) |
+| Destaque do botão de compra | Teste de usabilidade (P2) | Backlog priorizado | [9.3 Projeto.md](./Projeto.md) |
+
+&emsp;As iterações originadas no Figma já estão refletidas nos mockups e na implementação documentados nas seções 3 e 4. As iterações originadas nos testes de usabilidade compõem um backlog priorizado de refinamento visual, a ser implementado e revalidado em nova rodada de testes, com reaplicação do SUS para verificar se os ajustes elevam a média do grupo acima do limiar de 80,3 pontos (classificação A) e reduzem a dispersão entre participantes.

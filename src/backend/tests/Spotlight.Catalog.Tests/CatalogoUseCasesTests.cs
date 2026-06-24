@@ -88,6 +88,23 @@ public class CatalogoUseCasesTests
     }
 
     [Fact]
+    public async Task CriarEspetaculo_QuandoDetalheNaoExisteAposCriacao_LancaInvalidOperation()
+    {
+        var repositorio = new FakeEspetaculoRepository { CriarResult = 7, Detalhe = null };
+        var useCase = new CriarEspetaculoUseCase(repositorio);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => useCase.ExecutarAsync(new EspetaculoCreateDto
+        {
+            Titulo = "O Auto da Compadecida",
+            Duracao = 120,
+            Status = "em_cartaz"
+        }, Ct));
+
+        Assert.Equal(1, repositorio.CriarCalls);
+        Assert.Equal(7, repositorio.LastObterDetalheId);
+    }
+
+    [Fact]
     public async Task CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao()
     {
         var useCase = new CriarEspetaculoUseCase(new FakeEspetaculoRepository());
@@ -119,6 +136,40 @@ public class CatalogoUseCasesTests
     }
 
     [Fact]
+    public async Task AtualizarEspetaculo_ComDadosParciaisValidos_AtualizaEBuscaDetalhe()
+    {
+        var repositorio = new FakeEspetaculoRepository { AtualizarResult = true, Detalhe = DetalheCompleto() };
+        var useCase = new AtualizarEspetaculoUseCase(repositorio);
+
+        var resultado = await useCase.ExecutarAsync(
+            7,
+            new EspetaculoUpdateDto { Status = "encerrado", Duracao = 90 },
+            Ct);
+
+        Assert.Equal(1, repositorio.AtualizarCalls);
+        Assert.Equal(7, repositorio.LastAtualizarId);
+        Assert.Equal("encerrado", repositorio.LastAtualizarDados?.Status);
+        Assert.Equal(90, repositorio.LastAtualizarDados?.Duracao);
+        Assert.Equal(7, repositorio.LastObterDetalheId);
+        Assert.Equal("O Auto da Compadecida", resultado.Titulo);
+    }
+
+    [Fact]
+    public async Task AtualizarEspetaculo_QuandoDetalheNaoExisteAposAtualizar_LancaNotFound()
+    {
+        var repositorio = new FakeEspetaculoRepository { AtualizarResult = true, Detalhe = null };
+        var useCase = new AtualizarEspetaculoUseCase(repositorio);
+
+        await Assert.ThrowsAsync<CatalogoNotFoundException>(() => useCase.ExecutarAsync(
+            7,
+            new EspetaculoUpdateDto { Status = "em_breve" },
+            Ct));
+
+        Assert.Equal(1, repositorio.AtualizarCalls);
+        Assert.Equal(7, repositorio.LastObterDetalheId);
+    }
+
+    [Fact]
     public async Task AtualizarEspetaculo_ComTituloMuitoLongo_NaoChamaRepositorio()
     {
         var repositorio = new FakeEspetaculoRepository();
@@ -138,6 +189,18 @@ public class CatalogoUseCasesTests
         var useCase = new ExcluirEspetaculoUseCase(new FakeEspetaculoRepository { ExcluirResult = false });
 
         await Assert.ThrowsAsync<CatalogoNotFoundException>(() => useCase.ExecutarAsync(22, Ct));
+    }
+
+    [Fact]
+    public async Task ExcluirEspetaculo_QuandoExiste_ChamaRepositorioSemErro()
+    {
+        var repositorio = new FakeEspetaculoRepository { ExcluirResult = true };
+        var useCase = new ExcluirEspetaculoUseCase(repositorio);
+
+        await useCase.ExecutarAsync(22, Ct);
+
+        Assert.Equal(1, repositorio.ExcluirCalls);
+        Assert.Equal(22, repositorio.LastExcluirId);
     }
 
     [Fact]
@@ -293,6 +356,19 @@ public class CatalogoUseCasesTests
     }
 
     [Fact]
+    public async Task ListarSessoes_QuandoEspetaculoNaoExiste_LancaNotFoundENaoListaSessoes()
+    {
+        var sessaoRepositorio = new FakeSessaoRepository();
+        var useCase = new ListarSessoesUseCase(
+            sessaoRepositorio,
+            new FakeEspetaculoRepository { ExisteResult = false });
+
+        await Assert.ThrowsAsync<CatalogoNotFoundException>(() => useCase.ExecutarAsync(7, Ct));
+
+        Assert.Equal(0, sessaoRepositorio.ListarCalls);
+    }
+
+    [Fact]
     public async Task ListarCategoriasETeatros_MapeiamListasSimples()
     {
         var categorias = await new ListarCategoriasUseCase(new FakeCategoriaRepository()).ExecutarAsync(Ct);
@@ -308,6 +384,20 @@ public class CatalogoUseCasesTests
         var useCase = new ObterTeatroUseCase(new FakeTeatroRepository { Teatro = null });
 
         await Assert.ThrowsAsync<CatalogoNotFoundException>(() => useCase.ExecutarAsync(123, Ct));
+    }
+
+    [Fact]
+    public async Task ObterTeatro_QuandoExiste_MapeiaTodosOsCampos()
+    {
+        var useCase = new ObterTeatroUseCase(new FakeTeatroRepository());
+
+        var resultado = await useCase.ExecutarAsync(2, Ct);
+
+        Assert.Equal(2, resultado.Id);
+        Assert.Equal("Teatro Alfa", resultado.Nome);
+        Assert.Equal("Sao Paulo", resultado.Cidade);
+        Assert.True(resultado.Acessibilidade);
+        Assert.Equal("Parceiro", resultado.ParceiroNamingRights);
     }
 
     private static EspetaculoDetalhe DetalheCompleto() => new()
@@ -356,6 +446,10 @@ public class CatalogoUseCasesTests
         public int CriarCalls { get; private set; }
         public int AtualizarCalls { get; private set; }
         public int ExisteCalls { get; private set; }
+        public int ExcluirCalls { get; private set; }
+        public int LastAtualizarId { get; private set; }
+        public EspetaculoUpdateDto? LastAtualizarDados { get; private set; }
+        public int LastExcluirId { get; private set; }
 
         public Task<(IReadOnlyList<Espetaculo> Itens, int Total)> ListarAsync(
             ListarEspetaculosFiltro filtro,
@@ -386,10 +480,17 @@ public class CatalogoUseCasesTests
         public Task<bool> AtualizarAsync(int id, EspetaculoUpdateDto dados, CancellationToken cancellationToken)
         {
             AtualizarCalls++;
+            LastAtualizarId = id;
+            LastAtualizarDados = dados;
             return Task.FromResult(AtualizarResult);
         }
 
-        public Task<bool> ExcluirAsync(int id, CancellationToken cancellationToken) => Task.FromResult(ExcluirResult);
+        public Task<bool> ExcluirAsync(int id, CancellationToken cancellationToken)
+        {
+            ExcluirCalls++;
+            LastExcluirId = id;
+            return Task.FromResult(ExcluirResult);
+        }
     }
 
     private sealed class FakeAvaliacaoRepository : IAvaliacaoRepository
@@ -441,10 +542,15 @@ public class CatalogoUseCasesTests
     private sealed class FakeSessaoRepository : ISessaoRepository
     {
         public IReadOnlyList<Sessao> Sessoes { get; set; } = [];
+        public int ListarCalls { get; private set; }
 
         public Task<IReadOnlyList<Sessao>> ListarPorEspetaculoAsync(
             int espetaculoId,
-            CancellationToken cancellationToken) => Task.FromResult(Sessoes);
+            CancellationToken cancellationToken)
+        {
+            ListarCalls++;
+            return Task.FromResult(Sessoes);
+        }
     }
 
     private sealed class FakeTeatroRepository : ITeatroRepository
