@@ -5268,6 +5268,37 @@ Como evidência do progresso incremental da Sprint 4, foi gravado um vídeo demo
 
 O foco da Sprint 5 está na consolidação da qualidade e entrega final do Spotlight. As principais frentes de trabalho incluem a execução da rodada final de testes de usabilidade, de requisitos não-funcionais (RNFs) e de integração, a validação da implantação no servidor Inteli, a elaboração do manual de deploy e a preparação dos materiais para a apresentação final do projeto.
 
+#### Features finalizadas na Sprint 5
+
+Como parte da finalizacao das features pendentes, o aplicativo mobile foi revisado para reduzir dependencias de dados mockados, estabilizar a comunicacao com o backend em ambiente de rede local e consolidar os fluxos necessarios para demonstracao final. A entrega manteve a arquitetura ja adotada nas sprints anteriores: frontend React Native/Expo consumindo o API Gateway, servicos SOA em .NET e persistencia no PostgreSQL/Supabase e MongoDB.
+
+| Frente | Implementacao realizada | Evidencia no codigo |
+|---|---|---|
+| Estabilidade mobile | Centralizacao de chamadas HTTP com timeout, retry curto e mensagens de erro com a URL do backend utilizada, reduzindo falhas silenciosas em dispositivos fisicos na mesma rede. | `src/frontend/repositories/http.ts`, `src/frontend/config/api.ts` |
+| Safe area e experiencia mobile | Substituicao do uso legado de safe area por `react-native-safe-area-context`, eliminando alerta de depreciacao no Expo. | `App.js`, telas mobile principais |
+| Recomendacao hibrida | Manutencao da fileira "Recomendados para voce" com estrategia hibrida e fallback controlado quando o modelo nao retorna itens suficientes. | `src/backend/services/recommendation/application/services/RecomendacaoService.cs` |
+| Recomendacao user-based | Criacao de fallback colaborativo baseado em avaliacoes de usuarios com comportamento semelhante, usado na fileira de pessoas com gosto parecido. | `src/backend/services/recommendation/infrastructure/persistence/RecomendacaoRepository.cs` |
+| Recomendacao item-based | Uso da rota de espetaculos similares para compor a fileira "Porque voce gostou de X", sem depender de dados fixos no frontend. | `src/frontend/viewmodels/useCatalogViewModel.ts`, `src/frontend/repositories/RecommendationRepository.ts` |
+| Avaliacoes | Fluxo de avaliacao no detalhe do espetaculo integrado ao backend autenticado, com retorno de erro quando o usuario nao esta logado. | `src/frontend/repositories/RatingRepository.ts`, `src/frontend/viewmodels/DetailsViewModels.ts` |
+| Dashboard administrativo | Remocao de dados visuais mockados e calculo real de metricas a partir do catalogo: total de espetaculos, sessoes, itens em cartaz, nota media e distribuicao por genero. | `src/frontend/repositories/AdminDashboardRepository.ts`, `src/frontend/screens/AdminDashboardScreen.tsx` |
+| Gestao de administradores | Inclusao de rota administrativa para promover usuarios cadastrados a administradores e interface no dashboard para executar a operacao por e-mail. | `src/backend/services/user/presentation/controllers/AdminUsuariosController.cs`, `src/frontend/screens/AdminDashboardScreen.tsx` |
+| Perfil e logout | Criacao de pop-up de perfil reutilizavel para usuario comum e administrador, com edicao de nome e logout. | `src/frontend/components/ProfileSheet.tsx`, `src/frontend/repositories/UserRepository.ts` |
+| Alternancia de visao | Usuarios administradores podem alternar entre a navegacao normal do aplicativo e a visao administrativa sem novo login. | `App.js`, `src/frontend/screens/CatalogView.tsx`, `src/frontend/screens/AdminDashboardScreen.tsx` |
+| Higiene de entrega | Remocao de logs de depuracao, botao de modo desenvolvedor, rotulos mockados no grafico de sessoes e mensagens auxiliares nao necessarias na interface final. | `App.js`, `src/frontend/screens/LoginView.tsx`, `src/frontend/screens/AdminDashboardScreen.tsx` |
+
+#### Validacoes executadas
+
+| Comando | Resultado |
+|---|---|
+| `npx tsc --noEmit` | Aprovado, sem erros de TypeScript. |
+| `dotnet build src/backend/Spotlight.sln --configuration Release --no-restore` | Aprovado, sem erros ou avisos. |
+| `docker compose -f docker-compose.dev.yml config --quiet` | Aprovado; a configuracao do ambiente de desenvolvimento e valida. |
+| `docker compose -f docker-compose.prod.yml config --quiet` | Aprovado; a configuracao do ambiente de producao e valida. |
+
+#### Limitacoes conhecidas apos a finalizacao
+
+O aplicativo ainda nao persiste sessao local apos fechar e reabrir o app. Essa decisao evita armazenar tokens sensiveis no dispositivo sem uma camada dedicada de armazenamento seguro, como SecureStore, e mantem o login explicito como fluxo padrao desta versao. Alem disso, o dashboard administrativo permite promocao de administradores e consulta de indicadores reais, mas nao implementa uma interface completa de CRUD de espetaculos; as rotas administrativas de catalogo permanecem disponiveis no backend.
+
 ## 8.4 Testes Unitários e de Integração
 
 &emsp;Na Sprint 4, a cobertura automatizada do backend foi ampliada com testes unitários focados nos Services/UseCases entregues na Sprint 3. A motivação principal foi proteger a lógica de negócio contra regressões sem depender de banco de dados, rede, variáveis de ambiente ou serviços externos. Essa decisão torna a execução mais rápida, reproduzível e adequada à abordagem TDD, pois cada regra pode ser validada de forma isolada antes de sua integração com infraestrutura real.
@@ -8279,4 +8310,3 @@ docker build -t spotlight-geolocalizacao:local src/backend/services/geolocalizac
 ### 10.3.5 Estratégias de deploy
 
 &emsp;Para o estágio atual do projeto, a alternativa mais direta é uma VPS com Docker Compose, pois o repositório já contém a orquestração completa e depende de serviços gerenciados externos para banco relacional, autenticação, storage e telemetria. Em ambientes com maior exigência operacional, as imagens podem ser publicadas em registry e executadas em Render, Railway, Fly.io ou AWS ECS/Fargate. Em qualquer cenário, segredos devem ser configurados no provedor e não no repositório.
-

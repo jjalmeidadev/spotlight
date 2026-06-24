@@ -172,6 +172,10 @@ public class UsuarioContextoEControllerTests
             UsuarioUpdateDto dados,
             CancellationToken cancellationToken) => Task.FromResult(false);
 
+        public Task<Domain.Entities.Usuario?> PromoverAdministradorPorEmailAsync(
+            string email,
+            CancellationToken cancellationToken) => Task.FromResult<Domain.Entities.Usuario?>(null);
+
         public Task<Preferencias?> ObterPreferenciasAsync(
             Guid id,
             CancellationToken cancellationToken) => Task.FromResult(Preferencias);

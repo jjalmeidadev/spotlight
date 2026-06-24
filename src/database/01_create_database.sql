@@ -44,18 +44,32 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+    v_tipo_usuario TEXT;
 BEGIN
+    v_tipo_usuario := COALESCE(
+        NEW.raw_app_meta_data->>'tipoUsuario',
+        NEW.raw_app_meta_data->>'tipo_usuario',
+        'cadastrado'
+    );
+
+    IF v_tipo_usuario NOT IN ('cadastrado', 'administrador') THEN
+        v_tipo_usuario := 'cadastrado';
+    END IF;
+
     INSERT INTO public.usuario (
         id_usuario,
         nome,
         email,
-        data_nascimento
+        data_nascimento,
+        tipo_usuario
     )
     VALUES (
         NEW.id,
         COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
         NEW.email,
-        NULLIF(NEW.raw_user_meta_data->>'dataNascimento', '')::DATE
+        NULLIF(NEW.raw_user_meta_data->>'dataNascimento', '')::DATE,
+        v_tipo_usuario::tipo_usuario_enum
     );
     RETURN NEW;
 END;

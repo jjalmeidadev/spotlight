@@ -38,7 +38,6 @@ export function useSignupViewModel(onSuccess?: (usuario: Usuario) => void) {
         try {
           const localizacao = await obterLocalizacaoAtual();
           await salvarLocalizacaoUsuario(usuario.accessToken, localizacao);
-          console.log('Localizacao resolvida:', localizacao);
           onSuccess?.({ ...usuario, localizacao });
           return;
         } catch (locationError) {

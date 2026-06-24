@@ -737,6 +737,10 @@ public class UsuarioUseCasesTests
             return Task.FromResult(AtualizarResult);
         }
 
+        public Task<Domain.Entities.Usuario?> PromoverAdministradorPorEmailAsync(
+            string email,
+            CancellationToken cancellationToken) => Task.FromResult(Usuario);
+
         public Task<Preferencias?> ObterPreferenciasAsync(Guid id, CancellationToken cancellationToken) =>
             Task.FromResult(Preferencias);
 
