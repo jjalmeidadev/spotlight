@@ -5268,6 +5268,32 @@ Como evidência do progresso incremental da Sprint 4, foi gravado um vídeo demo
 
 O foco da Sprint 5 está na consolidação da qualidade e entrega final do Spotlight. As principais frentes de trabalho incluem a execução da rodada final de testes de usabilidade, de requisitos não-funcionais (RNFs) e de integração, a validação da implantação no servidor Inteli, a elaboração do manual de deploy e a preparação dos materiais para a apresentação final do projeto.
 
+#### Revisao final do pipeline de CI
+
+Na revisao final da Sprint 5, o pipeline do GitLab foi conferido para garantir que a versao consolidada do projeto continue validando build, testes automatizados, estrutura dos RNFs e artefatos do modelo de recomendacao antes da integracao em `develop`.
+
+| Job | Objetivo | Resultado esperado |
+|---|---|---|
+| `build` | Restaurar pacotes NuGet e compilar `src/backend/Spotlight.sln` em Release | Build sem erros |
+| `test:unit` | Executar testes automatizados .NET com filtro `Category!=Integration` | Testes unitarios executados e arquivo `.trx` preservado como artefato |
+| `test:frontend-typecheck` | Instalar dependencias Node com `npm ci` e executar `npm run typecheck` | Frontend Expo/TypeScript sem erros de tipagem |
+| `test:rnf-structure` | Validar a estrutura versionada dos testes de RNF | Relatorio `rnf-structure-validation.txt` preservado como artefato |
+| `train:model-artifacts` | Treinar o modelo ML.NET e validar arquivos gerados | Artefatos `.zip`, `.json` e relatorios do modelo publicados no job |
+| `publish:model-artifacts` | Publicar artefatos no bucket privado `ml-artifacts` apenas na branch `develop` | Execucao condicionada a variaveis seguras de CI/CD |
+
+Tambem foram removidas mensagens de debug do job de publicacao e os resultados dos testes .NET passaram a ser preservados como arquivos `.trx` em `TestResults/`, reduzindo ruido no log e facilitando auditoria posterior do pipeline.
+
+Validacoes locais executadas nesta revisao:
+
+| Comando | Resultado |
+|---|---|
+| `npm run typecheck` | Aprovado, sem erros TypeScript |
+| `dotnet build src/backend/Spotlight.sln --configuration Release --no-restore` | Aprovado, 0 erros e 0 avisos |
+| `dotnet test src/backend/Spotlight.sln --configuration Release --filter "Category!=Integration" --results-directory TestResults --logger "trx;LogFilePrefix=results"` | Aprovado, 133 testes executados, 0 falhas e 0 ignorados |
+| `powershell -ExecutionPolicy Bypass -File src/backend/tests/non-functional/scripts/validate-structure.ps1` | Aprovado, estrutura dos RNFs valida |
+
+No GitLab, a verificacao equivalente de estrutura dos RNFs usa o script `.sh` em ambiente Linux, mantendo compatibilidade com o executor do pipeline.
+
 ## 8.4 Testes Unitários e de Integração
 
 &emsp;Na Sprint 4, a cobertura automatizada do backend foi ampliada com testes unitários focados nos Services/UseCases entregues na Sprint 3. A motivação principal foi proteger a lógica de negócio contra regressões sem depender de banco de dados, rede, variáveis de ambiente ou serviços externos. Essa decisão torna a execução mais rápida, reproduzível e adequada à abordagem TDD, pois cada regra pode ser validada de forma isolada antes de sua integração com infraestrutura real.
@@ -8279,4 +8305,3 @@ docker build -t spotlight-geolocalizacao:local src/backend/services/geolocalizac
 ### 10.3.5 Estratégias de deploy
 
 &emsp;Para o estágio atual do projeto, a alternativa mais direta é uma VPS com Docker Compose, pois o repositório já contém a orquestração completa e depende de serviços gerenciados externos para banco relacional, autenticação, storage e telemetria. Em ambientes com maior exigência operacional, as imagens podem ser publicadas em registry e executadas em Render, Railway, Fly.io ou AWS ECS/Fargate. Em qualquer cenário, segredos devem ser configurados no provedor e não no repositório.
-
