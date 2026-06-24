@@ -5636,6 +5636,44 @@ tests/
 
 &emsp;Entre os módulos classificados como críticos, o motor de recomendação (`ml-engine` e serviço de recomendação), a autenticação (Gateway + Supabase Auth) e a geolocalização (serviço dedicado + Nominatim) concentram a expansão prioritária da suíte automatizada antes das demais camadas.
 
+### Detalhamento da rodada final por tipo de teste
+
+&emsp;Para a rodada final, os casos foram organizados por tipo de validação exigido pelo artefato. Cada grupo possui objetivo, escopo, cenário positivo, cenário negativo, ferramenta, evidência esperada e seção de rastreabilidade. Essa organização evita misturar planejamento com resultado de execução e permite que cada frente seja revisada de forma independente no MR.
+
+| Tipo de teste | Escopo da rodada final | Casos detalhados | Evidência esperada | Seção de referência |
+|---|---|---|---|---|
+| Funcionais | RF01 a RF16, com foco nos fluxos de usuário, recomendação, avaliação e administração | Casos `TF-RFXX-P/N` com pré-condição, procedimento, resultado esperado e pós-condição | TRX dos testes backend, roteiro manual/E2E quando aplicável e tabela de lacunas | [9.1.1](#911-planejamento) e [9.1.2](#912-resultados) |
+| Regras de negócio | UseCases/Services de catálogo, recomendação, usuário, geolocalização e telemetria | Casos `RN-XX-P/N/B` para regras positivas, negativas e borda | Saída `dotnet test`, métodos xUnit rastreados e cobertura por regra | [Casos de regras de negócio](#casos-de-regras-de-negócio-para-a-rodada-final) |
+| Integração | Gateway, Supabase Auth, PostgreSQL/Supabase, MongoDB, ticketeira e geolocalização externa | Casos `IT-XX-P/N` por fronteira interna ou externa | Logs, TRX, cassetes quando houver VHS, consultas de verificação e status HTTP | [9.4.1](#941-planejamento) |
+| RNFs | RNF01 a RNF12, exceto RNF09 quando declarado não aplicável | Cenários positivos e negativos por RNF, com limiar objetivo de aprovação | Relatórios Lighthouse/k6/ZAP/Newman, planilhas, logs e outputs dos scripts RNF | [9.2.1](#921-planejamento) |
+| Usabilidade | Fluxo mobile de login, preferências, catálogo, busca, filtro, detalhes e compra | Tarefas T01 a T09, cenários CP/CN e SUS | Planilha de campo, número de toques, tempo, ajuda, comentários e SUS | [9.3.1](#931-planejamento) |
+
+&emsp;A regra de entrada para executar a rodada é que cada caso listado tenha massa de teste definida, responsável pela execução, ambiente indicado e critério de aprovação explícito. A regra de saída é que cada tipo gere evidência revisável: resultado automatizado, planilha, relatório ou registro textual no `Projeto.md`.
+
+### Casos de regras de negócio para a rodada final
+
+&emsp;Os testes de regras de negócio exercitam decisões implementadas nos Services e UseCases, sem depender de UI, banco real ou serviços externos. O objetivo é garantir que validações, normalizações, fallbacks e limites sejam protegidos por testes rápidos e reprodutíveis no pipeline.
+
+| ID | Regra validada | Cenário | Procedimento | Resultado esperado | Tipo |
+|---|---|---|---|---|---|
+| RN-CAT-01-P | Avaliação aceita nota válida no limite superior | Usuário avalia espetáculo com nota `5` e comentário nulo | Executar teste do use case de criação de avaliação com espetáculo existente | Avaliação é criada, nota `5` é preservada e comentário nulo não quebra o fluxo | Positivo |
+| RN-CAT-02-N | Avaliação rejeita nota fora do intervalo | Usuário envia nota `null`, menor que `0` ou maior que `5` | Executar teoria xUnit com entradas inválidas | `ValidationException` é lançada antes de chamar o repositório de persistência | Negativo |
+| RN-CAT-03-N | Avaliação não é criada para espetáculo inexistente | Usuário tenta avaliar `id_espetaculo` inexistente | Simular repositório retornando ausência do espetáculo | `NotFoundException` é lançada e nenhuma avaliação é persistida | Negativo |
+| RN-CAT-04-B | Listagem de catálogo normaliza paginação | Requisição usa `page=0` ou `pageSize` acima do limite | Executar use case de listagem com parâmetros extremos | Página mínima vira `1`, tamanho máximo é limitado e resposta mantém DTO válido | Borda |
+| RN-REC-01-P | Recomendação respeita limite solicitado | Modelo retorna mais itens que o limite da requisição | Executar serviço de recomendação com limite `2` e ranking maior | Resposta final contém apenas os 2 primeiros itens, preservando a ordem de ranking | Positivo |
+| RN-REC-02-B | Limites inválidos de recomendação são normalizados | Requisição usa limite nulo, zero, negativo ou excessivo | Executar teorias de normalização do limite | Serviço aplica limite padrão/máximo e não lança erro indevido | Borda |
+| RN-REC-03-N | Similaridade exige espetáculo origem existente | Solicitar similares para origem inexistente | Simular consulta de origem retornando nulo | `NotFoundException` ocorre antes da listagem de similaridades | Negativo |
+| RN-USR-01-P | Preferências aceitam listas nulas como vazias | Usuário salva preferências sem listas preenchidas | Executar use case de atualização de preferências com listas nulas | Campos são normalizados para listas vazias e resposta permanece consistente | Positivo |
+| RN-USR-02-N | Preferências rejeitam preço inválido | Usuário informa faixa de preço negativa | Executar use case com `faixaPrecoMax < 0` | `ValidationException` é lançada e o repositório não é chamado para salvar | Negativo |
+| RN-USR-03-N | Localização rejeita coordenadas inválidas | Usuário envia latitude/longitude fora do intervalo permitido | Executar use case de atualização de localização | Erro de validação é retornado antes de persistir | Negativo |
+| RN-TEL-01-P | Telemetria válida retorna aceite assíncrono | App envia evento comportamental com `event_id` e entidade válidos | Executar service/controller de telemetria | API retorna `202 Accepted` e evento é encaminhado ao repositório | Positivo |
+| RN-TEL-02-N | Telemetria inválida não chega ao repositório | Evento vem sem campos obrigatórios ou com enum inválido | Executar validações do serviço de telemetria | API retorna erro de validação e nenhum documento é gravado | Negativo |
+| RN-TEL-03-B | Reenvio de telemetria não duplica documento | Mesmo `event_id` é enviado duas vezes | Executar integração Mongo com índice único | Apenas um documento fica persistido para o `event_id` | Borda |
+| RN-GEO-01-P | Geolocalização normaliza resposta válida | Nominatim retorna endereço e coordenadas | Executar serviço com `HttpMessageHandler` fake retornando payload válido | DTO final contém endereço formatado, latitude, longitude, `placeId` e provider | Positivo |
+| RN-GEO-02-N | Geolocalização trata upstream indisponível | Nominatim retorna erro ou timeout | Executar serviço com handler simulando falha | Erro controlado é retornado, sem exceção não tratada nem dado parcial persistido | Negativo |
+
+&emsp;A execução mínima desta frente usa o comando `dotnet test src/backend/Spotlight.sln --configuration Release --filter "Category!=Integration"`. Quando houver teste que dependa de MongoDB real via Testcontainers, a execução deve registrar explicitamente a variável de ambiente que libera os casos opt-in.
+
 ### Relação com os requisitos
 
 &emsp;A estratégia de testes articula-se diretamente aos **dezesseis RFs** e **doze RNFs** definidos na seção 3 e correlacionados na seção 3.3. Os testes funcionais verificam *o que* o sistema faz; os testes de RNFs verificam *como* ele se comporta sob carga, em produção e em dispositivos mobile; os testes de usabilidade validam a experiência percebida por usuários reais, incluindo público idoso e com baixa familiaridade digital; os testes de APIs externas e de integração garantem que as fronteiras SOA, especialmente autenticação, ticketeira e persistência, operem de forma coerente e resiliente. Nenhuma frente isolada substitui as demais: a conformidade do Spotlight depende da convergência dos resultados registrados nas subseções 9.1 a 9.4 em relação aos critérios de aceitação da seção 3.
@@ -7445,6 +7483,8 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 #### 9.3.1.5 Metodologia SUS
 
 &emsp;Após a execução das tarefas estruturadas, cada participante responderá ao questionário **SUS** em português, com escala Likert de 1 (discordo totalmente) a 5 (concordo totalmente). A pontuação individual será convertida para a escala padrão de 0 a 100; a média do grupo será confrontada com o limiar definido na seção 9.3.1.8.
+
+&emsp;O cálculo segue a planilha SUS usada na rodada: para questões ímpares (1, 3, 5, 7 e 9), calcula-se `resposta - 1`; para questões pares (2, 4, 6, 8 e 10), calcula-se `5 - resposta`. A soma dos dez valores é multiplicada por `2,5`, resultando na nota final de cada participante em escala de 0 a 100. A interpretação adotada é: `68` como média de usabilidade, acima de `68` como acima da média, acima de `80,3` como classificação A e abaixo de `51` como classificação F.
 
 &emsp;As dez perguntas fixas do SUS, sem alteração de redação, são:
 
