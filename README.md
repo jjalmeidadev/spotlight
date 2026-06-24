@@ -106,9 +106,9 @@
   <img src="documentos/img/bottom.png" alt="bottom">
 </p>
 
-# Spotlight <nome do projeto>
+# Spotlight
 
-## Dora <nome do grupo>
+## Grupo 04 - Dora
 
 ## 📝 Descrição
 
@@ -147,11 +147,11 @@ A pasta `documentos/` concentra a documentação do produto, do processo e das e
 
 ## 📁 Estrutura de pastas
 
-O repositório mantém o app Expo na raiz, os componentes de interface em `src/frontend`, os serviços .NET em `src/backend` e a documentação em `documentos`.
+O repositório mantém o app Expo na raiz por requisito de execução do React Native/Expo, os componentes de interface em `src/frontend`, os serviços .NET em `src/backend`, os testes em `src/backend/tests` e a documentação em `documentos`.
 
 ```text
 📦 g04
- ┣ 📂 .github                         automações e configurações do repositório
+ ┣ 📂 .githook                        hooks locais de validação de commits
  ┣ 📂 assets                          fontes e imagens usadas pelo app Expo
  ┣ 📂 deploy
  ┃ ┗ 📂 nginx                         configuração do Nginx para produção
@@ -175,7 +175,9 @@ O repositório mantém o app Expo na raiz, os componentes de interface em `src/f
  ┃ ┃ ┣ 📂 ml-engine                   preparação, treino e inferência do modelo
  ┃ ┃ ┣ 📂 scripts                     scripts auxiliares do backend
  ┃ ┃ ┣ 📂 services                    serviços catalog, user, recommendation e geolocation
- ┃ ┃ ┣ 📂 tests                       projetos de testes automatizados
+ ┃ ┃ ┣ 📂 tests                       testes automatizados xUnit e RNFs
+ ┃ ┃ ┃ ┣ 📂 Spotlight.*.Tests         testes unitários e de integração por serviço
+ ┃ ┃ ┃ ┗ 📂 non-functional            roteiros, scripts e resultados de RNFs
  ┃ ┃ ┣ 📄 run-all.ps1
  ┃ ┃ ┗ 📄 Spotlight.sln
  ┃ ┣ 📂 database
@@ -185,6 +187,7 @@ O repositório mantém o app Expo na raiz, os componentes de interface em `src/f
  ┃ ┣ 📂 dataset                       bases de apoio para recomendação
  ┃ ┣ 📂 frontend                      telas, componentes, hooks, tema e repositórios do app
  ┃ ┗ 📂 models                        artefatos e projetos de treinamento do modelo
+ ┣ 📄 .gitlab-ci.yml                  pipeline de CI do GitLab
  ┣ 📄 App.js                          entrada principal do Expo
  ┣ 📄 Dockerfile.frontend             build do frontend para dev e produção
  ┣ 📄 docker-compose.yml              Compose dos serviços backend atuais
@@ -195,7 +198,7 @@ O repositório mantém o app Expo na raiz, os componentes de interface em `src/f
  ┗ 📄 README.md
 ```
 
-Diretórios gerados localmente, como `node_modules/`, `dist/`, `.expo/`, `bin/` e `obj/`, não fazem parte da estrutura essencial do repositório.
+Diretórios e arquivos gerados localmente, como `node_modules/`, `dist/`, `.expo/`, `TestResults/`, `bin/`, `obj/`, `__pycache__/` e `*.pyc`, não fazem parte da estrutura essencial do repositório.
 
 ## ⚙️ Instalação e execução
 
