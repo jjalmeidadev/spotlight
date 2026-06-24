@@ -4563,13 +4563,102 @@ flowchart TB
 
 <div align="center">
 
-<sub>Figura 47 - Arquitetura de Codificação do Spotlight</sub><br>
+<sub>Figura 47 - Arquitetura de Codificação do Spotlight (versão final)</sub><br>
 
-![Arquitetura de Codificação](./img/arquiteturacodificação%20.png)
+![Arquitetura de Codificação](./img/arquitetura-codificacao.png)
 
 Fonte: Material produzido pelos autores (2026).
 
 </div>
+
+&emsp;O diagrama acima reflete a implementação final entregue ao longo das cinco sprints, com destaque para a **camada de recomendação** (Serviço de Recomendação orquestrando o ML Engine em ML.NET), a **telemetria comportamental persistida no MongoDB Atlas** (fluxo App → Gateway → Serviço de Usuário → coleção `interacoes`) e a **integração frontend-backend** mediada exclusivamente pelo API Gateway via `ISpotlightAPI` (HTTPS/REST). As linhas pontilhadas representam integrações de validação ou dependências técnicas, como a validação do JWT emitido pelo Supabase Auth.
+
+#### Código-fonte do diagrama (PlantUML)
+
+&emsp;O diagrama foi gerado a partir do código PlantUML abaixo, mantido versionado para permitir futuras atualizações da arquitetura:
+
+```plantuml
+@startuml
+title Arquitetura de Codificacao - Spotlight (g04) — Versao Final
+
+skinparam shadowing false
+skinparam defaultFontName "Helvetica"
+skinparam componentStyle uml2
+skinparam packageStyle rectangle
+skinparam ArrowColor #4A4A4A
+skinparam roundCorner 8
+top to bottom direction
+
+' ===================== 1. Apresentacao =====================
+package "1. Camada de Apresentacao" #EAF2FB {
+  component "Spotlight App\n(React Native + TypeScript - MVVM)" as App {
+    component "screens / viewmodels" as Views
+    component "repositories (HTTP)" as Repos
+    component "hooks / useTelemetrySession" as Tele
+  }
+}
+
+' ===================== Identidade externa =====================
+node "Supabase Auth\n(JWT / OAuth)" as Auth #FFF3E0
+
+' ===================== 2. API Gateway =====================
+package "2. Borda" #E8F5E9 {
+  component "API Gateway\n(ASP.NET Core .NET 9 - YARP)\nJWT - roteamento - rate limit" as Gateway
+}
+
+' ===================== 3. Servicos SOA =====================
+package "3. Servicos de Negocio (SOA - .NET 9)" #F3E5F5 {
+  component "Servico de Catalogo\n(ICatalog)" as Catalog
+  component "Servico de Usuario\n(IUserPrefs)" as User
+  component "Servico de Recomendacao\n(IRecommendation)" as Reco
+  component "Servico de Geolocalizacao\n(IGeolocation)" as Geo
+}
+
+' ===================== 4. Motor de Recomendacao =====================
+package "4. Motor de Recomendacao" #FFF8E1 {
+  component "ML Engine\n(C# + ML.NET - k-NN / SVD)" as ML
+  artifact "modelo .zip +\nitem_similarities.json" as Model
+}
+
+' ===================== 5. Camada de Dados =====================
+package "5. Camada de Dados (Persistencia Poliglota)" #FCE4EC {
+  database "Supabase DB\n(PostgreSQL)" as PG
+  database "MongoDB Atlas\n(telemetria - colecao interacoes)" as Mongo
+}
+
+' ===================== Servicos externos =====================
+node "OpenStreetMap /\nNominatim API" as OSM #FFF3E0
+
+' ===================== Relacoes =====================
+App  --> Auth     : IAuth (login JWT)
+App  --> Gateway  : ISpotlightAPI\nHTTPS / REST
+Tele --> Gateway  : POST /usuario/telemetria
+
+Gateway ..> Auth   : valida JWT
+Gateway --> Catalog : ICatalog
+Gateway --> User    : IUserPrefs
+Gateway --> Reco    : IRecommendation
+Gateway --> Geo     : IGeolocation
+
+Reco --> Geo   : contexto geografico
+Reco --> ML    : consome predicoes
+ML   --> Model : carrega artefato
+ML   --> PG    : SQL (leitura)
+
+Catalog --> PG  : SQL
+User    --> PG  : SQL
+Reco    --> PG  : SQL
+Geo     --> OSM : IGeocoding
+
+User --> Mongo : NoSQL (telemetria bruta)
+
+legend right
+  Linha cheia  = chamada/fluxo ativo
+  Linha pontilhada = validacao ou dependencia tecnica
+endlegend
+
+@enduml
+```
 
 #### Descrição das Camadas
 
