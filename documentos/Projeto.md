@@ -1457,72 +1457,72 @@ Esta seção detalha os requisitos do projeto Spotlight, apresentando a especifi
 
 ## 3.1 Requisitos Funcionais (RFs)
 
- &emsp; Os requisitos funcionais representam as funcionalidades que o sistema deverá oferecer para atender os objetivos e necessidades dos usuários da plataforma de recomendação de espetáculos da Aventura. Cada requisito define uma funcionalidade essencial do sistema, considerando tanto a experiência do usuário quanto os mecanismos de recomendação e gestão administrativa. Os testes descritos incluem pré-condição, procedimento, resultado esperado e pós-condição, garantindo a validação das funcionalidades implementadas.
+ &emsp; Os requisitos funcionais representam as funcionalidades que o sistema deverá oferecer para atender os objetivos e necessidades dos usuários da plataforma de recomendação de espetáculos da Aventura. Cada requisito define uma funcionalidade essencial do sistema, considerando tanto a experiência do usuário quanto os mecanismos de recomendação e gestão administrativa. Para atender ao feedback da Sprint 4, os critérios de aceitação foram separados dos procedimentos de validação: o critério descreve a condição objetiva de aprovação do requisito, enquanto o procedimento indica como essa condição será exercitada nos testes planejados nas seções 9.1, 9.3 e 9.4.
 
 <div align="center"> <sub>Tabela 6 - Requisitos funcionais</sub>
 
 #### Autenticação e Perfil
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF01 | Como usuário, eu quero me cadastrar na plataforma informando meus dados pessoais (como nome, email e senha) para acessar funcionalidades personalizadas e utilizar o sistema de recomendação. | Usuário não autenticado. | Inserir dados válidos e inválidos e submeter cadastro. | Usuário cadastrado com sucesso quando dados são válidos; mensagens de erro exibidas para campos inválidos. | Usuário registrado no sistema. |
-| RF02 | Como usuário, eu quero realizar login informando meu email e senha para acessar minha conta e meus dados personalizados. | Usuário previamente cadastrado. | Inserir credenciais válidas e inválidas. | Acesso permitido com credenciais válidas; erro exibido para dados incorretos. | Sessão autenticada iniciada. |
-| RF03 | Como usuário, eu quero definir minhas preferências (como gênero, faixa de preço e localização) para receber recomendações mais relevantes e alinhadas ao meu perfil. | Usuário autenticado. | Selecionar preferências e salvar. | Preferências armazenadas corretamente no sistema. | Perfil do usuário atualizado. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF01 | Como usuário, eu quero me cadastrar na plataforma informando meus dados pessoais (como nome, email e senha) para acessar funcionalidades personalizadas e utilizar o sistema de recomendação. | Usuário não autenticado. | Cadastro válido cria conta autenticável; dados inválidos são rejeitados com mensagem clara e sem criação de usuário inconsistente. | Executar cenários de cadastro com dados válidos, campos obrigatórios ausentes e credenciais inválidas, conforme testes funcionais e integração de autenticação. | Usuário registrado no sistema quando os dados forem válidos. |
+| RF02 | Como usuário, eu quero realizar login informando meu email e senha para acessar minha conta e meus dados personalizados. | Usuário previamente cadastrado. | Credenciais válidas iniciam sessão; credenciais inválidas bloqueiam o acesso e exibem erro sem iniciar sessão. | Executar login com credenciais válidas, senha incorreta e usuário inexistente. | Sessão autenticada iniciada apenas para credenciais válidas. |
+| RF03 | Como usuário, eu quero definir minhas preferências (como gênero, faixa de preço e localização) para receber recomendações mais relevantes e alinhadas ao meu perfil. | Usuário autenticado. | Preferências selecionadas são persistidas e recuperadas no perfil do usuário sem perda de categorias, gêneros ou faixa de preço. | Selecionar preferências no onboarding ou edição de perfil, salvar e consultar os dados persistidos. | Perfil do usuário atualizado. |
 
 ---
 
 #### Exploração e Navegação
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF04 | Como usuário, eu quero visualizar recomendações personalizadas com base no meu perfil e comportamento na plataforma para descobrir espetáculos alinhados aos meus interesses. | Usuário autenticado com ou sem histórico de interações. | Acessar tela inicial do sistema. | Lista com no mínimo 5 recomendações exibida, ordenada por relevância, contendo título, categoria, data e indicação de personalização (ex: “baseado nas suas preferências”). | Recomendações exibidas ao usuário. |
-| RF05 | Como usuário, eu quero pesquisar espetáculos por nome ou palavra-chave para encontrar conteúdos específicos. | Base de espetáculos disponível. | Inserir termo de busca válido e inválido. | Lista de resultados correspondente ao termo pesquisado ou mensagem de “nenhum resultado encontrado”. | Lista filtrada exibida. |
-| RF06 | Como usuário, eu quero filtrar espetáculos por categoria, data e faixa de preço para refinar minha busca. | Lista de espetáculos carregada. | Aplicar diferentes combinações de filtros. | Lista atualizada conforme filtros selecionados. | Lista refinada exibida ao usuário. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF04 | Como usuário, eu quero visualizar recomendações personalizadas com base no meu perfil e comportamento na plataforma para descobrir espetáculos alinhados aos meus interesses. | Usuário autenticado com ou sem histórico de interações. | A tela inicial exibe recomendações relevantes e identificáveis, com fallback por popularidade quando não houver histórico suficiente. | Acessar a tela inicial com usuários com histórico, sem histórico e com preferências distintas. | Recomendações exibidas ao usuário. |
+| RF05 | Como usuário, eu quero pesquisar espetáculos por nome ou palavra-chave para encontrar conteúdos específicos. | Base de espetáculos disponível. | Termos existentes retornam espetáculos compatíveis; termos sem correspondência exibem estado vazio compreensível. | Inserir termos de busca válidos, parciais e sem resultado. | Lista filtrada exibida. |
+| RF06 | Como usuário, eu quero filtrar espetáculos por categoria, data e faixa de preço para refinar minha busca. | Lista de espetáculos carregada. | Filtros aplicados alteram a lista de acordo com os critérios selecionados e podem ser combinados sem quebrar a navegação. | Aplicar filtros isolados e combinados, incluindo combinações com poucos ou nenhum item. | Lista refinada exibida ao usuário. |
 
 ---
 
 #### Conteúdo
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF07 | Como usuário, eu quero visualizar detalhes completos de um espetáculo para avaliar se tenho interesse em assisti-lo. | Espetáculo disponível no sistema. | Acessar página de detalhes do espetáculo. | Exibição de informações completas como descrição, categoria, data, horário, preço e local. | Dados apresentados ao usuário. |
-| RF08 | Como usuário, eu quero visualizar avaliações de outros usuários para apoiar minha decisão sobre assistir ou não a um espetáculo. | Avaliações cadastradas para o espetáculo. | Acessar seção de avaliações. | Lista de avaliações exibida corretamente, contendo nota e comentário. | Avaliações visíveis ao usuário. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF07 | Como usuário, eu quero visualizar detalhes completos de um espetáculo para avaliar se tenho interesse em assisti-lo. | Espetáculo disponível no sistema. | A página de detalhes apresenta informações suficientes para decisão do usuário, incluindo título, descrição, categoria, preço, local e ação de compra quando disponível. | Abrir detalhes a partir do catálogo e de recomendações, verificando campos obrigatórios e comportamento com dados opcionais ausentes. | Dados apresentados ao usuário. |
+| RF08 | Como usuário, eu quero visualizar avaliações de outros usuários para apoiar minha decisão sobre assistir ou não a um espetáculo. | Avaliações cadastradas para o espetáculo. | Avaliações disponíveis são exibidas com nota e comentário; ausência de avaliações apresenta estado vazio sem erro. | Acessar seção de avaliações de espetáculos com e sem avaliações cadastradas. | Avaliações visíveis ao usuário quando existirem. |
 
 ---
 
 #### Engajamento
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF09 | Como usuário, eu quero avaliar espetáculos atribuindo uma nota para expressar minha opinião e contribuir com o sistema. | Usuário autenticado. | Inserir nota válida e submeter. | Avaliação registrada corretamente no sistema. | Avaliação armazenada. |
-| RF10 | Como usuário, eu quero comentar sobre espetáculos para compartilhar minha experiência com outros usuários. | Usuário autenticado. | Inserir comentário válido e enviar. | Comentário exibido corretamente na página do espetáculo. | Comentário registrado no sistema. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF09 | Como usuário, eu quero avaliar espetáculos atribuindo uma nota para expressar minha opinião e contribuir com o sistema. | Usuário autenticado. | Nota válida é persistida para o espetáculo e associada ao usuário; nota inválida ou usuário não autenticado não gera avaliação. | Enviar avaliações com nota válida, nota fora do intervalo permitido e sessão ausente. | Avaliação armazenada quando válida. |
+| RF10 | Como usuário, eu quero comentar sobre espetáculos para compartilhar minha experiência com outros usuários. | Usuário autenticado. | Comentário válido é persistido e exibido no contexto do espetáculo; comentário vazio ou usuário não autenticado é rejeitado. | Enviar comentário válido, vazio e sem autenticação, verificando persistência e exibição. | Comentário registrado no sistema quando válido. |
 
 ---
 
 #### Coleta de Dados
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF11 | Como sistema, eu quero registrar interações dos usuários (como cliques, buscas, visualizações e avaliações) para alimentar e melhorar continuamente o algoritmo de recomendação. | Usuário interagindo com a plataforma. | Realizar diferentes tipos de interação no sistema. | Registro contendo ID do usuário, ID do espetáculo, tipo de ação e timestamp, sem impacto perceptível na navegação. | Dados armazenados para uso no algoritmo. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF11 | Como sistema, eu quero registrar interações dos usuários (como cliques, buscas, visualizações e avaliações) para alimentar e melhorar continuamente o algoritmo de recomendação. | Usuário interagindo com a plataforma. | Eventos relevantes são registrados com identificador de usuário ou sessão, espetáculo quando aplicável, tipo de ação e timestamp, sem bloquear a navegação. | Executar cliques, buscas, visualizações e avaliações, conferindo persistência da telemetria no MongoDB Atlas ou retorno best-effort controlado. | Dados armazenados para uso no algoritmo quando a telemetria estiver disponível. |
 
 ---
 
 #### Recomendação
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF12 | Como sistema, eu quero gerar recomendações personalizadas com base nas preferências declaradas e no histórico de interações do usuário para oferecer sugestões relevantes e contextualizadas. | Dados de preferências e histórico disponíveis. | Gerar recomendações para usuário com histórico. | Lista de recomendações personalizada exibida corretamente. | Recomendações geradas. |
-| RF13 | Como sistema, eu quero atualizar as recomendações após novas interações do usuário para tornar as sugestões progressivamente mais precisas ao longo do uso. | Novas interações registradas. | Realizar nova interação e atualizar recomendações. | Recomendações ajustadas conforme comportamento recente do usuário. | Recomendações atualizadas. |
-| RF14 | Como sistema, eu quero recomendar conteúdos com base em usuários com perfis e comportamentos semelhantes (filtragem colaborativa). | Base de usuários com interações registrada. | Comparar perfis e gerar recomendações. | Itens recomendados com base na similaridade entre usuários. | Recomendações exibidas. |
-| RF15 | Como sistema, eu quero recomendar conteúdos populares para usuários com pouco ou nenhum histórico de interação. | Usuário novo ou com baixa interação. | Acessar sistema com usuário sem histórico. | Lista de recomendações baseada em popularidade exibida. | Recomendações exibidas ao usuário. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF12 | Como sistema, eu quero gerar recomendações personalizadas com base nas preferências declaradas e no histórico de interações do usuário para oferecer sugestões relevantes e contextualizadas. | Dados de preferências e histórico disponíveis. | A API retorna lista de recomendações compatível com preferências e histórico, sem duplicidades indevidas e respeitando o limite solicitado. | Gerar recomendações para usuários com preferências e histórico conhecidos, comparando categorias, gêneros e ordenação retornada. | Recomendações geradas. |
+| RF13 | Como sistema, eu quero atualizar as recomendações após novas interações do usuário para tornar as sugestões progressivamente mais precisas ao longo do uso. | Novas interações registradas. | Interações recentes influenciam a composição ou justificativa das recomendações em nova consulta. | Registrar nova interação, consultar recomendações novamente e comparar variação esperada nos itens ou justificativas. | Recomendações atualizadas. |
+| RF14 | Como sistema, eu quero recomendar conteúdos com base em usuários com perfis e comportamentos semelhantes (filtragem colaborativa). | Base de usuários com interações registrada. | A fileira colaborativa retorna itens relacionados a usuários semelhantes, sem depender apenas de popularidade global. | Executar cenário com usuários de perfis próximos e verificar recomendações user based. | Recomendações colaborativas exibidas. |
+| RF15 | Como sistema, eu quero recomendar conteúdos populares para usuários com pouco ou nenhum histórico de interação. | Usuário novo ou com baixa interação. | Usuários em cold start recebem recomendações por popularidade ou fallback documentado, evitando lista vazia. | Acessar o sistema com usuário novo ou sem histórico e consultar recomendações. | Recomendações exibidas ao usuário. |
 
 ---
 
 #### Administração
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF16 | Como administrador, eu quero gerenciar conteúdos da plataforma (espetáculos, categorias e avaliações) para garantir a atualização, consistência e qualidade das informações exibidas aos usuários. | Administrador autenticado. | Criar, editar e remover conteúdos no sistema. | Alterações refletidas corretamente na plataforma. | Sistema atualizado. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF16 | Como administrador, eu quero gerenciar conteúdos da plataforma (espetáculos, categorias e avaliações) para garantir a atualização, consistência e qualidade das informações exibidas aos usuários. | Administrador autenticado. | Usuário administrador consegue criar, editar, remover ou promover dados permitidos; usuário comum não acessa ações administrativas. | Executar ações administrativas autenticado como admin e repetir tentativa com usuário sem permissão. | Sistema atualizado apenas por usuário autorizado. |
 </div>
 
 ## 3.2 Requisitos Não Funcionais (RNFs)
