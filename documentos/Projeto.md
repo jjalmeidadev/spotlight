@@ -5484,14 +5484,21 @@ Subindo o backend localmente (`src/backend/run-all.ps1`), a UI agregada fica em:
 
 > **http://localhost:5000/swagger**
 
+No ambiente publicado (Compose de produção, `docker-compose.prod.yml`), apenas
+o container `frontend` (Nginx) é exposto na rede pública. O Nginx faz
+proxy de `/api/*` para o gateway interno, então a UI fica em:
+
+> **`http://<host>:<FRONTEND_PORT>/api/swagger`** *(preencher com o host
+> publicado — ex.: servidor Inteli — quando a URL pública estiver disponível)*
+
 O dropdown "Select a definition" no canto superior direito alterna entre:
 
 | Definição | Fonte | Rotas |
 |---|---|---|
 | Gateway | gateway próprio | — |
 | Catálogo | proxy YARP → `/catalogo/swagger/v1/swagger.json` | 11 |
-| Usuário | proxy YARP → `/usuario/swagger/v1/swagger.json` | 6 |
-| Recomendação | proxy YARP → `/recomendacao/swagger/v1/swagger.json` | 2 |
+| Usuário | proxy YARP → `/usuario/swagger/v1/swagger.json` | 8 |
+| Recomendação | proxy YARP → `/recomendacao/swagger/v1/swagger.json` | 3 |
 | Geolocalização | proxy YARP → `/geolocalizacao/swagger/v1/swagger.json` | 2 |
 
 Como o gateway proxia os `swagger.json` dos serviços, **não há problemas de
@@ -5511,11 +5518,21 @@ sua própria UI:
 
 ### Como acessar
 
+#### Localmente
+
 1. Subir o backend completo: `pwsh src/backend/run-all.ps1` (ou `dotnet run`
    em cada `Spotlight.<Servico>.csproj`).
 2. Abrir **http://localhost:5000/swagger** no navegador.
 3. Escolher o serviço no dropdown.
 4. Clicar em uma rota → **"Try it out"** → preencher parâmetros → **"Execute"**.
+
+#### No ambiente publicado
+
+1. Subir o stack de produção: `docker compose -f docker-compose.prod.yml up -d`
+   (ou abrir o host onde já está rodando).
+2. Abrir **`http://<host>:<FRONTEND_PORT>/api/swagger`** no navegador (o Nginx
+   encaminha `/api/*` para o gateway interno).
+3. Mesmo fluxo de seleção e "Try it out".
 
 > Para rotas que exigem JWT (`cadastrado` ou `administrador`), clique em
 > **"Authorize"** no topo da UI e cole o token no formato

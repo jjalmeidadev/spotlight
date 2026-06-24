@@ -315,6 +315,10 @@ A aplicacao fica disponivel em:
 http://localhost:8080
 ```
 
+A documentacao Swagger agregada (Gateway + 4 servicos) fica em
+`http://localhost:8080/api/swagger`. No ambiente publicado, trocar
+`localhost:8080` pelo host real.
+
 Comandos uteis:
 
 ```powershell
