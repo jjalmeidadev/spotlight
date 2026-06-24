@@ -319,7 +319,9 @@ type BarChartProps = {
 };
 
 function BarChart({ data, maxValue }: BarChartProps) {
-  const yAxisLabels = ['25k', '15k', '10k', '5k', '1k', '0'];
+  const axisMaxValue = Math.max(1, Math.ceil(maxValue));
+  const yAxisLabels = [axisMaxValue, axisMaxValue * 0.75, axisMaxValue * 0.5, axisMaxValue * 0.25, 0]
+    .map((value) => String(Math.round(value)));
   const barTrackHeight = 210;
 
   return (
