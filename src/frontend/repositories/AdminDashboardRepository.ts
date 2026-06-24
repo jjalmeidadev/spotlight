@@ -5,7 +5,7 @@ import {
   obterDetalheEspetaculoCatalogo,
 } from '@/frontend/repositories/CatalogRepository';
 
-const COLORS = ['#526cf0', '#ff4627', '#17211D', '#D7DE65', '#8e8e8e'];
+const COLORS = ['#526cf0', '#ff4627', '#17211D', '#D7DE65', '#8e8e8e', '#1f9d7a', '#a45ee5', '#f29f05'];
 const WEEK_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
 const MONTH_LABELS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
@@ -70,7 +70,6 @@ function buildGenreShares(shows: Array<{ genre?: string | null }>) {
 
   return Array.from(counts.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
     .map(([label, value], index) => ({
       id: label.toLowerCase().replace(/\s+/g, '-'),
       label,

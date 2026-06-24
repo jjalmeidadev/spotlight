@@ -28,6 +28,7 @@ function AppContent() {
 	const [screen, setScreen] = React.useState('loading');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
 	const [userName, setUserName] = React.useState('Leonardo');
+	const [userEmail, setUserEmail] = React.useState('');
 	const [accessToken, setAccessToken] = React.useState(null);
 	const [userLocationAddress, setUserLocationAddress] = React.useState(null);
 
@@ -58,9 +59,18 @@ function AppContent() {
 
 	async function handleLogin(usuario) {
 		setUserName(usuario.nome);
+		setUserEmail(usuario.email);
 		setAccessToken(usuario.accessToken ?? null);
 		setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
 		await direcionarAposAutenticacao(usuario);
+	}
+
+	function handleLogout() {
+		setAccessToken(null);
+		setUserName('');
+		setUserEmail('');
+		setUserLocationAddress(null);
+		setScreen('login');
 	}
 
 	async function direcionarAposAutenticacao(usuario) {
@@ -123,6 +133,7 @@ function AppContent() {
 					}
 
 					setUserName(usuario.nome);
+					setUserEmail(usuario.email);
 					setAccessToken(usuario.accessToken ?? null);
 					setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
 					await direcionarAposAutenticacao(usuario);
@@ -147,8 +158,11 @@ function AppContent() {
 		return (
 			<CatalogView
 				accessToken={accessToken}
+				profileEmail={userEmail}
 				profileName={userName}
 				userLocationAddress={userLocationAddress}
+				onLogout={handleLogout}
+				onProfileUpdated={setUserName}
 				onItemPress={(item) => {
 					setEspetaculoId(item.id);
 					setScreen('detalhes');
@@ -170,7 +184,15 @@ function AppContent() {
 	}
 
 	if (screen === 'dashboard') {
-		return <AdminDashboardScreen profileName={userName} />;
+		return (
+			<AdminDashboardScreen
+				accessToken={accessToken}
+				profileEmail={userEmail}
+				profileName={userName}
+				onLogout={handleLogout}
+				onProfileUpdated={setUserName}
+			/>
+		);
 	}
 
 	if (screen === 'email-confirmado') {
