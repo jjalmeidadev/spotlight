@@ -107,6 +107,68 @@ public class UsuarioRepository(NpgsqlDataSource dataSource) : IUsuarioRepository
         return true;
     }
 
+    public async Task<Domain.Entities.Usuario?> PromoverAdministradorPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken)
+    {
+        var emailNormalizado = email.Trim().ToLowerInvariant();
+
+        await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);
+        await using var transacao = await conexao.BeginTransactionAsync(cancellationToken);
+
+        Guid? usuarioId;
+        await using (var localizar = conexao.CreateCommand())
+        {
+            localizar.Transaction = transacao;
+            localizar.CommandText = """
+                SELECT id_usuario
+                FROM public.usuario
+                WHERE lower(email) = @email;
+                """;
+            localizar.Parameters.AddWithValue("email", emailNormalizado);
+            var resultado = await localizar.ExecuteScalarAsync(cancellationToken);
+            usuarioId = resultado is Guid id ? id : null;
+        }
+
+        if (usuarioId is null)
+        {
+            await transacao.RollbackAsync(cancellationToken);
+            return null;
+        }
+
+        await using (var atualizarPerfil = conexao.CreateCommand())
+        {
+            atualizarPerfil.Transaction = transacao;
+            atualizarPerfil.CommandText = """
+                UPDATE public.usuario
+                SET tipo_usuario = 'administrador'
+                WHERE id_usuario = @id;
+                """;
+            atualizarPerfil.Parameters.AddWithValue("id", usuarioId.Value);
+            await atualizarPerfil.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await using (var atualizarAuth = conexao.CreateCommand())
+        {
+            atualizarAuth.Transaction = transacao;
+            atualizarAuth.CommandText = """
+                UPDATE auth.users
+                SET raw_app_meta_data = jsonb_set(
+                    COALESCE(raw_app_meta_data, '{}'::jsonb),
+                    '{tipoUsuario}',
+                    '"administrador"'::jsonb,
+                    true
+                )
+                WHERE id = @id;
+                """;
+            atualizarAuth.Parameters.AddWithValue("id", usuarioId.Value);
+            await atualizarAuth.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await transacao.CommitAsync(cancellationToken);
+        return await ObterAsync(usuarioId.Value, cancellationToken);
+    }
+
     public async Task<Preferencias?> ObterPreferenciasAsync(Guid id, CancellationToken cancellationToken)
     {
         await using var conexao = await dataSource.OpenConnectionAsync(cancellationToken);

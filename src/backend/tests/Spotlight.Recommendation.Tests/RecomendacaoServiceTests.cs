@@ -167,6 +167,23 @@ public class RecomendacaoServiceTests
     }
 
     [Fact]
+    public async Task PostgresStrategy_QuandoPreProcessadoVazio_UsaFallbackUserBased()
+    {
+        var repositorio = new FakeRecomendacaoRepository
+        {
+            Recomendacoes = [],
+            RecomendacoesUserBased = [NovaRecomendacao(8, "Indicacao colaborativa", 0.82m)]
+        };
+        var strategy = new PostgresPreProcessadoRecomendacaoStrategy(repositorio);
+
+        var resultado = await strategy.ListarAsync(Guid.NewGuid(), 10, Ct);
+
+        var item = Assert.Single(resultado);
+        Assert.Equal("Indicacao colaborativa", item.Espetaculo.Titulo);
+        Assert.Equal(1, repositorio.ListarUserBasedCalls);
+    }
+
+    [Fact]
     public async Task PostgresStrategy_PreservaOrdemDoRepositorio()
     {
         var repositorio = new FakeRecomendacaoRepository
@@ -482,10 +499,12 @@ public class RecomendacaoServiceTests
     private sealed class FakeRecomendacaoRepository : IRecomendacaoRepository
     {
         public IReadOnlyList<RecomendacaoEntity> Recomendacoes { get; set; } = [];
+        public IReadOnlyList<RecomendacaoEntity> RecomendacoesUserBased { get; set; } = [];
         public IReadOnlyDictionary<int, EspetaculoRecomendado> EspetaculosPorId { get; set; } =
             new Dictionary<int, EspetaculoRecomendado>();
         public Exception? ExcecaoAoObterEspetaculos { get; init; }
         public int ListarPorUsuarioCalls { get; private set; }
+        public int ListarUserBasedCalls { get; private set; }
         public int[] LastEspetaculoIds { get; private set; } = [];
 
         public Task<IReadOnlyList<RecomendacaoEntity>> ListarPorUsuarioAsync(
@@ -493,6 +512,13 @@ public class RecomendacaoServiceTests
         {
             ListarPorUsuarioCalls++;
             return Task.FromResult(Recomendacoes);
+        }
+
+        public Task<IReadOnlyList<RecomendacaoEntity>> ListarUserBasedPorAvaliacoesAsync(
+            Guid usuarioId, int limite, CancellationToken cancellationToken)
+        {
+            ListarUserBasedCalls++;
+            return Task.FromResult(RecomendacoesUserBased);
         }
 
         public Task<IReadOnlyDictionary<int, EspetaculoRecomendado>> ObterEspetaculosPorIdsAsync(

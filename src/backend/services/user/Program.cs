@@ -61,6 +61,7 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     builder.Services.AddScoped<ObterPreferenciasUseCase>();
     builder.Services.AddScoped<AtualizarPreferenciasUseCase>();
     builder.Services.AddScoped<ListarAvaliacoesUsuarioUseCase>();
+    builder.Services.AddScoped<PromoverAdministradorUseCase>();
 }
 
 if (!string.IsNullOrWhiteSpace(mongoConnectionString)

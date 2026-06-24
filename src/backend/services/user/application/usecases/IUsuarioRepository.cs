@@ -19,6 +19,10 @@ public interface IUsuarioRepository
 
     Task<bool> AtualizarAsync(Guid id, UsuarioUpdateDto dados, CancellationToken cancellationToken);
 
+    Task<Domain.Entities.Usuario?> PromoverAdministradorPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken);
+
     Task<Preferencias?> ObterPreferenciasAsync(Guid id, CancellationToken cancellationToken);
 
     Task<bool> AtualizarPreferenciasAsync(Guid id, Preferencias dados, CancellationToken cancellationToken);

@@ -17,12 +17,11 @@ import { useLoginViewModel } from '../viewmodels/useLoginViewModel';
 type LoginViewProps = {
   onLogin?: (usuario: Usuario) => void;
   onCadastroPress?: () => void;
-  onDevModePress?: () => void;
 };
 
 const backgroundImage = require('../../../assets/images/login-bg.png');
 
-export default function LoginView({ onLogin, onCadastroPress, onDevModePress }: LoginViewProps) {
+export default function LoginView({ onLogin, onCadastroPress }: LoginViewProps) {
   const { email, senha, loading, error, setEmail, setSenha, entrar } = useLoginViewModel(onLogin);
 
   return (
@@ -81,15 +80,6 @@ export default function LoginView({ onLogin, onCadastroPress, onDevModePress }: 
               </Pressable>
             </View>
 
-            {onDevModePress ? (
-              <Pressable
-                accessibilityRole="button"
-                onPress={onDevModePress}
-                style={({ pressed }) => [styles.devButton, pressed && styles.pressed]}
-              >
-                <Text style={styles.devButtonText}>Modo dev</Text>
-              </Pressable>
-            ) : null}
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -219,23 +209,5 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     textDecorationLine: 'underline',
-  },
-  devButton: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    borderColor: 'rgba(255,255,255,0.18)',
-    borderRadius: 6,
-    borderWidth: 1,
-    minHeight: 30,
-    paddingHorizontal: 12,
-    justifyContent: 'center',
-  },
-  devButtonText: {
-    color: 'rgba(255,255,255,0.45)',
-    fontFamily: 'Gotham-Book',
-    fontSize: 10,
-    letterSpacing: 0.8,
-    lineHeight: 14,
-    textTransform: 'uppercase',
   },
 });

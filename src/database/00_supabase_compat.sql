@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS auth.users (
     email              VARCHAR(255) UNIQUE,
     encrypted_password VARCHAR(255),
     email_confirmed_at TIMESTAMPTZ,
+    raw_app_meta_data  JSONB NOT NULL DEFAULT '{}'::JSONB,
     raw_user_meta_data JSONB NOT NULL DEFAULT '{}'::JSONB,
     created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()

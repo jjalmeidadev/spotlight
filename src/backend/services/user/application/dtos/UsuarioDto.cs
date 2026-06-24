@@ -22,3 +22,9 @@ public class UsuarioUpdateDto
     public string? Nome { get; set; }
     public DateOnly? DataNascimento { get; set; }
 }
+
+/// <summary>Body de POST /usuario/admin/usuarios/promover.</summary>
+public class PromoverAdministradorDto
+{
+    public string Email { get; set; } = string.Empty;
+}

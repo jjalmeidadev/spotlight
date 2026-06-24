@@ -11,6 +11,13 @@ public interface IRecomendacaoRepository
         Guid usuarioId, int limite, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Calcula recomendacoes colaborativas em tempo de leitura usando avaliacoes
+    /// de usuarios com gostos semelhantes ao usuario autenticado.
+    /// </summary>
+    Task<IReadOnlyList<Domain.Entities.Recomendacao>> ListarUserBasedPorAvaliacoesAsync(
+        Guid usuarioId, int limite, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Busca os espetaculos recomendados por identificador para enriquecer a
     /// saida ranqueada pelo modelo incrementado.
     /// </summary>

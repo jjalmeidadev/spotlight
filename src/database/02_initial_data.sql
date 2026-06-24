@@ -247,6 +247,10 @@ ON CONFLICT (id) DO NOTHING;
 -- Especificação completa em src/database/README.md.
 -- ---------------------------------------------------------------------------
 
+UPDATE auth.users SET
+    raw_app_meta_data = '{"tipoUsuario": "administrador"}'::jsonb
+WHERE id = '00000000-0000-0000-0000-000000000001';
+
 UPDATE usuario SET
     data_nascimento     = '1985-06-10',
     localizacao         = '{"formattedAddress": "São Paulo, SP", "latitude": -23.5505, "longitude": -46.6333, "placeId": "", "provider": "seed"}'::jsonb,
