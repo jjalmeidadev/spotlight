@@ -41,11 +41,6 @@ export async function salvarPreferenciasUsuario(
 
   const requestPayload = toApiPayload(selection);
 
-  console.log('Salvando preferencias do usuario:', {
-    generos: requestPayload.generosFavoritos.length,
-    faixaPrecoMax: requestPayload.faixaPrecoMax,
-  });
-
   const { response, payload: responsePayload } = await fetchJson<any>('/usuario/me/preferencias', {
     method: 'PUT',
     headers: {
@@ -57,8 +52,6 @@ export async function salvarPreferenciasUsuario(
     retries: 1,
     timeoutMs: PREFERENCE_TIMEOUT_MS,
   });
-
-  console.log('Resposta ao salvar preferencias:', response.status, responsePayload);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(responsePayload, 'Nao foi possivel salvar suas preferencias.'));
@@ -81,8 +74,6 @@ export async function obterPreferenciasUsuario(accessToken: string | null | unde
     retries: 1,
     timeoutMs: PREFERENCE_TIMEOUT_MS,
   });
-
-  console.log('Resposta ao buscar preferencias:', response.status, responsePayload);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(responsePayload, 'Nao foi possivel carregar suas preferencias.'));

@@ -38,13 +38,5 @@ export async function avaliarEspetaculo(
     throw new Error(getApiErrorMessage(payload, 'Nao foi possivel registrar sua avaliacao.'));
   }
 
-  if (__DEV__) {
-    console.log('Avaliacao registrada:', {
-      espetaculoId,
-      nota,
-      avaliacaoId: payload.id,
-    });
-  }
-
   return payload;
 }

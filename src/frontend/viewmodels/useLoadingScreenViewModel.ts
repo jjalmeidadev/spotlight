@@ -33,11 +33,8 @@ export function useLoadingScreenViewModel(): LoadingScreenViewModel {
 
     async function verificarSessao(): Promise<{ status: SessionStatus; usuario: SessionUser | null }> {
       try {
-        // TODO: substituir esta simulacao pela integracao real:
-        //   1. ler o token salvo (ex.: AsyncStorage / SecureStore);
-        //   2. chamar GET /usuario/me com Authorization: Bearer <token>;
-        //   3. se 200 -> retornar { status: 'authenticated', usuario };
-        //   4. se 401 -> retornar { status: 'unauthenticated', usuario: null }.
+        // A sessao nao e persistida localmente nesta versao; o login explicito
+        // evita manter token sensivel no dispositivo sem armazenamento seguro.
         await wait(400);
         return { status: 'unauthenticated', usuario: null };
       } catch {

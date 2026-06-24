@@ -92,8 +92,7 @@ function AppContent() {
 		try {
 			const preferencias = await obterPreferenciasUsuario(usuario.accessToken);
 			setScreen(preferenciasEstaoCompletas(preferencias) ? 'catalogo' : 'preferencias');
-		} catch (error) {
-			console.log('Nao foi possivel verificar preferencias salvas:', error);
+		} catch {
 			setScreen('catalogo');
 		}
 	}
