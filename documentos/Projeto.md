@@ -3353,9 +3353,9 @@ Responsabilidades centrais:
 
 Isso evita validações repetitivas de token em cada serviço interno.
 
-#### Telemetria Comportamental no MVP
+#### Telemetria Comportamental
 
-Aplicações mobile geram grande volume de eventos e telemetria.
+Aplicações mobile geram grande volume de eventos e telemetria. O fluxo adotado prioriza simplicidade operacional e validação ponta a ponta: o app envia eventos para `POST /usuario/telemetria`, o Gateway encaminha para o serviço de usuário, e o serviço valida o contrato antes de gravar os documentos na collection `interacoes` do MongoDB Atlas.
 
 Na Sprint 4, o fluxo implementado prioriza simplicidade operacional e validação ponta a ponta: o app envia eventos para `POST /usuario/telemetria`, o Gateway encaminha para o serviço de usuário, e o serviço valida o contrato antes de gravar os documentos na collection `interacoes` do MongoDB Atlas.
 
@@ -4401,9 +4401,9 @@ g04/
    │  │  ├─ recommendation/     # Spotlight.Recommendation (5003) — IRecommendation (ML.NET)
    │  │  └─ geolocation/        # Spotlight.Geolocation (5004) — IGeolocation (Nominatim)
    │  ├─ ml-engine/             # motor de ML do backend
-   │  │  ├─ data-preparation/   # reservado (placeholder)
+   │  │  ├─ data-preparation/   # reservado para evolução futura
    │  │  ├─ training/           # Spotlight.Recommendation.ModelTraining — treino ML.NET
-   │  │  └─ inference/          # reservado (placeholder)
+   │  │  └─ inference/          # reservado para evolução futura
    │  ├─ scripts/               # scripts utilitários (ex.: E2E telemetria)
    │  └─ tests/                 # projetos de testes por serviço + RNF
    │     ├─ Spotlight.Catalog.Tests/
@@ -5649,9 +5649,9 @@ tests/
 |----------|-----------------|----------------------|
 | Cobertura de RFs | Todos os dezesseis RFs devem possuir ao menos um cenário de teste funcional ou de integração documentado | Recomendação (RF04, RF12–RF15), autenticação (RF01–RF02), geolocalização e preferências (RF03) |
 | Cobertura de RNFs | Os doze RNFs devem possuir planejamento formal com critério objetivo de aceitação (seção 9.2.1) | Desempenho (RNF01, RNF02), segurança (RNF05), usabilidade mobile (RNF04, RNF10) |
-| Cobertura de integração | Mínimo de três cenários negativos por fronteira IT-01 a IT-06; meta documentada de **15/16 RFs** e **8/12 RNFs** cobertos diretamente pelos testes de integração (seção 9.4) | Gateway ↔ serviços SOA, Supabase Auth, MongoDB Atlas e fila de telemetria planejada |
+| Cobertura de integração | Mínimo de três cenários negativos por fronteira IT-01 a IT-04 e IT-06; meta documentada de **15/16 RFs** e **8/12 RNFs** cobertos diretamente pelos testes de integração (seção 9.4) | Gateway ↔ serviços SOA, Supabase Auth e MongoDB Atlas |
 | Cobertura de usabilidade | **≥ 85%** de conclusão por tarefa e **≤ 3 toques** nas execuções bem-sucedidas (RNF10); média SUS **≥ 68** (seção 9.3.1.8) | Fluxos de catálogo, busca, filtro e detalhes (RF04–RF07) |
-| Cenários de falha | Mínimo de **22 cenários negativos** planejados nas fronteiras de integração, abrangendo indisponibilidade externa, tokens inválidos e violações de constraint (seção 9.4) | Autenticação, persistência PostgreSQL, fila de telemetria |
+| Cenários de falha | Mínimo de **22 cenários negativos** planejados nas fronteiras de integração, abrangendo indisponibilidade externa, tokens inválidos e violações de constraint (seção 9.4) | Autenticação, persistência PostgreSQL, persistência MongoDB |
 
 &emsp;Entre os módulos classificados como críticos, o motor de recomendação (`ml-engine` e serviço de recomendação), a autenticação (Gateway + Supabase Auth) e a geolocalização (serviço dedicado + Nominatim) concentram a expansão prioritária da suíte automatizada antes das demais camadas.
 
@@ -6332,7 +6332,7 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 |---|---|---|---|---|
 | TF-RF13-N01 | Interação irrelevante não distorce | Apenas scroll sem clique | `L1 ≈ L0` (Jaccard ≥ 0,8) | — |
 | TF-RF13-N02 | Avaliação 1★ reduz exposição | Avaliar com 1★ um espetáculo presente em `L0` | Item removido da próxima `L1` | — |
-| TF-RF13-N03 | Falha de telemetria | Simular indisponibilidade do MongoDB durante interação | Navegação não é bloqueada; recomendação continua usando avaliações e dados já persistidos | Perda de evento registrada como limitação até a Sprint 5 |
+| TF-RF13-N03 | Falha de telemetria | Simular indisponibilidade do MongoDB durante interação | Navegação não é bloqueada; recomendação continua usando avaliações e dados já persistidos | Perda de evento aceita como limitação do fluxo síncrono de telemetria |
 
 **Pós-condições gerais:** Recomputo é assíncrono e não impacta a latência da requisição original.
 
@@ -7811,7 +7811,7 @@ builder.Services.AddHttpClient("ticketeira")
 
 #### Escopo dos Testes de Integração
 
-Os testes cobrem seis fronteiras de integração definidas pela arquitetura do Spotlight:
+Os testes cobrem cinco fronteiras core de integração definidas pela arquitetura do Spotlight, mais uma fronteira complementar:
 
 | ID | Fronteira | Tipo | Usa VHS |
 |---|---|---|---|
@@ -7823,7 +7823,7 @@ Os testes cobrem seis fronteiras de integração definidas pela arquitetura do S
 | IT-06 | App Mobile → API Ticketeira (link de compra) | Externo | **Sim** |
 | IT-07 | Serviço de Geolocalização → OpenStreetMap/Nominatim (contrato) | Externo | Não (contrato real em sandbox; complementa o fake unitário) |
 
-&emsp;As fronteiras IT-01 a IT-06 compõem o núcleo arquitetural do MVP; o **IT-07** é uma fronteira complementar planejada para validar o contrato de geocodificação contra o serviço real, além do `HttpMessageHandler` fake já usado nos testes unitários (seção 8.4).
+&emsp;As fronteiras IT-01 a IT-04 e IT-06 compõem o núcleo arquitetural do MVP; o **IT-07** é uma fronteira complementar planejada para validar o contrato de geocodificação contra o serviço real, além do `HttpMessageHandler` fake já usado nos testes unitários (seção 8.4).
 
 ---
 
@@ -8293,7 +8293,7 @@ dotnet test src/backend/services/catalogo \
 
 3. **Velocidade:** Chamadas reais ao Supabase Auth levam entre 200 ms e 800 ms por requisição. Com o VHS em cache-hit, a latência cai para menos de 5 ms, permitindo executar a suite completa em CI em menos de 60 segundos.
 
-&emsp;Para as fronteiras internas (IT-01, IT-03, IT-04, IT-05), o VHS não é utilizado porque os serviços são instanciados via `Testcontainers` no próprio ambiente de teste, garantindo isolamento e determinismo sem a necessidade de interceptar chamadas HTTP externas.
+&emsp;Para as fronteiras internas (IT-01, IT-03, IT-04), o VHS não é utilizado porque os serviços são instanciados via `Testcontainers` no próprio ambiente de teste, garantindo isolamento e determinismo sem a necessidade de interceptar chamadas HTTP externas.
 
 ---
 
