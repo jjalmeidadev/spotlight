@@ -1,0 +1,523 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="19ed7979-bb2c-4502-9ddc-e700093b2e51" name="Inteli@NOTEBOOK-0479 2026-06-24 18:16:13" runUser="NOTEBOOK-0479\Inteli" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-24T18:16:13.4103343-03:00" queuing="2026-06-24T18:16:13.4103349-03:00" start="2026-06-24T18:16:10.7546004-03:00" finish="2026-06-24T18:16:49.9974141-03:00" />
+  <TestSettings name="default" id="31327af7-da89-44a6-bed6-c9d0bcd807e4">
+    <Deployment runDeploymentRoot="Inteli_NOTEBOOK-0479_2026-06-24_18_16_13" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="2210a3ad-5d07-427a-98ae-24c66737a83d" testId="681e40f0-fe56-7128-be16-a19d3d06b131" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPropertiesNaoObjeto_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0015210" startTime="2026-06-24T18:16:49.8775248-03:00" endTime="2026-06-24T18:16:49.8775251-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2210a3ad-5d07-427a-98ae-24c66737a83d" />
+    <UnitTestResult executionId="e0cfc9d7-ba7c-461a-aa4a-74210918e041" testId="5eeb55cf-ff4e-d557-9829-061ab7095282" testName="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.CreateModels_PreservaNomeEOpcoesDosIndices" computerName="NOTEBOOK-0479" duration="00:00:00.0007350" startTime="2026-06-24T18:16:49.9069954-03:00" endTime="2026-06-24T18:16:49.9069955-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0cfc9d7-ba7c-461a-aa4a-74210918e041" />
+    <UnitTestResult executionId="174c5439-7ebc-4c28-99ce-5f7a2446f833" testId="35cd8ccc-263c-ca1d-329e-d31f586fe946" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0010093" startTime="2026-06-24T18:16:49.8554753-03:00" endTime="2026-06-24T18:16:49.8554755-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="174c5439-7ebc-4c28-99ce-5f7a2446f833" />
+    <UnitTestResult executionId="ef15ff5c-da1c-40af-9f9a-695c0c87c693" testId="9358c74b-edf5-074c-06d5-223276e01324" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir" computerName="NOTEBOOK-0479" duration="00:00:00.0005214" startTime="2026-06-24T18:16:49.9047137-03:00" endTime="2026-06-24T18:16:49.9047138-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ef15ff5c-da1c-40af-9f9a-695c0c87c693" />
+    <UnitTestResult executionId="5ec19b90-71d5-4335-a436-3cae99ef127a" testId="3feb3dc4-1684-bb88-ae37-847499c698c6" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias" computerName="NOTEBOOK-0479" duration="00:00:00.0013105" startTime="2026-06-24T18:16:49.9025755-03:00" endTime="2026-06-24T18:16:49.9025758-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5ec19b90-71d5-4335-a436-3cae99ef127a" />
+    <UnitTestResult executionId="3cf6f8bb-0037-401c-8d93-ad9bc658f04a" testId="90d53235-a17d-9704-0984-10cb7ea771ee" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo" computerName="NOTEBOOK-0479" duration="00:00:00.2638117" startTime="2026-06-24T18:16:38.7014514-03:00" endTime="2026-06-24T18:16:38.7014517-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3cf6f8bb-0037-401c-8d93-ad9bc658f04a" />
+    <UnitTestResult executionId="06c43dfd-079b-4c87-bf03-1ae26f5999a1" testId="3e23f7eb-bd0e-af31-c6aa-ab65fa5daf0d" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.Startup_ComMongoConfigurado_CriaIndicesOperacionais" computerName="NOTEBOOK-0479" duration="00:00:00.2248294" startTime="2026-06-24T18:16:49.8425391-03:00" endTime="2026-06-24T18:16:49.8426767-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="06c43dfd-079b-4c87-bf03-1ae26f5999a1" />
+    <UnitTestResult executionId="6648d38c-987f-4862-a0e3-c758679219ff" testId="d64f0cb4-9541-0a0d-9a65-17960a319325" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio" computerName="NOTEBOOK-0479" duration="00:00:00.0017602" startTime="2026-06-24T18:16:49.8796127-03:00" endTime="2026-06-24T18:16:49.8796129-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6648d38c-987f-4862-a0e3-c758679219ff" />
+    <UnitTestResult executionId="19d8cc44-2c58-45de-9bbe-e48bf1f1b5ef" testId="e9ba8dc7-676b-5496-cf9d-c579c5998721" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;   &quot;)" computerName="NOTEBOOK-0479" duration="00:00:00.0006238" startTime="2026-06-24T18:16:49.8592244-03:00" endTime="2026-06-24T18:16:49.8592246-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="19d8cc44-2c58-45de-9bbe-e48bf1f1b5ef" />
+    <UnitTestResult executionId="c7e62172-ef18-443a-9dd0-be443e5ac642" testId="16aaf508-ce9e-b215-7a37-fea8fcd5a0ab" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComClaimsDiretas_MapeiaIdentidade" computerName="NOTEBOOK-0479" duration="00:00:00.0043182" startTime="2026-06-24T18:16:12.4775303-03:00" endTime="2026-06-24T18:16:12.4775310-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c7e62172-ef18-443a-9dd0-be443e5ac642" />
+    <UnitTestResult executionId="ca6d5b54-2e30-4bcd-a6b0-3846887f2a44" testId="a208102a-18b7-f1cf-3431-0a8a41728608" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento" computerName="NOTEBOOK-0479" duration="00:00:00.2695944" startTime="2026-06-24T18:16:44.2368740-03:00" endTime="2026-06-24T18:16:44.2368744-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca6d5b54-2e30-4bcd-a6b0-3846887f2a44" />
+    <UnitTestResult executionId="85174337-ba75-4811-9dd0-7dfe4a1196f2" testId="e18d3faf-08f1-8542-3a73-0bfbf727fa47" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort" computerName="NOTEBOOK-0479" duration="00:00:02.3361209" startTime="2026-06-24T18:16:33.1779275-03:00" endTime="2026-06-24T18:16:33.1779278-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85174337-ba75-4811-9dd0-7dfe4a1196f2" />
+    <UnitTestResult executionId="b089726f-e555-4847-84c1-0157d7b3ff4e" testId="9d3ff365-18d4-e8eb-4f0d-96788d62a73e" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio" computerName="NOTEBOOK-0479" duration="00:00:00.0008185" startTime="2026-06-24T18:16:49.8543848-03:00" endTime="2026-06-24T18:16:49.8543849-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b089726f-e555-4847-84c1-0157d7b3ff4e" />
+    <UnitTestResult executionId="4e70da24-9bdb-43e6-8a75-f1450b85ff4f" testId="b34cee27-e661-ce48-14b3-bca5f012b2d2" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoCancelado_PropagaCancelamento" computerName="NOTEBOOK-0479" duration="00:00:00.0007096" startTime="2026-06-24T18:16:49.9041369-03:00" endTime="2026-06-24T18:16:49.9041370-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4e70da24-9bdb-43e6-8a75-f1450b85ff4f" />
+    <UnitTestResult executionId="c1c18679-9b38-492e-8405-f347e3bef34f" testId="58ce31e3-ccd9-fe46-ac80-48b5e8c1bbb9" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_SemServicoConfigurado_Retorna503" computerName="NOTEBOOK-0479" duration="00:00:00.0006567" startTime="2026-06-24T18:16:49.9060000-03:00" endTime="2026-06-24T18:16:49.9060001-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c1c18679-9b38-492e-8405-f347e3bef34f" />
+    <UnitTestResult executionId="0baf01ec-b99a-408d-9d67-4986744b3dd2" testId="347b0671-6bed-823e-5390-59c62d5844ed" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0059794" startTime="2026-06-24T18:16:49.8656125-03:00" endTime="2026-06-24T18:16:49.8656128-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0baf01ec-b99a-408d-9d67-4986744b3dd2" />
+    <UnitTestResult executionId="22bc9f12-c998-44b9-ac2a-47c3ef3ff744" testId="e7d1f324-35ed-3f55-b56b-9877e18f8f92" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict" computerName="NOTEBOOK-0479" duration="00:00:00.0014457" startTime="2026-06-24T18:16:49.8926129-03:00" endTime="2026-06-24T18:16:49.8926132-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="22bc9f12-c998-44b9-ac2a-47c3ef3ff744" />
+    <UnitTestResult executionId="cb47b952-c0d1-4340-b060-aa672f9ed225" testId="3c1d0b36-f19a-b29a-451e-bfb50cb1edf4" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil" computerName="NOTEBOOK-0479" duration="00:00:00.0005151" startTime="2026-06-24T18:16:49.9052813-03:00" endTime="2026-06-24T18:16:49.9052814-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cb47b952-c0d1-4340-b060-aa672f9ed225" />
+    <UnitTestResult executionId="f8a2ec45-079b-48fb-bf07-0bed54921f54" testId="2c996e59-787e-a99c-faad-3331ecdf793a" testName="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Health_Returns_200" computerName="NOTEBOOK-0479" duration="00:00:00.0113122" startTime="2026-06-24T18:16:14.3719568-03:00" endTime="2026-06-24T18:16:14.3719571-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f8a2ec45-079b-48fb-bf07-0bed54921f54" />
+    <UnitTestResult executionId="1f91135e-3a46-482e-9b9c-2b5cb1d4e466" testId="70f2cde3-1a99-2b4f-8072-eed4ea323ed7" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento" computerName="NOTEBOOK-0479" duration="00:00:00.8815681" startTime="2026-06-24T18:16:25.3875744-03:00" endTime="2026-06-24T18:16:25.3875748-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1f91135e-3a46-482e-9b9c-2b5cb1d4e466" />
+    <UnitTestResult executionId="f7d0fd6d-1874-41f9-8ca6-dc8a935dd3df" testId="2ed75864-db08-ec03-4806-4749ef65f5d3" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataForaDaJanela_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0006786" startTime="2026-06-24T18:16:49.8894806-03:00" endTime="2026-06-24T18:16:49.8894810-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f7d0fd6d-1874-41f9-8ca6-dc8a935dd3df" />
+    <UnitTestResult executionId="f829f5af-00ac-4168-ac1a-0b1a7e83c460" testId="2f701ffc-efee-bbef-1b2a-afe6e4bac240" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros" computerName="NOTEBOOK-0479" duration="00:00:00.0007315" startTime="2026-06-24T18:16:49.8695849-03:00" endTime="2026-06-24T18:16:49.8695850-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f829f5af-00ac-4168-ac1a-0b1a7e83c460" />
+    <UnitTestResult executionId="7b22941d-4188-4551-976a-50b02c067052" testId="365db29e-9866-8248-0d15-74f9fdb63ba3" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound" computerName="NOTEBOOK-0479" duration="00:00:00.0018506" startTime="2026-06-24T18:16:49.8584012-03:00" endTime="2026-06-24T18:16:49.8584016-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7b22941d-4188-4551-976a-50b02c067052" />
+    <UnitTestResult executionId="1105044b-76c0-4ea3-8504-076324b3077c" testId="2d0384c9-01c8-154a-612e-4594cc03c618" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComPrecoNegativo_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0017756" startTime="2026-06-24T18:16:49.8945809-03:00" endTime="2026-06-24T18:16:49.8945812-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1105044b-76c0-4ea3-8504-076324b3077c" />
+    <UnitTestResult executionId="83812364-be68-43af-94cc-9303f4c19df8" testId="a5463f32-63bf-4cc6-cd4f-24451f27f8fb" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_AtualizarPreferencias_SemEmailNaoGarantePerfil" computerName="NOTEBOOK-0479" duration="00:00:00.0089802" startTime="2026-06-24T18:16:12.4425109-03:00" endTime="2026-06-24T18:16:12.4425115-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="83812364-be68-43af-94cc-9303f4c19df8" />
+    <UnitTestResult executionId="c012ed4c-8739-40a0-878f-5db531159509" testId="a9274446-7e2e-6e3d-f239-8a2332223844" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado" computerName="NOTEBOOK-0479" duration="00:00:00.0077375" startTime="2026-06-24T18:16:49.8874907-03:00" endTime="2026-06-24T18:16:49.8874911-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c012ed4c-8739-40a0-878f-5db531159509" />
+    <UnitTestResult executionId="b9e02df5-b51b-44c8-93f4-4e3360e8e6db" testId="e362ff75-3c6c-9f32-2660-6d51c022945f" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoNaoExiste_LancaNotFound" computerName="NOTEBOOK-0479" duration="00:00:00.0008515" startTime="2026-06-24T18:16:49.8712195-03:00" endTime="2026-06-24T18:16:49.8712213-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9e02df5-b51b-44c8-93f4-4e3360e8e6db" />
+    <UnitTestResult executionId="b5fe3b3d-9c0a-4fe9-8d99-38b24d3f15c8" testId="7601604b-1a4d-063d-9eb3-80d45afbc0dc" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste" computerName="NOTEBOOK-0479" duration="00:00:00.0232992" startTime="2026-06-24T18:16:12.4730535-03:00" endTime="2026-06-24T18:16:12.4730543-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b5fe3b3d-9c0a-4fe9-8d99-38b24d3f15c8" />
+    <UnitTestResult executionId="718247a2-9ac9-4f0b-9591-179dbaa69ef0" testId="78b22f64-e929-08e2-345a-1dd1e43af787" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataFutura_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0015165" startTime="2026-06-24T18:16:49.8962215-03:00" endTime="2026-06-24T18:16:49.8962218-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="718247a2-9ac9-4f0b-9591-179dbaa69ef0" />
+    <UnitTestResult executionId="37476e48-1027-4ab5-9d3c-9f274b97a209" testId="81ec463e-b0d0-9f21-8fd1-fc8254aac633" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound" computerName="NOTEBOOK-0479" duration="00:00:00.0010954" startTime="2026-06-24T18:16:49.8910746-03:00" endTime="2026-06-24T18:16:49.8910749-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="37476e48-1027-4ab5-9d3c-9f274b97a209" />
+    <UnitTestResult executionId="7126135e-50b6-4f14-8145-f3522ded141d" testId="d0b01bae-5ae8-5ba6-5077-880e54383c1a" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco" computerName="NOTEBOOK-0479" duration="00:00:00.0065383" startTime="2026-06-24T18:16:49.8518203-03:00" endTime="2026-06-24T18:16:49.8518206-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7126135e-50b6-4f14-8145-f3522ded141d" />
+    <UnitTestResult executionId="34b0b33c-e9ae-422d-b8a6-277c2a15d41f" testId="7bd179fb-c79e-dbb1-8beb-2610e3a6f7d7" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;&quot;)" computerName="NOTEBOOK-0479" duration="00:00:00.0002450" startTime="2026-06-24T18:16:49.8595010-03:00" endTime="2026-06-24T18:16:49.8595013-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="34b0b33c-e9ae-422d-b8a6-277c2a15d41f" />
+    <UnitTestResult executionId="fa7e3974-fc17-4cb1-a59e-81cb15ca02c3" testId="7d1f5634-4300-c3f1-c6ed-99e8f8bc3b38" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoExiste_MapeiaPreferencias" computerName="NOTEBOOK-0479" duration="00:00:00.0007519" startTime="2026-06-24T18:16:49.9033642-03:00" endTime="2026-06-24T18:16:49.9033643-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fa7e3974-fc17-4cb1-a59e-81cb15ca02c3" />
+    <UnitTestResult executionId="2af8ed5f-c646-4bdd-b7d7-027296824d21" testId="e0d6ff0e-2ca6-dc3c-27c9-58426a347dcc" testName="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Ping_Returns_200" computerName="NOTEBOOK-0479" duration="00:00:00.0388202" startTime="2026-06-24T18:16:14.4115625-03:00" endTime="2026-06-24T18:16:14.4115630-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2af8ed5f-c646-4bdd-b7d7-027296824d21" />
+    <UnitTestResult executionId="5d2147fb-9a22-4cd0-8537-39373dabef48" testId="db2256bf-93be-2d07-0aef-da768c8e8799" testName="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco" computerName="NOTEBOOK-0479" duration="00:00:01.8624202" startTime="2026-06-24T18:16:14.3589355-03:00" endTime="2026-06-24T18:16:14.3589359-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5d2147fb-9a22-4cd0-8537-39373dabef48" />
+    <UnitTestResult executionId="c42d9719-43bc-4f37-acb9-8c5c3aaf55c1" testId="8c974096-6ebc-d8fa-b219-c99d7c25b011" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoNaoExiste_LancaNotFound" computerName="NOTEBOOK-0479" duration="00:00:00.0008823" startTime="2026-06-24T18:16:49.8564551-03:00" endTime="2026-06-24T18:16:49.8564553-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c42d9719-43bc-4f37-acb9-8c5c3aaf55c1" />
+    <UnitTestResult executionId="d0346485-ec91-41f7-b0cb-fda5cf4f4fd5" testId="25ae164f-8184-d65e-af50-ad57c63fa9fd" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataPriorizaNomeEDataDoJson" computerName="NOTEBOOK-0479" duration="00:00:00.0079443" startTime="2026-06-24T18:16:12.4496219-03:00" endTime="2026-06-24T18:16:12.4496225-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d0346485-ec91-41f7-b0cb-fda5cf4f4fd5" />
+    <UnitTestResult executionId="4638451a-27ad-4e14-82ec-8a9eb461fc6c" testId="954ab7e8-b980-0f5a-87b2-6909af1fd1b5" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComUsuarioAutenticado_AssociaUsuario" computerName="NOTEBOOK-0479" duration="00:00:00.0015806" startTime="2026-06-24T18:16:49.8535128-03:00" endTime="2026-06-24T18:16:49.8535130-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4638451a-27ad-4e14-82ec-8a9eb461fc6c" />
+    <UnitTestResult executionId="e90fc44c-55e2-4689-bf32-162e04ae6b38" testId="a612c17b-077d-3959-67ad-97f32e2d579f" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataInvalido_RetornaFallbacks" computerName="NOTEBOOK-0479" duration="00:00:00.0884202" startTime="2026-06-24T18:16:12.4343050-03:00" endTime="2026-06-24T18:16:12.4343058-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e90fc44c-55e2-4689-bf32-162e04ae6b38" />
+    <UnitTestResult executionId="684dca49-655f-44ef-bd1e-dfe1174d6b92" testId="6b41c000-731d-9d7e-ae9b-f40e84a05eed" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_SemUsuario_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0497895" startTime="2026-06-24T18:16:12.3453759-03:00" endTime="2026-06-24T18:16:12.3454239-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="684dca49-655f-44ef-bd1e-dfe1174d6b92" />
+    <UnitTestResult executionId="d9b5735f-2c2c-4ba2-b009-ed56d7f99352" testId="752788e6-3c62-5eef-0b0c-1e78a913be23" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias" computerName="NOTEBOOK-0479" duration="00:00:00.0047254" startTime="2026-06-24T18:16:49.9011234-03:00" endTime="2026-06-24T18:16:49.9011238-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d9b5735f-2c2c-4ba2-b009-ed56d7f99352" />
+    <UnitTestResult executionId="b8e146c0-89a7-4320-9238-626c884a1b15" testId="8a3f1f64-6b67-616a-39d3-a5f7b5ad43c5" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro" computerName="NOTEBOOK-0479" duration="00:00:00.0013390" startTime="2026-06-24T18:16:49.8451868-03:00" endTime="2026-06-24T18:16:49.8451871-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b8e146c0-89a7-4320-9238-626c884a1b15" />
+    <UnitTestResult executionId="697bd0fc-189a-4994-a15c-68034a11f452" testId="a4da275e-3e1b-9025-7e9a-8f6ed792246e" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComEventoAnonimo_RetornaAccepted" computerName="NOTEBOOK-0479" duration="00:00:00.0030292" startTime="2026-06-24T18:16:49.8758389-03:00" endTime="2026-06-24T18:16:49.8758391-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="697bd0fc-189a-4994-a15c-68034a11f452" />
+    <UnitTestResult executionId="efac6073-9848-4c29-82c9-c0be68268ebe" testId="5682444b-9aa5-df82-4dc9-4cb5f57f3753" testName="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.Definitions_IncluemIndicesOperacionaisDaTelemetria" computerName="NOTEBOOK-0479" duration="00:00:00.0039487" startTime="2026-06-24T18:16:49.9109754-03:00" endTime="2026-06-24T18:16:49.9109757-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="efac6073-9848-4c29-82c9-c0be68268ebe" />
+    <UnitTestResult executionId="585759e9-c650-4830-9e47-1e415b814f68" testId="db2ed03e-7238-a15e-71fe-91e70892ab57" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0006625" startTime="2026-06-24T18:16:49.8703091-03:00" endTime="2026-06-24T18:16:49.8703093-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="585759e9-c650-4830-9e47-1e415b814f68" />
+    <UnitTestResult executionId="160de514-8ad3-4641-9c2c-24e14bc73f27" testId="cd943063-0ab7-12da-0bfa-4601d535c392" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoExiste_MapeiaPerfil" computerName="NOTEBOOK-0479" duration="00:00:00.0011055" startTime="2026-06-24T18:16:49.8886831-03:00" endTime="2026-06-24T18:16:49.8886832-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="160de514-8ad3-4641-9c2c-24e14bc73f27" />
+    <UnitTestResult executionId="e797c2d6-7118-4911-8695-b5b1a3b7ad35" testId="00aee90d-7568-8409-3afd-4ecba5a84ffb" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo" computerName="NOTEBOOK-0479" duration="00:00:00.0031147" startTime="2026-06-24T18:16:49.8687957-03:00" endTime="2026-06-24T18:16:49.8687959-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e797c2d6-7118-4911-8695-b5b1a3b7ad35" />
+    <UnitTestResult executionId="699fc089-e7b7-4051-b15c-0df82f78e707" testId="4b4ca175-0ddf-f27f-3e76-ae3397676e73" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEventoValido_ChamaRepositorio" computerName="NOTEBOOK-0479" duration="00:00:00.0007828" startTime="2026-06-24T18:16:49.8725907-03:00" endTime="2026-06-24T18:16:49.8725910-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="699fc089-e7b7-4051-b15c-0df82f78e707" />
+    <UnitTestResult executionId="95390d04-4866-4364-874b-88fa77cd58a8" testId="c107860d-d4c7-dda5-5ec2-098e512ebf00" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation" computerName="NOTEBOOK-0479" duration="00:00:00.0004510" startTime="2026-06-24T18:16:49.8717568-03:00" endTime="2026-06-24T18:16:49.8717570-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="95390d04-4866-4364-874b-88fa77cd58a8" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="7601604b-1a4d-063d-9eb3-80d45afbc0dc">
+      <Execution id="b5fe3b3d-9c0a-4fe9-8d99-38b24d3f15c8" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataInvalido_RetornaFallbacks" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="a612c17b-077d-3959-67ad-97f32e2d579f">
+      <Execution id="e90fc44c-55e2-4689-bf32-162e04ae6b38" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioContextoHttp_ComMetadataInvalido_RetornaFallbacks" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataPriorizaNomeEDataDoJson" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="25ae164f-8184-d65e-af50-ad57c63fa9fd">
+      <Execution id="d0346485-ec91-41f7-b0cb-fda5cf4f4fd5" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioContextoHttp_ComMetadataPriorizaNomeEDataDoJson" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_SemUsuario_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="6b41c000-731d-9d7e-ae9b-f40e84a05eed">
+      <Execution id="684dca49-655f-44ef-bd1e-dfe1174d6b92" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioMeController_SemUsuario_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="e18d3faf-08f1-8542-3a73-0bfbf727fa47">
+      <Execution id="85174337-ba75-4811-9dd0-7dfe4a1196f2" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_AtualizarPreferencias_SemEmailNaoGarantePerfil" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="a5463f32-63bf-4cc6-cd4f-24451f27f8fb">
+      <Execution id="83812364-be68-43af-94cc-9303f4c19df8" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioMeController_AtualizarPreferencias_SemEmailNaoGarantePerfil" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoNaoExiste_LancaNotFound" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="8c974096-6ebc-d8fa-b219-c99d7c25b011">
+      <Execution id="c42d9719-43bc-4f37-acb9-8c5c3aaf55c1" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterPreferencias_QuandoNaoExiste_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="90d53235-a17d-9704-0984-10cb7ea771ee">
+      <Execution id="3cf6f8bb-0037-401c-8d93-ad9bc658f04a" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="c107860d-d4c7-dda5-5ec2-098e512ebf00">
+      <Execution id="95390d04-4866-4364-874b-88fa77cd58a8" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEventoValido_ChamaRepositorio" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="4b4ca175-0ddf-f27f-3e76-ae3397676e73">
+      <Execution id="699fc089-e7b7-4051-b15c-0df82f78e707" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComEventoValido_ChamaRepositorio" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.Definitions_IncluemIndicesOperacionaisDaTelemetria" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="5682444b-9aa5-df82-4dc9-4cb5f57f3753">
+      <Execution id="efac6073-9848-4c29-82c9-c0be68268ebe" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests" name="Definitions_IncluemIndicesOperacionaisDaTelemetria" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.Startup_ComMongoConfigurado_CriaIndicesOperacionais" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="3e23f7eb-bd0e-af31-c6aa-ab65fa5daf0d">
+      <Execution id="06c43dfd-079b-4c87-bf03-1ae26f5999a1" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="Startup_ComMongoConfigurado_CriaIndicesOperacionais" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="347b0671-6bed-823e-5390-59c62d5844ed">
+      <Execution id="0baf01ec-b99a-408d-9d67-4986744b3dd2" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="365db29e-9866-8248-0d15-74f9fdb63ba3">
+      <Execution id="7b22941d-4188-4551-976a-50b02c067052" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPropertiesNaoObjeto_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="681e40f0-fe56-7128-be16-a19d3d06b131">
+      <Execution id="2210a3ad-5d07-427a-98ae-24c66737a83d" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComPropertiesNaoObjeto_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="70f2cde3-1a99-2b4f-8072-eed4ea323ed7">
+      <Execution id="1f91135e-3a46-482e-9b9c-2b5cb1d4e466" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="81ec463e-b0d0-9f21-8fd1-fc8254aac633">
+      <Execution id="37476e48-1027-4ab5-9d3c-9f274b97a209" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="a208102a-18b7-f1cf-3431-0a8a41728608">
+      <Execution id="ca6d5b54-2e30-4bcd-a6b0-3846887f2a44" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComEventoAnonimo_RetornaAccepted" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="a4da275e-3e1b-9025-7e9a-8f6ed792246e">
+      <Execution id="697bd0fc-189a-4994-a15c-68034a11f452" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaController_ComEventoAnonimo_RetornaAccepted" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="35cd8ccc-263c-ca1d-329e-d31f586fe946">
+      <Execution id="174c5439-7ebc-4c28-99ce-5f7a2446f833" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="8a3f1f64-6b67-616a-39d3-a5f7b5ad43c5">
+      <Execution id="b8e146c0-89a7-4320-9238-626c884a1b15" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;&quot;)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="7bd179fb-c79e-dbb1-8beb-2610e3a6f7d7">
+      <Execution id="34b0b33c-e9ae-422d-b8a6-277c2a15d41f" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComNomeVazio_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataForaDaJanela_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="2ed75864-db08-ec03-4806-4749ef65f5d3">
+      <Execution id="f7d0fd6d-1874-41f9-8ca6-dc8a935dd3df" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComDataForaDaJanela_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataFutura_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="78b22f64-e929-08e2-345a-1dd1e43af787">
+      <Execution id="718247a2-9ac9-4f0b-9591-179dbaa69ef0" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComDataFutura_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="9358c74b-edf5-074c-06d5-223276e01324">
+      <Execution id="ef15ff5c-da1c-40af-9f9a-695c0c87c693" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoCancelado_PropagaCancelamento" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="b34cee27-e661-ce48-14b3-bca5f012b2d2">
+      <Execution id="4e70da24-9bdb-43e6-8a75-f1450b85ff4f" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_QuandoCancelado_PropagaCancelamento" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComPrecoNegativo_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="2d0384c9-01c8-154a-612e-4594cc03c618">
+      <Execution id="1105044b-76c0-4ea3-8504-076324b3077c" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_ComPrecoNegativo_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Ping_Returns_200" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="e0d6ff0e-2ca6-dc3c-27c9-58426a347dcc">
+      <Execution id="2af8ed5f-c646-4bdd-b7d7-027296824d21" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.HealthEndpointsTests" name="Get_Ping_Returns_200" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="db2256bf-93be-2d07-0aef-da768c8e8799">
+      <Execution id="5d2147fb-9a22-4cd0-8537-39373dabef48" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.HealthEndpointsTests" name="Get_HealthReady_Returns_503_SemBanco" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="a9274446-7e2e-6e3d-f239-8a2332223844">
+      <Execution id="c012ed4c-8739-40a0-878f-5db531159509" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="db2ed03e-7238-a15e-71fe-91e70892ab57">
+      <Execution id="585759e9-c650-4830-9e47-1e415b814f68" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="00aee90d-7568-8409-3afd-4ecba5a84ffb">
+      <Execution id="e797c2d6-7118-4911-8695-b5b1a3b7ad35" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="3c1d0b36-f19a-b29a-451e-bfb50cb1edf4">
+      <Execution id="cb47b952-c0d1-4340-b060-aa672f9ed225" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="d64f0cb4-9541-0a0d-9a65-17960a319325">
+      <Execution id="6648d38c-987f-4862-a0e3-c758679219ff" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="9d3ff365-18d4-e8eb-4f0d-96788d62a73e">
+      <Execution id="b089726f-e555-4847-84c1-0157d7b3ff4e" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="2f701ffc-efee-bbef-1b2a-afe6e4bac240">
+      <Execution id="f829f5af-00ac-4168-ac1a-0b1a7e83c460" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="3feb3dc4-1684-bb88-ae37-847499c698c6">
+      <Execution id="5ec19b90-71d5-4335-a436-3cae99ef127a" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="752788e6-3c62-5eef-0b0c-1e78a913be23">
+      <Execution id="d9b5735f-2c2c-4ba2-b009-ed56d7f99352" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.CreateModels_PreservaNomeEOpcoesDosIndices" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="5eeb55cf-ff4e-d557-9829-061ab7095282">
+      <Execution id="e0cfc9d7-ba7c-461a-aa4a-74210918e041" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests" name="CreateModels_PreservaNomeEOpcoesDosIndices" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Health_Returns_200" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="2c996e59-787e-a99c-faad-3331ecdf793a">
+      <Execution id="f8a2ec45-079b-48fb-bf07-0bed54921f54" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.HealthEndpointsTests" name="Get_Health_Returns_200" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="d0b01bae-5ae8-5ba6-5077-880e54383c1a">
+      <Execution id="7126135e-50b6-4f14-8145-f3522ded141d" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComClaimsDiretas_MapeiaIdentidade" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="16aaf508-ce9e-b215-7a37-fea8fcd5a0ab">
+      <Execution id="c7e62172-ef18-443a-9dd0-be443e5ac642" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioContextoHttp_ComClaimsDiretas_MapeiaIdentidade" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;   &quot;)" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="e9ba8dc7-676b-5496-cf9d-c579c5998721">
+      <Execution id="19d8cc44-2c58-45de-9bbe-e48bf1f1b5ef" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComNomeVazio_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoNaoExiste_LancaNotFound" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="e362ff75-3c6c-9f32-2660-6d51c022945f">
+      <Execution id="b9e02df5-b51b-44c8-93f4-4e3360e8e6db" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterUsuarioMe_QuandoNaoExiste_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoExiste_MapeiaPerfil" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="cd943063-0ab7-12da-0bfa-4601d535c392">
+      <Execution id="160de514-8ad3-4641-9c2c-24e14bc73f27" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterUsuarioMe_QuandoExiste_MapeiaPerfil" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComUsuarioAutenticado_AssociaUsuario" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="954ab7e8-b980-0f5a-87b2-6909af1fd1b5">
+      <Execution id="4638451a-27ad-4e14-82ec-8a9eb461fc6c" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaController_ComUsuarioAutenticado_AssociaUsuario" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_SemServicoConfigurado_Retorna503" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="58ce31e3-ccd9-fe46-ac80-48b5e8c1bbb9">
+      <Execution id="c1c18679-9b38-492e-8405-f347e3bef34f" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaController_SemServicoConfigurado_Retorna503" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoExiste_MapeiaPreferencias" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="7d1f5634-4300-c3f1-c6ed-99e8f8bc3b38">
+      <Execution id="fa7e3974-fc17-4cb1-a59e-81cb15ca02c3" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterPreferencias_QuandoExiste_MapeiaPreferencias" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.user.tests\bin\debug\net9.0\spotlight.user.tests.dll" id="e7d1f324-35ed-3f55-b56b-9877e18f8f92">
+      <Execution id="22bc9f12-c998-44b9-ac2a-47c3ef3ff744" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\bin\Debug\net9.0\Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="681e40f0-fe56-7128-be16-a19d3d06b131" executionId="2210a3ad-5d07-427a-98ae-24c66737a83d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5eeb55cf-ff4e-d557-9829-061ab7095282" executionId="e0cfc9d7-ba7c-461a-aa4a-74210918e041" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="35cd8ccc-263c-ca1d-329e-d31f586fe946" executionId="174c5439-7ebc-4c28-99ce-5f7a2446f833" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9358c74b-edf5-074c-06d5-223276e01324" executionId="ef15ff5c-da1c-40af-9f9a-695c0c87c693" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3feb3dc4-1684-bb88-ae37-847499c698c6" executionId="5ec19b90-71d5-4335-a436-3cae99ef127a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="90d53235-a17d-9704-0984-10cb7ea771ee" executionId="3cf6f8bb-0037-401c-8d93-ad9bc658f04a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3e23f7eb-bd0e-af31-c6aa-ab65fa5daf0d" executionId="06c43dfd-079b-4c87-bf03-1ae26f5999a1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d64f0cb4-9541-0a0d-9a65-17960a319325" executionId="6648d38c-987f-4862-a0e3-c758679219ff" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e9ba8dc7-676b-5496-cf9d-c579c5998721" executionId="19d8cc44-2c58-45de-9bbe-e48bf1f1b5ef" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16aaf508-ce9e-b215-7a37-fea8fcd5a0ab" executionId="c7e62172-ef18-443a-9dd0-be443e5ac642" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a208102a-18b7-f1cf-3431-0a8a41728608" executionId="ca6d5b54-2e30-4bcd-a6b0-3846887f2a44" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e18d3faf-08f1-8542-3a73-0bfbf727fa47" executionId="85174337-ba75-4811-9dd0-7dfe4a1196f2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9d3ff365-18d4-e8eb-4f0d-96788d62a73e" executionId="b089726f-e555-4847-84c1-0157d7b3ff4e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b34cee27-e661-ce48-14b3-bca5f012b2d2" executionId="4e70da24-9bdb-43e6-8a75-f1450b85ff4f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="58ce31e3-ccd9-fe46-ac80-48b5e8c1bbb9" executionId="c1c18679-9b38-492e-8405-f347e3bef34f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="347b0671-6bed-823e-5390-59c62d5844ed" executionId="0baf01ec-b99a-408d-9d67-4986744b3dd2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e7d1f324-35ed-3f55-b56b-9877e18f8f92" executionId="22bc9f12-c998-44b9-ac2a-47c3ef3ff744" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c1d0b36-f19a-b29a-451e-bfb50cb1edf4" executionId="cb47b952-c0d1-4340-b060-aa672f9ed225" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2c996e59-787e-a99c-faad-3331ecdf793a" executionId="f8a2ec45-079b-48fb-bf07-0bed54921f54" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="70f2cde3-1a99-2b4f-8072-eed4ea323ed7" executionId="1f91135e-3a46-482e-9b9c-2b5cb1d4e466" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2ed75864-db08-ec03-4806-4749ef65f5d3" executionId="f7d0fd6d-1874-41f9-8ca6-dc8a935dd3df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2f701ffc-efee-bbef-1b2a-afe6e4bac240" executionId="f829f5af-00ac-4168-ac1a-0b1a7e83c460" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="365db29e-9866-8248-0d15-74f9fdb63ba3" executionId="7b22941d-4188-4551-976a-50b02c067052" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2d0384c9-01c8-154a-612e-4594cc03c618" executionId="1105044b-76c0-4ea3-8504-076324b3077c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a5463f32-63bf-4cc6-cd4f-24451f27f8fb" executionId="83812364-be68-43af-94cc-9303f4c19df8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a9274446-7e2e-6e3d-f239-8a2332223844" executionId="c012ed4c-8739-40a0-878f-5db531159509" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e362ff75-3c6c-9f32-2660-6d51c022945f" executionId="b9e02df5-b51b-44c8-93f4-4e3360e8e6db" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7601604b-1a4d-063d-9eb3-80d45afbc0dc" executionId="b5fe3b3d-9c0a-4fe9-8d99-38b24d3f15c8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="78b22f64-e929-08e2-345a-1dd1e43af787" executionId="718247a2-9ac9-4f0b-9591-179dbaa69ef0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="81ec463e-b0d0-9f21-8fd1-fc8254aac633" executionId="37476e48-1027-4ab5-9d3c-9f274b97a209" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d0b01bae-5ae8-5ba6-5077-880e54383c1a" executionId="7126135e-50b6-4f14-8145-f3522ded141d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7bd179fb-c79e-dbb1-8beb-2610e3a6f7d7" executionId="34b0b33c-e9ae-422d-b8a6-277c2a15d41f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7d1f5634-4300-c3f1-c6ed-99e8f8bc3b38" executionId="fa7e3974-fc17-4cb1-a59e-81cb15ca02c3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e0d6ff0e-2ca6-dc3c-27c9-58426a347dcc" executionId="2af8ed5f-c646-4bdd-b7d7-027296824d21" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="db2256bf-93be-2d07-0aef-da768c8e8799" executionId="5d2147fb-9a22-4cd0-8537-39373dabef48" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8c974096-6ebc-d8fa-b219-c99d7c25b011" executionId="c42d9719-43bc-4f37-acb9-8c5c3aaf55c1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="25ae164f-8184-d65e-af50-ad57c63fa9fd" executionId="d0346485-ec91-41f7-b0cb-fda5cf4f4fd5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="954ab7e8-b980-0f5a-87b2-6909af1fd1b5" executionId="4638451a-27ad-4e14-82ec-8a9eb461fc6c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a612c17b-077d-3959-67ad-97f32e2d579f" executionId="e90fc44c-55e2-4689-bf32-162e04ae6b38" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6b41c000-731d-9d7e-ae9b-f40e84a05eed" executionId="684dca49-655f-44ef-bd1e-dfe1174d6b92" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="752788e6-3c62-5eef-0b0c-1e78a913be23" executionId="d9b5735f-2c2c-4ba2-b009-ed56d7f99352" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8a3f1f64-6b67-616a-39d3-a5f7b5ad43c5" executionId="b8e146c0-89a7-4320-9238-626c884a1b15" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4da275e-3e1b-9025-7e9a-8f6ed792246e" executionId="697bd0fc-189a-4994-a15c-68034a11f452" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5682444b-9aa5-df82-4dc9-4cb5f57f3753" executionId="efac6073-9848-4c29-82c9-c0be68268ebe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="db2ed03e-7238-a15e-71fe-91e70892ab57" executionId="585759e9-c650-4830-9e47-1e415b814f68" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cd943063-0ab7-12da-0bfa-4601d535c392" executionId="160de514-8ad3-4641-9c2c-24e14bc73f27" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="00aee90d-7568-8409-3afd-4ecba5a84ffb" executionId="e797c2d6-7118-4911-8695-b5b1a3b7ad35" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b4ca175-0ddf-f27f-3e76-ae3397676e73" executionId="699fc089-e7b7-4051-b15c-0df82f78e707" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c107860d-d4c7-dda5-5ec2-098e512ebf00" executionId="95390d04-4866-4364-874b-88fa77cd58a8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados que não estão em uma lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos os resultados carregados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="49" executed="49" passed="49" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)&#xD;
+[xUnit.net 00:00:00.23]   Discovering: Spotlight.User.Tests&#xD;
+[xUnit.net 00:00:00.34]   Discovered:  Spotlight.User.Tests&#xD;
+[xUnit.net 00:00:00.35]   Starting:    Spotlight.User.Tests&#xD;
+[18:16:14 DBG] Hosting starting&#xD;
+[18:16:14 DBG] Hosting started&#xD;
+[18:16:14 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null&#xD;
+[18:16:14 INF] Executing endpoint 'Health checks'&#xD;
+[18:16:14 DBG] Running health checks&#xD;
+[18:16:14 DBG] Running health check postgres&#xD;
+[18:16:14 ERR] Health check postgres with status Unhealthy completed after 1.7557ms with message 'Connection string do banco nao configurada.'&#xD;
+[18:16:14 DBG] Health check processing with combined status Unhealthy completed after 15.8463ms&#xD;
+[18:16:14 INF] Executed endpoint 'Health checks'&#xD;
+[18:16:14 ERR] HTTP GET /health/ready responded 503 in 87.7322 ms&#xD;
+[18:16:14 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 116.9734ms&#xD;
+[18:16:14 INF] Request starting HTTP/1.1 GET http://localhost/health - null null&#xD;
+[18:16:14 INF] Executing endpoint 'Health checks'&#xD;
+[18:16:14 DBG] Running health checks&#xD;
+[18:16:14 DBG] Health check processing with combined status Healthy completed after 0.2265ms&#xD;
+[18:16:14 INF] Executed endpoint 'Health checks'&#xD;
+[18:16:14 INF] HTTP GET /health responded 200 in 4.2275 ms&#xD;
+[18:16:14 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 6.9934ms&#xD;
+[18:16:14 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null&#xD;
+[18:16:14 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User)'&#xD;
+[18:16:14 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Usuario.Presentation.Controllers.PingController (Spotlight.User).&#xD;
+[18:16:14 INF] Executing OkObjectResult, writing value of type '&lt;&gt;f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.&#xD;
+[18:16:14 INF] Executed action Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User) in 20.6635ms&#xD;
+[18:16:14 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User)'&#xD;
+[18:16:14 INF] HTTP GET /api/ping responded 200 in 34.2136 ms&#xD;
+[18:16:14 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 34.8512ms&#xD;
+[18:16:14 DBG] Hosting stopping&#xD;
+[18:16:14 DBG] Hosting stopped&#xD;
+[18:16:14 DBG] Hosting stopping&#xD;
+[18:16:14 DBG] Hosting stopped&#xD;
+[testcontainers.org 00:00:00.25] Connected to Docker:&#xD;
+  Host: npipe://./pipe/docker_engine&#xD;
+  Server Version: 29.5.3&#xD;
+  Kernel Version: 6.6.87.2-microsoft-standard-WSL2&#xD;
+  API Version: 1.54&#xD;
+  Operating System: Docker Desktop&#xD;
+  Total Memory: 7.60 GB&#xD;
+  Labels: &#xD;
+    com.docker.desktop.address=npipe://\\.\pipe\docker_cli&#xD;
+[testcontainers.org 00:00:00.72] Docker container 922cc0f6c7d2 created&#xD;
+[testcontainers.org 00:00:00.83] Start Docker container 922cc0f6c7d2&#xD;
+[testcontainers.org 00:00:01.30] Wait for Docker container 922cc0f6c7d2 to complete readiness checks&#xD;
+[testcontainers.org 00:00:02.42] Docker container 922cc0f6c7d2 ready&#xD;
+[testcontainers.org 00:00:02.68] Docker container 81e8587d042b created&#xD;
+[testcontainers.org 00:00:02.70] Start Docker container 81e8587d042b&#xD;
+[testcontainers.org 00:00:03.04] Wait for Docker container 81e8587d042b to complete readiness checks&#xD;
+[testcontainers.org 00:00:09.32] Docker container 81e8587d042b ready&#xD;
+[18:16:24 DBG] Hosting starting&#xD;
+[18:16:24 INF] Indices MongoDB de telemetria garantidos na collection interacoes.&#xD;
+[18:16:24 DBG] Hosting started&#xD;
+[18:16:24 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 235&#xD;
+[18:16:24 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:24 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).&#xD;
+[18:16:24 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.&#xD;
+[18:16:24 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 152.0939ms&#xD;
+[18:16:24 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:24 INF] HTTP POST /telemetria responded 202 in 175.7226 ms&#xD;
+[18:16:24 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 180.1821ms&#xD;
+[18:16:24 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 235&#xD;
+[18:16:24 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:24 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).&#xD;
+[18:16:24 WRN] Falha ao persistir evento de telemetria evt_duplicado_44ac148cfcbe48b5bd27228eb39b70f1. A requisicao sera aceita para nao bloquear a experiencia do usuario.&#xD;
+MongoDB.Driver.MongoWriteException: A write operation resulted in an error. WriteError: { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_1098d7911438425494ae9f3f7dbd7b2d.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_44ac148cfcbe48b5bd27228eb39b70f1" }" }.&#xD;
+ ---&gt; MongoDB.Driver.MongoBulkWriteException`1[MongoDB.Bson.BsonDocument]: A bulk write operation resulted in one or more errors. WriteErrors: [ { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_1098d7911438425494ae9f3f7dbd7b2d.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_44ac148cfcbe48b5bd27228eb39b70f1" }" } ].&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)&#xD;
+   --- End of inner exception stack trace ---&#xD;
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)&#xD;
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\application\usecases\TelemetriaService.cs:line 85&#xD;
+[18:16:24 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.&#xD;
+[18:16:24 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 62.423ms&#xD;
+[18:16:24 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:24 INF] HTTP POST /telemetria responded 202 in 63.3585 ms&#xD;
+[18:16:24 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 64.7239ms&#xD;
+[18:16:24 DBG] Hosting stopping&#xD;
+[18:16:24 DBG] Hosting stopped&#xD;
+[18:16:24 DBG] Hosting stopping&#xD;
+[18:16:24 DBG] Hosting stopped&#xD;
+[testcontainers.org 00:00:10.16] Delete Docker container 81e8587d042b&#xD;
+[testcontainers.org 00:00:11.11] Docker container c6413a752691 created&#xD;
+[testcontainers.org 00:00:11.14] Start Docker container c6413a752691&#xD;
+[testcontainers.org 00:00:11.60] Wait for Docker container c6413a752691 to complete readiness checks&#xD;
+[testcontainers.org 00:00:15.86] Docker container c6413a752691 ready&#xD;
+[18:16:30 DBG] Hosting starting&#xD;
+[18:16:30 WRN] Nao foi possivel garantir os indices MongoDB de telemetria no startup.&#xD;
+System.TimeoutException: A timeout occurred after 200ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "4", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 4, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "ServerInitialDescription", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", LastHeartbeatTimestamp: null, LastUpdateTimestamp: "2026-06-24T21:16:30.5521190Z" }] }.&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Operations.CreateIndexesOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.MongoIndexManager.CreateManyAsync(IClientSessionHandle session, IEnumerable`1 models, CreateManyIndexesOptions options, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)&#xD;
+   at Spotlight.Usuario.Infrastructure.Persistence.MongoTelemetryIndexInitializer.StartAsync(CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\infrastructure\persistence\MongoTelemetryIndexInitializer.cs:line 84&#xD;
+[18:16:30 DBG] Hosting started&#xD;
+[18:16:30 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 244&#xD;
+[18:16:30 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:30 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).&#xD;
+[18:16:32 WRN] Falha ao persistir evento de telemetria evt_mongo_indisponivel_9c9eb1655bd14a44b34a8ca5eba95f94. A requisicao sera aceita para nao bloquear a experiencia do usuario.&#xD;
+System.TimeoutException: A timeout occurred after 2000ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "5", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 5, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "ServerInitialDescription", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", LastHeartbeatTimestamp: null, LastUpdateTimestamp: "2026-06-24T21:16:30.7802150Z" }] }.&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Operations.RetryableWriteContext.InitializeAsync(CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Operations.RetryableWriteContext.CreateAsync(IWriteBinding binding, Boolean retryRequested, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.Core.Operations.BulkMixedWriteOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)&#xD;
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)&#xD;
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\application\usecases\TelemetriaService.cs:line 85&#xD;
+[18:16:32 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.&#xD;
+[18:16:32 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 2018.2618ms&#xD;
+[18:16:32 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:32 INF] HTTP POST /telemetria responded 202 in 2021.5590 ms&#xD;
+[18:16:32 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 2022.3146ms&#xD;
+[18:16:32 DBG] Hosting stopping&#xD;
+[18:16:32 DBG] Hosting stopped&#xD;
+[18:16:32 DBG] Hosting stopping&#xD;
+[18:16:32 DBG] Hosting stopped&#xD;
+[testcontainers.org 00:00:18.20] Delete Docker container c6413a752691&#xD;
+[testcontainers.org 00:00:18.79] Docker container 56785e3857da created&#xD;
+[testcontainers.org 00:00:18.81] Start Docker container 56785e3857da&#xD;
+[testcontainers.org 00:00:19.16] Wait for Docker container 56785e3857da to complete readiness checks&#xD;
+[testcontainers.org 00:00:23.42] Docker container 56785e3857da ready&#xD;
+[18:16:38 DBG] Hosting starting&#xD;
+[18:16:38 INF] Indices MongoDB de telemetria garantidos na collection interacoes.&#xD;
+[18:16:38 DBG] Hosting started&#xD;
+[18:16:38 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 298&#xD;
+[18:16:38 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:38 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).&#xD;
+[18:16:38 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.&#xD;
+[18:16:38 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 19.6896ms&#xD;
+[18:16:38 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:38 INF] HTTP POST /telemetria responded 202 in 24.2682 ms&#xD;
+[18:16:38 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 26.6636ms&#xD;
+[18:16:38 DBG] Hosting stopping&#xD;
+[18:16:38 DBG] Hosting stopped&#xD;
+[18:16:38 DBG] Hosting stopping&#xD;
+[18:16:38 DBG] Hosting stopped&#xD;
+[testcontainers.org 00:00:23.69] Delete Docker container 56785e3857da&#xD;
+[testcontainers.org 00:00:24.35] Docker container ede0623f7cc4 created&#xD;
+[testcontainers.org 00:00:24.38] Start Docker container ede0623f7cc4&#xD;
+[testcontainers.org 00:00:24.78] Wait for Docker container ede0623f7cc4 to complete readiness checks&#xD;
+[testcontainers.org 00:00:28.97] Docker container ede0623f7cc4 ready&#xD;
+[18:16:43 DBG] Hosting starting&#xD;
+[18:16:43 INF] Indices MongoDB de telemetria garantidos na collection interacoes.&#xD;
+[18:16:43 DBG] Hosting started&#xD;
+[18:16:43 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 232&#xD;
+[18:16:43 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:43 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).&#xD;
+[18:16:43 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 4.1685ms&#xD;
+[18:16:43 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'&#xD;
+[18:16:43 ERR] HTTP POST /telemetria responded 500 in 7.8471 ms&#xD;
+Spotlight.Usuario.Domain.Entities.ValidationException: Dados de entrada inv�lidos.&#xD;
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.Validar(Nullable`1 usuarioId, RegistrarTelemetriaRequest request) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\application\usecases\TelemetriaService.cs:line 181&#xD;
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\application\usecases\TelemetriaService.cs:line 59&#xD;
+   at Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar(RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\presentation\controllers\TelemetriaController.cs:line 38&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.&lt;InvokeActionMethodAsync&gt;g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.&lt;InvokeNextActionFilterAsync&gt;g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State&amp; next, Scope&amp; scope, Object&amp; state, Boolean&amp; isCompleted)&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()&#xD;
+--- End of stack trace from previous location ---&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.&lt;InvokeFilterPipelineAsync&gt;g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.&lt;InvokeAsync&gt;g__Logged|17_1(ResourceInvoker invoker)&#xD;
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.&lt;InvokeAsync&gt;g__Logged|17_1(ResourceInvoker invoker)&#xD;
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.&lt;Invoke&gt;g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)&#xD;
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)&#xD;
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)&#xD;
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)&#xD;
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)&#xD;
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)&#xD;
+[18:16:43 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 400 null application/json 28.6715ms&#xD;
+[18:16:43 DBG] Hosting stopping&#xD;
+[18:16:43 DBG] Hosting stopping&#xD;
+[18:16:43 DBG] Hosting stopped&#xD;
+[18:16:43 DBG] Hosting stopped&#xD;
+[testcontainers.org 00:00:29.25] Delete Docker container ede0623f7cc4&#xD;
+[testcontainers.org 00:00:29.98] Docker container 0d76c28fc03e created&#xD;
+[testcontainers.org 00:00:30.02] Start Docker container 0d76c28fc03e&#xD;
+[testcontainers.org 00:00:30.45] Wait for Docker container 0d76c28fc03e to complete readiness checks&#xD;
+[testcontainers.org 00:00:34.65] Docker container 0d76c28fc03e ready&#xD;
+[18:16:49 DBG] Hosting starting&#xD;
+[18:16:49 INF] Indices MongoDB de telemetria garantidos na collection interacoes.&#xD;
+[18:16:49 DBG] Hosting started&#xD;
+[18:16:49 DBG] Hosting stopping&#xD;
+[18:16:49 DBG] Hosting stopped&#xD;
+[18:16:49 DBG] Hosting stopping&#xD;
+[18:16:49 DBG] Hosting stopped&#xD;
+[testcontainers.org 00:00:34.88] Delete Docker container 0d76c28fc03e&#xD;
+[xUnit.net 00:00:38.04]   Finished:    Spotlight.User.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

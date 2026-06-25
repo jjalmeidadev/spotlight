@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="840b6556-b561-4f9d-99a4-8ee06fae70ae" name="Inteli@NOTEBOOK-0479 2026-06-24 18:10:57" runUser="NOTEBOOK-0479\Inteli" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-24T18:10:57.7551546-03:00" queuing="2026-06-24T18:10:57.7551551-03:00" start="2026-06-24T18:10:54.6538057-03:00" finish="2026-06-24T18:10:57.7654206-03:00" />
+  <TestSettings name="default" id="72efb132-aa3c-4960-8d97-c31590ff7b2d">
+    <Deployment runDeploymentRoot="Inteli_NOTEBOOK-0479_2026-06-24_18_10_57" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="7d40dbd6-f063-4308-af69-55beed459d16" testId="473f7d34-0fdf-e3ec-a53d-8a6728e75619" testName="Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Health_Returns_200" computerName="NOTEBOOK-0479" duration="00:00:01.2069386" startTime="2026-06-24T18:10:57.5807503-03:00" endTime="2026-06-24T18:10:57.5807669-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7d40dbd6-f063-4308-af69-55beed459d16" />
+    <UnitTestResult executionId="4deadeff-cb73-4064-ac63-c3b28f00ff58" testId="5fa95823-3dd2-0534-0ed9-841a346cbedb" testName="Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Ping_Returns_200" computerName="NOTEBOOK-0479" duration="00:00:00.0397857" startTime="2026-06-24T18:10:57.6229305-03:00" endTime="2026-06-24T18:10:57.6229313-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4deadeff-cb73-4064-ac63-c3b28f00ff58" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Ping_Returns_200" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.gateway.tests\bin\debug\net9.0\spotlight.gateway.tests.dll" id="5fa95823-3dd2-0534-0ed9-841a346cbedb">
+      <Execution id="4deadeff-cb73-4064-ac63-c3b28f00ff58" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Gateway.Tests.HealthEndpointsTests" name="Get_Ping_Returns_200" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Health_Returns_200" storage="c:\users\inteli\onedrive\documentos\github\modulo6\g04\src\backend\tests\spotlight.gateway.tests\bin\debug\net9.0\spotlight.gateway.tests.dll" id="473f7d34-0fdf-e3ec-a53d-8a6728e75619">
+      <Execution id="7d40dbd6-f063-4308-af69-55beed459d16" />
+      <TestMethod codeBase="C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Gateway.Tests.HealthEndpointsTests" name="Get_Health_Returns_200" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="473f7d34-0fdf-e3ec-a53d-8a6728e75619" executionId="7d40dbd6-f063-4308-af69-55beed459d16" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5fa95823-3dd2-0534-0ed9-841a346cbedb" executionId="4deadeff-cb73-4064-ac63-c3b28f00ff58" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados que não estão em uma lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos os resultados carregados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)&#xD;
+[xUnit.net 00:00:00.27]   Discovering: Spotlight.Gateway.Tests&#xD;
+[xUnit.net 00:00:00.31]   Discovered:  Spotlight.Gateway.Tests&#xD;
+[xUnit.net 00:00:00.32]   Starting:    Spotlight.Gateway.Tests&#xD;
+[18:10:57 INF] User profile is available. Using 'C:\Users\Inteli\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.&#xD;
+[18:10:57 INF] Loading proxy data from config.&#xD;
+[18:10:57 DBG] Destination 'd1' has been added.&#xD;
+[18:10:57 DBG] New client created for cluster 'catalogo'.&#xD;
+[18:10:57 DBG] Cluster 'catalogo' has been added.&#xD;
+[18:10:57 DBG] Destination 'd1' has been added.&#xD;
+[18:10:57 DBG] New client created for cluster 'geolocalizacao'.&#xD;
+[18:10:57 DBG] Cluster 'geolocalizacao' has been added.&#xD;
+[18:10:57 DBG] Destination 'd1' has been added.&#xD;
+[18:10:57 DBG] New client created for cluster 'recomendacao'.&#xD;
+[18:10:57 DBG] Cluster 'recomendacao' has been added.&#xD;
+[18:10:57 DBG] Destination 'd1' has been added.&#xD;
+[18:10:57 DBG] New client created for cluster 'usuario'.&#xD;
+[18:10:57 DBG] Cluster 'usuario' has been added.&#xD;
+[18:10:57 DBG] Route 'catalogo' has been added.&#xD;
+[18:10:57 DBG] Route 'geolocalizacao' has been added.&#xD;
+[18:10:57 DBG] Route 'recomendacao' has been added.&#xD;
+[18:10:57 DBG] Route 'usuario' has been added.&#xD;
+[18:10:57 DBG] Hosting starting&#xD;
+[18:10:57 DBG] Hosting started&#xD;
+[18:10:57 INF] Request starting HTTP/1.1 GET http://localhost/health - null null&#xD;
+[18:10:57 INF] Executing endpoint 'Health checks'&#xD;
+[18:10:57 DBG] Running health checks&#xD;
+[18:10:57 DBG] Health check processing with combined status Healthy completed after 2.0437ms&#xD;
+[18:10:57 INF] Executed endpoint 'Health checks'&#xD;
+[18:10:57 INF] HTTP GET /health responded 200 in 38.8238 ms&#xD;
+[18:10:57 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 59.9278ms&#xD;
+[18:10:57 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null&#xD;
+[18:10:57 INF] Executing endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'&#xD;
+[18:10:57 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Gateway.Controllers.PingController (Spotlight.Gateway).&#xD;
+[18:10:57 INF] Executing OkObjectResult, writing value of type '&lt;&gt;f__AnonymousType0`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.&#xD;
+[18:10:57 INF] Executed action Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway) in 20.4199ms&#xD;
+[18:10:57 INF] Executed endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'&#xD;
+[18:10:57 INF] HTTP GET /api/ping responded 200 in 31.9543 ms&#xD;
+[18:10:57 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 34.7593ms&#xD;
+[18:10:57 DBG] Hosting stopping&#xD;
+[18:10:57 DBG] Hosting stopped&#xD;
+[18:10:57 DBG] Hosting stopping&#xD;
+[18:10:57 DBG] Hosting stopped&#xD;
+[xUnit.net 00:00:01.64]   Finished:    Spotlight.Gateway.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
