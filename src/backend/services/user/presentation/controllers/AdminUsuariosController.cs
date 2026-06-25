@@ -12,6 +12,7 @@ namespace Spotlight.Usuario.Presentation.Controllers;
 [Authorize]
 public class AdminUsuariosController : ControllerBase
 {
+    /// <summary>Promove um usuário ao papel <c>administrador</c>. Exige JWT do papel <c>administrador</c>.</summary>
     [HttpPost("promover")]
     [ProducesResponseType(typeof(UsuarioDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status400BadRequest)]

@@ -15,6 +15,11 @@ namespace Spotlight.Usuario.Presentation.Controllers;
 [Route("telemetria")]
 public sealed class TelemetriaController : ControllerBase
 {
+    /// <summary>
+    /// Registra um evento comportamental (impressão, clique, conversão) para persistência no MongoDB.
+    /// Retorna <c>202 Accepted</c> com o identificador do evento. Aceita requisições com ou sem JWT —
+    /// <c>user_id</c> é gravado quando o token é válido; caso contrário usa o <c>anonymous_id</c> do cliente.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(RegistrarTelemetriaResponse), StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status400BadRequest)]
