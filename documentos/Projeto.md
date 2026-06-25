@@ -6970,13 +6970,13 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 **Cenário negativo:** Tarefas com taxa de sucesso inferior a 85% ou média de toques superior a 3 serão classificadas como não conformes, com problemas de usabilidade priorizados no backlog de interface.
 
-**Pós-condições:** Relatório de usabilidade referenciado na seção 9.3.2. Evidências: `[INSERIR_REFERENCIA_RESULTADOS_USABILIDADE_RNF10]`.
+**Pós-condições:** Relatório de usabilidade consolidado na seção 9.3.2, com taxa de conclusão, número de toques e tempo por tarefa e pontuação SUS por participante. Evidências: planilha de campo (seção 9.3.1.10) e tabela de toques da seção 9.3.2.1.
 
 **Critério de aceitação:** **≥ 85%** de sucesso e **≤ 3 toques** por tarefa nas execuções que atingiram o critério de conclusão.
 
 **RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07.
 
-**Status:** planejado / pendente de sessões com usuários (instrumentos T01–T09 e analisador prontos; toques por tarefa e a vaga 60+ ficaram não conclusivos na rodada de 9.3.2 e devem ser registrados na próxima execução).
+**Status:** executado (seção 9.3.2). Taxa de conclusão 100% (atende ≥ 85%) e média SUS 79,5 (atende ≥ 68); o critério de eficiência **≤ 3 toques não foi atendido** (apenas 13,3% das execuções), atribuído à inadequação da métrica a tarefas com digitação, seleção múltipla e gestos — recomenda-se recalibrá-la (seção 9.3.2.6). A vaga 60+ permanece não confirmada por ausência de registro de idade/familiaridade na planilha, a capturar na próxima execução.
 
 ---
 
@@ -7590,7 +7590,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 &emsp;Considera-se **conclusão bem-sucedida** o atendimento ao critério da tarefa (seção 9.3.1.6) sem auxílio verbal que indique o elemento correto da interface. Desvios serão classificados na análise (seção 9.3.2) como problema de usabilidade, defeito do protótipo ou limitação do escopo mockado.
 
-&emsp;**Registro obrigatório (lacunas da rodada anterior).** Para que o veredito do RNF10 seja conclusivo, são de preenchimento obrigatório na planilha de campo (seção 9.3.1.10), por participante e por tarefa: (i) o **número de toques** em cada execução bem-sucedida, base do critério "≤ 3 toques em ≥ 85% das execuções"; e (ii) a **identificação do participante 60+ com baixa familiaridade tecnológica** (vaga obrigatória da seção 9.3.1.4), com suas observações de acessibilidade. Esses dois campos ficaram "não conclusivos" na rodada consolidada em 9.3.2 e devem ser capturados na próxima execução para fechar a rastreabilidade ao RNF10 e à persona Carlos Nóbrega.
+&emsp;**Registro obrigatório.** Para que o veredito do RNF10 seja conclusivo, são de preenchimento obrigatório na planilha de campo (seção 9.3.1.10), por participante e por tarefa: (i) o **número de toques** em cada execução bem-sucedida, base do critério "≤ 3 toques em ≥ 85% das execuções"; e (ii) a **identificação do participante 60+ com baixa familiaridade tecnológica** (vaga obrigatória da seção 9.3.1.4), com suas observações de acessibilidade. Na rodada consolidada em 9.3.2, o número de toques **foi registrado** (e indicou que o critério de eficiência não foi atendido com a métrica atual), mas a idade e a familiaridade tecnológica dos participantes **não foram registradas**; este último campo deve ser capturado na próxima execução para fechar a rastreabilidade à persona Carlos Nóbrega.
 
 #### 9.3.1.9 Pós-condições
 
@@ -7650,25 +7650,44 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 ### 9.3.2 Resultados
 
-&emsp;Esta subseção consolida os resultados da rodada de testes de usabilidade realizada com cinco participantes, identificados como P1, P2, P3, P4 e P5. A análise combina os comportamentos observados durante a execução das tarefas com as pontuações obtidas por meio do System Usability Scale (SUS), permitindo avaliar a efetividade dos fluxos principais e a percepção global de facilidade de uso do aplicativo.
+&emsp;Esta subseção consolida os resultados da rodada de testes de usabilidade realizada com cinco participantes, identificados como P1, P2, P3, P4 e P5. A análise combina os comportamentos observados durante a execução das tarefas, o número de toques e o tempo registrados por tarefa e as pontuações obtidas por meio do System Usability Scale (SUS), permitindo avaliar a efetividade dos fluxos principais, a eficiência de interação e a percepção global de facilidade de uso do aplicativo. Os dados brutos completos (conclusão, toques, tempo, auxílio e respostas SUS por participante) estão na planilha de campo referenciada na seção 9.3.1.10.
 
 | Métrica | Resultado observado | Critério de aceitação | Veredito |
 |---------|---------------------|-----------------------|----------|
 | Quantidade de participantes externos | 5 participantes | Mínimo de 5 participantes | Atendido |
-| Participante 60+ com baixa familiaridade tecnológica | Não informado nos dados consolidados | Pelo menos 1 participante | Não conclusivo |
+| Participante 60+ com baixa familiaridade tecnológica | Idade e familiaridade não registradas na planilha de campo | Pelo menos 1 participante | Não confirmado |
 | Média SUS | 79,5 | SUS médio ≥ 68 | Atendido |
 | Taxa média de conclusão das tarefas | 100% | ≥ 85% | Atendido |
-| Tarefas concluídas em até 3 toques | Não informado nos dados consolidados | ≥ 85% das execuções bem-sucedidas | Não conclusivo |
+| Tarefas concluídas em até 3 toques | 6 de 45 execuções (13,3%) | ≥ 85% das execuções bem-sucedidas | Não atendido |
 | Principais dificuldades observadas | Filtros, navegação horizontal, faixa de preço, destaque do botão de compra e ausência de sugestões na busca | Registro qualitativo | Registrado |
-| Melhorias priorizadas | Refinar filtros, carrosséis, busca, faixa de preço e botão de compra | Backlog de ajustes | Definido |
+| Melhorias priorizadas | Refinar filtros, carrosséis, busca, faixa de preço e botão de compra; recalibrar a métrica de toques | Backlog de ajustes | Definido |
 
-&emsp;As evidências consideradas nesta análise são os registros de conclusão das tarefas, as dificuldades observadas durante as sessões e as pontuações individuais do questionário SUS. Não foram disponibilizados dados consolidados de tempo, número de toques ou perfil etário dos participantes; portanto, não é possível emitir veredito sobre esses critérios específicos sem extrapolar as informações coletadas.
+&emsp;As evidências consideradas nesta análise são os registros de conclusão das tarefas, o número de toques e o tempo por tarefa, as dificuldades observadas durante as sessões e as pontuações individuais do questionário SUS. A planilha de campo não registrou a idade nem a familiaridade tecnológica dos participantes; por isso, não é possível confirmar a presença do perfil 60+ com baixa familiaridade exigido na seção 9.3.1.4, ainda que o comportamento de P5 (maior necessidade de auxílio e menor SUS) seja compatível com esse perfil. Esse campo deve ser preenchido na próxima execução para fechar a rastreabilidade à persona Carlos Nóbrega.
 
 #### 9.3.2.1 Resultados gerais dos testes
 
-&emsp;A rodada foi efetivamente realizada com cinco participantes externos, e todos concluíram todas as tarefas propostas no roteiro, resultando em taxa observada de conclusão de 100%. Esse resultado supera o critério quantitativo de 85% definido no planejamento e comprova boa efetividade geral dos fluxos avaliados, uma vez que os participantes conseguiram alcançar os objetivos estabelecidos sem ocorrência de bloqueios. Entretanto, a conclusão integral não significa ausência de dificuldades: P4 necessitou de ajuda leve nas etapas de preferências e filtros, enquanto P5 apresentou maior dificuldade na seleção da faixa de preço, na utilização dos filtros e na navegação horizontal.
+&emsp;A rodada foi efetivamente realizada com cinco participantes externos, e todos concluíram todas as tarefas propostas no roteiro, resultando em taxa observada de conclusão de 100%. Esse resultado supera o critério quantitativo de 85% definido no planejamento e comprova boa efetividade geral dos fluxos avaliados, uma vez que os participantes conseguiram alcançar os objetivos estabelecidos sem ocorrência de bloqueios. Entretanto, a conclusão integral não significa ausência de dificuldades: P4 necessitou de ajuda leve nas etapas de preferências e filtros, enquanto P5 apresentou maior dificuldade na seleção da faixa de preço, na utilização dos filtros e na navegação horizontal. Os registros de auxílio confirmam esse padrão — P5 precisou de ajuda em quatro tarefas (T03, T04, T06 e T08) e P4 em duas (T03 e T06); os demais participantes concluíram o roteiro sem auxílio que revelasse o caminho na interface.
 
-&emsp;Como o critério de sucesso do RNF10 também considera a conclusão sem auxílio verbal que revele o caminho na interface e a eficiência em até três toques, os dados disponíveis não permitem afirmar que todas as execuções atenderam integralmente a esse requisito. A natureza exata da ajuda fornecida a P4 não foi detalhada, e as quantidades de toques por tarefa não foram consolidadas. Assim, confirma-se o atendimento ao critério de conclusão, mas a eficiência por toques permanece não conclusiva. As dificuldades de P4 e P5 devem ser tratadas como prioridade de melhoria, pois indicam menor autonomia na interação com determinados componentes.
+&emsp;A planilha de campo desta rodada consolidou o número de toques e o tempo por tarefa, fechando a lacuna registrada na revisão anterior. A tabela a seguir reúne os toques por participante, a mediana por tarefa e a contagem de execuções concluídas em até três toques, base do critério de eficiência do RNF10.
+
+| Tarefa | P1 | P2 | P3 | P4 | P5 | Mediana | Execuções ≤ 3 toques |
+|--------|---:|---:|---:|---:|---:|--------:|:--------------------:|
+| T01 | 1 | 1 | 1 | 1 | 2 | 1 | 5/5 |
+| T02 | 4 | 4 | 3 | 4 | 5 | 4 | 1/5 |
+| T03 | 7 | 8 | 6 | 9 | 10 | 8 | 0/5 |
+| T04 | 8 | 7 | 7 | 8 | 10 | 8 | 0/5 |
+| T05 | 5 | 6 | 5 | 6 | 7 | 6 | 0/5 |
+| T06 | 6 | 8 | 6 | 9 | 10 | 8 | 0/5 |
+| T07 | 7 | 8 | 7 | 8 | 9 | 8 | 0/5 |
+| T08 | 9 | 8 | 7 | 9 | 11 | 9 | 0/5 |
+| T09 | 5 | 6 | 5 | 7 | 8 | 6 | 0/5 |
+| **Total de toques** | **52** | **56** | **47** | **61** | **72** | — | **6/45 (13,3%)** |
+
+&emsp;O tempo total de execução do roteiro acompanhou o mesmo padrão: P3 foi o mais rápido (301 s) e P5 o mais lento (584 s), com P1 (337 s), P2 (361 s) e P4 (409 s) em posições intermediárias. A correspondência entre maior tempo, mais toques, mais pedidos de auxílio e menor SUS reforça que P5 concentrou as dificuldades da rodada.
+
+&emsp;Quanto ao critério de eficiência do RNF10 — **≤ 3 toques em ≥ 85% das execuções bem-sucedidas** —, apenas 6 das 45 execuções (13,3%) ficaram dentro do limite: todas as cinco execuções de T01 e uma de T02. As demais tarefas exigiram, de forma consistente entre participantes, mais de três toques. Esse resultado decorre da própria natureza das tarefas: T02 envolve digitação de e-mail e senha, T03 exige seleção de tipo de espetáculo e faixa de preço, e T04 a T09 combinam rolagem, gestos horizontais e navegação entre telas. Portanto, o critério de eficiência **não foi atendido** tal como literalmente definido. Como o limite de três toques é realista apenas para ações pontuais de navegação, e não para tarefas que envolvem entrada de texto e múltiplas seleções, recomenda-se recalibrar a métrica (seção 9.3.2.6): contar separadamente os toques de navegação ou estabelecer um *baseline* de toques esperados por tarefa, em vez de aplicar um limite único a todo o roteiro.
+
+&emsp;Em síntese, confirma-se o atendimento ao critério de conclusão (100%) e à média SUS (≥ 68), mas a eficiência por toques não atinge o limiar do RNF10 com a métrica atual. As dificuldades de P4 e P5 devem ser tratadas como prioridade de melhoria, pois indicam menor autonomia na interação com determinados componentes.
 
 #### 9.3.2.2 Análise dos comportamentos observados
 
@@ -7710,6 +7729,8 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 - Dificuldade de P5 na seleção da faixa de preço.
 - Necessidade de ajuda leve para P4 nas etapas de preferências e filtros.
 - Experiência menos satisfatória para P5, refletida tanto nas dificuldades observadas quanto na pontuação SUS de 57,5.
+- Eficiência por toques abaixo do critério do RNF10: apenas 13,3% das execuções (6 de 45) foram concluídas em até três toques, concentradas em T01 e T02. As tarefas com digitação, seleção múltipla e gestos (T03–T09) superaram consistentemente o limite, evidenciando que a métrica de três toques não é adequada a todo o roteiro e precisa de recalibração.
+- Ausência de registro de idade e familiaridade tecnológica na planilha de campo, o que impede confirmar a vaga obrigatória do perfil 60+ com baixa familiaridade (seção 9.3.1.4).
 
 #### 9.3.2.6 Recomendações de melhoria
 
@@ -7717,11 +7738,13 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 &emsp;Os filtros devem receber maior destaque na hierarquia visual e apresentar estados de seleção mais evidentes, incluindo retorno perceptível após a aplicação. A seleção de faixa de preço deve ser revisada quanto à clareza dos rótulos, área de toque e representação do valor escolhido. Também se recomenda reforçar visualmente o botão de compra, assegurando contraste, posicionamento e identificação compatíveis com sua relevância no fluxo.
 
+&emsp;Recomenda-se, ainda, **recalibrar a métrica de toques do RNF10**. O limite único de três toques por execução não é adequado a tarefas que envolvem digitação (T02), múltiplas seleções (T03) ou gestos e rolagem (T04–T09), nas quais a contagem naturalmente supera o limiar — apenas 13,3% das execuções ficaram dentro dele. Sugere-se contar separadamente os toques estritamente de navegação ou definir um *baseline* de toques esperados por tarefa, comparando o desempenho observado a esse referencial. Os campos de idade e familiaridade tecnológica também devem ser incluídos na planilha de campo, de modo a confirmar a presença do perfil 60+ com baixa familiaridade (persona Carlos Nóbrega) exigido na seção 9.3.1.4.
+
 &emsp;Após a implementação dos ajustes, recomenda-se repetir as tarefas T03, T05, T06, T08 e T09 com o mesmo roteiro, pois elas abrangem os elementos que concentraram as dificuldades observadas. Uma nova aplicação do SUS permitirá verificar se as alterações reduzem a diferença entre participantes e elevam a média do grupo acima do limiar de 80,3 pontos.
 
 #### 9.3.2.7 Conclusão
 
-&emsp;Os resultados indicam que o Spotlight atendeu aos critérios de aceitação relativos à pontuação SUS e à conclusão das tarefas. A média SUS de 79,5 superou o critério mínimo de 68 pontos, e a taxa de conclusão de 100% superou o limiar de 85%. O resultado agregado permanece abaixo de 80,3 e, portanto, não recebe classificação A. Além disso, não é possível concluir o atendimento ao critério de eficiência em até três toques nem confirmar a participação do perfil 60+ com baixa familiaridade tecnológica, pois essas informações não constam nos dados consolidados.
+&emsp;Os resultados indicam que o Spotlight atendeu aos critérios de aceitação relativos à pontuação SUS e à conclusão das tarefas. A média SUS de 79,5 superou o critério mínimo de 68 pontos, e a taxa de conclusão de 100% superou o limiar de 85%. O resultado agregado permanece abaixo de 80,3 e, portanto, não recebe classificação A. O critério de eficiência em até três toques, agora calculável com os dados consolidados de toques, **não foi atendido**: apenas 13,3% das execuções ficaram dentro do limite, resultado atribuído à inadequação da métrica a tarefas com digitação, seleção múltipla e gestos — daí a recomendação de recalibrá-la (seção 9.3.2.6). Por fim, não é possível confirmar a participação do perfil 60+ com baixa familiaridade tecnológica, pois a idade e a familiaridade dos participantes não foram registradas na planilha de campo, embora o comportamento de P5 seja compatível com esse perfil.
 
 &emsp;Conclui-se que a solução possui uma base de interação funcional e compreensível. Os pontos críticos identificados não impediram o uso, mas afetaram a descobribilidade, a hierarquia visual e a autonomia em componentes de busca, filtros, faixa de preço, carrosséis e compra. Após a implementação dos ajustes, recomenda-se realizar nova rodada de validação com ênfase nas tarefas T03, T05, T06, T08 e T09, preservando o roteiro sempre que possível para permitir a comparação dos resultados.
 
