@@ -1282,8 +1282,8 @@ Esta seção documenta o comportamento esperado dos quatro índices criados em `
 
 - **Query:** `SELECT * FROM sessao WHERE id_espetaculo = 1 ORDER BY data, horario`
 - **Índice:** `idx_sessao_espetaculo_data_horario` (B-tree composto)
-- **Plano esperado em produção:** `Index Scan using idx_sessao_espetaculo_data_horario` — o índice composto cobre o filtro e a ordenação sem sort adicional.
-- **Observação:** elimina o custo de sort em espetáculos com muitas sessões.
+- **Plano esperado em produção:** `Index Scan using idx_sessao_espetaculo_data_horario` — o índice composto cobre o filtro e, quando o otimizador estima que o `Index Scan` é mais barato, entrega as linhas já ordenadas sem um nó de `Sort` separado.
+- **Observação:** elimina o custo de sort em espetáculos com **muitas** sessões. **Ressalva de evidência:** na massa sintética do teste de carga (~20 mil sessões distribuídas por poucos espetáculos), o planner escolheu `Bitmap Heap Scan` com um `Sort` por cima — o caminho "sem sort" depende da seletividade do filtro por espetáculo e do volume por chave; o plano `Index Scan` ordenado se confirma quando há muitas sessões para um mesmo espetáculo. O `EXPLAIN ANALYZE` real dessa query no volume testado deve ser anexado em vez de assumir o plano ideal.
 
 > Os planos acima foram validados com `EXPLAIN` no ambiente Supabase com dados de seed. Com volume reduzido o PostgreSQL opta por `Seq Scan`, que é o comportamento correto — o otimizador escolhe automaticamente o índice quando o volume justificar.
 
@@ -1491,6 +1491,22 @@ Execution Time: 0.249 ms          -- índice composto cobre filtro + ordenação
 ->  Bitmap Index Scan on idx_recomendacao_usuario
       Index Cond: (id_usuario = '...')
 ```
+
+> **Cobertura de evidência por índice.** Dos quatro índices da migration `06`, três foram comprovados em plano sob volume: `idx_espetaculo_status_popularidade` (acima), `idx_espetaculo_genero` (`Index Scan` para filtro de gênero) e `idx_recomendacao_usuario` (acima). O índice GIN trigram `idx_espetaculo_titulo_trgm` **não** foi exercitado em `EXPLAIN ANALYZE` porque a massa sintética usa títulos homogêneos (`"Espetáculo Carga N"`), sem termo seletivo que justifique o `Bitmap Index Scan` — é hoje o índice menos comprovado em execução. Para evidenciá-lo, gerar a massa com títulos variados e reexecutar a busca por título com um termo seletivo.
+
+### Meta de desempenho (vínculo com RNF)
+
+Os números acima são lidos contra uma meta explícita de desempenho da camada de dados, derivada do **RNF06** (resposta fim-a-fim ≤ 3 s sob 200 usuários simultâneos, seção 3.2 do `Projeto.md`): como o banco é apenas uma fração do tempo total da requisição, o orçamento de latência reservado a ele é **≤ 50 ms por query** sob carga, com **0 falhas** e throughput mínimo compatível com o pico esperado.
+
+| Métrica | Meta (camada de dados) | Medido (pgbench) | Resultado |
+|---|---|---|---|
+| Latência média por query (leitura) | ≤ 50 ms | ~1,3–1,6 ms | ✅ atende com folga |
+| Latência média de escrita + auditoria | ≤ 50 ms | 3,77 ms | ✅ atende |
+| Throughput de leitura | ≥ 500 tx/s | 2.681 tx/s | ✅ atende |
+| Throughput de escrita | ≥ 500 tx/s | 5.306 tx/s | ✅ atende |
+| Taxa de falhas | 0% | 0,000% | ✅ atende |
+
+> **Ressalva metodológica:** o pgbench reporta latência **média** por statement; a meta acima é definida sobre essa média. Uma meta de **p95** por endpoint exige captura do percentil na próxima rodada (`pgbench` com `--latency-limit` / análise do log por transação) e fica registrada como evolução do teste de carga.
 
 ### Análise
 
