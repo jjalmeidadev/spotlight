@@ -1,0 +1,186 @@
+name: spotlight-loadtest
+
+x-dotnet-loadtest: &dotnet-loadtest
+  restart: "no"
+  networks:
+    - loadtest_net
+
+x-health-ready: &health-ready
+  test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health/ready || exit 1"]
+  interval: 10s
+  timeout: 5s
+  retries: 15
+  start_period: 30s
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: America/Sao_Paulo
+    command:
+      - postgres
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - max_connections=300
+      - -c
+      - work_mem=8MB
+      - -c
+      - log_min_duration_statement=500
+    ports:
+      - "5433:5432"
+    volumes:
+      - ../../src/database/00_supabase_compat.sql:/docker-entrypoint-initdb.d/01-compat.sql:ro
+      - ../../src/database/01_create_database.sql:/docker-entrypoint-initdb.d/02-schema.sql:ro
+      - ../../src/database/02_initial_data.sql:/docker-entrypoint-initdb.d/03-seed.sql:ro
+      - ./db-init/04-apply-migrations.sh:/docker-entrypoint-initdb.d/04-apply-migrations.sh:ro
+      - ./db-init/05-load-mass.sh:/docker-entrypoint-initdb.d/05-load-mass.sh:ro
+      - ../../src/database/migrations:/migrations:ro
+      - ../../src/database/load_test/massa_carga.sql:/massa_carga.sql:ro
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - loadtest_net
+
+  mongo:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    ports:
+      - "27018:27017"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' | grep -q 1"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - loadtest_net
+
+  catalogo:
+    <<: *dotnet-loadtest
+    build:
+      context: ../../src/backend/services/catalog
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING_LOCAL}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET_LOCAL}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck: *health-ready
+
+  usuario:
+    <<: *dotnet-loadtest
+    build:
+      context: ../../src/backend/services/user
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING_LOCAL}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET_LOCAL}
+      MONGODB_CONNECTION_STRING: ${MONGODB_CONNECTION_STRING_LOCAL}
+      MONGODB_DATABASE: ${MONGODB_DATABASE}
+      MONGODB_TELEMETRY_COLLECTION: ${MONGODB_TELEMETRY_COLLECTION}
+    depends_on:
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck: *health-ready
+
+  recomendacao:
+    <<: *dotnet-loadtest
+    build:
+      context: ../../src/backend/services/recommendation
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING_LOCAL}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET_LOCAL}
+      RecommendationModel__Enabled: "false"
+      SupabaseModelArtifacts__Enabled: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck: *health-ready
+
+  geolocalizacao:
+    <<: *dotnet-loadtest
+    build:
+      context: ../../src/backend/services/geolocation
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      NOMINATIM_BASE_URL: https://nominatim.openstreetmap.org
+      NOMINATIM_USER_AGENT: spotlight-loadtest/1.0
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  gateway:
+    <<: *dotnet-loadtest
+    build:
+      context: ../../src/backend/api-gateway
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    depends_on:
+      catalogo:
+        condition: service_healthy
+      usuario:
+        condition: service_healthy
+      recomendacao:
+        condition: service_healthy
+      geolocalizacao:
+        condition: service_started
+    ports:
+      - "5000:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 15s
+
+  k6:
+    image: grafana/k6:0.49.0
+    profiles: ["test"]
+    environment:
+      GATEWAY_URL: http://gateway:8080
+      JWT_SECRET: ${SUPABASE_JWT_SECRET_LOCAL}
+    volumes:
+      - ./k6:/scripts:ro
+      - ./resultados:/out
+    entrypoint: ["k6"]
+    networks:
+      - loadtest_net
+
+networks:
+  loadtest_net:
+    driver: bridge
+
+volumes:
+  db_data:
