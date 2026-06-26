@@ -1,29 +1,88 @@
 import React from 'react';
 import {
-  Image,
+  ActivityIndicator,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   DashboardMetric,
   DashboardMetricIcon,
+  ExhibitionTypeShare,
   SalesDataPoint,
   SalesPeriod,
   SalesPeriodOption,
 } from '@/frontend/models/AdminDashboard';
+import { promoverUsuarioAdministrador } from '@/frontend/repositories/UserRepository';
 import { spacing, typography } from '@/frontend/theme';
 import { useAdminDashboardViewModel } from '@/frontend/viewmodels/useAdminDashboardViewModel';
+import { ProfileSheet } from '@/frontend/components/ProfileSheet';
 
-const adminAvatar = require('../../../documentos/img/celso.png');
+type AdminDashboardScreenProps = {
+  accessToken?: string | null;
+  profileEmail?: string;
+  profileName?: string;
+  onOpenCatalog?: () => void;
+  onLogout?: () => void;
+  onProfileUpdated?: (name: string) => void;
+};
 
-export default function AdminDashboardScreen() {
-  const viewModel = useAdminDashboardViewModel();
+export default function AdminDashboardScreen({
+  accessToken,
+  profileEmail,
+  profileName,
+  onOpenCatalog,
+  onLogout,
+  onProfileUpdated,
+}: AdminDashboardScreenProps) {
+  const [profileOpen, setProfileOpen] = React.useState(false);
+  const [adminEmail, setAdminEmail] = React.useState('');
+  const [promoteLoading, setPromoteLoading] = React.useState(false);
+  const [promoteMessage, setPromoteMessage] = React.useState<string | null>(null);
+  const viewModel = useAdminDashboardViewModel(profileName ?? 'Administrador');
+
+  async function handlePromoteAdmin() {
+    try {
+      setPromoteLoading(true);
+      setPromoteMessage(null);
+      const usuario = await promoverUsuarioAdministrador(accessToken, adminEmail);
+      setAdminEmail('');
+      setPromoteMessage(`${usuario.nome} agora é administrador. Oriente a pessoa a sair e entrar novamente.`);
+    } catch (err) {
+      setPromoteMessage(err instanceof Error ? err.message : 'Não foi possível promover o usuário.');
+    } finally {
+      setPromoteLoading(false);
+    }
+  }
+
+  if (viewModel.loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content" backgroundColor={dashboardColors.background} />
+        <View style={styles.centeredState}>
+          <ActivityIndicator color={dashboardColors.ink} />
+          <Text style={styles.stateText}>Carregando dashboard...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (viewModel.error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content" backgroundColor={dashboardColors.background} />
+        <View style={styles.centeredState}>
+          <Text style={styles.stateText}>{viewModel.error}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -35,8 +94,17 @@ export default function AdminDashboardScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.welcomeRow}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onOpenCatalog}
+            style={({ pressed }) => [styles.catalogButton, pressed && styles.pressed]}
+          >
+            <Text style={styles.catalogButtonText}>Ver app</Text>
+          </Pressable>
           <Text style={styles.welcomeText}>Bem vindo, {viewModel.adminName}!</Text>
-          <Image source={adminAvatar} resizeMode="cover" style={styles.avatar} />
+          <Pressable accessibilityRole="button" hitSlop={8} onPress={() => setProfileOpen(true)} style={styles.avatarFallback}>
+            <Text style={styles.avatarInitial}>{getInitial(viewModel.adminName)}</Text>
+          </Pressable>
         </View>
 
         <Text style={styles.title}>Estatísticas</Text>
@@ -48,21 +116,12 @@ export default function AdminDashboardScreen() {
         </View>
 
         <View style={styles.panel}>
-          <Text style={styles.sectionTitle}>Tipos de exibições</Text>
-          <DonutChart />
-
-          <View style={styles.legendRow}>
-            {viewModel.exhibitionTypes.map((type) => (
-              <View key={type.id} style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: type.color }]} />
-                <Text style={styles.legendText}>{type.label}</Text>
-              </View>
-            ))}
-          </View>
+          <Text style={styles.sectionTitle}>Gêneros no catálogo</Text>
+          <GenreChart data={viewModel.exhibitionTypes} total={viewModel.exhibitionTotal} />
         </View>
 
         <View style={styles.salesPanel}>
-          <Text style={styles.sectionTitle}>Vendas por período</Text>
+          <Text style={styles.sectionTitle}>Sessões por período</Text>
 
           <PeriodTabs
             options={viewModel.salesPeriodOptions}
@@ -72,7 +131,46 @@ export default function AdminDashboardScreen() {
 
           <BarChart data={viewModel.salesData} maxValue={viewModel.salesMaxValue} />
         </View>
+
+        <View style={styles.adminPanel}>
+          <Text style={styles.sectionTitle}>Administradores</Text>
+          <Text style={styles.adminDescription}>
+            Promova usuários cadastrados para liberar acesso ao dashboard e às rotas administrativas.
+          </Text>
+          <TextInput
+            autoCapitalize="none"
+            keyboardType="email-address"
+            onChangeText={setAdminEmail}
+            placeholder="email@dominio.com"
+            placeholderTextColor="#9a9a9a"
+            style={styles.adminInput}
+            value={adminEmail}
+          />
+          {promoteMessage ? <Text style={styles.adminMessage}>{promoteMessage}</Text> : null}
+          <Pressable
+            accessibilityRole="button"
+            disabled={promoteLoading || !adminEmail.trim()}
+            onPress={handlePromoteAdmin}
+            style={({ pressed }) => [
+              styles.promoteButton,
+              pressed && styles.pressed,
+              (promoteLoading || !adminEmail.trim()) && styles.disabled,
+            ]}
+          >
+            {promoteLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.promoteButtonText}>Promover admin</Text>}
+          </Pressable>
+        </View>
       </ScrollView>
+
+      <ProfileSheet
+        accessToken={accessToken}
+        email={profileEmail}
+        name={viewModel.adminName}
+        onClose={() => setProfileOpen(false)}
+        onLogout={onLogout ?? (() => undefined)}
+        onProfileUpdated={onProfileUpdated}
+        visible={profileOpen}
+      />
     </SafeAreaView>
   );
 }
@@ -143,12 +241,41 @@ function MetricIcon({ icon }: MetricIconProps) {
   );
 }
 
-function DonutChart() {
+type GenreChartProps = {
+  data: ExhibitionTypeShare[];
+  total: number;
+};
+
+function GenreChart({ data, total }: GenreChartProps) {
+  if (data.length === 0 || total === 0) {
+    return <Text style={styles.emptyChartText}>Nenhum gênero encontrado no catálogo.</Text>;
+  }
+
   return (
-    <View style={styles.donutOuter}>
-      <View style={styles.donutRing} />
-      <View style={styles.donutBlueArc} />
-      <View style={styles.donutHole} />
+    <View style={styles.genreChart}>
+      {data.map((type) => {
+        const percentage = Math.round((type.value / total) * 100);
+
+        return (
+          <View key={type.id} style={styles.genreRow}>
+            <View style={styles.genreHeader}>
+              <View style={[styles.legendDot, { backgroundColor: type.color }]} />
+              <Text style={styles.legendText} numberOfLines={1}>
+                {type.label}
+              </Text>
+              <Text style={styles.genreValue}>{percentage}%</Text>
+            </View>
+            <View style={styles.genreTrack}>
+              <View
+                style={[
+                  styles.genreFill,
+                  { width: `${Math.max(percentage, 4)}%`, backgroundColor: type.color },
+                ]}
+              />
+            </View>
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -192,7 +319,9 @@ type BarChartProps = {
 };
 
 function BarChart({ data, maxValue }: BarChartProps) {
-  const yAxisLabels = ['25k', '15k', '10k', '5k', '1k', '0'];
+  const axisMaxValue = Math.max(1, Math.ceil(maxValue));
+  const yAxisLabels = [axisMaxValue, axisMaxValue * 0.75, axisMaxValue * 0.5, axisMaxValue * 0.25, 0]
+    .map((value) => String(Math.round(value)));
   const barTrackHeight = 210;
 
   return (
@@ -225,6 +354,10 @@ function BarChart({ data, maxValue }: BarChartProps) {
   );
 }
 
+function getInitial(value: string) {
+  return value.trim().charAt(0).toUpperCase() || 'A';
+}
+
 const dashboardColors = {
   background: '#f0f2f1',
   panel: '#ffffff',
@@ -242,6 +375,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: dashboardColors.background,
   },
+  centeredState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+    rowGap: spacing.md,
+  },
+  stateText: {
+    color: dashboardColors.ink,
+    ...typography.body,
+    textAlign: 'center',
+  },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: spacing.xxxl,
@@ -255,6 +400,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     backgroundColor: '#eef4ef',
   },
+  catalogButton: {
+    alignItems: 'center',
+    borderColor: dashboardColors.ink,
+    borderRadius: 999,
+    borderWidth: 1,
+    justifyContent: 'center',
+    marginRight: 'auto',
+    minHeight: 28,
+    paddingHorizontal: spacing.md,
+  },
+  catalogButtonText: {
+    color: dashboardColors.ink,
+    fontFamily: typography.fontFamily.bold,
+    fontSize: 11,
+    lineHeight: 14,
+    letterSpacing: 0,
+  },
   welcomeText: {
     color: dashboardColors.ink,
     ...typography.caption,
@@ -262,10 +424,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0,
   },
-  avatar: {
+  avatarFallback: {
     width: 28,
     height: 28,
     borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: dashboardColors.ink,
+  },
+  avatarInitial: {
+    color: dashboardColors.panel,
+    fontFamily: typography.fontFamily.bold,
+    fontSize: 12,
+    lineHeight: 14,
+    letterSpacing: 0,
   },
   title: {
     color: dashboardColors.ink,
@@ -318,7 +490,7 @@ const styles = StyleSheet.create({
   panel: {
     backgroundColor: dashboardColors.panel,
     borderRadius: 18,
-    paddingTop: 76,
+    paddingTop: spacing.xl,
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxxl,
     marginBottom: spacing.xs,
@@ -330,6 +502,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xl,
   },
+  adminPanel: {
+    backgroundColor: dashboardColors.panel,
+    borderRadius: 18,
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xl,
+  },
+  adminDescription: {
+    color: dashboardColors.tab,
+    ...typography.body,
+    fontSize: 13,
+    lineHeight: 18,
+    letterSpacing: 0,
+    marginBottom: spacing.md,
+  },
+  adminInput: {
+    borderColor: dashboardColors.blueSoft,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: dashboardColors.ink,
+    fontFamily: typography.fontFamily.book,
+    fontSize: 14,
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+  },
+  adminMessage: {
+    color: dashboardColors.ink,
+    ...typography.caption,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0,
+    marginTop: spacing.sm,
+  },
+  promoteButton: {
+    alignItems: 'center',
+    backgroundColor: dashboardColors.ink,
+    borderRadius: 8,
+    justifyContent: 'center',
+    marginTop: spacing.md,
+    minHeight: 44,
+  },
+  promoteButtonText: {
+    color: dashboardColors.panel,
+    fontFamily: typography.fontFamily.bold,
+    fontSize: 13,
+    letterSpacing: 0,
+  },
   sectionTitle: {
     color: dashboardColors.ink,
     ...typography.title,
@@ -338,48 +557,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
     marginBottom: spacing.lg,
   },
-  donutOuter: {
-    alignSelf: 'center',
-    width: 176,
-    height: 176,
-    borderRadius: 88,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: dashboardColors.panel,
-    marginTop: spacing.xs,
+  genreChart: {
+    rowGap: spacing.md,
   },
-  donutRing: {
-    position: 'absolute',
-    width: 136,
-    height: 136,
-    borderRadius: 68,
-    borderWidth: 22,
-    borderColor: dashboardColors.red,
+  genreRow: {
+    rowGap: spacing.xs,
   },
-  donutBlueArc: {
-    position: 'absolute',
-    width: 136,
-    height: 136,
-    borderRadius: 68,
-    borderWidth: 22,
-    borderColor: 'transparent',
-    borderTopColor: dashboardColors.blueDeep,
-    borderRightColor: dashboardColors.blueDeep,
-    transform: [{ rotate: '8deg' }],
-  },
-  donutHole: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    backgroundColor: dashboardColors.panel,
-  },
-  legendRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    columnGap: spacing.xxxl,
-    marginTop: spacing.lg,
-  },
-  legendItem: {
+  genreHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     columnGap: spacing.sm,
@@ -392,8 +576,33 @@ const styles = StyleSheet.create({
   legendText: {
     color: dashboardColors.ink,
     ...typography.label,
+    flex: 1,
     fontSize: 16,
     lineHeight: 20,
+    letterSpacing: 0,
+  },
+  genreValue: {
+    color: dashboardColors.muted,
+    ...typography.caption,
+    fontSize: 13,
+    lineHeight: 16,
+    letterSpacing: 0,
+    minWidth: 38,
+    textAlign: 'right',
+  },
+  genreTrack: {
+    height: 8,
+    borderRadius: 999,
+    overflow: 'hidden',
+    backgroundColor: dashboardColors.blueSoft,
+  },
+  genreFill: {
+    height: '100%',
+    borderRadius: 999,
+  },
+  emptyChartText: {
+    color: dashboardColors.muted,
+    ...typography.body,
     letterSpacing: 0,
   },
   periodTabs: {
@@ -637,5 +846,8 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.82,
+  },
+  disabled: {
+    opacity: 0.58,
   },
 });

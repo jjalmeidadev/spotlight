@@ -6,13 +6,13 @@ import {
   ImageBackground,
   ListRenderItemInfo,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 import { Carousel, CarouselItem } from '@/frontend/components/Carousel';
@@ -35,9 +35,31 @@ type DetailsViewProps = {
 const STAR_COUNT = 5;
 const HERO_HEIGHT = 280;
 const NOVICA_REBELDE_CAPA = require('../../../assets/images/novicarebelde.png');
-const novicaRebeldeCapaSource = Image.resolveAssetSource(NOVICA_REBELDE_CAPA);
+const novicaRebeldeCapaSource = resolveLocalImageSource(NOVICA_REBELDE_CAPA, {
+  width: 1239,
+  height: 487,
+});
 const NOVICA_REBELDE_CAPA_ASPECT_RATIO =
   novicaRebeldeCapaSource.width / novicaRebeldeCapaSource.height;
+
+function resolveLocalImageSource(source: unknown, fallback: { width: number; height: number }) {
+  const resolveAssetSource = (
+    Image as typeof Image & {
+      resolveAssetSource?: (source: unknown) => { width?: number; height?: number } | undefined;
+    }
+  ).resolveAssetSource;
+
+  if (typeof resolveAssetSource !== 'function') {
+    return fallback;
+  }
+
+  const resolved = resolveAssetSource(source);
+  if (!resolved?.width || !resolved?.height) {
+    return fallback;
+  }
+
+  return { width: resolved.width, height: resolved.height };
+}
 
 
 export default function DetailsView({

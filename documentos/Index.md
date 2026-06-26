@@ -111,23 +111,28 @@
 
 ## Índice da Documentação
 
-Esta documentação está organizada em diferentes arquivos conforme apresentado abaixo.
+Esta documentação está organizada em diferentes arquivos, todos versionados na pasta `documentos/`.
 
 ### Gestão do Projeto
 
-- **GestaoProjeto.md**: planejamento da equipe, papéis, cerimônias e visão geral da gestão das sprints.
+- [GestaoProjeto.md](./GestaoProjeto.md): planejamento da equipe, papéis, cerimônias, retrospectivas, matriz de riscos e acompanhamento das sprints.
+- [Gestao_Projeto_Configuracao.md](./Gestao_Projeto_Configuracao.md): políticas de versionamento, branches, hooks de commit, critérios de tarefas e configuração do repositório.
 
 ### Processo de Desenvolvimento de Software
 
-- **Gestao_Projeto_Configuracao.md**: políticas de versionamento, branches, hooks de commit e configuração do repositório.
-- **GuiaPadroesDesenvolvimento.md**: convenções de codificação (Python/SQL/C#/TS), estrutura de diretórios e padrões de projeto adotados (Builder, Strategy, Factory).
+- [GuiaPadroesDesenvolvimento.md](./GuiaPadroesDesenvolvimento.md): convenções de codificação, estrutura de diretórios, padrões de projeto, arquitetura em camadas e critérios de contribuição técnica.
 
 ### Desenvolvimento do Produto
 
-- **Projeto.md**: descrição do produto Spotlight — visão, personas, jornadas, requisitos, arquitetura e decisões técnicas.
-- **Documentacao_soa.md**: detalhamento da arquitetura SOA do backend (serviços, gateway, contratos, integração).
-- **Manual-instalacao.md**: passo a passo para subir o ambiente local (backend, frontend, banco e variáveis de ambiente).
-- **ProjetoVisual.md**: wireframes, mockups e ajustes visuais aplicados no frontend.
+- [Projeto.md](./Projeto.md): documentação principal do Spotlight, incluindo visão de produto, personas, requisitos, arquitetura, implementação, testes, implantação e evidências finais.
+- [Documentacao_soa.md](./Documentacao_soa.md): detalhamento da arquitetura SOA do backend, serviços, API Gateway, contratos, integrações e responsabilidades por domínio.
+- [ProjetoVisual.md](./ProjetoVisual.md): diretrizes visuais, wireframes, mockups, identidade de interface e evolução das telas do aplicativo.
+
+### Execução, Implantação e Evidências
+
+- [Manual-instalacao.md](./Manual-instalacao.md): passo a passo para configurar variáveis de ambiente, instalar dependências e executar frontend, backend e banco em ambiente local.
+- [manual_deploy.md](./manual_deploy.md): manual operacional do deploy final em AWS EC2, com criação da infraestrutura, publicação via Docker Compose, validação de endpoints e rotina de operação.
+- [evidencias/testes-funcionais/README.md](./evidencias/testes-funcionais/README.md): registro dos comandos, saídas e artefatos usados como evidência da execução dos testes funcionais.
 
 
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://git.inteli.edu.br/graduacao/2026-1b/t17/g04">Spotlight</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://git.inteli.edu.br/graduacao/2026-1b/t17/g04">Inteli, Celso Rodrigues Rocha Júnior, Jaime Andrade de Almeida, Leonardo Ramos Vieira, Mariana Lacerda Reis, Mariana Pereira de Souza, Rafael Figueiredo Campos e Vitor Ribeiro</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"></a></p>

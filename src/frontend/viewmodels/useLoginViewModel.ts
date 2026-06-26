@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { loginUsuario, Usuario } from '../models/User';
 import { obterLocalizacaoAtual, salvarLocalizacaoUsuario } from '../repositories/LocationRepository';
+import { obterPerfilUsuario } from '../repositories/UserRepository';
 
 export function useLoginViewModel(onSuccess?: (usuario: Usuario) => void) {
   const [email, setEmail] = useState('');
@@ -12,7 +13,23 @@ export function useLoginViewModel(onSuccess?: (usuario: Usuario) => void) {
     try {
       setLoading(true);
       setError(null);
-      const usuario = await loginUsuario({ email, senha });
+      const usuarioAutenticado = await loginUsuario({ email, senha });
+      let usuario = usuarioAutenticado;
+
+      if (usuarioAutenticado.accessToken) {
+        try {
+          const perfil = await obterPerfilUsuario(usuarioAutenticado.accessToken);
+          usuario = {
+            ...usuarioAutenticado,
+            nome: perfil.nome || usuarioAutenticado.nome,
+            email: perfil.email || usuarioAutenticado.email,
+            dataNascimento: perfil.dataNascimento ?? usuarioAutenticado.dataNascimento,
+            tipoUsuario: perfil.tipoUsuario,
+          };
+        } catch (profileError) {
+          console.warn(profileError);
+        }
+      }
 
       if (usuario.compartilharLocalizacao) {
         try {

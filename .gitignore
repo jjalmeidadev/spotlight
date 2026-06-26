@@ -20,6 +20,11 @@ TestResults/
 **/bin/
 **/obj/
 
+# Python cache artifacts
+__pycache__/
+*.pyc
+*.pyo
+
 # Artefatos gerados por notebooks e análises locais
 src/aad/*.png
 src/aad/*.jpg
@@ -58,3 +63,4 @@ Thumbs.db
 .aiox-core
 .AGENTS.md
 .codex
+.codex-tmp/

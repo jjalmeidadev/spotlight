@@ -1,8 +1,8 @@
-import { getApiBaseUrl } from '@/frontend/config/api';
+import { fetchJson, getApiErrorMessage } from '@/frontend/repositories/http';
 import { obterUrlMidiaConhecida } from './CatalogRepository';
 
-const API_BASE_URL = getApiBaseUrl();
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://nyaxqgujyyvkjnqzbklf.supabase.co';
+const RECOMMENDATION_TIMEOUT_MS = 22000;
 
 export type RecommendedShow = {
   id: string;
@@ -82,15 +82,16 @@ export async function listarRecomendacoesUsuario(
     return [];
   }
 
-  const response = await fetch(`${API_BASE_URL}/recomendacao/me?limite=${limite}`, {
+  const { response, payload } = await fetchJson<RecommendationEnvelope>(`/recomendacao/me?limite=${limite}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,
       Accept: 'application/json',
     },
+    operation: 'carregar recomendacoes',
+    retries: 1,
+    timeoutMs: RECOMMENDATION_TIMEOUT_MS,
   });
-
-  const payload = await parseJsonResponse<RecommendationEnvelope>(response);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(payload, 'Nao foi possivel carregar recomendacoes.'));
@@ -109,17 +110,18 @@ export async function listarEspetaculosSimilares(
     return [];
   }
 
-  const response = await fetch(
-    `${API_BASE_URL}/recomendacao/espetaculos/${encodeURIComponent(espetaculoId)}/similares?limite=${limite}`,
+  const { response, payload } = await fetchJson<SimilarEnvelope>(
+    `/recomendacao/espetaculos/${encodeURIComponent(espetaculoId)}/similares?limite=${limite}`,
     {
       method: 'GET',
       headers: {
         Accept: 'application/json',
       },
+      operation: 'carregar espetaculos similares',
+      retries: 1,
+      timeoutMs: RECOMMENDATION_TIMEOUT_MS,
     },
   );
-
-  const payload = await parseJsonResponse<SimilarEnvelope>(response);
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(payload, 'Nao foi possivel carregar espetaculos similares.'));
@@ -184,27 +186,11 @@ function obterUrlMidia(
 
   const encodedPath = media.storagePath
     .trim()
+    .replace(/\s+(\.[a-z0-9]+)$/i, '$1')
+    .replace(/__+/g, '_')
     .split('/')
     .map((segment) => encodeURIComponent(segment))
     .join('/');
 
   return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/${media.storageBucket}/${encodedPath}`;
-}
-
-function getApiErrorMessage(payload: any, fallback: string) {
-  const details = typeof payload?.details === 'string'
-    ? ` (${payload.details})`
-    : '';
-
-  return `${payload?.error ?? fallback}${details}`;
-}
-
-async function parseJsonResponse<T>(response: Response): Promise<T> {
-  const text = await response.text();
-
-  if (!text.trim()) {
-    return {} as T;
-  }
-
-  return JSON.parse(text) as T;
 }

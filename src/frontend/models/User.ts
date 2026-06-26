@@ -47,6 +47,10 @@ type SupabaseAuthResponse = {
   user?: {
     id: string;
     email?: string;
+    app_metadata?: {
+      tipoUsuario?: TipoUsuario;
+      tipo_usuario?: TipoUsuario;
+    };
     user_metadata?: {
       nome?: string;
       dataNascimento?: string;
@@ -129,7 +133,13 @@ async function requestSupabaseAuth(path: string, body: unknown): Promise<Usuario
 
   const auth = payload as SupabaseAuthResponse;
   const metadata = auth.user?.user_metadata;
+  const appMetadata = auth.user?.app_metadata;
   const email = auth.user?.email ?? '';
+  const tipoUsuario = normalizeTipoUsuario(
+    appMetadata?.tipoUsuario
+      ?? appMetadata?.tipo_usuario
+      ?? metadata?.tipoUsuario,
+  );
 
   return {
     id: auth.user?.id ?? '',
@@ -138,10 +148,14 @@ async function requestSupabaseAuth(path: string, body: unknown): Promise<Usuario
     dataNascimento: metadata?.dataNascimento ?? '',
     genero: metadata?.genero ?? 'Prefiro nao informar',
     compartilharLocalizacao: metadata?.compartilharLocalizacao ?? false,
-    tipoUsuario: metadata?.tipoUsuario ?? (email.toLowerCase().includes('admin') ? 'administrador' : 'cadastrado'),
+    tipoUsuario,
     accessToken: auth.access_token ?? null,
     refreshToken: auth.refresh_token ?? null,
   };
+}
+
+function normalizeTipoUsuario(value?: string): TipoUsuario {
+  return value === 'administrador' ? 'administrador' : 'cadastrado';
 }
 
 function getSupabaseErrorMessage(payload: any) {

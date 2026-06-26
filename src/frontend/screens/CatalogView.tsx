@@ -6,6 +6,7 @@ import { CATALOG_HERO_HEIGHT, CatalogHero } from '../components/CatalogHero';
 import { HeroFloatingArtwork } from '../components/HeroFloatingArtwork';
 import { CatalogRail } from '../components/CatalogRail';
 import { FilterDropdown } from '../components/FilterDropdown';
+import { ProfileSheet } from '../components/ProfileSheet';
 import { SearchBar } from '../components/SearchBar';
 import type { CatalogItem } from '../models/CatalogItem';
 import { emitTelemetryEvent } from '../repositories/TelemetryRepository';
@@ -13,9 +14,14 @@ import { useCatalogViewModel } from '../viewmodels/useCatalogViewModel';
 
 type CatalogViewProps = {
 	accessToken?: string | null;
+	profileEmail?: string;
 	profileName?: string;
+	isAdmin?: boolean;
 	userLocationAddress?: string | null;
 	onItemPress?: (item: CatalogItem) => void;
+	onAdminPress?: () => void;
+	onLogout?: () => void;
+	onProfileUpdated?: (name: string) => void;
 };
 
 const HERO_HEIGHT = CATALOG_HERO_HEIGHT;
@@ -23,7 +29,18 @@ const CONTENT_SHELL_MARGIN_TOP = 80;
 const HERO_ARTWORK_BASELINE_OFFSET = -152;
 const SECTION_VERTICAL_GAP = 56;
 
-export default function CatalogView({ accessToken, profileName, userLocationAddress, onItemPress }: CatalogViewProps) {
+export default function CatalogView({
+	accessToken,
+	profileEmail,
+	profileName,
+	isAdmin = false,
+	userLocationAddress,
+	onItemPress,
+	onAdminPress,
+	onLogout,
+	onProfileUpdated,
+}: CatalogViewProps) {
+	const [profileOpen, setProfileOpen] = React.useState(false);
 	const { width } = useWindowDimensions();
 	const vm = useCatalogViewModel({ accessToken, userLocationAddress });
 	const horizontalPadding = Math.max(16, Math.round(width * 0.044));
@@ -93,6 +110,7 @@ export default function CatalogView({ accessToken, profileName, userLocationAddr
 							}
 						}}
 						overSource={vm.assets.heroArtwork}
+						onProfilePress={() => setProfileOpen(true)}
 						profileLabel={profileName ?? vm.userName}
 						profileSource={null}
 						subtitle={vm.heroItem?.subtitle ?? 'Um dos maiores classicos da broadway'}
@@ -182,6 +200,17 @@ export default function CatalogView({ accessToken, profileName, userLocationAddr
 					) : null}
 				</View>
 			</ScrollView>
+			<ProfileSheet
+				accessToken={accessToken}
+				email={profileEmail}
+				name={profileName ?? vm.userName}
+				onAdminPress={onAdminPress}
+				onClose={() => setProfileOpen(false)}
+				onLogout={onLogout ?? (() => undefined)}
+				onProfileUpdated={onProfileUpdated}
+				showAdminAction={isAdmin}
+				visible={profileOpen}
+			/>
 		</View>
 	);
 }

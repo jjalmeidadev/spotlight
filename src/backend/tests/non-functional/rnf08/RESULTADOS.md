@@ -14,6 +14,8 @@ Atualização independente com indisponibilidade máxima de cinco minutos e 100%
 - instrução de rollback;
 - modo seguro antes de qualquer operação real.
 
-## Limitação arquitetural identificada
+## Escopo e limitação
 
-O `docker-compose.yml` contém catálogo, usuário, recomendação e geolocalização. O API Gateway possui projeto próprio, mas não está incluído no Compose analisado; portanto, não integra o escopo de deploy containerizado deste teste.
+O executor deste RNF foi criado para atualização isolada dos serviços de domínio: catálogo, usuário, recomendação e geolocalização. A topologia final de produção da entrega está em `docker-compose.prod.yml` e inclui também frontend e API Gateway.
+
+Para a evidência final de deploy, registrar a execução em AWS EC2 conforme `documentos/manual_deploy.md`, incluindo `docker compose -f docker-compose.prod.yml ps`, `http://<PUBLIC_IP>/api/health` e `http://<PUBLIC_IP>/swagger`.

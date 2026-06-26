@@ -106,9 +106,9 @@
   <img src="documentos/img/bottom.png" alt="bottom">
 </p>
 
-# Spotlight <nome do projeto>
+# Spotlight
 
-## Dora <nome do grupo>
+## Grupo 04 - Dora
 
 ## 📝 Descrição
 
@@ -138,22 +138,25 @@ A pasta `documentos/` concentra a documentação do produto, do processo e das e
 - [Índice da documentação](documentos/Index.md): ponto de entrada para navegar pelos documentos do projeto.
 - [Documentação geral do projeto](documentos/Projeto.md): visão completa do Spotlight, incluindo negócio, arquitetura, requisitos, implementação, testes e implantação.
 - [Manual de instalação](documentos/Manual-instalacao.md): guia detalhado para preparar ambiente, configurar variáveis, banco de dados e execução local.
+- [Manual de deploy AWS EC2](documentos/manual_deploy.md): guia operacional do deploy final em nuvem comercial usando CloudFormation, EC2 e Docker Compose.
 - [Gestão de projeto](documentos/GestaoProjeto.md): acompanhamento evolutivo das sprints, retrospectivas, planejamento e gestão das entregas.
 - [Gestão de projeto e configuração](documentos/Gestao_Projeto_Configuracao.md): políticas de versionamento, GitFlow, critérios de tarefas e alinhamento com o processo do projeto.
 - [Projeto visual](documentos/ProjetoVisual.md): diretrizes de design, wireframes, mockups, identidade visual e decisões de interface.
 - [Documentação SOA](documentos/Documentacao_soa.md): descrição da arquitetura orientada a serviços e da integração com API externa de geolocalização.
 - [Guia de padrões de desenvolvimento](documentos/GuiaPadroesDesenvolvimento.md): convenções de código, organização de diretórios, nomenclatura e práticas de desenvolvimento.
 - [Evidências de testes funcionais](documentos/evidencias/testes-funcionais/README.md): comandos, saídas e artefatos `.trx` usados para registrar a execução dos testes.
+- [Vídeo demonstrativo final da Sprint 5](https://drive.google.com/drive/folders/10Zdn87V9-GyspVk1HmN2RcQyfkOT5F4z?usp=sharing): demonstração da versão consolidada da aplicação.
 
 ## 📁 Estrutura de pastas
 
-O repositório mantém o app Expo na raiz, os componentes de interface em `src/frontend`, os serviços .NET em `src/backend` e a documentação em `documentos`.
+O repositório mantém o app Expo na raiz por requisito de execução do React Native/Expo, os componentes de interface em `src/frontend`, os serviços .NET em `src/backend`, os testes em `src/backend/tests` e a documentação em `documentos`.
 
 ```text
 📦 g04
- ┣ 📂 .github                         automações e configurações do repositório
+ ┣ 📂 .githook                        hooks locais de validação de commits
  ┣ 📂 assets                          fontes e imagens usadas pelo app Expo
  ┣ 📂 deploy
+ ┃ ┣ 📂 aws                           scripts CloudFormation/EC2 para deploy em AWS
  ┃ ┗ 📂 nginx                         configuração do Nginx para produção
  ┣ 📂 documentos
  ┃ ┣ 📂 evidencias
@@ -175,7 +178,9 @@ O repositório mantém o app Expo na raiz, os componentes de interface em `src/f
  ┃ ┃ ┣ 📂 ml-engine                   preparação, treino e inferência do modelo
  ┃ ┃ ┣ 📂 scripts                     scripts auxiliares do backend
  ┃ ┃ ┣ 📂 services                    serviços catalog, user, recommendation e geolocation
- ┃ ┃ ┣ 📂 tests                       projetos de testes automatizados
+ ┃ ┃ ┣ 📂 tests                       testes automatizados xUnit e RNFs
+ ┃ ┃ ┃ ┣ 📂 Spotlight.*.Tests         testes unitários e de integração por serviço
+ ┃ ┃ ┃ ┗ 📂 non-functional            roteiros, scripts e resultados de RNFs
  ┃ ┃ ┣ 📄 run-all.ps1
  ┃ ┃ ┗ 📄 Spotlight.sln
  ┃ ┣ 📂 database
@@ -185,6 +190,7 @@ O repositório mantém o app Expo na raiz, os componentes de interface em `src/f
  ┃ ┣ 📂 dataset                       bases de apoio para recomendação
  ┃ ┣ 📂 frontend                      telas, componentes, hooks, tema e repositórios do app
  ┃ ┗ 📂 models                        artefatos e projetos de treinamento do modelo
+ ┣ 📄 .gitlab-ci.yml                  pipeline de CI do GitLab
  ┣ 📄 App.js                          entrada principal do Expo
  ┣ 📄 Dockerfile.frontend             build do frontend para dev e produção
  ┣ 📄 docker-compose.yml              Compose dos serviços backend atuais
@@ -195,7 +201,7 @@ O repositório mantém o app Expo na raiz, os componentes de interface em `src/f
  ┗ 📄 README.md
 ```
 
-Diretórios gerados localmente, como `node_modules/`, `dist/`, `.expo/`, `bin/` e `obj/`, não fazem parte da estrutura essencial do repositório.
+Diretórios e arquivos gerados localmente, como `node_modules/`, `dist/`, `.expo/`, `TestResults/`, `bin/`, `obj/`, `__pycache__/` e `*.pyc`, não fazem parte da estrutura essencial do repositório.
 
 ## ⚙️ Instalação e execução
 
@@ -264,6 +270,20 @@ Somente serviços backend de domínio, sem gateway e sem frontend, usando o Comp
 ```powershell
 docker compose up --build
 ```
+
+### Deploy final em AWS EC2
+
+O deploy final previsto para a entrega usa AWS EC2 com Docker Compose. O passo a passo oficial está em [documentos/manual_deploy.md](documentos/manual_deploy.md) e cobre criação da key pair, stack CloudFormation, publicação do código, envio seguro do `.env`, validação de containers, health checks e operação básica.
+
+Resumo dos comandos principais:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\create-keypair.ps1 -KeyName spotlight-ec2-key
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\deploy-stack.ps1 -KeyName spotlight-ec2-key -InstanceType t3.small
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\publish-app.ps1 -PublicIp <PUBLIC_IP> -KeyPath .\.codex-tmp\spotlight-ec2-key.pem -EnvFile .\.env
+```
+
+Após a publicação, os principais pontos de validação são `http://<PUBLIC_IP>/`, `http://<PUBLIC_IP>/api/health` e `http://<PUBLIC_IP>/swagger`.
 
 ### Validação
 
