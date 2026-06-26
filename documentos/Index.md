@@ -131,7 +131,7 @@ Esta documentação está organizada em diferentes arquivos, todos versionados n
 ### Execução, Implantação e Evidências
 
 - [Manual-instalacao.md](./Manual-instalacao.md): passo a passo para configurar variáveis de ambiente, instalar dependências e executar frontend, backend e banco em ambiente local.
-- [manual_deploy.md](./manual_deploy.md): manual operacional reservado para consolidação futura dos procedimentos de deploy e operação em ambiente de entrega.
+- [manual_deploy.md](./manual_deploy.md): manual operacional do deploy final em AWS EC2, com criação da infraestrutura, publicação via Docker Compose, validação de endpoints e rotina de operação.
 - [evidencias/testes-funcionais/README.md](./evidencias/testes-funcionais/README.md): registro dos comandos, saídas e artefatos usados como evidência da execução dos testes funcionais.
 
 

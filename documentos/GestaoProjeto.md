@@ -293,7 +293,7 @@ O backlog da Sprint 3 foi estruturado com base em uma matriz de dependências t�
 | T3   | Construir dicionário de dados (tipos, restrições, relacionamentos, descrições)             |             | M                 | Alta       | A Fazer |
 | T4   | Documentar regras de negócio implementadas diretamente no banco                            |             | P                 | Alta       | A Fazer |
 | T5   | Redigir instruções de implantação (versão, dependências, ajustes) no `README.md`           |             | P                 | Alta       | A Fazer |
-| T6   | Dockerizar o banco e implantar no servidor Inteli conforme acordado                        |             | G                 | Alta       | A Fazer |
+| T6   | Dockerizar o ambiente e preparar implantação em nuvem comercial conforme estratégia final   |             | G                 | Alta       | A Fazer |
  
 ###### Bloco 2 — Arquitetura e Padrões de Codificação
  
@@ -664,7 +664,7 @@ Checkpoint do dia: código congelado, slides em versão apresentável, evidênci
 | Execução de Testes | T51 e validação final de logs, ferramentas, casos e abrangência |
 | Gestão de Projetos | T57, T58 e revisão final dos slides |
 
-Checkpoint do dia: entrega fechada, documentação revisada, vídeo pronto, servidor validado, Swagger acessível, testes documentados, retrospectiva da Sprint 4 registrada e planejamento da Sprint 5 incluído no `GestaoProjeto.md`.
+Checkpoint do dia: entrega fechada, documentação revisada, vídeo pronto, ambiente publicado validado, Swagger acessível, testes documentados, retrospectiva da Sprint 4 registrada e planejamento da Sprint 5 incluído no `GestaoProjeto.md`.
 
 #### Alinhamento com a Gestão de Configuração
 
@@ -760,7 +760,7 @@ Esta atualização atende ao card [#383](https://git.inteli.edu.br/graduacao/202
 
 #### Objetivo da Sprint 5
 
-A Sprint 5 representa o encerramento do projeto Spotlight. O ciclo tem como objetivo consolidar a solução final com backend e frontend funcionais, ambiente dockerizado no servidor Inteli, cobertura de testes abrangente, documentação completa e apresentação final estruturada com técnica narrativa definida. Esta sprint também contempla a análise post mortem do projeto e a consolidação da gestão evolutiva ao longo de todas as sprints.
+A Sprint 5 representa o encerramento do projeto Spotlight. O ciclo tem como objetivo consolidar a solução final com backend e frontend funcionais, ambiente dockerizado em AWS EC2/nuvem comercial, cobertura de testes abrangente, documentação completa e apresentação final estruturada com técnica narrativa definida. Esta sprint também contempla a análise post mortem do projeto e a consolidação da gestão evolutiva ao longo de todas as sprints.
 
 A Sprint 5 tem uma restrição de capacidade relevante: a primeira semana coincide com período de provas, reduzindo os dias produtivos a tasks de menor complexidade, principalmente `SIZE_P` e `SIZE_M`. A segunda semana concentra as entregas técnicas e documentais mais pesadas, com quatro dias úteis efetivos de alta produtividade.
 
@@ -785,7 +785,7 @@ Com sete integrantes e sete dias úteis efetivos, cada membro deve assumir ao me
 | 1 | 17/06 (Ter) | Prova | Fundação e limpeza documental | Resolver pendências do EP, definir técnica de apresentação, iniciar planejamento no `GestaoProjeto.md` e agendar usuários de usabilidade |
 | 2 | 18/06 (Qua) | Prova | Atualização de documentação técnica | Atualizar guia de padrões, seções do `Projeto.md`, `ProjetoVisual.md`, `Gestao_Projeto_Configuracao.md` e planejamento de testes |
 | 3 | 19/06 (Qui) | Prova | Revisão e preparação para semana final | Incorporar feedbacks pendentes, revisar RNFs, separar critérios de aceitação, detalhar casos de teste e iniciar estrutura dos slides |
-| 4 | 23/06 (Seg) | Final | Implementação e infraestrutura | Finalizar features pendentes, validar ambiente no servidor Inteli, iniciar execução de testes funcionais e de integração |
+| 4 | 23/06 (Seg) | Final | Implementação e infraestrutura | Finalizar features pendentes, validar ambiente AWS EC2/nuvem comercial, iniciar execução de testes funcionais e de integração |
 | 5 | 24/06 (Ter) | Final | Testes e evidências técnicas | Executar rodada final de todos os tipos de teste, organizar logs e ampliar cobertura de testes unitários |
 | 6 | 25/06 (Qua) | Final | Documentação final e apresentação | Consolidar `Projeto.md`, gravar vídeo, avançar slides, criar `manual_deploy.md`, elaborar métricas e post mortem |
 | 7 | 26/06 (Qui) | Final | Fechamento e entrega | Ensaio final, revisão cruzada de documentação, retrospectiva da Sprint 5, validação dos critérios do EP e entrega |
@@ -808,9 +808,9 @@ O backlog abaixo representa o recorte inicial da Sprint 5 no momento do planning
 | T08 | Documentar TDD e cobertura de testes no `Projeto.md` | SIZE_M | Alta | Dia 3 |
 | T09 | Atualizar `README.md` do banco de dados — versão final | SIZE_P | Alta | Dia 3 |
 | T10 | Finalizar implementação de features pendentes | SIZE_G | Alta | Dia 4 |
-| T11 | Validar ambiente final no servidor Inteli — dockerizado | SIZE_G | Crítica | Dia 4 |
+| T11 | Validar ambiente final em AWS EC2 — dockerizado | SIZE_G | Crítica | Dia 4 |
 | T12 | Validar integração final frontend-backend-recomendação | SIZE_M | Alta | Dia 4 |
-| T13 | Validar Swagger no ambiente final do servidor Inteli | SIZE_P | Alta | Dia 4 |
+| T13 | Validar Swagger no ambiente final AWS EC2 | SIZE_P | Alta | Dia 4 |
 | T14 | Revisar pipeline de CI no GitLab — versão final | SIZE_P | Média | Dia 4 |
 | T15 | Atualizar Swagger com todas as rotas finais da API | SIZE_M | Alta | Dia 5 |
 | T16 | Implementar melhorias de performance identificadas nos testes | SIZE_M | Média | Dia 5 |
@@ -934,14 +934,14 @@ Checkpoint do dia: T24 e T54 devem estar concluídas. Casos de teste detalhados 
 
 ##### Dia 4 — Segunda 23/06 — Implementação e Infraestrutura
 
-Objetivo do dia: garantir que o ambiente está funcionando no servidor Inteli, finalizar features pendentes e iniciar a execução dos testes. T11 é o ponto crítico do dia, pois há demérito se o servidor não estiver funcionando.
+Objetivo do dia: garantir que o ambiente AWS EC2 está funcionando, finalizar features pendentes e iniciar a execução dos testes. T11 é o ponto crítico do dia, pois a entrega final depende do deploy em nuvem comercial validado.
 
 | Bloco | Tasks | Membro | Status inicial |
 |---|---|---|---|
 | Desenvolvimento | T10 — Finalizar features pendentes (`SIZE_G`) | Não atribuído | Não iniciada |
-| Desenvolvimento | T11 — Validar ambiente no servidor Inteli (`SIZE_G`) | Leonardo | Não iniciada |
+| Desenvolvimento | T11 — Validar ambiente AWS EC2 (`SIZE_G`) | Leonardo | Não iniciada |
 | Desenvolvimento | T12 — Validar integração frontend-backend-recomendação (`SIZE_M`) | Não atribuído | Não iniciada |
-| Desenvolvimento | T13 — Validar Swagger no servidor Inteli (`SIZE_P`) | Vitor | Não iniciada |
+| Desenvolvimento | T13 — Validar Swagger na AWS EC2 (`SIZE_P`) | Vitor | Não iniciada |
 | Desenvolvimento | T14 — Revisar pipeline de CI (`SIZE_P`) | Não atribuído | Não iniciada |
 | Testes | T26 — Executar testes de funcionalidade (`SIZE_G`) | Não atribuído | Não iniciada |
 | Testes | T27 — Executar testes de integração (`SIZE_G`) | Não atribuído | Não iniciada |
@@ -949,7 +949,7 @@ Objetivo do dia: garantir que o ambiente está funcionando no servidor Inteli, f
 | Testes | T29 — Implementar testes unitários adicionais (`SIZE_G`) | Jaime | Em análise |
 | Versão Final | T55 — Organizar repositório conforme estrutura EP (`SIZE_P`) | Não atribuído | Não iniciada |
 
-Checkpoint do dia: T11 e T12 são inegociáveis. Sem o servidor funcionando e o fluxo integrado validado, os testes de RNF e o vídeo ficam comprometidos. A partir deste dia, novas features não devem ser iniciadas.
+Checkpoint do dia: T11 e T12 são inegociáveis. Sem o ambiente AWS EC2 funcionando e o fluxo integrado validado, os testes de RNF e o vídeo ficam comprometidos. A partir deste dia, novas features não devem ser iniciadas.
 
 ##### Dia 5 — Terça 24/06 — Testes e Evidências Técnicas
 
@@ -998,7 +998,7 @@ Objetivo do dia: ensaio final, revisão cruzada de documentação, retrospectiva
 | Versão Final | T60 — Ensaio final da apresentação (`SIZE_G`) | Não atribuído | Não iniciada |
 | Versão Final | T61 — Finalizar apresentação — versão de entrega (`SIZE_M`) | Não atribuído | Não iniciada |
 
-Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, Swagger acessível, servidor validado, testes documentados, retrospectiva registrada e slides aprovados pelo grupo.
+Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, Swagger acessível na AWS EC2, deploy validado, testes documentados, retrospectiva registrada e slides aprovados pelo grupo.
 
 #### Matriz de Dependências Críticas
 
@@ -1009,18 +1009,18 @@ Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, S
 | T06 — Seção de arquitetura no `Projeto.md` | T02 | Seção referencia o diagrama atualizado. |
 | T07 — Features no `Projeto.md` | T10 | Documentar features exige implementação estável. |
 | T08 — TDD e cobertura | T29 | Documentar cobertura exige testes unitários adicionais implementados. |
-| T10 — Finalizar features | T11 | Features devem ser finalizadas antes da validação do servidor. |
-| T12 — Integração final | T10, T11 | Validação integrada depende de features prontas e servidor funcionando. |
-| T13 — Swagger no servidor | T11, T15 | Swagger no servidor depende do ambiente funcionando e das rotas finalizadas. |
+| T10 — Finalizar features | T11 | Features devem ser finalizadas antes da validação do ambiente AWS EC2. |
+| T12 — Integração final | T10, T11 | Validação integrada depende de features prontas e ambiente publicado funcionando. |
+| T13 — Swagger na AWS EC2 | T11, T15 | Swagger público depende do ambiente AWS EC2 funcionando e das rotas finalizadas. |
 | T15 — Swagger rotas finais | T10 | Swagger só pode ser atualizado com todas as rotas implementadas. |
-| T17 — Nuvem comercial | T11 | Deploy em nuvem depende do ambiente Inteli validado como referência. |
-| T19 — Vídeo demonstrativo | T11, T12 | Vídeo depende do ambiente funcionando e do fluxo integrado validado. |
+| T17 — Nuvem comercial | T11 | Deploy em nuvem depende da infraestrutura AWS EC2 criada e validada. |
+| T19 — Vídeo demonstrativo | T11, T12 | Vídeo depende do ambiente publicado funcionando e do fluxo integrado validado. |
 | T20 — Consolidar `Projeto.md` | T07, T08, T18, T19 | Consolidação final depende de todas as seções preenchidas. |
 | T23 — Separar critérios de aceitação | T22 | Separação depende dos RNFs revisados em formato user story. |
 | T24 — Casos de teste detalhados | T22, T23 | Detalhamento depende de RNFs e critérios de aceitação revisados. |
 | T26, T27, T28 — Testes funcionais, integração e negócio | T24, T12 | Execução depende de casos detalhados e fluxo integrado funcionando. |
 | T29 — Testes unitários adicionais | T10 | Testes unitários dependem de features finalizadas. |
-| T30, T31 — Testes RNF desempenho e segurança | T11, T26 | Testes de RNF dependem do ambiente no servidor e dos testes funcionais executados. |
+| T30, T31 — Testes RNF desempenho e segurança | T11, T26 | Testes de RNF dependem do ambiente publicado e dos testes funcionais executados. |
 | T32 — Testes de usabilidade | T25, T12 | Usabilidade depende de usuários agendados e interface integrada. |
 | T33 — Revisar scripts de teste | T26, T27, T28 | Revisão de scripts ocorre após execução final. |
 | T34, T35 — Logs e abrangência | T26, T27, T28, T29, T30, T31, T32 | Logs e abrangência dependem de todos os tipos de teste executados. |
@@ -1045,7 +1045,7 @@ Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, S
 
 #### Pontos Críticos do Cronograma
 
-- T11 — Validar servidor Inteli é o maior risco da sprint. Não deve ficar para depois do Dia 4.
+- T11 — Validar AWS EC2 é o maior risco da sprint. Não deve ficar para depois do Dia 4.
 - T25 — Agendar usuários de usabilidade deve acontecer no Dia 1. Sem agendamento antecipado, não há como garantir cinco usuários externos na semana final.
 - T48 — Técnica de apresentação no Slack é obrigatória na primeira semana conforme o artefato Versão Final.
 - T10 e T12 são o caminho crítico do desenvolvimento. Se features ou integração não estiverem estáveis no Dia 4, testes, vídeo e Swagger atrasam em cascata.
@@ -1075,7 +1075,7 @@ O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a 
 
 | ID | Risco | Probabilidade | Impacto | Frente afetada | Sinais de alerta | Ação de mitigação | Task vinculada | Responsável |
 |----|------|--------------|---------|---------------|------------------|-------------------|----------------|-------------|
-| R1 | Servidor Inteli indisponível ou instável no Dia 4 | Média | Alto | Deploy / Desenvolvimento | Health checks falhando, Swagger inacessível ou containers reiniciando | Validar ambiente no início do Dia 4, registrar evidências e priorizar correção antes de qualquer nova feature | T11, T13, T14 | Leonardo + Tech Lead |
+| R1 | AWS EC2 indisponível ou instável no Dia 4 | Média | Alto | Deploy / Desenvolvimento | Health checks falhando, Swagger inacessível ou containers reiniciando | Validar ambiente AWS EC2 no início do Dia 4, registrar evidências e priorizar correção antes de qualquer nova feature | T11, T13, T14 | Leonardo + Tech Lead |
 | R2 | Integração frontend-backend-recomendação não demonstrável de ponta a ponta | Média | Alto | Desenvolvimento / Testes | Fluxo principal sem resposta, recomendações ausentes ou divergência entre contrato e frontend | Congelar novas features após Dia 4 e priorizar validação integrada antes da execução de testes finais | T10, T12, T19 | Equipe técnica |
 | R3 | Usuários externos insuficientes para teste de usabilidade | Média | Alto | Testes / Produto | Menos de cinco participantes confirmados até o fim do Dia 1 | Agendar usuários no Dia 1, manter lista reserva e confirmar disponibilidade antes da rodada | T25, T32 | Celso |
 | R4 | Documentação final divergente do board ou com placeholders residuais | Média | Alto | Versão Final / Gestão | Itens no Kanban sem reflexo nos documentos, ocorrência de "Tabela X", placeholders ou seções incompletas | Executar revisão diária de consistência e priorizar limpeza documental nos três primeiros dias | T40, T44, T45, T46, T47, T53, T59 | Mariana Lacerda + equipe |
@@ -1090,7 +1090,7 @@ O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a 
 
 | Risco | Estratégia de Mitigação |
 |------|------------------------|
-| R1 | Validar servidor Inteli no início do Dia 4, registrar health checks e priorizar correção antes de vídeo, Swagger e testes de RNF. |
+| R1 | Validar AWS EC2 no início do Dia 4, registrar health checks e priorizar correção antes de vídeo, Swagger e testes de RNF. |
 | R2 | Usar T12 como gate para testes e vídeo: sem integração validada, o time deve interromper novas features e corrigir o fluxo principal. |
 | R3 | Confirmar usuários externos no Dia 1, manter lista reserva e registrar a agenda antes da rodada de usabilidade. |
 | R4 | Executar revisão diária entre Kanban e documentação, com varredura de placeholders antes da revisão final. |
@@ -1139,7 +1139,7 @@ Apesar dos avanços, o projeto apresentou oportunidades de melhoria importantes.
 | Reduzir concentração de trabalho em integrantes específicos | Sprint 3 e Sprint 4 registraram concentração de entregas críticas em poucas pessoas e desbalanceamento de volume. | Gera sobrecarga, risco de gargalo e dependência de conhecimento individual. | Planejar por capacidade real, criar pares de apoio em tasks críticas e medir distribuição por complexidade, não apenas por quantidade de issues. |
 | Melhorar granularidade e clareza das tasks | A Sprint 3 identificou diferença entre o detalhamento dos cards e o documento de gestão. | Dificulta rastreabilidade histórica e entendimento por revisores externos. | Padronizar issue com contexto, DoR, DoD, dependências, evidências esperadas e link para seção documental afetada. |
 | Padronizar fluxo de Kanban e commits desde o início | A Sprint 2 registrou inconsistência na movimentação dos cards e no padrão de commits. | Compromete métricas, revisão e rastreabilidade de configuração. | Fazer auditoria leve do board a cada dois dias e automatizar, quando possível, validações de branch, tipo de issue e mensagem de commit. |
-| Iniciar validação de ambiente mais cedo | Na Sprint 5, o servidor Inteli foi identificado como risco crítico; deploy, Swagger, RNFs e vídeo dependiam dele. | Uma falha de ambiente pode atrasar várias frentes simultaneamente. | Tratar deploy como entrega incremental desde o meio do projeto, com smoke tests automatizados e ambiente reserva para demonstração. |
+| Iniciar validação de ambiente mais cedo | Na Sprint 5, a AWS EC2 foi identificada como risco crítico; deploy, Swagger, RNFs e vídeo dependiam dela. | Uma falha de ambiente pode atrasar várias frentes simultaneamente. | Tratar deploy como entrega incremental desde o meio do projeto, com smoke tests automatizados e ambiente reserva para demonstração. |
 | Separar escopo de MVP de evolução futura com mais rigor | Fila assíncrona, re-ranking, métricas de diversidade, drift e algumas ações éticas ficaram planejadas, mas não implementadas. | Pode gerar expectativa maior que a capacidade real da sprint. | Manter uma lista explícita "MVP / pós-MVP", revisada em planning, para evitar que itens planejados pareçam compromisso de entrega final. |
 | Medir usabilidade com dados mais completos | Os testes SUS tiveram cinco participantes e 100% de conclusão, mas não havia dados consolidados de tempo, número de toques ou perfil etário para todos os critérios. | Parte do RNF10 ficou não conclusiva, mesmo com resultado geral positivo. | Definir planilha obrigatória com campos mínimos antes da sessão: perfil, tempo, toques, ajuda recebida, sucesso, dificuldade e observações. |
 | Evoluir acessibilidade formal | O projeto considerou mobile first, áreas de toque e persona idosa, mas não executou auditoria WCAG completa. | A experiência pode ainda ter barreiras para públicos com deficiência visual, motora ou cognitiva. | Incluir checklist WCAG/mobile accessibility em paralelo aos testes SUS e validar contraste, foco, labels e navegação por leitores de tela. |

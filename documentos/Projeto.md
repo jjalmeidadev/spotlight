@@ -254,7 +254,7 @@
   - [10.3 Execução containerizada com Docker Compose](#103-execução-containerizada-com-docker-compose)
     - [10.3.1 Preparação do ambiente](#1031-preparação-do-ambiente)
     - [10.3.2 Desenvolvimento com hot reload](#1032-desenvolvimento-com-hot-reload)
-    - [10.3.3 Produção local ou VPS](#1033-produção-local-ou-vps)
+    - [10.3.3 Produção local e AWS EC2](#1033-produção-local-e-aws-ec2)
     - [10.3.4 Builds manuais](#1034-builds-manuais)
     - [10.3.5 Estratégias de deploy](#1035-estratégias-de-deploy)
 
@@ -5261,7 +5261,7 @@ personalizadas em vez de depender apenas de conteúdo estático.
 | Banco de dados e governança de acesso | [`06_indexes.sql`](../src/database/migrations/06_indexes.sql), [`09_espetaculo_midia.sql`](../src/database/migrations/09_espetaculo_midia.sql), [`11_seed_recomendacao_incremental.sql`](../src/database/migrations/11_seed_recomendacao_incremental.sql), [`12_controle_acesso_administrativo_catalogo.sql`](../src/database/migrations/12_controle_acesso_administrativo_catalogo.sql), [`13_rls_similaridade_item_avaliacao.sql`](../src/database/migrations/13_rls_similaridade_item_avaliacao.sql) | O banco ganhou índices, mídia de catálogo, seeds incrementais de recomendação, controle administrativo e policies RLS para tabelas novas ou sensíveis. |
 | Contratos, Swagger e documentação técnica | [`api-contracts.md`](../src/backend/contracts/api-contracts.md), [`openapi.json`](../src/backend/contracts/openapi.json), [`telemetria.md`](../src/backend/contracts/telemetria.md), [`supabase-storage.md`](../src/backend/contracts/supabase-storage.md) | A documentação técnica passou a cobrir recomendação, similares, telemetria e storage, reduzindo divergência entre contrato e implementação. |
 | Validação automatizada | [`RecomendacaoServiceTests.cs`](../src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoServiceTests.cs), [`RecomendacaoBaseControllerTests.cs`](../src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoBaseControllerTests.cs), [`MongoTelemetryIndexesTests.cs`](../src/backend/tests/Spotlight.User.Tests/MongoTelemetryIndexesTests.cs), [`TelemetriaMongoIntegrationTests.cs`](../src/backend/tests/Spotlight.User.Tests/TelemetriaMongoIntegrationTests.cs), [`Test-TelemetriaAtlasE2E.ps1`](../src/backend/scripts/Test-TelemetriaAtlasE2E.ps1) | A Sprint 4 ampliou a validação além do fluxo manual, cobrindo recomendação, health checks, índices MongoDB, integração Mongo opt-in e validação E2E com Atlas. |
-| Execução e infraestrutura local | [`docker-compose.yml`](../docker-compose.yml), [`catalogo/Dockerfile`](../src/backend/services/catalogo/Dockerfile), [`recomendacao/Dockerfile`](../src/backend/services/recomendacao/Dockerfile), [`usuario/Dockerfile`](../src/backend/services/usuario/Dockerfile), [`.gitlab-ci.yml`](../.gitlab-ci.yml) | O ambiente ganhou suporte mais claro para execução dos serviços backend, variáveis centralizadas e pipeline de CI para reduzir regressões entre branches. |
+| Execução e infraestrutura local | [`docker-compose.yml`](../docker-compose.yml), [`catalog/Dockerfile`](../src/backend/services/catalog/Dockerfile), [`recommendation/Dockerfile`](../src/backend/services/recommendation/Dockerfile), [`user/Dockerfile`](../src/backend/services/user/Dockerfile), [`.gitlab-ci.yml`](../.gitlab-ci.yml) | O ambiente ganhou suporte mais claro para execução dos serviços backend, variáveis centralizadas e pipeline de CI para reduzir regressões entre branches. |
 
 ### Fluxo Principal Entregue
 
@@ -5344,8 +5344,9 @@ melhorar o treinamento nas próximas iterações.
   e das variáveis seguras de CI/CD.
 - Alguns dados de catálogo ainda dependem da qualidade do seed e da
   padronização de mídias no banco.
-- O fluxo completo está funcional localmente, mas a evidência em ambiente
-  publicado no servidor Inteli deve ser registrada separadamente.
+- O fluxo completo está funcional localmente, e a evidência final em AWS EC2
+  deve registrar a URL pública real, `docker compose ps`, endpoints saudáveis,
+  Swagger acessível e capturas da aplicação quando a instância estiver publicada.
 
 ### Evidência de execução da aplicação
 
@@ -5355,7 +5356,7 @@ Como evidência do progresso incremental da Sprint 4, foi gravado um vídeo demo
 
 ### 8.3.3 Sprint 5
 
-O foco da Sprint 5 está na consolidação da qualidade e entrega final do Spotlight. As principais frentes de trabalho incluem a execução da rodada final de testes de usabilidade, de requisitos não-funcionais (RNFs) e de integração, a validação da implantação no servidor Inteli, a elaboração do manual de deploy e a preparação dos materiais para a apresentação final do projeto.
+O foco da Sprint 5 está na consolidação da qualidade e entrega final do Spotlight. As principais frentes de trabalho incluem a execução da rodada final de testes de usabilidade, de requisitos não-funcionais (RNFs) e de integração, a validação da implantação em nuvem comercial via AWS EC2, a elaboração do manual de deploy e a preparação dos materiais para a apresentação final do projeto.
 
 #### Features finalizadas na Sprint 5
 
@@ -5501,7 +5502,7 @@ a UI com os `<summary>` das ações e DTOs.
 
 A UI agregada do Swagger fica em:
 
-> **Servidor (produção):** _URL pública do servidor Inteli — a registrar após o deploy_ → `https://<host>/swagger`
+> **AWS EC2 (produção):** após a publicação, acessar `http://<PUBLIC_IP>/swagger` e substituir `<PUBLIC_IP>` pela URL pública real registrada nas evidências de deploy.
 > **Local:** `http://localhost:5000/swagger` (subindo o backend via `src/backend/run-all.ps1`)
 
 O dropdown "Select a definition" no canto superior direito alterna entre:
@@ -6938,7 +6939,7 @@ Os testes cobrem regras críticas de validação de avaliação e recomendação
 
 **RFs associados (rastreabilidade):** RF04, RF05, RF06, RF12.
 
-**Status:** planejado / pendente de deploy controlado (atualização isolada com `--no-deps`, monitoramento e rollback documentados; Gateway ainda fora do Compose atual — seção 9.2.2).
+**Status:** automação implementada e pendente de execução controlada em AWS EC2. A topologia final de produção está em `docker-compose.prod.yml`, com frontend, gateway e microsserviços internos; o roteiro operacional está em [`documentos/manual_deploy.md`](./manual_deploy.md).
 
 ---
 
@@ -7109,11 +7110,11 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 | RNF05 | Suíte de segurança implementada    | `src/backend/tests/non-functional/rnf05/`                                                   | Newman, ZAP, inspeção estática, HTTPS e verificação agregada de bcrypt preparados; execução completa exige homologação autorizada e segredos locais | Pendente de execução integrada      |
 | RNF06 | Banco executado; API instrumentada | `src/database/load_test/resultados_pgbench.txt` e `src/backend/tests/non-functional/rnf06/` | 242.011 transações no PostgreSQL, sem falhas; carga HTTP com 200 VUs implementada, mas bloqueada por health checks HTTP 503 no ambiente local       | Aprovado no banco e pendente na API |
 | RNF07 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf07/RESULTADOS.md`                                      | Serilog presente, porém sem comprovação de saída JSON e enriquecimento padronizado com os cinco campos obrigatórios                                 | Parcialmente conforme               |
-| RNF08 | Automação concluída                | `src/backend/tests/non-functional/rnf08/`                                                   | Atualização isolada com `--no-deps`, monitoramento e rollback documentados; Gateway não integra o Compose atual                                     | Pendente de deploy controlado       |
+| RNF08 | Automação concluída                | `src/backend/tests/non-functional/rnf08/`                                                   | Atualização isolada com `--no-deps`, monitoramento e rollback documentados; produção final usa `docker-compose.prod.yml` com gateway e frontend       | Pendente de execução em AWS EC2     |
 | RNF09 | Não aplicável                      | Registro documental                                                                         | Infraestrutura assíncrona não implementada e removida do escopo de execução                                                                         | Não aplicável nesta versão          |
 | RNF10 | Instrumentos concluídos            | `src/backend/tests/non-functional/rnf10/`                                                   | Roteiro T01–T09, planilha e analisador entregues; depende de cinco participantes externos                                                           | Pendente de sessões com usuários    |
 | RNF11 | Matriz concluída                   | `src/backend/tests/non-functional/rnf11/`                                                   | Matriz com quatro dispositivos, dez fluxos e 200 execuções planejadas; depende de dispositivos físicos                                              | Pendente de validação física        |
-| RNF12 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf12/RESULTADOS.md`                                      | Quatro serviços possuem Dockerfile, health check, política de reinício e rede; Gateway não está containerizado no Compose                           | Parcialmente conforme               |
+| RNF12 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf12/RESULTADOS.md`                                      | Topologia final em `docker-compose.prod.yml` inclui frontend, gateway e quatro microsserviços com health checks e rede interna                      | Parcial; execução final pendente    |
 
 #### 9.2.2.2 RNF01 — Tempo de carregamento das telas
 
@@ -7309,7 +7310,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
  Foi implementado um executor de deploy isolado que realiza o build do serviço alvo, aplica `docker compose up -d --no-deps`, monitora seu health check e confirma a continuidade dos demais serviços. O script inicia em modo seguro e somente executa a alteração real quando recebe confirmação explícita. Também registra o tempo até recuperação, falhas externas ao alvo e instrução de rollback.
 
- O Compose analisado contém catálogo, usuário, recomendação e geolocalização. O API Gateway possui projeto próprio, porém não integra o `docker-compose.yml` atual; por isso, não está coberto pelo deploy containerizado.
+ A topologia final de produção está no `docker-compose.prod.yml` e contém frontend, API Gateway, catálogo, usuário, recomendação e geolocalização. O executor de RNF08 continua focado na atualização isolada de serviços de domínio, enquanto a validação final do gateway e do frontend deve ser registrada no deploy AWS EC2 por `docker compose -f docker-compose.prod.yml ps`, health checks e Swagger público.
 
 | Item verificado                 | Estado                       |
 | ------------------------------- | ---------------------------- |
@@ -7319,12 +7320,12 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 | Verificação dos demais serviços | Automatizada                 |
 | Limite de cinco minutos         | Configurado                  |
 | Rollback                        | Documentado                  |
-| Gateway no Compose              | Ausente                      |
-| Deploy controlado executado     | Pendente                     |
+| Gateway no Compose de produção  | Presente                     |
+| Deploy controlado em AWS EC2    | Pendente                     |
 
 **Critério:** serviço alvo recuperado em até 300 segundos e 100% dos demais serviços operacionais durante a atualização.
 
-**Veredito:** automação concluída; resultado final pendente de execução em ambiente de deploy autorizado.
+**Veredito:** automação concluída; resultado final pendente de execução em ambiente AWS EC2 autorizado.
 
 **Evidências:**
 
@@ -7390,7 +7391,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 #### 9.2.2.13 RNF12 — Containers e recuperação
 
- A auditoria estática do repositório identificou quatro serviços no Compose: catálogo, usuário, recomendação e geolocalização. Todos possuem Dockerfile, health check, política `restart: unless-stopped` e participação na rede `spotlight_network`. O API Gateway possui projeto .NET, porém não possui Dockerfile nem entrada no Compose analisado.
+ A topologia final de produção em `docker-compose.prod.yml` inclui frontend, API Gateway, catálogo, usuário, recomendação e geolocalização. Os serviços backend possuem Dockerfile, health check, política `restart: unless-stopped` e rede interna; o frontend/Nginx é o único serviço exposto ao host no deploy final.
 
  Também foi criado um executor que reinicia cada serviço de forma controlada, mede o tempo até o health check positivo e verifica se os demais containers permanecem disponíveis. Operações destrutivas exigem o parâmetro explícito `-Execute`.
 
@@ -7400,15 +7401,15 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 | Usuário containerizado         | Conforme                             |
 | Recomendação containerizada    | Conforme                             |
 | Geolocalização containerizada  | Conforme                             |
-| Health checks                  | Presentes nos quatro serviços        |
-| Política de reinício           | `unless-stopped` nos quatro serviços |
-| Rede isolada                   | `spotlight_network`                  |
-| API Gateway containerizado     | Não conforme / fora do Compose       |
+| Health checks                  | Presentes nos serviços principais    |
+| Política de reinício           | `unless-stopped` nos serviços        |
+| Rede isolada                   | Redes internas do Compose de produção |
+| API Gateway containerizado     | Conforme no `docker-compose.prod.yml` |
 | Recuperação em até 30 segundos | Pendente de execução controlada      |
 
 **Critério:** 100% dos serviços do escopo em containers isolados e retorno ao health check em até 30 segundos, sem indisponibilizar os demais.
 
-**Veredito:** parcialmente conforme na auditoria estática; os quatro serviços do Compose atendem à estrutura prevista, mas o Gateway não está containerizado e a recuperação temporal depende de execução controlada.
+**Veredito:** parcialmente conforme na auditoria estática; a topologia final de produção está containerizada, mas a recuperação temporal ainda depende de execução controlada no ambiente AWS EC2.
 
 **Evidências:**
 
@@ -7419,11 +7420,11 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 #### 9.2.2.14 Síntese dos achados
 
- A execução dos cards resultou em uma base reproduzível para todos os RNFs aplicáveis. A maior parte dos requisitos possui executor, modelo de evidência, critérios automatizados e relatório associado. As auditorias estáticas permitiram identificar não conformidades concretas antes das execuções externas: alvos de toque inferiores a 44 unidades no RNF04, ausência de comprovação de cinco campos estruturados no RNF07 e ausência do API Gateway no Compose nos RNF08 e RNF12.
+ A execução dos cards resultou em uma base reproduzível para todos os RNFs aplicáveis. A maior parte dos requisitos possui executor, modelo de evidência, critérios automatizados e relatório associado. As auditorias estáticas permitiram identificar não conformidades concretas antes das execuções externas: alvos de toque inferiores a 44 unidades no RNF04, ausência de comprovação de cinco campos estruturados no RNF07 e necessidade de executar a validação final de deploy/recuperação no ambiente AWS EC2.
 
  O RNF06 possui evidência quantitativa da camada de persistência, com 242.011 transações processadas sem falhas. A validação de carga HTTP permanece pendente porque os serviços responderam HTTP 503 nos health checks do ambiente local. Os RNFs dependentes de usuários, dispositivos, credenciais ou períodos prolongados foram mantidos como pendentes, com os instrumentos necessários para execução posterior.
 
- Como próximos passos técnicos, recomenda-se priorizar: correção dos alvos de toque subdimensionados; enriquecimento estruturado dos logs; inclusão do API Gateway na estratégia de containerização; estabilização das dependências para execução do k6; disponibilização de ambiente HTTPS de homologação; e realização das sessões com usuários e dispositivos físicos.
+ Como próximos passos técnicos, recomenda-se priorizar: correção dos alvos de toque subdimensionados; enriquecimento estruturado dos logs; execução da validação final de deploy na AWS EC2; estabilização das dependências para execução do k6; disponibilização de ambiente HTTPS de homologação; e realização das sessões com usuários e dispositivos físicos.
 
 ---
 
@@ -8332,7 +8333,7 @@ dotnet test src/backend/services/catalogo \
 
 # 10. Procedimentos de Implantação
 
-&emsp;Esta seção descreve o procedimento utilizado para executar a solução em ambiente local de desenvolvimento e demonstração. Na Sprint 3, o backend foi validado localmente por meio do API Gateway e dos serviços independentes, enquanto o aplicativo mobile foi executado via Expo Go em dispositivo físico. O ambiente Docker existente no projeto ainda é utilizado principalmente para apoio ao banco local; a containerização completa dos serviços backend permanece como evolução planejada para implantação.
+&emsp;Esta seção descreve os procedimentos de execução local, execução containerizada e implantação final em nuvem comercial. A execução local continua disponível para desenvolvimento e demonstração com Expo e serviços .NET, enquanto o deploy final da entrega usa AWS EC2 com CloudFormation, Docker Compose, Nginx e dependências externas gerenciadas em Supabase e MongoDB Atlas.
 
 ## 10.1 Implantação e Configuração do Banco de Dados
 
@@ -8366,7 +8367,7 @@ ipconfig
 &emsp;Para executar o backend localmente, deve-se abrir um terminal na pasta `src/backend` e executar:
 
 ```powershell
-cd C:\Users\MarianaReis\OneDrive\Documentos\GitLab\g04\src\backend
+cd .\src\backend
 .\run-all.ps1
 ```
 
@@ -8396,7 +8397,7 @@ Healthy
 &emsp;Com o backend ativo, o aplicativo mobile deve ser executado em outro terminal, na raiz do projeto:
 
 ```powershell
-cd C:\Users\MarianaReis\OneDrive\Documentos\GitLab\g04
+# na raiz do repositório
 npx expo start --lan --clear
 ```
 
@@ -8476,13 +8477,15 @@ docker compose -f docker-compose.dev.yml up --build
 | Recomendação | 5003 | `http://localhost:5003` |
 | Geolocalização | 5004 | `http://localhost:5004` |
 
-### 10.3.3 Produção local ou VPS
+### 10.3.3 Produção local e AWS EC2
 
 &emsp;Para produção, o Compose publica apenas o frontend. O frontend servido por Nginx encaminha `/api/*` para o gateway interno, e o gateway distribui as requisições aos serviços `catalogo`, `usuario`, `recomendacao` e `geolocalizacao`.
 
 ```powershell
 docker compose -f docker-compose.prod.yml up --build -d
 ```
+
+&emsp;Em produção local, a porta padrão é `8080`, conforme `FRONTEND_PORT` no `.env.example`. No deploy em AWS EC2, o script `deploy/aws/publish-app.ps1` ajusta `FRONTEND_PORT=80` na cópia do `.env` enviada para a instância, expondo a aplicação diretamente em `http://<PUBLIC_IP>/`.
 
 &emsp;Comandos de verificação:
 
@@ -8498,12 +8501,13 @@ docker compose -f docker-compose.prod.yml logs -f frontend
 http://localhost:8080
 ```
 
-&emsp;Em um servidor, a porta `8080` pode ser colocada atrás de um proxy reverso com TLS, como Caddy, Traefik ou Nginx. Para um deploy simples em VPS, o desenho recomendado é:
+&emsp;No deploy final em AWS EC2, o desenho recomendado é o descrito em [`documentos/manual_deploy.md`](./manual_deploy.md):
 
-1. Proxy reverso externo nas portas 80/443.
-2. Serviço `frontend` acessível apenas pelo proxy ou pela porta local configurada.
-3. API Gateway e microsserviços sem portas públicas.
-4. Supabase e MongoDB Atlas com allowlist do IP do servidor.
+1. CloudFormation cria EC2 Amazon Linux 2023, Security Group e bootstrap de Docker.
+2. A porta 80 pública expõe apenas o frontend/Nginx.
+3. API Gateway e microsserviços permanecem internos à rede Docker Compose.
+4. Supabase e MongoDB Atlas permanecem como serviços externos, com allowlist do IP público da EC2.
+5. A validação final deve registrar `docker compose -f docker-compose.prod.yml ps`, `http://<PUBLIC_IP>/`, `http://<PUBLIC_IP>/api/health` e `http://<PUBLIC_IP>/swagger`.
 
 ### 10.3.4 Builds manuais
 
@@ -8512,12 +8516,22 @@ http://localhost:8080
 ```powershell
 docker build -f Dockerfile.frontend --target runtime -t spotlight-frontend:local .
 docker build -t spotlight-gateway:local src/backend/api-gateway
-docker build -t spotlight-catalogo:local src/backend/services/catalogo
-docker build -t spotlight-usuario:local src/backend/services/usuario
-docker build -t spotlight-recomendacao:local src/backend/services/recomendacao
-docker build -t spotlight-geolocalizacao:local src/backend/services/geolocalizacao
+docker build -t spotlight-catalogo:local src/backend/services/catalog
+docker build -t spotlight-usuario:local src/backend/services/user
+docker build -t spotlight-recomendacao:local src/backend/services/recommendation
+docker build -t spotlight-geolocalizacao:local src/backend/services/geolocation
 ```
 
-### 10.3.5 Estratégias de deploy
+### 10.3.5 Estratégia de deploy final
 
-&emsp;Para o estágio atual do projeto, a alternativa mais direta é uma VPS com Docker Compose, pois o repositório já contém a orquestração completa e depende de serviços gerenciados externos para banco relacional, autenticação, storage e telemetria. Em ambientes com maior exigência operacional, as imagens podem ser publicadas em registry e executadas em Render, Railway, Fly.io ou AWS ECS/Fargate. Em qualquer cenário, segredos devem ser configurados no provedor e não no repositório.
+&emsp;Para a entrega final, a estratégia adotada é AWS EC2 com Docker Compose. O repositório versiona os artefatos operacionais em `deploy/aws/`: template CloudFormation, criação de key pair, criação/atualização da stack e publicação da aplicação por SSH/SCP. O manual completo está em [`documentos/manual_deploy.md`](./manual_deploy.md).
+
+&emsp;Fluxo resumido:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\create-keypair.ps1 -KeyName spotlight-ec2-key
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\deploy-stack.ps1 -KeyName spotlight-ec2-key -InstanceType t3.small
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\publish-app.ps1 -PublicIp <PUBLIC_IP> -KeyPath .\.codex-tmp\spotlight-ec2-key.pem -EnvFile .\.env
+```
+
+&emsp;A URL pública real, os prints da aplicação, a saída de `docker compose ps`, os health checks e o Swagger público devem ser registrados como evidência final quando a EC2 estiver publicada. Segredos permanecem fora do repositório: `.env`, `.pem` e `.codex-tmp/aws-lab.ps1` são arquivos locais ignorados pelo Git.

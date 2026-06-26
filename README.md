@@ -138,6 +138,7 @@ A pasta `documentos/` concentra a documentação do produto, do processo e das e
 - [Índice da documentação](documentos/Index.md): ponto de entrada para navegar pelos documentos do projeto.
 - [Documentação geral do projeto](documentos/Projeto.md): visão completa do Spotlight, incluindo negócio, arquitetura, requisitos, implementação, testes e implantação.
 - [Manual de instalação](documentos/Manual-instalacao.md): guia detalhado para preparar ambiente, configurar variáveis, banco de dados e execução local.
+- [Manual de deploy AWS EC2](documentos/manual_deploy.md): guia operacional do deploy final em nuvem comercial usando CloudFormation, EC2 e Docker Compose.
 - [Gestão de projeto](documentos/GestaoProjeto.md): acompanhamento evolutivo das sprints, retrospectivas, planejamento e gestão das entregas.
 - [Gestão de projeto e configuração](documentos/Gestao_Projeto_Configuracao.md): políticas de versionamento, GitFlow, critérios de tarefas e alinhamento com o processo do projeto.
 - [Projeto visual](documentos/ProjetoVisual.md): diretrizes de design, wireframes, mockups, identidade visual e decisões de interface.
@@ -154,6 +155,7 @@ O repositório mantém o app Expo na raiz por requisito de execução do React N
  ┣ 📂 .githook                        hooks locais de validação de commits
  ┣ 📂 assets                          fontes e imagens usadas pelo app Expo
  ┣ 📂 deploy
+ ┃ ┣ 📂 aws                           scripts CloudFormation/EC2 para deploy em AWS
  ┃ ┗ 📂 nginx                         configuração do Nginx para produção
  ┣ 📂 documentos
  ┃ ┣ 📂 evidencias
@@ -267,6 +269,20 @@ Somente serviços backend de domínio, sem gateway e sem frontend, usando o Comp
 ```powershell
 docker compose up --build
 ```
+
+### Deploy final em AWS EC2
+
+O deploy final previsto para a entrega usa AWS EC2 com Docker Compose. O passo a passo oficial está em [documentos/manual_deploy.md](documentos/manual_deploy.md) e cobre criação da key pair, stack CloudFormation, publicação do código, envio seguro do `.env`, validação de containers, health checks e operação básica.
+
+Resumo dos comandos principais:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\create-keypair.ps1 -KeyName spotlight-ec2-key
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\deploy-stack.ps1 -KeyName spotlight-ec2-key -InstanceType t3.small
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\publish-app.ps1 -PublicIp <PUBLIC_IP> -KeyPath .\.codex-tmp\spotlight-ec2-key.pem -EnvFile .\.env
+```
+
+Após a publicação, os principais pontos de validação são `http://<PUBLIC_IP>/`, `http://<PUBLIC_IP>/api/health` e `http://<PUBLIC_IP>/swagger`.
 
 ### Validação
 
