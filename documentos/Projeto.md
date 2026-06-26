@@ -5260,7 +5260,7 @@ personalizadas em vez de depender apenas de conteúdo estático.
 | Telemetria comportamental | [`TelemetriaController.cs`](../src/backend/services/usuario/presentation/controllers/TelemetriaController.cs), [`TelemetriaService.cs`](../src/backend/services/usuario/application/usecases/TelemetriaService.cs), [`MongoTelemetriaRepository.cs`](../src/backend/services/usuario/infrastructure/persistence/MongoTelemetriaRepository.cs), [`TelemetryRepository.ts`](../src/frontend/repositories/TelemetryRepository.ts), [`useTelemetrySession.ts`](../src/frontend/hooks/useTelemetrySession.ts) | A Sprint 3 não persistia eventos comportamentais; a Sprint 4 adicionou contrato, validação, envio pelo app e gravação no MongoDB Atlas. |
 | Banco de dados e governança de acesso | [`06_indexes.sql`](../src/database/migrations/06_indexes.sql), [`09_espetaculo_midia.sql`](../src/database/migrations/09_espetaculo_midia.sql), [`11_seed_recomendacao_incremental.sql`](../src/database/migrations/11_seed_recomendacao_incremental.sql), [`12_controle_acesso_administrativo_catalogo.sql`](../src/database/migrations/12_controle_acesso_administrativo_catalogo.sql), [`13_rls_similaridade_item_avaliacao.sql`](../src/database/migrations/13_rls_similaridade_item_avaliacao.sql) | O banco ganhou índices, mídia de catálogo, seeds incrementais de recomendação, controle administrativo e policies RLS para tabelas novas ou sensíveis. |
 | Contratos, Swagger e documentação técnica | [`api-contracts.md`](../src/backend/contracts/api-contracts.md), [`openapi.json`](../src/backend/contracts/openapi.json), [`telemetria.md`](../src/backend/contracts/telemetria.md), [`supabase-storage.md`](../src/backend/contracts/supabase-storage.md) | A documentação técnica passou a cobrir recomendação, similares, telemetria e storage, reduzindo divergência entre contrato e implementação. |
-| Validação automatizada | [`RecomendacaoServiceTests.cs`](../src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoServiceTests.cs), [`RecomendacaoBaseControllerTests.cs`](../src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoBaseControllerTests.cs), [`MongoTelemetryIndexesTests.cs`](../src/backend/tests/Spotlight.Usuario.Tests/MongoTelemetryIndexesTests.cs), [`TelemetriaMongoIntegrationTests.cs`](../src/backend/tests/Spotlight.Usuario.Tests/TelemetriaMongoIntegrationTests.cs), [`Test-TelemetriaAtlasE2E.ps1`](../src/backend/scripts/Test-TelemetriaAtlasE2E.ps1) | A Sprint 4 ampliou a validação além do fluxo manual, cobrindo recomendação, health checks, índices MongoDB, integração Mongo opt-in e validação E2E com Atlas. |
+| Validação automatizada | [`RecomendacaoServiceTests.cs`](../src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoServiceTests.cs), [`RecomendacaoBaseControllerTests.cs`](../src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoBaseControllerTests.cs), [`MongoTelemetryIndexesTests.cs`](../src/backend/tests/Spotlight.User.Tests/MongoTelemetryIndexesTests.cs), [`TelemetriaMongoIntegrationTests.cs`](../src/backend/tests/Spotlight.User.Tests/TelemetriaMongoIntegrationTests.cs), [`Test-TelemetriaAtlasE2E.ps1`](../src/backend/scripts/Test-TelemetriaAtlasE2E.ps1) | A Sprint 4 ampliou a validação além do fluxo manual, cobrindo recomendação, health checks, índices MongoDB, integração Mongo opt-in e validação E2E com Atlas. |
 | Execução e infraestrutura local | [`docker-compose.yml`](../docker-compose.yml), [`catalogo/Dockerfile`](../src/backend/services/catalogo/Dockerfile), [`recomendacao/Dockerfile`](../src/backend/services/recomendacao/Dockerfile), [`usuario/Dockerfile`](../src/backend/services/usuario/Dockerfile), [`.gitlab-ci.yml`](../.gitlab-ci.yml) | O ambiente ganhou suporte mais claro para execução dos serviços backend, variáveis centralizadas e pipeline de CI para reduzir regressões entre branches. |
 
 ### Fluxo Principal Entregue
@@ -5461,10 +5461,10 @@ dotnet test src/backend/Spotlight.sln --configuration Release --collect:"XPlat C
 
 | Projeto de teste | Cobertura de linhas geral | Cobertura de branches geral |
 |---|---:|---:|
-| `Spotlight.Catalogo.Tests` | 41,29% | 20,84% |
-| `Spotlight.Usuario.Tests` | 56,67% | 41,62% |
-| `Spotlight.Recomendacao.Tests` | 36,43% | 17,80% |
-| `Spotlight.Geolocalizacao.Tests` | 40,55% | 53,70% |
+| `Spotlight.Catalog.Tests` | 41,29% | 20,84% |
+| `Spotlight.User.Tests` | 56,67% | 41,62% |
+| `Spotlight.Recommendation.Tests` | 36,43% | 17,80% |
+| `Spotlight.Geolocation.Tests` | 40,55% | 53,70% |
 | `Spotlight.Gateway.Tests` | 81,96% | 100,00% |
 | **Total ponderado por linhas** | **45,54%** | - |
 
@@ -5634,9 +5634,9 @@ g04/
       ├─ ml-engine/
       └─ tests/
          ├─ Spotlight.Gateway.Tests/      # Testes unitários e de integração do Gateway
-         ├─ Spotlight.Catalogo.Tests/
-         ├─ Spotlight.Usuario.Tests/
-         └─ Spotlight.Recomendacao.Tests/
+         ├─ Spotlight.Catalog.Tests/
+         ├─ Spotlight.User.Tests/
+         └─ Spotlight.Recommendation.Tests/
 tests/
 └─ cassettes/
    ├─ supabase/                          # Respostas gravadas do Supabase Auth (VHS)
@@ -6232,7 +6232,7 @@ detox test --testNamePattern "RF10"
 **Instruções de execução:**
 ```bash
 $env:RUN_MONGO_INTEGRATION_TESTS="true"
-dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.csproj --filter "Mongo|Telemetria"
+dotnet test src/backend/tests/Spotlight.User.Tests/Spotlight.User.Tests.csproj --filter "Mongo|Telemetria"
 detox test --testNamePattern "RF11"
 # Conferência manual
 mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE').getCollection('$MONGODB_TELEMETRY_COLLECTION').find().sort({received_at:-1}).limit(20)"
@@ -6559,14 +6559,14 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 | Projeto | Total | Aprovados | Ignorados | Reprovados | Tempo |
 |---|---:|---:|---:|---:|---:|
-| Spotlight.Catalogo.Tests | 20 | 20 | 0 | 0 | 1,0 s |
+| Spotlight.Catalog.Tests | 32 | 32 | 0 | 0 | 1,0 s |
 | Spotlight.Gateway.Tests | 2 | 2 | 0 | 0 | 1,0 s |
-| Spotlight.Geolocalizacao.Tests | 7 | 7 | 0 | 0 | 0,1 s |
-| Spotlight.Recomendacao.Tests | 16 | 16 | 0 | 0 | 0,9 s |
-| Spotlight.Usuario.Tests | 38 | 38 | 0 | 0 | 35 s |
-| **Total** | **83** | **83** | **0** | **0** | **≈ 38 s** |
+| Spotlight.Geolocation.Tests | 9 | 9 | 0 | 0 | 0,1 s |
+| Spotlight.Recommendation.Tests | 47 | 47 | 0 | 0 | 0,8 s |
+| Spotlight.User.Tests | 49 | 49 | 0 | 0 | ≈ 2 min |
+| **Total** | **139** | **139** | **0** | **0** | **≈ 2 min** |
 
-&emsp;A taxa de aprovação foi de **100 % (83 / 83)**, sem teste reprovado e sem teste ignorado. Os 35 s do projeto `Spotlight.Usuario.Tests` concentram o ciclo de provisionamento do container MongoDB efêmero (`mongo:7.0`) consumido pelos cinco testes de `TelemetriaMongoIntegrationTests`; os demais projetos rodam em < 2 s cada.
+&emsp;A taxa de aprovação foi de **100 % (139 / 139)**, sem teste reprovado e sem teste ignorado. Os ~2 min do projeto `Spotlight.User.Tests` concentram o ciclo de provisionamento do container MongoDB efêmero (`mongo:7.0`) consumido pelos cinco testes de `TelemetriaMongoIntegrationTests`; os demais projetos rodam em < 2 s cada.
 
 ### Rastreabilidade RF ↔ Testes automatizados
 
@@ -6620,15 +6620,15 @@ cd src/admin-web && npx playwright test --grep "RF16"
 | `README.md` | Comando único, comando por projeto, tabela-resumo e descrição dos demais arquivos |
 | `run-tests.bat` | Script de reprodução da bateria consolidada (`Spotlight.sln`) — invoca o `dotnet test` com a env `RUN_MONGO_INTEGRATION_TESTS=true` |
 | `run-per-project.bat` | Script de reprodução por projeto, gerando uma `*.trx` distinta para cada serviço |
-| `saida-completa.txt` | Log integral do `dotnet test` da solution, com nome, duração e status de cada um dos 83 testes |
+| `saida-completa.txt` | Log integral do `dotnet test` da solution, com nome, duração e status de cada um dos 139 testes |
 | `saida-por-projeto.txt` | Log do `dotnet test` em modo por projeto (linha-resumo `Aprovado!  – Com falha: 0…` por serviço) |
-| `Spotlight.Catalogo.Tests.trx` | Resultado TRX (Visual Studio Test Results) — 20 testes |
+| `Spotlight.Catalog.Tests.trx` | Resultado TRX (Visual Studio Test Results) — 32 testes |
 | `Spotlight.Gateway.Tests.trx` | Resultado TRX — 2 testes |
-| `Spotlight.Geolocalizacao.Tests.trx` | Resultado TRX — 7 testes |
-| `Spotlight.Recomendacao.Tests.trx` | Resultado TRX — 16 testes |
-| `Spotlight.Usuario.Tests.trx` | Resultado TRX — 38 testes (inclui os 5 de integração Mongo) |
+| `Spotlight.Geolocation.Tests.trx` | Resultado TRX — 9 testes |
+| `Spotlight.Recommendation.Tests.trx` | Resultado TRX — 47 testes |
+| `Spotlight.User.Tests.trx` | Resultado TRX — 49 testes (inclui os 5 de integração Mongo) |
 
-&emsp;Cada TRX preserva `executionId`, `outcome`, `duration` e `startTime` de cada caso, viabilizando importação em ReportGenerator, Azure Test Plans e equivalentes sem reexecução. Conferência rápida: `grep -oE 'outcome="[^"]+"' *.trx | sort | uniq -c` totaliza **83 `Passed`** e nenhum outro estado.
+&emsp;Cada TRX preserva `executionId`, `outcome`, `duration` e `startTime` de cada caso, viabilizando importação em ReportGenerator, Azure Test Plans e equivalentes sem reexecução. Conferência rápida: `grep -oE 'outcome="[^"]+"' *.trx | sort | uniq -c` totaliza **139 `Passed`** e nenhum outro estado.
 
 ### Lacunas conscientes e plano de cobertura
 
@@ -6659,18 +6659,18 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 | Caso | Arquivo | Resultado esperado |
 |---|---|---|
-| `CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio` | `src/backend/tests/Spotlight.Catalogo.Tests/CatalogoUseCasesTests.cs` | Nota `5` é aceita, comentário nulo é preservado e os dados corretos chegam ao repositório. |
-| `CriarAvaliacao_ComNotaInvalida_LancaValidation` | `src/backend/tests/Spotlight.Catalogo.Tests/CatalogoUseCasesTests.cs` | Notas inválidas geram `ValidationException` antes de consultar espetáculo ou chamar o repositório de avaliação. |
-| `CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao` | `src/backend/tests/Spotlight.Catalogo.Tests/CatalogoUseCasesTests.cs` | Espetáculo inexistente gera `NotFoundException` e nenhuma avaliação é persistida. |
-| `ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal` | `src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoUseCasesTests.cs` | Resultado final respeita o limite normalizado e mantém a ordem de ranking do modelo. |
+| `CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Nota `5` é aceita, comentário nulo é preservado e os dados corretos chegam ao repositório. |
+| `CriarAvaliacao_ComNotaInvalida_LancaValidation` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Notas inválidas geram `ValidationException` antes de consultar espetáculo ou chamar o repositório de avaliação. |
+| `CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Espetáculo inexistente gera `NotFoundException` e nenhuma avaliação é persistida. |
+| `ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal` | `src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoUseCasesTests.cs` | Resultado final respeita o limite normalizado e mantém a ordem de ranking do modelo. |
 
 #### Evidência de execução
 
 Os testes foram executados localmente em configuração `Release`, pois havia serviços do backend em execução usando os binários `Debug`.
 
 ```powershell
-dotnet test src/backend/tests/Spotlight.Catalogo.Tests/Spotlight.Catalogo.Tests.csproj -c Release --no-restore
-dotnet test src/backend/tests/Spotlight.Recomendacao.Tests/Spotlight.Recomendacao.Tests.csproj -c Release --no-restore
+dotnet test src/backend/tests/Spotlight.Catalog.Tests/Spotlight.Catalog.Tests.csproj -c Release --no-restore
+dotnet test src/backend/tests/Spotlight.Recommendation.Tests/Spotlight.Recommendation.Tests.csproj -c Release --no-restore
 dotnet test src/backend/Spotlight.sln -c Release --no-restore
 ```
 
@@ -6678,11 +6678,11 @@ Resultado observado, já considerando os 4 testes novos somados à bateria regis
 
 | Comando | Aprovados | Ignorados | Falhas |
 |---|---:|---:|---:|
-| `Spotlight.Catalogo.Tests` | 22 | 0 | 0 |
-| `Spotlight.Recomendacao.Tests` | 39 | 0 | 0 |
-| `Spotlight.sln` | 103 | 5 | 0 |
+| `Spotlight.Catalog.Tests` | 32 | 0 | 0 |
+| `Spotlight.Recommendation.Tests` | 47 | 0 | 0 |
+| `Spotlight.sln` | 139 | 0 | 0 |
 
-Os 5 testes ignorados pertencem aos testes de integração MongoDB condicionais do projeto `Spotlight.Usuario.Tests`, que dependem de configuração externa específica para execução (veja `RUN_MONGO_INTEGRATION_TESTS` na subseção "Ambiente de execução" acima). Eles não representam falha da suíte de regras de negócio executada nesta tarefa.
+Os 5 testes de integração MongoDB condicionais do projeto `Spotlight.User.Tests` rodaram e passaram nesta execução porque havia Docker disponível e `RUN_MONGO_INTEGRATION_TESTS=true` (veja a subseção "Ambiente de execução" acima); sem Docker, o `MongoIntegrationFactAttribute` os manteria como ignorados — sem representar falha da suíte de regras de negócio.
 
 #### Abrangência e limitações
 
@@ -8069,7 +8069,7 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" 
 **Instruções de execução:**
 ```bash
 $env:RUN_MONGO_INTEGRATION_TESTS="true"
-dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.csproj --filter "Mongo|Telemetria"
+dotnet test src/backend/tests/Spotlight.User.Tests/Spotlight.User.Tests.csproj --filter "Mongo|Telemetria"
 ```
 
 ---
