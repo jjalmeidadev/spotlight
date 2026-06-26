@@ -92,8 +92,9 @@ function AppContent() {
 		try {
 			const preferencias = await obterPreferenciasUsuario(usuario.accessToken);
 			setScreen(preferenciasEstaoCompletas(preferencias) ? 'catalogo' : 'preferencias');
-		} catch {
-			setScreen('catalogo');
+		} catch (error) {
+			console.warn(error);
+			setScreen('preferencias');
 		}
 	}
 
@@ -139,7 +140,7 @@ function AppContent() {
 					setUserType(usuario.tipoUsuario ?? 'cadastrado');
 					setAccessToken(usuario.accessToken ?? null);
 					setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
-					await direcionarAposAutenticacao(usuario);
+					setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
 				}}
 			/>
 		);
