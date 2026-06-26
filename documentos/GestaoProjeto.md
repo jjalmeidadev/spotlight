@@ -119,8 +119,9 @@
   - [2.4 Sprint 4](#24-sprint-4)
   - [2.5 Sprint 5](#25-sprint-5)
 - [3. Análise de Riscos](#3-análise-de-riscos)
-  - [3.1 Riscos identificados](#31-riscos-identificados)
-  - [3.2 Mitigação de Riscos](#32-mitigação-de-riscos)
+  - [3.1 Riscos Identificados](#31-riscos-identificados)
+  - [3.2 Mitigação de Riscos e Resultados](#32-mitigação-de-riscos-e-resultados)
+  - [3.3 Novos Riscos Identificados na Sprint 5](#33-novos-riscos-identificados-na-sprint-5)
 - [4. Análise Post Mortem](#4-análise-post-mortem)
   - [4.1 Sucessos do Projeto](#41-sucessos-do-projeto)
   - [4.2 Oportunidades de Melhoria](#42-oportunidades-de-melhoria)
@@ -293,7 +294,7 @@ O backlog da Sprint 3 foi estruturado com base em uma matriz de dependências t�
 | T3   | Construir dicionário de dados (tipos, restrições, relacionamentos, descrições)             |             | M                 | Alta       | A Fazer |
 | T4   | Documentar regras de negócio implementadas diretamente no banco                            |             | P                 | Alta       | A Fazer |
 | T5   | Redigir instruções de implantação (versão, dependências, ajustes) no `README.md`           |             | P                 | Alta       | A Fazer |
-| T6   | Dockerizar o ambiente e preparar implantação em nuvem comercial conforme estratégia final   |             | G                 | Alta       | A Fazer |
+| T6   | Dockerizar o banco e implantar no servidor Inteli conforme acordado                        |             | G                 | Alta       | A Fazer |
  
 ###### Bloco 2 — Arquitetura e Padrões de Codificação
  
@@ -664,7 +665,7 @@ Checkpoint do dia: código congelado, slides em versão apresentável, evidênci
 | Execução de Testes | T51 e validação final de logs, ferramentas, casos e abrangência |
 | Gestão de Projetos | T57, T58 e revisão final dos slides |
 
-Checkpoint do dia: entrega fechada, documentação revisada, vídeo pronto, ambiente publicado validado, Swagger acessível, testes documentados, retrospectiva da Sprint 4 registrada e planejamento da Sprint 5 incluído no `GestaoProjeto.md`.
+Checkpoint do dia: entrega fechada, documentação revisada, vídeo pronto, servidor validado, Swagger acessível, testes documentados, retrospectiva da Sprint 4 registrada e planejamento da Sprint 5 incluído no `GestaoProjeto.md`.
 
 #### Alinhamento com a Gestão de Configuração
 
@@ -760,7 +761,7 @@ Esta atualização atende ao card [#383](https://git.inteli.edu.br/graduacao/202
 
 #### Objetivo da Sprint 5
 
-A Sprint 5 representa o encerramento do projeto Spotlight. O ciclo tem como objetivo consolidar a solução final com backend e frontend funcionais, ambiente dockerizado em AWS EC2/nuvem comercial, cobertura de testes abrangente, documentação completa e apresentação final estruturada com técnica narrativa definida. Esta sprint também contempla a análise post mortem do projeto e a consolidação da gestão evolutiva ao longo de todas as sprints.
+A Sprint 5 representa o encerramento do projeto Spotlight. O ciclo tem como objetivo consolidar a solução final com backend e frontend funcionais, ambiente dockerizado no servidor Inteli, cobertura de testes abrangente, documentação completa e apresentação final estruturada com técnica narrativa definida. Esta sprint também contempla a análise post mortem do projeto e a consolidação da gestão evolutiva ao longo de todas as sprints.
 
 A Sprint 5 tem uma restrição de capacidade relevante: a primeira semana coincide com período de provas, reduzindo os dias produtivos a tasks de menor complexidade, principalmente `SIZE_P` e `SIZE_M`. A segunda semana concentra as entregas técnicas e documentais mais pesadas, com quatro dias úteis efetivos de alta produtividade.
 
@@ -785,7 +786,7 @@ Com sete integrantes e sete dias úteis efetivos, cada membro deve assumir ao me
 | 1 | 17/06 (Ter) | Prova | Fundação e limpeza documental | Resolver pendências do EP, definir técnica de apresentação, iniciar planejamento no `GestaoProjeto.md` e agendar usuários de usabilidade |
 | 2 | 18/06 (Qua) | Prova | Atualização de documentação técnica | Atualizar guia de padrões, seções do `Projeto.md`, `ProjetoVisual.md`, `Gestao_Projeto_Configuracao.md` e planejamento de testes |
 | 3 | 19/06 (Qui) | Prova | Revisão e preparação para semana final | Incorporar feedbacks pendentes, revisar RNFs, separar critérios de aceitação, detalhar casos de teste e iniciar estrutura dos slides |
-| 4 | 23/06 (Seg) | Final | Implementação e infraestrutura | Finalizar features pendentes, validar ambiente AWS EC2/nuvem comercial, iniciar execução de testes funcionais e de integração |
+| 4 | 23/06 (Seg) | Final | Implementação e infraestrutura | Finalizar features pendentes, validar ambiente no servidor Inteli, iniciar execução de testes funcionais e de integração |
 | 5 | 24/06 (Ter) | Final | Testes e evidências técnicas | Executar rodada final de todos os tipos de teste, organizar logs e ampliar cobertura de testes unitários |
 | 6 | 25/06 (Qua) | Final | Documentação final e apresentação | Consolidar `Projeto.md`, gravar vídeo, avançar slides, criar `manual_deploy.md`, elaborar métricas e post mortem |
 | 7 | 26/06 (Qui) | Final | Fechamento e entrega | Ensaio final, revisão cruzada de documentação, retrospectiva da Sprint 5, validação dos critérios do EP e entrega |
@@ -808,9 +809,9 @@ O backlog abaixo representa o recorte inicial da Sprint 5 no momento do planning
 | T08 | Documentar TDD e cobertura de testes no `Projeto.md` | SIZE_M | Alta | Dia 3 |
 | T09 | Atualizar `README.md` do banco de dados — versão final | SIZE_P | Alta | Dia 3 |
 | T10 | Finalizar implementação de features pendentes | SIZE_G | Alta | Dia 4 |
-| T11 | Validar ambiente final em AWS EC2 — dockerizado | SIZE_G | Crítica | Dia 4 |
+| T11 | Validar ambiente final no servidor Inteli — dockerizado | SIZE_G | Crítica | Dia 4 |
 | T12 | Validar integração final frontend-backend-recomendação | SIZE_M | Alta | Dia 4 |
-| T13 | Validar Swagger no ambiente final AWS EC2 | SIZE_P | Alta | Dia 4 |
+| T13 | Validar Swagger no ambiente final do servidor Inteli | SIZE_P | Alta | Dia 4 |
 | T14 | Revisar pipeline de CI no GitLab — versão final | SIZE_P | Média | Dia 4 |
 | T15 | Atualizar Swagger com todas as rotas finais da API | SIZE_M | Alta | Dia 5 |
 | T16 | Implementar melhorias de performance identificadas nos testes | SIZE_M | Média | Dia 5 |
@@ -934,14 +935,14 @@ Checkpoint do dia: T24 e T54 devem estar concluídas. Casos de teste detalhados 
 
 ##### Dia 4 — Segunda 23/06 — Implementação e Infraestrutura
 
-Objetivo do dia: garantir que o ambiente AWS EC2 está funcionando, finalizar features pendentes e iniciar a execução dos testes. T11 é o ponto crítico do dia, pois a entrega final depende do deploy em nuvem comercial validado.
+Objetivo do dia: garantir que o ambiente está funcionando no servidor Inteli, finalizar features pendentes e iniciar a execução dos testes. T11 é o ponto crítico do dia, pois há demérito se o servidor não estiver funcionando.
 
 | Bloco | Tasks | Membro | Status inicial |
 |---|---|---|---|
 | Desenvolvimento | T10 — Finalizar features pendentes (`SIZE_G`) | Não atribuído | Não iniciada |
-| Desenvolvimento | T11 — Validar ambiente AWS EC2 (`SIZE_G`) | Leonardo | Não iniciada |
+| Desenvolvimento | T11 — Validar ambiente no servidor Inteli (`SIZE_G`) | Leonardo | Não iniciada |
 | Desenvolvimento | T12 — Validar integração frontend-backend-recomendação (`SIZE_M`) | Não atribuído | Não iniciada |
-| Desenvolvimento | T13 — Validar Swagger na AWS EC2 (`SIZE_P`) | Vitor | Não iniciada |
+| Desenvolvimento | T13 — Validar Swagger no servidor Inteli (`SIZE_P`) | Vitor | Não iniciada |
 | Desenvolvimento | T14 — Revisar pipeline de CI (`SIZE_P`) | Não atribuído | Não iniciada |
 | Testes | T26 — Executar testes de funcionalidade (`SIZE_G`) | Não atribuído | Não iniciada |
 | Testes | T27 — Executar testes de integração (`SIZE_G`) | Não atribuído | Não iniciada |
@@ -949,7 +950,7 @@ Objetivo do dia: garantir que o ambiente AWS EC2 está funcionando, finalizar fe
 | Testes | T29 — Implementar testes unitários adicionais (`SIZE_G`) | Jaime | Em análise |
 | Versão Final | T55 — Organizar repositório conforme estrutura EP (`SIZE_P`) | Não atribuído | Não iniciada |
 
-Checkpoint do dia: T11 e T12 são inegociáveis. Sem o ambiente AWS EC2 funcionando e o fluxo integrado validado, os testes de RNF e o vídeo ficam comprometidos. A partir deste dia, novas features não devem ser iniciadas.
+Checkpoint do dia: T11 e T12 são inegociáveis. Sem o servidor funcionando e o fluxo integrado validado, os testes de RNF e o vídeo ficam comprometidos. A partir deste dia, novas features não devem ser iniciadas.
 
 ##### Dia 5 — Terça 24/06 — Testes e Evidências Técnicas
 
@@ -998,7 +999,7 @@ Objetivo do dia: ensaio final, revisão cruzada de documentação, retrospectiva
 | Versão Final | T60 — Ensaio final da apresentação (`SIZE_G`) | Não atribuído | Não iniciada |
 | Versão Final | T61 — Finalizar apresentação — versão de entrega (`SIZE_M`) | Não atribuído | Não iniciada |
 
-Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, Swagger acessível na AWS EC2, deploy validado, testes documentados, retrospectiva registrada e slides aprovados pelo grupo.
+Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, Swagger acessível, servidor validado, testes documentados, retrospectiva registrada e slides aprovados pelo grupo.
 
 #### Matriz de Dependências Críticas
 
@@ -1009,18 +1010,18 @@ Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, S
 | T06 — Seção de arquitetura no `Projeto.md` | T02 | Seção referencia o diagrama atualizado. |
 | T07 — Features no `Projeto.md` | T10 | Documentar features exige implementação estável. |
 | T08 — TDD e cobertura | T29 | Documentar cobertura exige testes unitários adicionais implementados. |
-| T10 — Finalizar features | T11 | Features devem ser finalizadas antes da validação do ambiente AWS EC2. |
-| T12 — Integração final | T10, T11 | Validação integrada depende de features prontas e ambiente publicado funcionando. |
-| T13 — Swagger na AWS EC2 | T11, T15 | Swagger público depende do ambiente AWS EC2 funcionando e das rotas finalizadas. |
+| T10 — Finalizar features | T11 | Features devem ser finalizadas antes da validação do servidor. |
+| T12 — Integração final | T10, T11 | Validação integrada depende de features prontas e servidor funcionando. |
+| T13 — Swagger no servidor | T11, T15 | Swagger no servidor depende do ambiente funcionando e das rotas finalizadas. |
 | T15 — Swagger rotas finais | T10 | Swagger só pode ser atualizado com todas as rotas implementadas. |
-| T17 — Nuvem comercial | T11 | Deploy em nuvem depende da infraestrutura AWS EC2 criada e validada. |
-| T19 — Vídeo demonstrativo | T11, T12 | Vídeo depende do ambiente publicado funcionando e do fluxo integrado validado. |
+| T17 — Nuvem comercial | T11 | Deploy em nuvem depende do ambiente Inteli validado como referência. |
+| T19 — Vídeo demonstrativo | T11, T12 | Vídeo depende do ambiente funcionando e do fluxo integrado validado. |
 | T20 — Consolidar `Projeto.md` | T07, T08, T18, T19 | Consolidação final depende de todas as seções preenchidas. |
 | T23 — Separar critérios de aceitação | T22 | Separação depende dos RNFs revisados em formato user story. |
 | T24 — Casos de teste detalhados | T22, T23 | Detalhamento depende de RNFs e critérios de aceitação revisados. |
 | T26, T27, T28 — Testes funcionais, integração e negócio | T24, T12 | Execução depende de casos detalhados e fluxo integrado funcionando. |
 | T29 — Testes unitários adicionais | T10 | Testes unitários dependem de features finalizadas. |
-| T30, T31 — Testes RNF desempenho e segurança | T11, T26 | Testes de RNF dependem do ambiente publicado e dos testes funcionais executados. |
+| T30, T31 — Testes RNF desempenho e segurança | T11, T26 | Testes de RNF dependem do ambiente no servidor e dos testes funcionais executados. |
 | T32 — Testes de usabilidade | T25, T12 | Usabilidade depende de usuários agendados e interface integrada. |
 | T33 — Revisar scripts de teste | T26, T27, T28 | Revisão de scripts ocorre após execução final. |
 | T34, T35 — Logs e abrangência | T26, T27, T28, T29, T30, T31, T32 | Logs e abrangência dependem de todos os tipos de teste executados. |
@@ -1045,7 +1046,7 @@ Checkpoint do dia: entrega fechada, documentação revisada, vídeo publicado, S
 
 #### Pontos Críticos do Cronograma
 
-- T11 — Validar AWS EC2 é o maior risco da sprint. Não deve ficar para depois do Dia 4.
+- T11 — Validar servidor Inteli é o maior risco da sprint. Não deve ficar para depois do Dia 4.
 - T25 — Agendar usuários de usabilidade deve acontecer no Dia 1. Sem agendamento antecipado, não há como garantir cinco usuários externos na semana final.
 - T48 — Técnica de apresentação no Slack é obrigatória na primeira semana conforme o artefato Versão Final.
 - T10 e T12 são o caminho crítico do desenvolvimento. Se features ou integração não estiverem estáveis no Dia 4, testes, vídeo e Swagger atrasam em cascata.
@@ -1071,34 +1072,74 @@ Todas as tasks da Sprint 5 estão registradas no board do GitLab com descrição
 
 O registro de riscos do projeto é mantido de forma evolutiva, sendo revisado a cada sprint como parte das cerimônias de retrospectiva e planejamento. Os riscos são classificados por probabilidade e impacto, com estratégias de mitigação definidas e responsáveis atribuídos.
 
+Diferentemente de um registro estático, esta seção consolida os riscos **reais** que se materializaram ou foram monitorados ao longo das Sprints 1 a 5. Cada risco está vinculado à sprint em que foi identificado, à evidência que o originou e ao resultado observado após a aplicação da estratégia de mitigação. Essa abordagem reflete diretamente o ciclo de melhoria contínua adotado pela equipe, no qual os pontos negativos de cada retrospectiva alimentaram o registro de riscos da sprint seguinte.
+
+### Critérios de Classificação
+
+| Dimensão | Níveis | Significado |
+|---|---|---|
+| Probabilidade | Baixa / Média / Alta | Chance de o risco se materializar no contexto do ciclo. |
+| Impacto | Baixo / Médio / Alto | Efeito sobre prazo, qualidade do produto ou da entrega documental. |
+| Status | Mitigado / Controlado / Monitorado / Materializado | Situação do risco após a aplicação das ações de tratamento. |
+
 ## 3.1 Riscos Identificados
 
-| ID | Risco | Probabilidade | Impacto | Frente afetada | Sinais de alerta | Ação de mitigação | Task vinculada | Responsável |
-|----|------|--------------|---------|---------------|------------------|-------------------|----------------|-------------|
-| R1 | AWS EC2 indisponível ou instável no Dia 4 | Média | Alto | Deploy / Desenvolvimento | Health checks falhando, Swagger inacessível ou containers reiniciando | Validar ambiente AWS EC2 no início do Dia 4, registrar evidências e priorizar correção antes de qualquer nova feature | T11, T13, T14 | Leonardo + Tech Lead |
-| R2 | Integração frontend-backend-recomendação não demonstrável de ponta a ponta | Média | Alto | Desenvolvimento / Testes | Fluxo principal sem resposta, recomendações ausentes ou divergência entre contrato e frontend | Congelar novas features após Dia 4 e priorizar validação integrada antes da execução de testes finais | T10, T12, T19 | Equipe técnica |
-| R3 | Usuários externos insuficientes para teste de usabilidade | Média | Alto | Testes / Produto | Menos de cinco participantes confirmados até o fim do Dia 1 | Agendar usuários no Dia 1, manter lista reserva e confirmar disponibilidade antes da rodada | T25, T32 | Celso |
-| R4 | Documentação final divergente do board ou com placeholders residuais | Média | Alto | Versão Final / Gestão | Itens no Kanban sem reflexo nos documentos, ocorrência de "Tabela X", placeholders ou seções incompletas | Executar revisão diária de consistência e priorizar limpeza documental nos três primeiros dias | T40, T44, T45, T46, T47, T53, T59 | Mariana Lacerda + equipe |
-| R5 | Cobertura de testes e evidências insuficientes para sustentar a entrega final | Média | Alto | Testes | Ausência de logs, TRX, prints, relatórios ou análise de abrangência | Organizar evidências logo após cada execução e consolidar seção de testes antes do Dia 6 | T26, T27, T28, T29, T34, T35, T36 | Jaime + responsáveis por testes |
-| R6 | Pipeline de CI falhar por ambiente, dependências ou testes de integração classificados incorretamente | Média | Médio | Qualidade / CI | Jobs falhando por Docker/Testcontainers, NuGet, filtros de categoria ou artefatos ausentes | Revisar CI no Dia 4, separar testes unitários e integração, e validar filtros antes do congelamento | T14, T27, T29, T33 | Tech Lead + Jaime |
-| R7 | Slides, vídeo ou técnica de apresentação atrasarem por dependência de evidências finais | Média | Alto | Apresentação | Slides sem conteúdo técnico até Dia 5 ou vídeo sem ambiente funcional | Definir técnica no Dia 1, iniciar estrutura no Dia 3 e reservar Dia 6 para consolidação final | T48, T54, T57, T60, T61 | Vitor + Mariana Pereira |
-| R8 | Conflitos de branches no fechamento atrasarem merge para develop | Média | Médio | Gestão de Configuração | Muitas branches abertas em paralelo, MRs sem reviewer ou dependências implícitas | Revisar dependências diariamente, evitar branches longas e manter SLA de revisão de 24h | T40, matriz de dependências da seção 2.5.1 | Tech Lead |
-| R9 | Tipo das issues ficar inconsistente, dificultando leitura de métricas e rastreabilidade | Alta | Médio | Gestão / Métricas | Uso simultâneo de `DOCUMENTATION`, `DOCS` e tipos genéricos para trabalhos diferentes | Padronizar `DOCS` para documentação e revisar tipos conforme trabalho predominante no board | T37, T40, T41 | Scrum Master |
+Os riscos abaixo foram extraídos das retrospectivas reais de cada ciclo. A coluna "Origem" indica a sprint em que o risco foi identificado pela primeira vez; riscos recorrentes são tratados como evolutivos e acompanhados nos ciclos seguintes.
 
+| ID | Risco | Origem | Probabilidade | Impacto | Responsável |
+|----|------|--------|--------------|---------|-------------|
+| R1 | Atraso na preparação e revisão dos slides de apresentação | Sprint 1 | Alta | Alto | Responsável pelos slides / Scrum Master |
+| R2 | Atraso na condução e no encerramento das cerimônias (review/fechamento) | Sprint 1 | Média | Médio | Scrum Master |
+| R3 | Ausência de priorização e de mapeamento de dependências entre tasks | Sprint 2 | Alta | Alto | Scrum Master |
+| R4 | Inconsistência no fluxo de cards do Kanban e no padrão de commits | Sprint 2 | Alta | Médio | Equipe |
+| R5 | Acúmulo de revisões de Merge Requests no fim do ciclo | Sprint 2 | Alta | Alto | Equipe |
+| R6 | Tarefas estagnadas no estado "Doing" sem progressão | Sprint 2 | Média | Médio | Scrum Master |
+| R7 | Centralização de entregas críticas em poucos integrantes | Sprint 3 | Alta | Alto | Scrum Master |
+| R8 | Distribuição desbalanceada de carga de trabalho entre os membros | Sprint 3 | Alta | Médio | Scrum Master |
+| R9 | Divergência de detalhamento entre o documento de gestão e os cards do Kanban | Sprint 3 | Média | Médio | Equipe |
+| R10 | Atraso no início da produção após interrupção (feriado/pausa) | Sprint 4 | Alta | Alto | Scrum Master |
+| R11 | Conflitos de merge por branches críticas em desenvolvimento simultâneo | Sprint 4 | Média | Alto | Tech Lead |
+| R12 | Concentração de documentação no último dia da sprint | Sprint 4 | Média | Médio | Equipe |
 
-## 3.2 Mitigação de Riscos
+## 3.2 Mitigação de Riscos e Resultados
 
-| Risco | Estratégia de Mitigação |
-|------|------------------------|
-| R1 | Validar AWS EC2 no início do Dia 4, registrar health checks e priorizar correção antes de vídeo, Swagger e testes de RNF. |
-| R2 | Usar T12 como gate para testes e vídeo: sem integração validada, o time deve interromper novas features e corrigir o fluxo principal. |
-| R3 | Confirmar usuários externos no Dia 1, manter lista reserva e registrar a agenda antes da rodada de usabilidade. |
-| R4 | Executar revisão diária entre Kanban e documentação, com varredura de placeholders antes da revisão final. |
-| R5 | Salvar logs, TRX, prints e relatórios imediatamente após cada execução de teste, evitando consolidação manual apenas no fechamento. |
-| R6 | Separar testes unitários e integração por categoria, revisar filtros do CI e validar dependências de ambiente antes do congelamento. |
-| R7 | Definir técnica de apresentação no Dia 1, iniciar roteiro no Dia 3 e reservar Dia 6 para evidências finais e ensaio. |
-| R8 | Registrar dependências entre branches/MRs nas dailys e impedir avanço de integração sem branch base definida. |
-| R9 | Revisar tipos das issues no board: `DOCS` para documentação, `TEST` para testes, `DEV` para implementação, `INFRA` para ambiente/deploy e `REVIEW` para revisão. |
+A tabela a seguir registra, para cada risco, a estratégia de mitigação efetivamente aplicada e o resultado observado nas sprints subsequentes. O resultado é a evidência de que o registro de riscos cumpriu seu papel de instrumento de melhoria contínua, e não apenas de documentação formal.
+
+| Risco | Estratégia de Mitigação Aplicada | Resultado Observado | Status |
+|------|----------------------------------|---------------------|--------|
+| R1 | Criação de checkpoint antecipado para revisão de materiais não-técnicos e task específica de apresentação desde o Dia 1 da sprint, com roteiro, versão preliminar e ensaio. | Reincidência na Sprint 3 (slides montados um dia antes), corrigida de forma consolidada nas Sprints 4 e 5: estrutura completa pronta com dois dias de antecedência por dois ciclos consecutivos (issues #251–#253). | Mitigado |
+| R2 | Maior atenção ao planejamento das cerimônias e definição de ritual de fechamento mais estruturado, com responsabilidades claras de revisão e consolidação. | Ritual de fechamento tornou-se mais previsível a partir da Sprint 3, com a equipe chegando ao encerramento com clareza sobre o que validar e revisar. | Mitigado |
+| R3 | Construção de matriz de dependências críticas formalizando precedências técnicas antes da execução, adotada a partir da Sprint 3. | Sequenciamento técnico respeitado nas Sprints 3 e 4 (banco antes de backend, rotas antes de frontend). Na Sprint 4 a matriz perdeu força como instrumento de acompanhamento diário, motivando ação corretiva na Sprint 5. | Controlado |
+| R4 | Reforço do padrão de mensagens de commit com verificação amostral pelo Scrum Master e definição de movimentação consistente de cards (Doing → Review → Closed). | Aderência ao padrão melhorou progressivamente; o fluxo de cards tornou-se mais consistente a partir da Sprint 3, embora ainda exija checagem cruzada entre Kanban e documentação. | Controlado |
+| R5 | Estabelecimento de SLA interno de revisão de Merge Requests em até 24 horas após a abertura, evitando concentração no fim do ciclo. | Maior evolução do projeto: na Sprint 4 as revisões foram distribuídas ao longo do ciclo (Celso reviewer em 6 MRs, Mariana Reis em 3, Jaime em 2, Rafael em 1), eliminando o gargalo recorrente das Sprints 2 e 3. | Mitigado |
+| R6 | Definição de limite de WIP (máximo de duas tasks simultâneas em "Doing") e verificação diária nas dailys de tarefas estagnadas há mais de 48 horas. | Tarefas passaram a fluir com maior regularidade a partir da Sprint 3; as dailys passaram a tratar impedimentos de forma objetiva e conectada ao estado real do Kanban. | Mitigado |
+| R7 | Definição de limite de carga por integrante e exigência de dupla de apoio para entregas críticas (tasks M e G). | Reduzido na Sprint 4 (toda entrega crítica com responsável principal e apoio designado), mas persistiu desbalanceamento residual de volume (3:1 entre o membro mais e o menos ativo), exigindo reequilíbrio na Sprint 5. | Controlado |
+| R8 | Criação de tabela de alocação por pessoa relacionando responsável, apoio, tamanho da task e dependências, considerando capacidade individual no planning. | Distribuição por frentes técnicas na Sprint 4 deu responsável claro a cada frente, mas Celso e Mariana Pereira ficaram 48% e 58% abaixo da média do grupo, mantendo o risco ativo para o ciclo final. | Monitorado |
+| R9 | Expansão da descrição das tasks no documento de gestão (objetivo, entrega esperada, DoR e DoD resumidos) e checagem entre Kanban e documentação ao final das dailys. | Rastreabilidade documental melhorou a partir da Sprint 4, com planejamento compreensível fora do card. A checagem cruzada foi reforçada como rotina diária (T47) na Sprint 5. | Controlado |
+| R10 | Realização de daily de retomada no primeiro dia útil pós-interrupção, com checklist explícito garantindo ao menos uma task em "Doing" por membro. | Risco materializado na Sprint 4 (produção concentrada na segunda semana, 13 MRs nos últimos 3 dias). Ação de retomada planejada e incorporada formalmente ao planejamento da Sprint 5. | Materializado / em tratamento |
+| R11 | Mapeamento na matriz de dependências de branches que não devem evoluir em paralelo e comunicação ativa da ordem de integração no início de cada dia. | Conflitos gerenciados sem comprometer a entrega na Sprint 4, mas o risco evidenciou a necessidade de tornar a dependência entre branches um controle operacional, adotado na Sprint 5 (registro antes de entrar em Review). | Monitorado |
+| R12 | Distribuição das tasks de documentação final (post mortem, retrospectiva, atualização de artefatos) ao longo de todos os dias úteis, desde o Dia 1. | Cronograma da Sprint 5 distribui placeholders, guias, README, riscos e manual de deploy entre os três primeiros dias, evitando concentração no fechamento. | Monitorado |
+
+## 3.3 Novos Riscos Identificados na Sprint 5
+
+A Sprint 5, por ser o ciclo de encerramento, introduziu riscos próprios relacionados a acabamento, consolidação documental e preparação da entrega final ao parceiro. Esses riscos foram identificados durante o planning do ciclo e estão sob monitoramento ativo.
+
+| ID | Risco | Probabilidade | Impacto | Responsável |
+|----|------|--------------|---------|-------------|
+| R13 | Crescimento de escopo na sprint de encerramento (novas issues sem teto definido) | Alta | Médio | Scrum Master |
+| R14 | Permanência de placeholders e inconsistências formais na documentação final | Média | Alto | Equipe |
+| R15 | Falha ou instabilidade no deploy do ambiente final (servidor Inteli e nuvem comercial) | Média | Alto | Tech Lead |
+| R16 | Evidências de testes incompletas ou não registradas antes da entrega final | Média | Alto | Equipe de Testes |
+
+| Risco | Estratégia de Mitigação Planejada | Status |
+|------|-----------------------------------|--------|
+| R13 | Tratar o recorte inicial de 47 issues como base, não como teto; exigir que toda nova issue entre no Kanban com DoR, DoD, tamanho e dependências, preservando rastreabilidade mesmo com expansão do backlog. | Monitorado |
+| R14 | Concentrar a limpeza de placeholders nos três primeiros dias (T4, T5, T6, T18), com revisão completa da documentação antes da entrega (T35) e checagem dos critérios do Escritório de Projetos (T40). | Monitorado |
+| R15 | Validar o ambiente final dockerizado no servidor Inteli (T22) e tratar a nuvem comercial como diferencial não bloqueante (T21); elaborar manual de deploy a partir de um processo de implantação já validado (T32). | Monitorado |
+| R16 | Executar a rodada final de testes nos primeiros dias (T10–T15), organizar logs e evidências (T25) e consolidar a seção de testes no `Projeto.md` (T27) antes do fechamento, evitando entrega sem comprovação de validação. | Monitorado |
+
+A gestão evolutiva de riscos demonstra que o projeto tratou os pontos negativos das retrospectivas como insumo direto para o planejamento seguinte. Riscos críticos das Sprints 1 e 2 — atraso de slides, acúmulo de revisões e estagnação de tasks — foram efetivamente mitigados ao longo dos ciclos, enquanto riscos estruturais de distribuição de carga e dependências permaneceram sob monitoramento até a entrega final, refletindo a natureza recorrente e evolutiva desses desafios em um time de sete integrantes.
+
 ---
 
 # 4. Análise Post Mortem
@@ -1139,7 +1180,7 @@ Apesar dos avanços, o projeto apresentou oportunidades de melhoria importantes.
 | Reduzir concentração de trabalho em integrantes específicos | Sprint 3 e Sprint 4 registraram concentração de entregas críticas em poucas pessoas e desbalanceamento de volume. | Gera sobrecarga, risco de gargalo e dependência de conhecimento individual. | Planejar por capacidade real, criar pares de apoio em tasks críticas e medir distribuição por complexidade, não apenas por quantidade de issues. |
 | Melhorar granularidade e clareza das tasks | A Sprint 3 identificou diferença entre o detalhamento dos cards e o documento de gestão. | Dificulta rastreabilidade histórica e entendimento por revisores externos. | Padronizar issue com contexto, DoR, DoD, dependências, evidências esperadas e link para seção documental afetada. |
 | Padronizar fluxo de Kanban e commits desde o início | A Sprint 2 registrou inconsistência na movimentação dos cards e no padrão de commits. | Compromete métricas, revisão e rastreabilidade de configuração. | Fazer auditoria leve do board a cada dois dias e automatizar, quando possível, validações de branch, tipo de issue e mensagem de commit. |
-| Iniciar validação de ambiente mais cedo | Na Sprint 5, a AWS EC2 foi identificada como risco crítico; deploy, Swagger, RNFs e vídeo dependiam dela. | Uma falha de ambiente pode atrasar várias frentes simultaneamente. | Tratar deploy como entrega incremental desde o meio do projeto, com smoke tests automatizados e ambiente reserva para demonstração. |
+| Iniciar validação de ambiente mais cedo | Na Sprint 5, o servidor Inteli foi identificado como risco crítico; deploy, Swagger, RNFs e vídeo dependiam dele. | Uma falha de ambiente pode atrasar várias frentes simultaneamente. | Tratar deploy como entrega incremental desde o meio do projeto, com smoke tests automatizados e ambiente reserva para demonstração. |
 | Separar escopo de MVP de evolução futura com mais rigor | Fila assíncrona, re-ranking, métricas de diversidade, drift e algumas ações éticas ficaram planejadas, mas não implementadas. | Pode gerar expectativa maior que a capacidade real da sprint. | Manter uma lista explícita "MVP / pós-MVP", revisada em planning, para evitar que itens planejados pareçam compromisso de entrega final. |
 | Medir usabilidade com dados mais completos | Os testes SUS tiveram cinco participantes e 100% de conclusão, mas não havia dados consolidados de tempo, número de toques ou perfil etário para todos os critérios. | Parte do RNF10 ficou não conclusiva, mesmo com resultado geral positivo. | Definir planilha obrigatória com campos mínimos antes da sessão: perfil, tempo, toques, ajuda recebida, sucesso, dificuldade e observações. |
 | Evoluir acessibilidade formal | O projeto considerou mobile first, áreas de toque e persona idosa, mas não executou auditoria WCAG completa. | A experiência pode ainda ter barreiras para públicos com deficiência visual, motora ou cognitiva. | Incluir checklist WCAG/mobile accessibility em paralelo aos testes SUS e validar contraste, foco, labels e navegação por leitores de tela. |
