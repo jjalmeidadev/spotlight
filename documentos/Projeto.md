@@ -196,7 +196,7 @@
     - [5.3.2 Banco de Dados Não Relacional: MongoDB](#532-banco-de-dados-não-relacional-mongodb)
     - [5.3.3 Backend de APIs: ASP.NET Core Web API (C#, .NET 9)](#533-backend-de-apis-aspnet-core-web-api-c-net-9)
     - [5.3.4 Frontend: React Native + TypeScript](#534-frontend-react-native--typescript)
-    - [5.3.5 Comunicação de Telemetria e Fila Planejada](#535-comunicação-de-telemetria-e-fila-planejada)
+    - [5.3.5 Comunicação de Telemetria](#535-comunicação-de-telemetria)
     - [5.3.6 Motor de Recomendação: C# + ML.NET](#536-motor-de-recomendação-c--mlnet)
     - [5.3.7 Tabela de Stacks](#537-tabela-de-stacks)
 - [6. Mapeamento Técnico de Infraestrutura e Implantação](#6-mapeamento-técnico-de-infraestrutura-e-implantação)
@@ -1402,7 +1402,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 | RE09 | Modelo degradado em produção sem detecção | Beneficência / Explicabilidade | Pipeline reprodutível e publicação de artefatos versionados | Métricas de drift e re-treino agendado; alerta em queda de qualidade | Planejado | Time de Dados / DevOps |
 | RE10 | Modo dev usado por engano em produção | Não-Maleficência | Modo dev sinalizado, desligável por flag | Garantir que build de produção desabilite o modo dev por padrão | Planejado | DevOps |
 | RE11 | Falta de canal para o usuário contestar uma recomendação | Autonomia / Explicabilidade | Edição livre de preferências (RF03/RF13) | Adicionar ação "não me mostre mais este tipo" no card de recomendação | Recomendado | Produto |
-| RE12 | Telemetria perdida em falha do MongoDB compromete justiça do modelo | Justiça / Explicabilidade | Best-effort declarado e fila planejada | Implementar RabbitMQ entre serviço de usuário e MongoDB (RNF09) | Planejado (Sprint 5) | Time de Backend |
+| RE12 | Telemetria perdida em falha do MongoDB compromete justiça do modelo | Justiça / Explicabilidade | Best-effort declarado e endpoint não bloqueante | Monitoramento de falhas de gravação no MongoDB e política de retry no cliente; broker assíncrono RabbitMQ originalmente previsto foi descartado na Sprint 5 por conflito com a latência da recomendação (ver 8.3.3) | Descartado (Sprint 5); mitigação parcial via best-effort | Time de Backend |
 | RE13 | Ausência de endpoints de portabilidade e exclusão de conta exigidos pelo Art. 18 da LGPD | Autonomia / Não-Maleficência | Edição livre já cobre correção parcial | Endpoint `DELETE /usuario/me` com hard delete em PostgreSQL e MongoDB e endpoint de exportação dos dados do titular | Recomendado (pós-MVP) | Time de Backend + Jurídico |
 | RE14 | Ausência de um responsável formal pelo tratamento de dados (Encarregado / DPO) | Não-Maleficência / Explicabilidade | Documentação ética assumida pela equipe | Definir Encarregado de Dados conforme Art. 41 da LGPD ao operacionalizar com a Aventura | Recomendado | Produto + Jurídico |
 
@@ -1422,7 +1422,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 |---|---|---|
 | Sprint 3 (concluída) | RLS ativa no PostgreSQL para dados privados, validação de JWT no serviço de usuário, RF15 (cold start por popularidade global), persona idosa incluída no escopo | Não-Maleficência, Justiça |
 | Sprint 4 | Exibição do campo `motivo` no card de recomendação (consumo no frontend) e copy padronizado da explicação; testes de usabilidade SUS com participantes representativos; documentação ética (esta seção) | Explicabilidade, Justiça, Autonomia |
-| Sprint 5 | Centralização da validação de JWT no API Gateway; re-ranking com penalização de popularidade; métricas de diversidade de gênero teatral; fila RabbitMQ para telemetria; ação "não me mostre mais" no card; revisão de guideline visual entre patrocinado e personalizado | Justiça, Autonomia, Não-Maleficência |
+| Sprint 5 | Centralização da validação de JWT no API Gateway; re-ranking com penalização de popularidade; métricas de diversidade de gênero teatral; ação "não me mostre mais" no card; revisão de guideline visual entre patrocinado e personalizado; **decisão arquitetural de descartar a fila RabbitMQ** para preservar a latência das recomendações em tempo real (ver 8.3.3) | Justiça, Autonomia, Não-Maleficência |
 | Pós-MVP | Painel de monitoramento de drift do modelo; auditoria periódica de RLS; re-treino agendado; relatório semestral de impacto ético publicado junto à doc | Explicabilidade, Beneficência |
 
 <sup>Fonte: Material produzido pelos autores, 2026.</sup>
@@ -1433,7 +1433,7 @@ Como a solução gera valor financeiro ou reduz custos, justificando o investime
 
 &emsp;O Spotlight não é eticamente neutro: ele decide, em escala, o que cada usuário do Portal Aventura encontra primeiro. Aplicar o IA4People à arquitetura desde o entendimento do negócio — e ancorá-lo na LGPD — força a equipe a tratar **Beneficência** (descoberta cultural), **Não-Maleficência** (privacidade e ausência de perfilamento sensível), **Autonomia** (consentimento, edição de preferências, direitos do titular), **Justiça** (cold start, viés de popularidade, acessibilidade) e **Explicabilidade** (justificativa visível, logs, doc viva) como restrições de projeto, não como verniz a posteriori.
 
-&emsp;Boa parte das ações já está incorporada à arquitetura entregue até a Sprint 3 — RLS para dados privados, pseudonimização da telemetria, fallback de cold start por popularidade global, persona idosa, documentação aberta e campo `motivo` exposto pela API de recomendação. Permanecem lacunas honestas para as próximas sprints: exibir o `motivo` no card (a explicabilidade está disponível na API, ainda não na UI), centralizar a validação de JWT no API Gateway, evoluir o fallback de cold start para considerar segmento e região, re-ranking contra viés de popularidade, métrica de diversidade, fila resiliente de telemetria, ação de contestação no card e governança de drift. No pós-MVP, ficam endereçados os direitos do titular pela LGPD (portabilidade, exclusão) e a definição formal de Encarregado de Dados. O compromisso é tratar essas ações como entregas auditáveis, com responsável e status, e revisitar esta seção ao final de cada sprint para refletir o estado real do sistema.
+&emsp;Boa parte das ações já está incorporada à arquitetura entregue até a Sprint 3 — RLS para dados privados, pseudonimização da telemetria, fallback de cold start por popularidade global, persona idosa, documentação aberta e campo `motivo` exposto pela API de recomendação. Permanecem lacunas honestas para as próximas sprints: exibir o `motivo` no card (a explicabilidade está disponível na API, ainda não na UI), centralizar a validação de JWT no API Gateway, evoluir o fallback de cold start para considerar segmento e região, re-ranking contra viés de popularidade, métrica de diversidade, ação de contestação no card e governança de drift. A fila resiliente de telemetria, originalmente prevista, foi descartada na Sprint 5 (ver 8.3.3) para preservar a latência da recomendação. No pós-MVP, ficam endereçados os direitos do titular pela LGPD (portabilidade, exclusão) e a definição formal de Encarregado de Dados. O compromisso é tratar essas ações como entregas auditáveis, com responsável e status, e revisitar esta seção ao final de cada sprint para refletir o estado real do sistema.
 
 ### 2.9.7 Nota Metodológica e Limites da Análise
 
@@ -1457,72 +1457,72 @@ Esta seção detalha os requisitos do projeto Spotlight, apresentando a especifi
 
 ## 3.1 Requisitos Funcionais (RFs)
 
- &emsp; Os requisitos funcionais representam as funcionalidades que o sistema deverá oferecer para atender os objetivos e necessidades dos usuários da plataforma de recomendação de espetáculos da Aventura. Cada requisito define uma funcionalidade essencial do sistema, considerando tanto a experiência do usuário quanto os mecanismos de recomendação e gestão administrativa. Os testes descritos incluem pré-condição, procedimento, resultado esperado e pós-condição, garantindo a validação das funcionalidades implementadas.
+ &emsp; Os requisitos funcionais representam as funcionalidades que o sistema deverá oferecer para atender os objetivos e necessidades dos usuários da plataforma de recomendação de espetáculos da Aventura. Cada requisito define uma funcionalidade essencial do sistema, considerando tanto a experiência do usuário quanto os mecanismos de recomendação e gestão administrativa. Para atender ao feedback da Sprint 4, os critérios de aceitação foram separados dos procedimentos de validação: o critério descreve a condição objetiva de aprovação do requisito, enquanto o procedimento indica como essa condição será exercitada nos testes planejados nas seções 9.1, 9.3 e 9.4.
 
 <div align="center"> <sub>Tabela 6 - Requisitos funcionais</sub>
 
 #### Autenticação e Perfil
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF01 | Como usuário, eu quero me cadastrar na plataforma informando meus dados pessoais (como nome, email e senha) para acessar funcionalidades personalizadas e utilizar o sistema de recomendação. | Usuário não autenticado. | Inserir dados válidos e inválidos e submeter cadastro. | Usuário cadastrado com sucesso quando dados são válidos; mensagens de erro exibidas para campos inválidos. | Usuário registrado no sistema. |
-| RF02 | Como usuário, eu quero realizar login informando meu email e senha para acessar minha conta e meus dados personalizados. | Usuário previamente cadastrado. | Inserir credenciais válidas e inválidas. | Acesso permitido com credenciais válidas; erro exibido para dados incorretos. | Sessão autenticada iniciada. |
-| RF03 | Como usuário, eu quero definir minhas preferências (como gênero, faixa de preço e localização) para receber recomendações mais relevantes e alinhadas ao meu perfil. | Usuário autenticado. | Selecionar preferências e salvar. | Preferências armazenadas corretamente no sistema. | Perfil do usuário atualizado. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF01 | Como usuário, eu quero me cadastrar na plataforma informando meus dados pessoais (como nome, email e senha) para acessar funcionalidades personalizadas e utilizar o sistema de recomendação. | Usuário não autenticado. | Cadastro válido cria conta autenticável; dados inválidos são rejeitados com mensagem clara e sem criação de usuário inconsistente. | Executar cenários de cadastro com dados válidos, campos obrigatórios ausentes e credenciais inválidas, conforme testes funcionais e integração de autenticação. | Usuário registrado no sistema quando os dados forem válidos. |
+| RF02 | Como usuário, eu quero realizar login informando meu email e senha para acessar minha conta e meus dados personalizados. | Usuário previamente cadastrado. | Credenciais válidas iniciam sessão; credenciais inválidas bloqueiam o acesso e exibem erro sem iniciar sessão. | Executar login com credenciais válidas, senha incorreta e usuário inexistente. | Sessão autenticada iniciada apenas para credenciais válidas. |
+| RF03 | Como usuário, eu quero definir minhas preferências (como gênero, faixa de preço e localização) para receber recomendações mais relevantes e alinhadas ao meu perfil. | Usuário autenticado. | Preferências selecionadas são persistidas e recuperadas no perfil do usuário sem perda de categorias, gêneros ou faixa de preço. | Selecionar preferências no onboarding ou edição de perfil, salvar e consultar os dados persistidos. | Perfil do usuário atualizado. |
 
 ---
 
 #### Exploração e Navegação
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF04 | Como usuário, eu quero visualizar recomendações personalizadas com base no meu perfil e comportamento na plataforma para descobrir espetáculos alinhados aos meus interesses. | Usuário autenticado com ou sem histórico de interações. | Acessar tela inicial do sistema. | Lista com no mínimo 5 recomendações exibida, ordenada por relevância, contendo título, categoria, data e indicação de personalização (ex: “baseado nas suas preferências”). | Recomendações exibidas ao usuário. |
-| RF05 | Como usuário, eu quero pesquisar espetáculos por nome ou palavra-chave para encontrar conteúdos específicos. | Base de espetáculos disponível. | Inserir termo de busca válido e inválido. | Lista de resultados correspondente ao termo pesquisado ou mensagem de “nenhum resultado encontrado”. | Lista filtrada exibida. |
-| RF06 | Como usuário, eu quero filtrar espetáculos por categoria, data e faixa de preço para refinar minha busca. | Lista de espetáculos carregada. | Aplicar diferentes combinações de filtros. | Lista atualizada conforme filtros selecionados. | Lista refinada exibida ao usuário. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF04 | Como usuário, eu quero visualizar recomendações personalizadas com base no meu perfil e comportamento na plataforma para descobrir espetáculos alinhados aos meus interesses. | Usuário autenticado com ou sem histórico de interações. | A tela inicial exibe recomendações relevantes e identificáveis, com fallback por popularidade quando não houver histórico suficiente. | Acessar a tela inicial com usuários com histórico, sem histórico e com preferências distintas. | Recomendações exibidas ao usuário. |
+| RF05 | Como usuário, eu quero pesquisar espetáculos por nome ou palavra-chave para encontrar conteúdos específicos. | Base de espetáculos disponível. | Termos existentes retornam espetáculos compatíveis; termos sem correspondência exibem estado vazio compreensível. | Inserir termos de busca válidos, parciais e sem resultado. | Lista filtrada exibida. |
+| RF06 | Como usuário, eu quero filtrar espetáculos por categoria, data e faixa de preço para refinar minha busca. | Lista de espetáculos carregada. | Filtros aplicados alteram a lista de acordo com os critérios selecionados e podem ser combinados sem quebrar a navegação. | Aplicar filtros isolados e combinados, incluindo combinações com poucos ou nenhum item. | Lista refinada exibida ao usuário. |
 
 ---
 
 #### Conteúdo
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF07 | Como usuário, eu quero visualizar detalhes completos de um espetáculo para avaliar se tenho interesse em assisti-lo. | Espetáculo disponível no sistema. | Acessar página de detalhes do espetáculo. | Exibição de informações completas como descrição, categoria, data, horário, preço e local. | Dados apresentados ao usuário. |
-| RF08 | Como usuário, eu quero visualizar avaliações de outros usuários para apoiar minha decisão sobre assistir ou não a um espetáculo. | Avaliações cadastradas para o espetáculo. | Acessar seção de avaliações. | Lista de avaliações exibida corretamente, contendo nota e comentário. | Avaliações visíveis ao usuário. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF07 | Como usuário, eu quero visualizar detalhes completos de um espetáculo para avaliar se tenho interesse em assisti-lo. | Espetáculo disponível no sistema. | A página de detalhes apresenta informações suficientes para decisão do usuário, incluindo título, descrição, categoria, preço, local e ação de compra quando disponível. | Abrir detalhes a partir do catálogo e de recomendações, verificando campos obrigatórios e comportamento com dados opcionais ausentes. | Dados apresentados ao usuário. |
+| RF08 | Como usuário, eu quero visualizar avaliações de outros usuários para apoiar minha decisão sobre assistir ou não a um espetáculo. | Avaliações cadastradas para o espetáculo. | Avaliações disponíveis são exibidas com nota e comentário; ausência de avaliações apresenta estado vazio sem erro. | Acessar seção de avaliações de espetáculos com e sem avaliações cadastradas. | Avaliações visíveis ao usuário quando existirem. |
 
 ---
 
 #### Engajamento
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF09 | Como usuário, eu quero avaliar espetáculos atribuindo uma nota para expressar minha opinião e contribuir com o sistema. | Usuário autenticado. | Inserir nota válida e submeter. | Avaliação registrada corretamente no sistema. | Avaliação armazenada. |
-| RF10 | Como usuário, eu quero comentar sobre espetáculos para compartilhar minha experiência com outros usuários. | Usuário autenticado. | Inserir comentário válido e enviar. | Comentário exibido corretamente na página do espetáculo. | Comentário registrado no sistema. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF09 | Como usuário, eu quero avaliar espetáculos atribuindo uma nota para expressar minha opinião e contribuir com o sistema. | Usuário autenticado. | Nota válida é persistida para o espetáculo e associada ao usuário; nota inválida ou usuário não autenticado não gera avaliação. | Enviar avaliações com nota válida, nota fora do intervalo permitido e sessão ausente. | Avaliação armazenada quando válida. |
+| RF10 | Como usuário, eu quero comentar sobre espetáculos para compartilhar minha experiência com outros usuários. | Usuário autenticado. | Comentário válido é persistido e exibido no contexto do espetáculo; comentário vazio ou usuário não autenticado é rejeitado. | Enviar comentário válido, vazio e sem autenticação, verificando persistência e exibição. | Comentário registrado no sistema quando válido. |
 
 ---
 
 #### Coleta de Dados
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF11 | Como sistema, eu quero registrar interações dos usuários (como cliques, buscas, visualizações e avaliações) para alimentar e melhorar continuamente o algoritmo de recomendação. | Usuário interagindo com a plataforma. | Realizar diferentes tipos de interação no sistema. | Registro contendo ID do usuário, ID do espetáculo, tipo de ação e timestamp, sem impacto perceptível na navegação. | Dados armazenados para uso no algoritmo. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF11 | Como sistema, eu quero registrar interações dos usuários (como cliques, buscas, visualizações e avaliações) para alimentar e melhorar continuamente o algoritmo de recomendação. | Usuário interagindo com a plataforma. | Eventos relevantes são registrados com identificador de usuário ou sessão, espetáculo quando aplicável, tipo de ação e timestamp, sem bloquear a navegação. | Executar cliques, buscas, visualizações e avaliações, conferindo persistência da telemetria no MongoDB Atlas ou retorno best-effort controlado. | Dados armazenados para uso no algoritmo quando a telemetria estiver disponível. |
 
 ---
 
 #### Recomendação
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF12 | Como sistema, eu quero gerar recomendações personalizadas com base nas preferências declaradas e no histórico de interações do usuário para oferecer sugestões relevantes e contextualizadas. | Dados de preferências e histórico disponíveis. | Gerar recomendações para usuário com histórico. | Lista de recomendações personalizada exibida corretamente. | Recomendações geradas. |
-| RF13 | Como sistema, eu quero atualizar as recomendações após novas interações do usuário para tornar as sugestões progressivamente mais precisas ao longo do uso. | Novas interações registradas. | Realizar nova interação e atualizar recomendações. | Recomendações ajustadas conforme comportamento recente do usuário. | Recomendações atualizadas. |
-| RF14 | Como sistema, eu quero recomendar conteúdos com base em usuários com perfis e comportamentos semelhantes (filtragem colaborativa). | Base de usuários com interações registrada. | Comparar perfis e gerar recomendações. | Itens recomendados com base na similaridade entre usuários. | Recomendações exibidas. |
-| RF15 | Como sistema, eu quero recomendar conteúdos populares para usuários com pouco ou nenhum histórico de interação. | Usuário novo ou com baixa interação. | Acessar sistema com usuário sem histórico. | Lista de recomendações baseada em popularidade exibida. | Recomendações exibidas ao usuário. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF12 | Como sistema, eu quero gerar recomendações personalizadas com base nas preferências declaradas e no histórico de interações do usuário para oferecer sugestões relevantes e contextualizadas. | Dados de preferências e histórico disponíveis. | A API retorna lista de recomendações compatível com preferências e histórico, sem duplicidades indevidas e respeitando o limite solicitado. | Gerar recomendações para usuários com preferências e histórico conhecidos, comparando categorias, gêneros e ordenação retornada. | Recomendações geradas. |
+| RF13 | Como sistema, eu quero atualizar as recomendações após novas interações do usuário para tornar as sugestões progressivamente mais precisas ao longo do uso. | Novas interações registradas. | Interações recentes influenciam a composição ou justificativa das recomendações em nova consulta. | Registrar nova interação, consultar recomendações novamente e comparar variação esperada nos itens ou justificativas. | Recomendações atualizadas. |
+| RF14 | Como sistema, eu quero recomendar conteúdos com base em usuários com perfis e comportamentos semelhantes (filtragem colaborativa). | Base de usuários com interações registrada. | A fileira colaborativa retorna itens relacionados a usuários semelhantes, sem depender apenas de popularidade global. | Executar cenário com usuários de perfis próximos e verificar recomendações user based. | Recomendações colaborativas exibidas. |
+| RF15 | Como sistema, eu quero recomendar conteúdos populares para usuários com pouco ou nenhum histórico de interação. | Usuário novo ou com baixa interação. | Usuários em cold start recebem recomendações por popularidade ou fallback documentado, evitando lista vazia. | Acessar o sistema com usuário novo ou sem histórico e consultar recomendações. | Recomendações exibidas ao usuário. |
 
 ---
 
 #### Administração
 
-| RF | Requisito Funcional | Pré-condição | Procedimento de Teste | Resultado Esperado | Pós-condição |
-|----|---------------------|--------------|------------------------|---------------------|---------------|
-| RF16 | Como administrador, eu quero gerenciar conteúdos da plataforma (espetáculos, categorias e avaliações) para garantir a atualização, consistência e qualidade das informações exibidas aos usuários. | Administrador autenticado. | Criar, editar e remover conteúdos no sistema. | Alterações refletidas corretamente na plataforma. | Sistema atualizado. |
+| RF | Requisito Funcional | Pré-condição | Critério de Aceitação | Procedimento de Validação | Pós-condição |
+|----|---------------------|--------------|------------------------|---------------------------|---------------|
+| RF16 | Como administrador, eu quero gerenciar conteúdos da plataforma (espetáculos, categorias e avaliações) para garantir a atualização, consistência e qualidade das informações exibidas aos usuários. | Administrador autenticado. | Usuário administrador consegue criar, editar, remover ou promover dados permitidos; usuário comum não acessa ações administrativas. | Executar ações administrativas autenticado como admin e repetir tentativa com usuário sem permissão. | Sistema atualizado apenas por usuário autorizado. |
 </div>
 
 ## 3.2 Requisitos Não Funcionais (RNFs)
@@ -3193,7 +3193,7 @@ Esta seção descreve a solução técnica adotada para o Spotlight, incluindo d
 
 ## 5.2 Diagrama de Componentes UML
 
-Um diagrama de componentes é um modelo arquitetural da UML que representa os principais módulos de um sistema, suas responsabilidades e a forma como eles se comunicam entre si. Ele é importante para o Spotlight porque permite visualizar claramente a separação entre frontend, APIs, motor de recomendação e bancos de dados, facilitando o entendimento da arquitetura, a escalabilidade e a manutenção do sistema. Além disso, o diagrama evidencia como os serviços trabalham com fronteiras claras, com telemetria persistida no MongoDB Atlas pelo serviço de usuário e mensageria planejada como evolução da Sprint 5.
+Um diagrama de componentes é um modelo arquitetural da UML que representa os principais módulos de um sistema, suas responsabilidades e a forma como eles se comunicam entre si. Ele é importante para o Spotlight porque permite visualizar claramente a separação entre frontend, APIs, motor de recomendação e bancos de dados, facilitando o entendimento da arquitetura, a escalabilidade e a manutenção do sistema. Além disso, o diagrama evidencia como os serviços trabalham com fronteiras claras, com telemetria persistida diretamente no MongoDB Atlas pelo serviço de usuário. O componente de mensageria (RabbitMQ) presente em revisões anteriores do diagrama foi formalmente abandonado na Sprint 5 — ver 8.3.3 para a justificativa da decisão.
 
 <div align="center">
 
@@ -3233,7 +3233,7 @@ O **ML Engine**, componente especializado e isolado, responsável por processar 
 
 ### Mensageria
 
-O **RabbitMQ** está planejado para a Sprint 5 como *message broker* para desacoplar a ingestão de telemetria. No estado atual, a telemetria é enviada por HTTP ao Gateway e persistida diretamente pelo serviço de usuário no MongoDB Atlas.
+O **RabbitMQ** foi originalmente planejado para a Sprint 5 como *message broker* para desacoplar a ingestão de telemetria, mas o componente foi **descartado na Sprint 5** após revisão técnica, por conflito com o requisito de latência das recomendações em tempo próximo ao real (ver 8.3.3). A telemetria é enviada por HTTP ao Gateway e persistida diretamente pelo serviço de usuário no MongoDB Atlas, sem broker intermediário.
 
 ### Camada de Dados
 
@@ -3255,7 +3255,7 @@ Infraestrutura de persistência segregada por perfil de carga, contendo:
 | **Serviço de Recomendação** | Orquestração do fluxo de sugestões, consultando predições pré-processadas pelo Motor de ML. | ASP.NET Core Web API |
 | **Serviço de Geolocalização** | Normalização de localização, consulta de proximidade e integração com OpenStreetMap/Nominatim para apoiar recomendações contextuais. | ASP.NET Core Web API |
 | **Motor de ML** | Processamento de algoritmos de filtragem colaborativa (k-NN, SVD) para geração de recomendações. | C# + ML.NET |
-| **Fila de telemetria (Sprint 5)** | Message broker planejado para enfileiramento, retry e dead-letter de eventos de telemetria. | RabbitMQ ou equivalente |
+| **Fila de telemetria (descartada na Sprint 5)** | Message broker originalmente previsto para enfileiramento, retry e dead-letter de eventos de telemetria; descartado por penalizar a latência da recomendação em tempo real (ver 8.3.3). | RabbitMQ ou equivalente — não implementado |
 | **Supabase Auth** | Provedor de Identidade, responsável por autenticação e emissão de tokens JWT. | Supabase Auth |
 | **OpenStreetMap/Nominatim API** | API externa para geocodificação e geocodificação reversa entre localização do usuário e endereços normalizados. | OpenStreetMap/Nominatim |
 | **Supabase DB (PostgreSQL)** | Banco de dados relacional primário para perfis, catálogo e metadados transacionais. | PostgreSQL via Supabase |
@@ -3353,15 +3353,15 @@ Responsabilidades centrais:
 
 Isso evita validações repetitivas de token em cada serviço interno.
 
-#### Telemetria Comportamental no MVP
+#### Telemetria Comportamental
 
-Aplicações mobile geram grande volume de eventos e telemetria.
+Aplicações mobile geram grande volume de eventos e telemetria. O fluxo adotado prioriza simplicidade operacional e validação ponta a ponta: o app envia eventos para `POST /usuario/telemetria`, o Gateway encaminha para o serviço de usuário, e o serviço valida o contrato antes de gravar os documentos na collection `interacoes` do MongoDB Atlas.
 
 Na Sprint 4, o fluxo implementado prioriza simplicidade operacional e validação ponta a ponta: o app envia eventos para `POST /usuario/telemetria`, o Gateway encaminha para o serviço de usuário, e o serviço valida o contrato antes de gravar os documentos na collection `interacoes` do MongoDB Atlas.
 
-O envio no frontend é fire-and-forget e o backend trata a persistência como best-effort após a validação do payload. Assim, falhas transitórias do MongoDB não quebram a navegação do usuário, embora eventos possam ser perdidos enquanto a fila ainda não existir.
+O envio no frontend é fire-and-forget e o backend trata a persistência como best-effort após a validação do payload. Assim, falhas transitórias do MongoDB não quebram a navegação do usuário, embora eventos possam eventualmente ser perdidos — limitação aceita conscientemente como contrapartida pela redução da latência (ver 8.3.3).
 
-O desacoplamento via RabbitMQ fica planejado para a Sprint 5. Quando implementado, a fila deve entrar entre o serviço de usuário e o MongoDB, mantendo o schema atual e adicionando retry, dead-letter e maior resiliência operacional.
+O desacoplamento via RabbitMQ foi avaliado e **descartado na Sprint 5** (ver 8.3.3). A fila introduziria um salto adicional entre a interação do usuário e a disponibilidade do sinal comportamental para o motor de ML, conflitando com o RNF02. A reintrodução do broker permanece tecnicamente viável apenas se um cenário futuro de produção apresentar saturação real do caminho síncrono.
 
 #### Separação entre Transacional e Analítico
 
@@ -3430,11 +3430,11 @@ TypeScript adiciona tipagem estática, especialmente relevante num contexto com 
 
 O gerenciamento de estado é feito com **Redux Toolkit** e **RTK Query**, que eliminam boilerplate e tratam o caching de requisições de forma declarativa.
 
-### 5.3.5 Comunicação de Telemetria e Fila Planejada
+### 5.3.5 Comunicação de Telemetria
 
 Na implementação corrente, cada interação relevante do usuário (sessão, visualização de tela, clique em card, busca, visualização de espetáculo, favorito e clique de compra) é enviada por HTTP para o Gateway e persistida pelo serviço de usuário no MongoDB Atlas.
 
-RabbitMQ permanece como evolução planejada para a Sprint 5. A fila será útil para desacoplamento temporal, retry, dead-letter e redução de perda de eventos, mas não é dependência do fluxo atual de telemetria.
+O RabbitMQ foi documentado em sprints anteriores como evolução planejada para esta camada, mas o broker foi **descartado na Sprint 5** (ver 8.3.3). A motivação foi preservar a latência percebida na geração de recomendações, sustentando o requisito de personalização em tempo próximo ao real, em vez de privilegiar resiliência operacional cujo ganho seria marginal frente ao volume real de telemetria observado no MVP.
 
 ### 5.3.6 Motor de Recomendação: C# + ML.NET
 
@@ -3444,7 +3444,7 @@ O motor de recomendação é implementado como um serviço C# separado utilizand
 - **SVD**: para usuários com histórico. Fatora a matriz usuário × espetáculo e gera predições de afinidade latente.
 - **k-means**: para segmentação de público. Agrupa espectadores em clusters comportamentais (ex.: Famílias, Musical Adulto, Ballet Clássico, Experimental), alimentando relatórios de marketing.
 
-A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à capacidade de rodar os três algoritmos de forma nativa, sem dependências externas. A integração entre recomendação, avaliações relacionais e telemetria comportamental deve consumir PostgreSQL e MongoDB como fontes de dados; a comunicação por fila fica reservada para a Sprint 5.
+A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à capacidade de rodar os três algoritmos de forma nativa, sem dependências externas. A integração entre recomendação, avaliações relacionais e telemetria comportamental consome PostgreSQL e MongoDB diretamente como fontes de dados; a comunicação por fila foi descartada na Sprint 5 para não introduzir latência adicional entre a interação do usuário e o re-ranqueamento (ver 8.3.3).
 
 ### 5.3.7 Tabela de Stacks
 
@@ -3457,7 +3457,7 @@ A escolha do ML.NET em vez de Python se deve à obrigatoriedade da stack C# e à
 | Armazenamento       | Supabase Storage                    | Assets de espetáculos via CDN |
 | API Gateway         | ASP.NET Core (.NET 9)               | Roteamento · validação JWT · rate limiting |
 | Serviços SOA        | ASP.NET Core Web API (C#)           | Obrigatoriedade · maturidade · DI nativa |
-| Mensageria          | RabbitMQ (Sprint 5)                 | Desacoplamento futuro de telemetria, retry e dead-letter |
+| Mensageria          | RabbitMQ — descartado na Sprint 5   | Originalmente planejado para desacoplamento de telemetria; abandonado para preservar a latência da recomendação (ver 8.3.3) |
 | Motor de ML         | C# + ML.NET                         | Obrigatoriedade C# · k-NN, SVD, k-means nativos |
 
 # 6. Mapeamento Técnico de Infraestrutura e Implantação
@@ -4401,9 +4401,9 @@ g04/
    │  │  ├─ recommendation/     # Spotlight.Recommendation (5003) — IRecommendation (ML.NET)
    │  │  └─ geolocation/        # Spotlight.Geolocation (5004) — IGeolocation (Nominatim)
    │  ├─ ml-engine/             # motor de ML do backend
-   │  │  ├─ data-preparation/   # reservado (placeholder)
+   │  │  ├─ data-preparation/   # reservado para evolução futura
    │  │  ├─ training/           # Spotlight.Recommendation.ModelTraining — treino ML.NET
-   │  │  └─ inference/          # reservado (placeholder)
+   │  │  └─ inference/          # reservado para evolução futura
    │  ├─ scripts/               # scripts utilitários (ex.: E2E telemetria)
    │  └─ tests/                 # projetos de testes por serviço + RNF
    │     ├─ Spotlight.Catalog.Tests/
@@ -4745,15 +4745,15 @@ Responsabilidades detalhadas:
 - Lê dados estruturados do Supabase DB (PostgreSQL) via interface SQL.
 - Componente isolado — não exposto diretamente ao Gateway.
 
-**Fila de eventos (planejada para Sprint 5)**
+**Fila de eventos (descartada na Sprint 5)**
 
 | Componente | Tecnologia | Responsabilidade |
 |---|---|---|
-| Fila de telemetria | RabbitMQ ou broker equivalente | Desacoplar a ingestão de eventos, permitir retry/dead-letter e reduzir perda de eventos quando MongoDB/Atlas estiver indisponível |
+| Fila de telemetria | RabbitMQ ou broker equivalente | Originalmente prevista para desacoplar a ingestão de eventos e permitir retry/dead-letter; descartada por penalizar a latência da recomendação em tempo real (ver 8.3.3) |
 
-- Este componente ainda não faz parte da implementação corrente da Sprint 4.
-- A escrita atual de telemetria é direta: App → Gateway → Serviço do Usuário → MongoDB Atlas.
-- Na Sprint 5, a fila pode ser inserida entre o serviço do usuário e o MongoDB sem alterar o schema principal da collection `interacoes`.
+- Este componente **não foi implementado** e foi formalmente abandonado na Sprint 5.
+- A escrita de telemetria permanece direta e síncrona: App → Gateway → Serviço do Usuário → MongoDB Atlas.
+- A decisão preserva a latência do caminho que alimenta o motor de recomendação, alinhada ao RNF02 e à proposta de valor descrita em 2.3.2.
 
 ##### 6. Camada de Dados (Persistência Poliglota)
 
@@ -4766,7 +4766,7 @@ Responsabilidades detalhadas:
 
 Supabase DB é utilizado por: Serviço do Usuário, Serviço do Catálogo, Serviço de Recomendação e rotinas/modelos de recomendação (leitura via SQL).
 
-MongoDB é utilizado por: Serviço do Usuário para escrita de telemetria bruta. Na Sprint 5, esse papel pode ser movido para um consumer de fila.
+MongoDB é utilizado por: Serviço do Usuário para escrita de telemetria bruta, em modelo síncrono. A possibilidade de mover esse papel para um consumer de fila foi avaliada e descartada na Sprint 5 (ver 8.3.3).
 
 #### Interfaces do Sistema
 
@@ -4853,7 +4853,7 @@ Fonte: Material produzido pelos autores (2026).
 | Controle de acesso | RBAC (usuario, admin) | Separação clara entre perfis de uso |
 | Banco relacional | PostgreSQL via Supabase | Dados estruturados, integridade referencial |
 | Banco de telemetria | MongoDB | Alto volume, esquema flexível, sem onerar o relacional |
-| Mensageria | RabbitMQ planejado para Sprint 5 | Desacoplamento futuro de eventos, retry e dead-letter sem alterar o schema MongoDB |
+| Mensageria | Descartada na Sprint 5 | RabbitMQ era a opção originalmente prevista; abandonada para não comprometer a latência da recomendação em tempo real (ver 8.3.3) |
 | Motor de ML | ML.NET | Ecossistema .NET, integração nativa com os serviços SOA |
 | Containerização | Docker + Docker Compose | Portabilidade entre ambientes dev/prod |
 
@@ -5260,7 +5260,7 @@ personalizadas em vez de depender apenas de conteúdo estático.
 | Telemetria comportamental | [`TelemetriaController.cs`](../src/backend/services/usuario/presentation/controllers/TelemetriaController.cs), [`TelemetriaService.cs`](../src/backend/services/usuario/application/usecases/TelemetriaService.cs), [`MongoTelemetriaRepository.cs`](../src/backend/services/usuario/infrastructure/persistence/MongoTelemetriaRepository.cs), [`TelemetryRepository.ts`](../src/frontend/repositories/TelemetryRepository.ts), [`useTelemetrySession.ts`](../src/frontend/hooks/useTelemetrySession.ts) | A Sprint 3 não persistia eventos comportamentais; a Sprint 4 adicionou contrato, validação, envio pelo app e gravação no MongoDB Atlas. |
 | Banco de dados e governança de acesso | [`06_indexes.sql`](../src/database/migrations/06_indexes.sql), [`09_espetaculo_midia.sql`](../src/database/migrations/09_espetaculo_midia.sql), [`11_seed_recomendacao_incremental.sql`](../src/database/migrations/11_seed_recomendacao_incremental.sql), [`12_controle_acesso_administrativo_catalogo.sql`](../src/database/migrations/12_controle_acesso_administrativo_catalogo.sql), [`13_rls_similaridade_item_avaliacao.sql`](../src/database/migrations/13_rls_similaridade_item_avaliacao.sql) | O banco ganhou índices, mídia de catálogo, seeds incrementais de recomendação, controle administrativo e policies RLS para tabelas novas ou sensíveis. |
 | Contratos, Swagger e documentação técnica | [`api-contracts.md`](../src/backend/contracts/api-contracts.md), [`openapi.json`](../src/backend/contracts/openapi.json), [`telemetria.md`](../src/backend/contracts/telemetria.md), [`supabase-storage.md`](../src/backend/contracts/supabase-storage.md) | A documentação técnica passou a cobrir recomendação, similares, telemetria e storage, reduzindo divergência entre contrato e implementação. |
-| Validação automatizada | [`RecomendacaoServiceTests.cs`](../src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoServiceTests.cs), [`RecomendacaoBaseControllerTests.cs`](../src/backend/tests/Spotlight.Recomendacao.Tests/RecomendacaoBaseControllerTests.cs), [`MongoTelemetryIndexesTests.cs`](../src/backend/tests/Spotlight.Usuario.Tests/MongoTelemetryIndexesTests.cs), [`TelemetriaMongoIntegrationTests.cs`](../src/backend/tests/Spotlight.Usuario.Tests/TelemetriaMongoIntegrationTests.cs), [`Test-TelemetriaAtlasE2E.ps1`](../src/backend/scripts/Test-TelemetriaAtlasE2E.ps1) | A Sprint 4 ampliou a validação além do fluxo manual, cobrindo recomendação, health checks, índices MongoDB, integração Mongo opt-in e validação E2E com Atlas. |
+| Validação automatizada | [`RecomendacaoServiceTests.cs`](../src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoServiceTests.cs), [`RecomendacaoBaseControllerTests.cs`](../src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoBaseControllerTests.cs), [`MongoTelemetryIndexesTests.cs`](../src/backend/tests/Spotlight.User.Tests/MongoTelemetryIndexesTests.cs), [`TelemetriaMongoIntegrationTests.cs`](../src/backend/tests/Spotlight.User.Tests/TelemetriaMongoIntegrationTests.cs), [`Test-TelemetriaAtlasE2E.ps1`](../src/backend/scripts/Test-TelemetriaAtlasE2E.ps1) | A Sprint 4 ampliou a validação além do fluxo manual, cobrindo recomendação, health checks, índices MongoDB, integração Mongo opt-in e validação E2E com Atlas. |
 | Execução e infraestrutura local | [`docker-compose.yml`](../docker-compose.yml), [`catalogo/Dockerfile`](../src/backend/services/catalogo/Dockerfile), [`recomendacao/Dockerfile`](../src/backend/services/recomendacao/Dockerfile), [`usuario/Dockerfile`](../src/backend/services/usuario/Dockerfile), [`.gitlab-ci.yml`](../.gitlab-ci.yml) | O ambiente ganhou suporte mais claro para execução dos serviços backend, variáveis centralizadas e pipeline de CI para reduzir regressões entre branches. |
 
 ### Fluxo Principal Entregue
@@ -5375,7 +5375,7 @@ Como parte da finalizacao das features pendentes, o aplicativo mobile foi revisa
 | Alternancia de visao | Usuarios administradores podem alternar entre a navegacao normal do aplicativo e a visao administrativa sem novo login. | `App.js`, `src/frontend/screens/CatalogView.tsx`, `src/frontend/screens/AdminDashboardScreen.tsx` |
 | Higiene de entrega | Remocao de logs de depuracao, botao de modo desenvolvedor, rotulos mockados no grafico de sessoes e mensagens auxiliares nao necessarias na interface final. | `App.js`, `src/frontend/screens/LoginView.tsx`, `src/frontend/screens/AdminDashboardScreen.tsx` |
 
-#### Validacoes executadas
+#### Validações executadas
 
 | Comando | Resultado |
 |---|---|
@@ -5384,11 +5384,30 @@ Como parte da finalizacao das features pendentes, o aplicativo mobile foi revisa
 | `docker compose -f docker-compose.dev.yml config --quiet` | Aprovado; a configuracao do ambiente de desenvolvimento e valida. |
 | `docker compose -f docker-compose.prod.yml config --quiet` | Aprovado; a configuracao do ambiente de producao e valida. |
 
-#### Limitacoes conhecidas apos a finalizacao
+#### Limitações conhecidas apos a finalização
 
-O aplicativo ainda nao persiste sessao local apos fechar e reabrir o app. Essa decisao evita armazenar tokens sensiveis no dispositivo sem uma camada dedicada de armazenamento seguro, como SecureStore, e mantem o login explicito como fluxo padrao desta versao. Alem disso, o dashboard administrativo permite promocao de administradores e consulta de indicadores reais, mas nao implementa uma interface completa de CRUD de espetaculos; as rotas administrativas de catalogo permanecem disponiveis no backend.
+O aplicativo ainda nao persiste sessão local apos fechar e reabrir o app. Essa decisão evita armazenar tokens sensíveis no dispositivo sem uma camada dedicada de armazenamento seguro, como SecureStore, e mantem o login explícito como fluxo padrão desta versão. Além disso, o dashboard administrativo permite promocão de administradores e consulta de indicadores reais, mas não implementa uma interface completa de CRUD de espetáculos; as rotas administrativas de catálogo permanecem disponíveis no backend.
 
-#### Revisao final do pipeline de CI
+#### Decisão Arquitetural: Abandono do RabbitMQ
+
+Durante as sprints anteriores, o RabbitMQ foi documentado como evolução planejada para a Sprint 5, com o papel de desacoplar a ingestao de telemetria entre o Servico do Usuario e o MongoDB, adicionando retry, dead-letter e maior resiliência operacional. 
+
+Na Sprint 5, após revisão técnica orientada pela mentoria do professor responsável, decidimos **abandonar o componente RabbitMQ** do escopo do MVP. A decisão foi motivada pelo conflito entre o ganho marginal de resiliÊncia trazido pela fila e o impacto direto desse desacoplamento sobre a latência percebida na geração de recomendações, que e o requisito central do produto (RNF02, recomendacoes em ate 2 segundos).
+
+| Eixo de análise | Motivação para o abandono |
+|---|---|
+| Latencia da recomendação | A fila introduz um salto adicional (publisher → broker → consumer → MongoDB) entre a interação do usuário e a disponibilidade do sinal comportamental para o motor de ML. Esse atraso compromete a capacidade de reagir, em tempo próximo ao real, a sinais recentes de navegacao, justamente o diferencial visado pelo produto. |
+| Custo de propagação de sinal | Com persistencia direta no MongoDB Atlas, os eventos ficam imediatamente consultaveis pelo motor de recomendação, sustentando o requisito de personalização dinamica descrito em 2.3 e em RF13/RF14. A fila, ao contrário, criaria janela de eventual consistency entre o evento e o re-ranqueamento. |
+| Complexidade operacional | A inclusão do broker exigiria sustentar mais um componente (publisher, consumer, exchange, dead-letter), configuração de Testcontainers em CI, monitoramento adicional e procedimentos de recuperação, sem retorno proporcional dentro do horizonte do MVP. |
+| Volume real de telemetria | A volumetria observada nos testes funcionais e de RNF (secao 9.2.2) não caracteriza saturação do caminho síncrono atual. O cenário que justificaria a fila — picos sustentados acima da capacidade de escrita do MongoDB — não se materializa no escopo do projeto. |
+| Tolerância atual a perdas | A telemetria ja e tratada como *best-effort* no backend: o endpoint retorna `202 Accepted` mesmo em caso de falha transitoria do MongoDB, sem bloquear a UX. Essa política, combinada ao volume real de eventos, mantem o impacto de perdas em patamar aceitável para o MVP. |
+| Alinhamento com a proposta de valor | A seção 2.3.2 estabelece como entrega central transformar atenção em descoberta e descoberta em conversão. Privilegiar a latência da recomendação em detrimento do desacoplamento assíncrono reforça essa proposta no estado atual do produto. |
+
+Como consequência, o fluxo de telemetria permanece com o desenho ja consolidado: **App → API Gateway → Servico do Usuario → MongoDB Atlas**, sem broker intermediário. As referências ao RabbitMQ presentes em seções anteriores (5.2, 5.3.5, 5.3.7, 6, 8.1, 9, 9.2 e 9.4) foram atualizadas para refletir o abandono do componente, apontando para esta subseção como justificativa de decisão. O caso de teste IT-05 e o RNF09 permanecem documentados apenas como registro histórico do desenho originalmente previsto, marcados explicitamente como *não aplicáveis nesta versão*.
+
+A reintrodução de uma fila de mensageria continua sendo uma evolução técnicamente viável para um cenário futuro de produção com volumetria significativamente maior, vinculada a métricas concretas de saturação do caminho síncrono e não mais a uma decisão de arquitetura *a priori*.
+
+#### Revisão final do pipeline de CI
 
 Na revisao final da Sprint 5, o pipeline do GitLab foi conferido para garantir que a versao consolidada do projeto continue validando build, testes automatizados, estrutura dos RNFs e artefatos do modelo de recomendacao antes da integracao em `develop`.
 
@@ -5442,10 +5461,10 @@ dotnet test src/backend/Spotlight.sln --configuration Release --collect:"XPlat C
 
 | Projeto de teste | Cobertura de linhas geral | Cobertura de branches geral |
 |---|---:|---:|
-| `Spotlight.Catalogo.Tests` | 41,29% | 20,84% |
-| `Spotlight.Usuario.Tests` | 56,67% | 41,62% |
-| `Spotlight.Recomendacao.Tests` | 36,43% | 17,80% |
-| `Spotlight.Geolocalizacao.Tests` | 40,55% | 53,70% |
+| `Spotlight.Catalog.Tests` | 41,29% | 20,84% |
+| `Spotlight.User.Tests` | 56,67% | 41,62% |
+| `Spotlight.Recommendation.Tests` | 36,43% | 17,80% |
+| `Spotlight.Geolocation.Tests` | 40,55% | 53,70% |
 | `Spotlight.Gateway.Tests` | 81,96% | 100,00% |
 | **Total ponderado por linhas** | **45,54%** | - |
 
@@ -5480,22 +5499,32 @@ a UI com os `<summary>` das ações e DTOs.
 
 ### Documentação unificada (recomendado)
 
-Subindo o backend localmente (`src/backend/run-all.ps1`), a UI agregada fica em:
+A UI agregada do Swagger fica em:
 
-> **http://localhost:5000/swagger**
+> **Servidor (produção):** _URL pública do servidor Inteli — a registrar após o deploy_ → `https://<host>/swagger`
+> **Local:** `http://localhost:5000/swagger` (subindo o backend via `src/backend/run-all.ps1`)
 
 O dropdown "Select a definition" no canto superior direito alterna entre:
 
-| Definição | Fonte | Rotas |
-|---|---|---|
-| Gateway | gateway próprio | — |
-| Catálogo | proxy YARP → `/catalogo/swagger/v1/swagger.json` | 11 |
-| Usuário | proxy YARP → `/usuario/swagger/v1/swagger.json` | 6 |
-| Recomendação | proxy YARP → `/recomendacao/swagger/v1/swagger.json` | 2 |
-| Geolocalização | proxy YARP → `/geolocalizacao/swagger/v1/swagger.json` | 2 |
+| Definição | Fonte | Rotas de negócio | Descoberta (`GET /`) | Healthcheck (`GET /api/Ping`) | Total no Swagger |
+|---|---|---|---|---|---|
+| Gateway | gateway próprio | — | — | sim | 1 |
+| Catálogo | proxy YARP → `/catalogo/swagger/v1/swagger.json` | 11 | — | sim | 12 |
+| Usuário | proxy YARP → `/usuario/swagger/v1/swagger.json` | 8 | sim | sim | 10 |
+| Recomendação | proxy YARP → `/recomendacao/swagger/v1/swagger.json` | 2 | sim | sim | 4 |
+| Geolocalização | proxy YARP → `/geolocalizacao/swagger/v1/swagger.json` | 2 | sim | sim | 4 |
 
 Como o gateway proxia os `swagger.json` dos serviços, **não há problemas de
 CORS no navegador** — todas as requisições saem da mesma origem.
+
+Detalhamento das rotas de negócio expostas por cada serviço (os endpoints de
+descoberta `GET /{servico}` e o healthcheck `GET /api/Ping` aparecem listados
+no Swagger junto com as rotas abaixo):
+
+- **Catálogo (11):** `GET /catalogo/categorias`, `GET /catalogo/teatros`, `GET /catalogo/teatros/{id}`, `GET /catalogo/espetaculos`, `GET /catalogo/espetaculos/{id}`, `GET /catalogo/espetaculos/{id}/sessoes`, `GET /catalogo/espetaculos/{id}/avaliacoes`, `POST /catalogo/espetaculos/{id}/avaliacoes`, `POST /catalogo/espetaculos`, `PUT /catalogo/espetaculos/{id}`, `DELETE /catalogo/espetaculos/{id}`.
+- **Usuário (8):** `GET /usuario/me`, `PUT /usuario/me`, `PUT /usuario/me/localizacao`, `GET /usuario/me/preferencias`, `PUT /usuario/me/preferencias`, `GET /usuario/me/avaliacoes`, `POST /usuario/telemetria`, `POST /usuario/admin/usuarios/promover`.
+- **Recomendação (2):** `GET /recomendacao/me`, `GET /recomendacao/espetaculos/{id}/similares`.
+- **Geolocalização (2):** `GET /geolocalizacao/geocoding`, `GET /geolocalizacao/geocoding/reverse`.
 
 ### Documentação por serviço (acesso direto)
 
@@ -5533,7 +5562,7 @@ divergências entre o contrato negociado e o que está implementado.
 
 # 9. Planejamento e Execução de Testes
 
-&emsp;O Spotlight é um sistema de recomendação de espetáculos para o Portal Aventura Teatros, construído sobre arquitetura SOA (API Gateway, serviços de catálogo, usuário, recomendação e geolocalização, MongoDB Atlas para telemetria e motor de ML) e aplicativo mobile first em React Native/Expo. A fila RabbitMQ permanece como evolução planejada para a Sprint 5. Diante desse desenho distribuído e de um público heterogêneo, incluindo personas com baixa familiaridade tecnológica, como **Carlos Nóbrega** (seção 2.4), a validação sistemática deixa de ser etapa opcional e passa a condicionar a confiança na solução: recomendações relevantes, autenticação segura, integrações externas estáveis e interface utilizável em smartphones devem ser verificadas de forma planejada, rastreável e complementar entre si.
+&emsp;O Spotlight é um sistema de recomendação de espetáculos para o Portal Aventura Teatros, construído sobre arquitetura SOA (API Gateway, serviços de catálogo, usuário, recomendação e geolocalização, MongoDB Atlas para telemetria e motor de ML) e aplicativo mobile first em React Native/Expo. A fila RabbitMQ, originalmente prevista como evolução da Sprint 5, foi formalmente descartada (ver 8.3.3) para preservar a latência da recomendação em tempo próximo ao real. Diante desse desenho distribuído e de um público heterogêneo, incluindo personas com baixa familiaridade tecnológica, como **Carlos Nóbrega** (seção 2.4), a validação sistemática deixa de ser etapa opcional e passa a condicionar a confiança na solução: recomendações relevantes, autenticação segura, integrações externas estáveis e interface utilizável em smartphones devem ser verificadas de forma planejada, rastreável e complementar entre si.
 
 &emsp;Esta seção consolida a estratégia geral de testes do ciclo de desenvolvimento. Ela orienta e justifica os esforços detalhados nas subseções 9.1 a 9.4, sem substituir seus planejamentos específicos. Os resultados de cada frente serão registrados nas respectivas subseções de resultados ao longo da execução.
 
@@ -5548,7 +5577,7 @@ divergências entre o contrato negociado e o que está implementado.
 | **Testes de RNFs** | Avaliam características de qualidade — desempenho, disponibilidade, segurança, escalabilidade, usabilidade mobile e manutenibilidade — conforme os doze RNFs da seção 3.2. | [9.2](#92-testes-de-rnfs) |
 | **Testes de usabilidade** | Validam a experiência com usuários reais no aplicativo mobile, mensurando conclusão de tarefas, número de toques e percepção global via **System Usability Scale (SUS)**. | [9.3](#93-testes-de-usabilidade) |
 | **Testes de APIs externas** | Exercitam contratos e respostas dos serviços terceiros integrados ao Spotlight — **Supabase Auth**, **API da Ticketeira** e, no escopo de geolocalização, **OpenStreetMap/Nominatim** (seções 5.3 e 8.1) — com cenários positivos e negativos de indisponibilidade, autenticação e formato de payload. | Integrados ao planejamento da seção [9.4](#94-testes-de-integração) (IT-02, IT-06 e fluxos de geocodificação) |
-| **Testes de integração** | Validam interações entre componentes internos (Gateway, serviços SOA, PostgreSQL, MongoDB, motor de recomendação e, na Sprint 5, RabbitMQ) e fronteiras externas. Chamadas a Supabase Auth e Ticketeira utilizam obrigatoriamente o módulo **VHS** (*Virtual HTTP Server*) para cache determinístico de respostas HTTP em `tests/cassettes/`. | [9.4](#94-testes-de-integração) |
+| **Testes de integração** | Validam interações entre componentes internos (Gateway, serviços SOA, PostgreSQL, MongoDB e motor de recomendação) e fronteiras externas. A fronteira do RabbitMQ presente em revisões anteriores foi descartada na Sprint 5 (ver 8.3.3) e o caso IT-05 permanece apenas como registro histórico. Chamadas a Supabase Auth e Ticketeira utilizam obrigatoriamente o módulo **VHS** (*Virtual HTTP Server*) para cache determinístico de respostas HTTP em `tests/cassettes/`. | [9.4](#94-testes-de-integração) |
 
 ### Ferramentas por tipo de teste
 
@@ -5561,7 +5590,7 @@ divergências entre o contrato negociado e o que está implementado.
 | Testes de RNFs | Lighthouse (mobile), k6, UptimeRobot, OWASP ZAP, Postman, dispositivos físicos Android/iOS, inspeção manual de logs, scripts shell, pipeline CI/CD | Detalhamento por RNF na seção 9.2.1 |
 | Testes de usabilidade | Roteiro estruturado (T01–T09), planilha de campo, questionário **SUS** | Detalhamento na seção 9.3.1; resultados subsidiam RNF10 |
 | Testes de APIs externas | Módulo **VHS** (`VhsCachingHandler`), cassetes JSON em `tests/cassettes/supabase/` e `tests/cassettes/ticketeira/`, `xUnit` | Respostas gravadas garantem determinismo; modo `VHS_MODE=record` para geração inicial de cassetes |
-| Testes de integração | `xUnit`, `Testcontainers` (PostgreSQL, MongoDB e, futuramente, RabbitMQ), `Microsoft.AspNetCore.Mvc.Testing`, `Respawn`, **VHS**, `docker compose` | Seis fronteiras IT-01 a IT-06 documentadas na seção 9.4.1 |
+| Testes de integração | `xUnit`, `Testcontainers` (PostgreSQL e MongoDB), `Microsoft.AspNetCore.Mvc.Testing`, `Respawn`, **VHS**, `docker compose` | Seis fronteiras IT-01 a IT-06 documentadas na seção 9.4.1; o suporte previsto a `Testcontainers.RabbitMq` foi descartado junto com o broker (ver 8.3.3) |
 
 &emsp;A tabela abaixo justifica cada ferramenta em relação ao tipo de teste e à stack (seções 5.3 e 8.1) e distingue, com honestidade, o que já é **usado de fato** do que está **planejado/não versionado**. A situação reflete o estado descrito nas seções 8.3, 8.4 e 9.2.2.
 
@@ -5572,7 +5601,7 @@ divergências entre o contrato negociado e o que está implementado.
 | `FluentAssertions` | Funcional, integração | Asserções expressivas sobre respostas HTTP/BSON, legíveis na revisão dos contratos de API | Planejado nas suítes de integração |
 | `Bogus` | Funcional | Geração de massa fictícia (usuários, tokens) para cenários de contrato sem dados reais | Planejado |
 | `Respawn` | Integração (PostgreSQL) | Reset do banco entre testes garantindo isolamento sobre o PostgreSQL/Supabase | Planejado (IT-03) |
-| `Testcontainers` | Integração (PostgreSQL, MongoDB, RabbitMQ) | Sobe instâncias efêmeras dos bancos da stack em Docker, dispensando ambiente compartilhado | Planejado (IT-03/IT-04; RabbitMQ na Sprint 5) |
+| `Testcontainers` | Integração (PostgreSQL, MongoDB) | Sobe instâncias efêmeras dos bancos da stack em Docker, dispensando ambiente compartilhado | Planejado (IT-03/IT-04); suporte a `Testcontainers.RabbitMq` removido após o abandono do broker (ver 8.3.3) |
 | **VHS** (`VhsCachingHandler`) | APIs externas | Intercepta o `HttpClient` e grava/repete respostas de Supabase Auth e Ticketeira em cassetes, garantindo determinismo em CI | **Planejado** (mecanismo ainda a versionar — IT-02/IT-06) |
 | `k6` | RNF06 (carga) | Gera carga HTTP scriptável contra a topologia SOA para medir latência/erro sob concorrência | Instrumentado; execução HTTP pendente (health check 503, seção 9.2.2) |
 | Lighthouse (mobile) | RNF01, RNF02 | Audita FCP/TTI em emulação mobile, coerente com o alvo 4G do app React Native/Expo | Instrumentado; medição final pendente de app acessível |
@@ -5605,9 +5634,9 @@ g04/
       ├─ ml-engine/
       └─ tests/
          ├─ Spotlight.Gateway.Tests/      # Testes unitários e de integração do Gateway
-         ├─ Spotlight.Catalogo.Tests/
-         ├─ Spotlight.Usuario.Tests/
-         └─ Spotlight.Recomendacao.Tests/
+         ├─ Spotlight.Catalog.Tests/
+         ├─ Spotlight.User.Tests/
+         └─ Spotlight.Recommendation.Tests/
 tests/
 └─ cassettes/
    ├─ supabase/                          # Respostas gravadas do Supabase Auth (VHS)
@@ -5630,9 +5659,9 @@ tests/
 |----------|-----------------|----------------------|
 | Cobertura de RFs | Todos os dezesseis RFs devem possuir ao menos um cenário de teste funcional ou de integração documentado | Recomendação (RF04, RF12–RF15), autenticação (RF01–RF02), geolocalização e preferências (RF03) |
 | Cobertura de RNFs | Os doze RNFs devem possuir planejamento formal com critério objetivo de aceitação (seção 9.2.1) | Desempenho (RNF01, RNF02), segurança (RNF05), usabilidade mobile (RNF04, RNF10) |
-| Cobertura de integração | Mínimo de três cenários negativos por fronteira IT-01 a IT-06; meta documentada de **15/16 RFs** e **8/12 RNFs** cobertos diretamente pelos testes de integração (seção 9.4) | Gateway ↔ serviços SOA, Supabase Auth, MongoDB Atlas e fila de telemetria planejada |
+| Cobertura de integração | Mínimo de três cenários negativos por fronteira IT-01 a IT-04 e IT-06; meta documentada de **15/16 RFs** e **8/12 RNFs** cobertos diretamente pelos testes de integração (seção 9.4) | Gateway ↔ serviços SOA, Supabase Auth e MongoDB Atlas |
 | Cobertura de usabilidade | **≥ 85%** de conclusão por tarefa e **≤ 3 toques** nas execuções bem-sucedidas (RNF10); média SUS **≥ 68** (seção 9.3.1.8) | Fluxos de catálogo, busca, filtro e detalhes (RF04–RF07) |
-| Cenários de falha | Mínimo de **22 cenários negativos** planejados nas fronteiras de integração, abrangendo indisponibilidade externa, tokens inválidos e violações de constraint (seção 9.4) | Autenticação, persistência PostgreSQL, fila de telemetria |
+| Cenários de falha | Mínimo de **22 cenários negativos** planejados nas fronteiras de integração, abrangendo indisponibilidade externa, tokens inválidos e violações de constraint (seção 9.4) | Autenticação, persistência PostgreSQL, persistência MongoDB |
 
 &emsp;Entre os módulos classificados como críticos, o motor de recomendação (`ml-engine` e serviço de recomendação), a autenticação (Gateway + Supabase Auth) e a geolocalização (serviço dedicado + Nominatim) concentram a expansão prioritária da suíte automatizada antes das demais camadas.
 
@@ -5704,7 +5733,7 @@ tests/
 
 &emsp;As pré-condições abaixo são compartilhadas por toda a bateria e, portanto, não são repetidas em cada caso de teste:
 
-- Containers Docker do stack provisionados via `docker compose up -d` para os serviços implementados; MongoDB Atlas configurado via variáveis de ambiente para telemetria; RabbitMQ fica reservado à Sprint 5
+- Containers Docker do stack provisionados via `docker compose up -d` para os serviços implementados; MongoDB Atlas configurado via variáveis de ambiente para telemetria; o broker RabbitMQ deixa de ser pré-condição após o abandono do componente na Sprint 5 (ver 8.3.3)
 - Massa de dados seed carregada (script `dotnet run --project src/backend/seed`) garantindo: 20 espetáculos em 4+ categorias (drama, comédia, infantil, musical), 5 teatros em São Paulo, 50 sessões nos próximos 60 dias, 30 usuários sintéticos com histórico de interações
 - Três usuários de teste cadastrados no Supabase Auth:
   - `usuario.comum@spotlighttest.com` — `tipo_usuario=comum`, com histórico de 10+ interações
@@ -5871,7 +5900,7 @@ detox test --testNamePattern "RF03"
 | TF-RF03-N02 | Tentativa de salvar sem autenticação | Forjar chamada `PUT /api/usuario/preferencias` sem JWT | HTTP 401 | Nenhuma alteração |
 | TF-RF03-N03 | Categoria inexistente | Forjar chamada com `categoria_id=99999` | HTTP 400; mensagem "Categoria inválida" | Nenhuma alteração |
 
-**Pós-condições gerais:** Após salvar, as preferências ficam persistidas no PostgreSQL e disponíveis para o serviço de recomendação. A publicação assíncrona de eventos de preferência fica reservada à evolução com fila na Sprint 5.
+**Pós-condições gerais:** Após salvar, as preferências ficam persistidas no PostgreSQL e disponíveis para o serviço de recomendação. A publicação assíncrona de eventos de preferência, originalmente prevista via fila, foi descartada na Sprint 5 (ver 8.3.3) e permanece atendida de forma síncrona pelo próprio serviço.
 
 **Ferramenta(s):** `xUnit` (UseCases de preferências/localização); `Detox` para a UI de onboarding (planejado).
 
@@ -6210,7 +6239,7 @@ detox test --testNamePattern "RF10"
 **Instruções de execução:**
 ```bash
 $env:RUN_MONGO_INTEGRATION_TESTS="true"
-dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.csproj --filter "Mongo|Telemetria"
+dotnet test src/backend/tests/Spotlight.User.Tests/Spotlight.User.Tests.csproj --filter "Mongo|Telemetria"
 detox test --testNamePattern "RF11"
 # Conferência manual
 mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE').getCollection('$MONGODB_TELEMETRY_COLLECTION').find().sort({received_at:-1}).limit(20)"
@@ -6230,7 +6259,7 @@ mongosh "$MONGODB_CONNECTION_STRING" --eval "db.getSiblingDB('$MONGODB_DATABASE'
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| TF-RF11-N01 | MongoDB indisponível | Configurar connection string indisponível; gerar interação | API retorna `202 Accepted` após payload válido; falha é logada para não bloquear UX | Evento pode ser perdido enquanto a fila da Sprint 5 não existir |
+| TF-RF11-N01 | MongoDB indisponível | Configurar connection string indisponível; gerar interação | API retorna `202 Accepted` após payload válido; falha é logada para não bloquear UX | Evento pode ser perdido — limitação aceita conscientemente após o abandono do broker assíncrono na Sprint 5 (ver 8.3.3) |
 | TF-RF11-N02 | Usuário anônimo sem `anonymousId` | Forjar evento sem JWT e sem `anonymousId` | HTTP 400 por ausência de identificador de usuário ou anônimo | Nenhum documento inserido |
 | TF-RF11-N03 | Payload incompatível com evento | Enviar `search_performed` sem `query` ou com entidade diferente de `busca` | HTTP 400 por violação das regras do contrato | Nenhum documento inserido |
 
@@ -6320,7 +6349,7 @@ dotnet test src/backend/recomendacao-service --filter "Category=Functional&RF=RF
 |---|---|---|---|---|
 | TF-RF13-N01 | Interação irrelevante não distorce | Apenas scroll sem clique | `L1 ≈ L0` (Jaccard ≥ 0,8) | — |
 | TF-RF13-N02 | Avaliação 1★ reduz exposição | Avaliar com 1★ um espetáculo presente em `L0` | Item removido da próxima `L1` | — |
-| TF-RF13-N03 | Falha de telemetria | Simular indisponibilidade do MongoDB durante interação | Navegação não é bloqueada; recomendação continua usando avaliações e dados já persistidos | Perda de evento registrada como limitação até a Sprint 5 |
+| TF-RF13-N03 | Falha de telemetria | Simular indisponibilidade do MongoDB durante interação | Navegação não é bloqueada; recomendação continua usando avaliações e dados já persistidos | Perda de evento aceita como limitação do fluxo síncrono de telemetria |
 
 **Pós-condições gerais:** Recomputo é assíncrono e não impacta a latência da requisição original.
 
@@ -6438,7 +6467,7 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
-| TF-RF16-P01 | Criar espetáculo | Painel → "Novo espetáculo"; preencher campos obrigatórios; salvar | HTTP 201; espetáculo aparece no catálogo do app mobile em ≤ 30 s | Linha em `espetaculo`; publicação assíncrona de `catalog_updated` fica planejada para Sprint 5 |
+| TF-RF16-P01 | Criar espetáculo | Painel → "Novo espetáculo"; preencher campos obrigatórios; salvar | HTTP 201; espetáculo aparece no catálogo do app mobile em ≤ 30 s | Linha em `espetaculo`; a publicação assíncrona de `catalog_updated`, originalmente prevista via fila, foi descartada com o abandono do RabbitMQ na Sprint 5 (ver 8.3.3) — a atualização do catálogo permanece atendida por leitura direta do PostgreSQL |
 | TF-RF16-P02 | Editar espetáculo | Alterar título e salvar | HTTP 200; mudança visível no catálogo após refresh | Histórico de alteração em `audit_log` |
 | TF-RF16-P03 | Remover espetáculo | Excluir espetáculo sem sessões futuras | HTTP 204; espetáculo some do catálogo | Soft delete (`deleted_at` preenchido) |
 | TF-RF16-P04 | Criar categoria | Adicionar "dança contemporânea" | HTTP 201; disponível como filtro (RF06) | — |
@@ -6627,9 +6656,53 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 &emsp;Em resumo: dos 16 RFs catalogados em 3.1, **14 têm pelo menos um sub-cenário validado nesta execução** (RF03 a RF16), **2 (RF01, RF02)** só foram exercitados nos contratos adjacentes (perfil/JWT e mapeamento de claims) por não haver Detox versionado; nenhum teste planejado para esta rodada falhou. Os achados negativos da bateria são, por desenho, validações de mensagens de erro e códigos HTTP, e todos seguiram o contrato.
 
+### Rodada complementar — regras de negócio (Sprint 5)
+
+&emsp;Em complemento à bateria geral consolidada acima, na Sprint 5 foi executada uma rodada dedicada de testes automatizados de regras de negócio focada nos Services e UseCases do backend. O objetivo foi validar regras críticas em nível de aplicação, com cenários positivos, negativos e de borda, sem depender de banco real, autenticação externa ou serviços de terceiros. Essa abordagem complementa os testes funcionais planejados e reduz o risco de regressão em comportamentos centrais do sistema.
+
+#### Escopo executado
+
+| Serviço | Regra de negócio validada | Cenários cobertos |
+|---|---|---|
+| Catálogo | Avaliações de espetáculo devem aceitar notas dentro do intervalo permitido, rejeitar notas inválidas e não criar avaliação para espetáculo inexistente. | Nota limite `5`, comentário nulo, nota `null`, nota menor que `0`, nota maior que `5`, espetáculo inexistente. |
+| Recomendação | A API deve respeitar o limite de recomendações solicitado mesmo quando o modelo ML.NET retorna mais predições do que o permitido. | Modelo retorna 3 predições; backend recebe limite `2`; resposta final preserva ranking e retorna apenas 2 itens. |
+
+#### Casos adicionados ou reforçados
+
+| Caso | Arquivo | Resultado esperado |
+|---|---|---|
+| `CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Nota `5` é aceita, comentário nulo é preservado e os dados corretos chegam ao repositório. |
+| `CriarAvaliacao_ComNotaInvalida_LancaValidation` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Notas inválidas geram `ValidationException` antes de consultar espetáculo ou chamar o repositório de avaliação. |
+| `CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Espetáculo inexistente gera `NotFoundException` e nenhuma avaliação é persistida. |
+| `ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal` | `src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoUseCasesTests.cs` | Resultado final respeita o limite normalizado e mantém a ordem de ranking do modelo. |
+
+#### Evidência de execução
+
+Os testes foram executados localmente em configuração `Release`, pois havia serviços do backend em execução usando os binários `Debug`.
+
+```powershell
+dotnet test src/backend/tests/Spotlight.Catalog.Tests/Spotlight.Catalog.Tests.csproj -c Release --no-restore
+dotnet test src/backend/tests/Spotlight.Recommendation.Tests/Spotlight.Recommendation.Tests.csproj -c Release --no-restore
+dotnet test src/backend/Spotlight.sln -c Release --no-restore
+```
+
+Resultado observado, já considerando os 4 testes novos somados à bateria registrada nas tabelas anteriores:
+
+| Comando | Aprovados | Ignorados | Falhas |
+|---|---:|---:|---:|
+| `Spotlight.Catalog.Tests` | 32 | 0 | 0 |
+| `Spotlight.Recommendation.Tests` | 47 | 0 | 0 |
+| `Spotlight.sln` | 139 | 0 | 0 |
+
+Os 5 testes de integração MongoDB condicionais do projeto `Spotlight.User.Tests` rodaram e passaram nesta execução porque havia Docker disponível e `RUN_MONGO_INTEGRATION_TESTS=true` (veja a subseção "Ambiente de execução" acima); sem Docker, o `MongoIntegrationFactAttribute` os manteria como ignorados — sem representar falha da suíte de regras de negócio.
+
+#### Abrangência e limitações
+
+Os testes cobrem regras críticas de validação de avaliação e recomendação personalizada, incluindo tratamento de erro e limite de resposta. A camada de persistência real, policies RLS e integração com Supabase/PostgreSQL continuam sendo responsabilidade dos testes de integração e das validações de banco descritas nas demais seções deste capítulo.
+
 ## 9.2 Testes de RNFs
 
-&emsp;Os testes de requisitos não funcionais (RNFs) do Spotlight complementam os testes funcionais e de usabilidade ao validar **como** o sistema se comporta em termos de desempenho, confiabilidade, segurança, escalabilidade e experiência mobile. No contexto do Portal Aventura Teatros, trata-se de um sistema de recomendação de espetáculos com arquitetura SOA, aplicativo mobile first (React Native/Expo) e integração com serviços externos (autenticação, catálogo, MongoDB Atlas para telemetria e ticketeira). A fila de eventos entra como evolução planejada para a Sprint 5. A validação sistemática desses aspectos de qualidade assegura que a descoberta cultural e o fluxo até a intenção de compra permaneçam utilizáveis sob carga, disponíveis em produção e adequados aos dispositivos-alvo.
+&emsp;Os testes de requisitos não funcionais (RNFs) do Spotlight complementam os testes funcionais e de usabilidade ao validar **como** o sistema se comporta em termos de desempenho, confiabilidade, segurança, escalabilidade e experiência mobile. No contexto do Portal Aventura Teatros, trata-se de um sistema de recomendação de espetáculos com arquitetura SOA, aplicativo mobile first (React Native/Expo) e integração com serviços externos (autenticação, catálogo, MongoDB Atlas para telemetria e ticketeira). A fila de eventos, originalmente prevista como evolução da Sprint 5, foi descartada após análise de impacto sobre a latência da recomendação (ver 8.3.3). A validação sistemática desses aspectos de qualidade assegura que a descoberta cultural e o fluxo até a intenção de compra permaneçam utilizáveis sob carga, disponíveis em produção e adequados aos dispositivos-alvo.
 
 &emsp;Cada RNF está especificado na seção 3.2 com pré-condição, procedimento e resultado esperado. Esta seção evolui essa base para um planejamento formal de execução, com cenários positivos e negativos, ferramentas definidas, critérios objetivos de aprovação e rastreabilidade aos RFs associados. Os resultados consolidados serão documentados em [9.2.2 Resultados](#922-resultados).
 
@@ -6885,9 +6958,9 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 **Status:** Não aplicável nesta versão.
 
-O RNF09 não será executado porque a infraestrutura de processamento assíncrono prevista no planejamento, incluindo RabbitMQ ou mecanismo equivalente, não foi implementada no escopo atual do projeto.
+O RNF09 não será executado porque o broker assíncrono originalmente previsto (RabbitMQ ou mecanismo equivalente) foi formalmente descartado na Sprint 5, conforme decisão arquitetural documentada em 8.3.3. A motivação é o conflito entre o salto adicional introduzido pela fila e o requisito de latência da recomendação em tempo próximo ao real (RNF02), somado à ausência de saturação observada no caminho síncrono atual.
 
-Por esse motivo, não foram criados scripts, cenários de execução ou resultados simulados para este requisito. Caso a infraestrutura assíncrona seja implementada futuramente, o planejamento e os testes deste RNF deverão ser retomados.
+Por esse motivo, não foram criados scripts, cenários de execução ou resultados simulados para este requisito. Uma eventual retomada deste RNF está condicionada à reintrodução do broker em cenário futuro de produção que apresente saturação real do caminho síncrono.
 
 ---
 
@@ -6909,13 +6982,13 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 **Cenário negativo:** Tarefas com taxa de sucesso inferior a 85% ou média de toques superior a 3 serão classificadas como não conformes, com problemas de usabilidade priorizados no backlog de interface.
 
-**Pós-condições:** Relatório de usabilidade referenciado na seção 9.3.2. Evidências: `[INSERIR_REFERENCIA_RESULTADOS_USABILIDADE_RNF10]`.
+**Pós-condições:** Relatório de usabilidade consolidado na seção 9.3.2, com taxa de conclusão, número de toques e tempo por tarefa e pontuação SUS por participante. Evidências: planilha de campo (seção 9.3.1.10) e tabela de toques da seção 9.3.2.1.
 
 **Critério de aceitação:** **≥ 85%** de sucesso e **≤ 3 toques** por tarefa nas execuções que atingiram o critério de conclusão.
 
 **RFs associados (rastreabilidade):** RF04, RF05, RF06, RF07.
 
-**Status:** planejado / pendente de sessões com usuários (instrumentos T01–T09 e analisador prontos; toques por tarefa e a vaga 60+ ficaram não conclusivos na rodada de 9.3.2 e devem ser registrados na próxima execução).
+**Status:** executado (seção 9.3.2). Taxa de conclusão 100% (atende ≥ 85%) e média SUS 79,5 (atende ≥ 68); o critério de eficiência **≤ 3 toques não foi atendido** (apenas 13,3% das execuções), atribuído à inadequação da métrica a tarefas com digitação, seleção múltipla e gestos — recomenda-se recalibrá-la (seção 9.3.2.6). A vaga 60+ permanece não confirmada por ausência de registro de idade/familiaridade na planilha, a capturar na próxima execução.
 
 ---
 
@@ -7009,11 +7082,11 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 | Relação | RNFs | Impacto na validação |
 |---------|------|----------------------|
-| Desempenho percebido × backend | RNF01, RNF02, RNF06, RNF09 | Falha na futura fila ou carga elevada pode invalidar tempos de tela e recomendação |
+| Desempenho percebido × backend | RNF01, RNF02, RNF06 | Carga elevada pode invalidar tempos de tela e recomendação; o RNF09 deixou de ser dependência ativa após o abandono da fila (ver 8.3.3) |
 | Disponibilidade × segurança | RNF03, RNF05 | Indisponibilidade do gateway impede testes de JWT; varreduras ZAP dependem de ambiente estável |
 | Mobile × usabilidade | RNF04, RNF10, RNF11 | Compatibilidade e áreas de toque influenciam taxa de sucesso e número de toques |
 | Infraestrutura × deploy | RNF08, RNF12 | Containers e pipeline CI/CD são pré-requisito para deploy independente |
-| Observabilidade × recomendação | RNF07, RNF09, RNF02 | Logs e, na Sprint 5, fila sustentam diagnóstico de atraso em recomendações |
+| Observabilidade × recomendação | RNF07, RNF02 | Logs sustentam diagnóstico de atraso em recomendações; o RNF09 ficou fora do escopo após o abandono do broker (ver 8.3.3) |
 
 **Maior complexidade no contexto acadêmico**
 
@@ -7273,7 +7346,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 #### 9.2.2.10 RNF09 — Processamento assíncrono
 
- O RNF09 foi classificado como **não aplicável nesta versão**. A infraestrutura de processamento assíncrono com RabbitMQ ou mecanismo equivalente não foi implementada e foi removida do escopo de execução dos testes. Não foram criados scripts, métricas ou evidências artificiais para esse requisito.
+ O RNF09 foi classificado como **não aplicável nesta versão**. O broker assíncrono originalmente previsto (RabbitMQ ou equivalente) foi formalmente descartado na Sprint 5 por conflito com o requisito de latência da recomendação (ver 8.3.3), e foi removido do escopo de execução dos testes. Não foram criados scripts, métricas ou evidências artificiais para esse requisito.
 
 **Veredito:** não aplicável nesta versão.
 
@@ -7529,7 +7602,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 &emsp;Considera-se **conclusão bem-sucedida** o atendimento ao critério da tarefa (seção 9.3.1.6) sem auxílio verbal que indique o elemento correto da interface. Desvios serão classificados na análise (seção 9.3.2) como problema de usabilidade, defeito do protótipo ou limitação do escopo mockado.
 
-&emsp;**Registro obrigatório (lacunas da rodada anterior).** Para que o veredito do RNF10 seja conclusivo, são de preenchimento obrigatório na planilha de campo (seção 9.3.1.10), por participante e por tarefa: (i) o **número de toques** em cada execução bem-sucedida, base do critério "≤ 3 toques em ≥ 85% das execuções"; e (ii) a **identificação do participante 60+ com baixa familiaridade tecnológica** (vaga obrigatória da seção 9.3.1.4), com suas observações de acessibilidade. Esses dois campos ficaram "não conclusivos" na rodada consolidada em 9.3.2 e devem ser capturados na próxima execução para fechar a rastreabilidade ao RNF10 e à persona Carlos Nóbrega.
+&emsp;**Registro obrigatório.** Para que o veredito do RNF10 seja conclusivo, são de preenchimento obrigatório na planilha de campo (seção 9.3.1.10), por participante e por tarefa: (i) o **número de toques** em cada execução bem-sucedida, base do critério "≤ 3 toques em ≥ 85% das execuções"; e (ii) a **identificação do participante 60+ com baixa familiaridade tecnológica** (vaga obrigatória da seção 9.3.1.4), com suas observações de acessibilidade. Na rodada consolidada em 9.3.2, o número de toques **foi registrado** (e indicou que o critério de eficiência não foi atendido com a métrica atual), mas a idade e a familiaridade tecnológica dos participantes **não foram registradas**; este último campo deve ser capturado na próxima execução para fechar a rastreabilidade à persona Carlos Nóbrega.
 
 #### 9.3.1.9 Pós-condições
 
@@ -7589,25 +7662,44 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 ### 9.3.2 Resultados
 
-&emsp;Esta subseção consolida os resultados da rodada de testes de usabilidade realizada com cinco participantes, identificados como P1, P2, P3, P4 e P5. A análise combina os comportamentos observados durante a execução das tarefas com as pontuações obtidas por meio do System Usability Scale (SUS), permitindo avaliar a efetividade dos fluxos principais e a percepção global de facilidade de uso do aplicativo.
+&emsp;Esta subseção consolida os resultados da rodada de testes de usabilidade realizada com cinco participantes, identificados como P1, P2, P3, P4 e P5. A análise combina os comportamentos observados durante a execução das tarefas, o número de toques e o tempo registrados por tarefa e as pontuações obtidas por meio do System Usability Scale (SUS), permitindo avaliar a efetividade dos fluxos principais, a eficiência de interação e a percepção global de facilidade de uso do aplicativo. Os dados brutos completos (conclusão, toques, tempo, auxílio e respostas SUS por participante) estão na planilha de campo referenciada na seção 9.3.1.10.
 
 | Métrica | Resultado observado | Critério de aceitação | Veredito |
 |---------|---------------------|-----------------------|----------|
 | Quantidade de participantes externos | 5 participantes | Mínimo de 5 participantes | Atendido |
-| Participante 60+ com baixa familiaridade tecnológica | Não informado nos dados consolidados | Pelo menos 1 participante | Não conclusivo |
+| Participante 60+ com baixa familiaridade tecnológica | Idade e familiaridade não registradas na planilha de campo | Pelo menos 1 participante | Não confirmado |
 | Média SUS | 79,5 | SUS médio ≥ 68 | Atendido |
 | Taxa média de conclusão das tarefas | 100% | ≥ 85% | Atendido |
-| Tarefas concluídas em até 3 toques | Não informado nos dados consolidados | ≥ 85% das execuções bem-sucedidas | Não conclusivo |
+| Tarefas concluídas em até 3 toques | 6 de 45 execuções (13,3%) | ≥ 85% das execuções bem-sucedidas | Não atendido |
 | Principais dificuldades observadas | Filtros, navegação horizontal, faixa de preço, destaque do botão de compra e ausência de sugestões na busca | Registro qualitativo | Registrado |
-| Melhorias priorizadas | Refinar filtros, carrosséis, busca, faixa de preço e botão de compra | Backlog de ajustes | Definido |
+| Melhorias priorizadas | Refinar filtros, carrosséis, busca, faixa de preço e botão de compra; recalibrar a métrica de toques | Backlog de ajustes | Definido |
 
-&emsp;As evidências consideradas nesta análise são os registros de conclusão das tarefas, as dificuldades observadas durante as sessões e as pontuações individuais do questionário SUS. Não foram disponibilizados dados consolidados de tempo, número de toques ou perfil etário dos participantes; portanto, não é possível emitir veredito sobre esses critérios específicos sem extrapolar as informações coletadas.
+&emsp;As evidências consideradas nesta análise são os registros de conclusão das tarefas, o número de toques e o tempo por tarefa, as dificuldades observadas durante as sessões e as pontuações individuais do questionário SUS. A planilha de campo não registrou a idade nem a familiaridade tecnológica dos participantes; por isso, não é possível confirmar a presença do perfil 60+ com baixa familiaridade exigido na seção 9.3.1.4, ainda que o comportamento de P5 (maior necessidade de auxílio e menor SUS) seja compatível com esse perfil. Esse campo deve ser preenchido na próxima execução para fechar a rastreabilidade à persona Carlos Nóbrega.
 
 #### 9.3.2.1 Resultados gerais dos testes
 
-&emsp;A rodada foi efetivamente realizada com cinco participantes externos, e todos concluíram todas as tarefas propostas no roteiro, resultando em taxa observada de conclusão de 100%. Esse resultado supera o critério quantitativo de 85% definido no planejamento e comprova boa efetividade geral dos fluxos avaliados, uma vez que os participantes conseguiram alcançar os objetivos estabelecidos sem ocorrência de bloqueios. Entretanto, a conclusão integral não significa ausência de dificuldades: P4 necessitou de ajuda leve nas etapas de preferências e filtros, enquanto P5 apresentou maior dificuldade na seleção da faixa de preço, na utilização dos filtros e na navegação horizontal.
+&emsp;A rodada foi efetivamente realizada com cinco participantes externos, e todos concluíram todas as tarefas propostas no roteiro, resultando em taxa observada de conclusão de 100%. Esse resultado supera o critério quantitativo de 85% definido no planejamento e comprova boa efetividade geral dos fluxos avaliados, uma vez que os participantes conseguiram alcançar os objetivos estabelecidos sem ocorrência de bloqueios. Entretanto, a conclusão integral não significa ausência de dificuldades: P4 necessitou de ajuda leve nas etapas de preferências e filtros, enquanto P5 apresentou maior dificuldade na seleção da faixa de preço, na utilização dos filtros e na navegação horizontal. Os registros de auxílio confirmam esse padrão — P5 precisou de ajuda em quatro tarefas (T03, T04, T06 e T08) e P4 em duas (T03 e T06); os demais participantes concluíram o roteiro sem auxílio que revelasse o caminho na interface.
 
-&emsp;Como o critério de sucesso do RNF10 também considera a conclusão sem auxílio verbal que revele o caminho na interface e a eficiência em até três toques, os dados disponíveis não permitem afirmar que todas as execuções atenderam integralmente a esse requisito. A natureza exata da ajuda fornecida a P4 não foi detalhada, e as quantidades de toques por tarefa não foram consolidadas. Assim, confirma-se o atendimento ao critério de conclusão, mas a eficiência por toques permanece não conclusiva. As dificuldades de P4 e P5 devem ser tratadas como prioridade de melhoria, pois indicam menor autonomia na interação com determinados componentes.
+&emsp;A planilha de campo desta rodada consolidou o número de toques e o tempo por tarefa, fechando a lacuna registrada na revisão anterior. A tabela a seguir reúne os toques por participante, a mediana por tarefa e a contagem de execuções concluídas em até três toques, base do critério de eficiência do RNF10.
+
+| Tarefa | P1 | P2 | P3 | P4 | P5 | Mediana | Execuções ≤ 3 toques |
+|--------|---:|---:|---:|---:|---:|--------:|:--------------------:|
+| T01 | 1 | 1 | 1 | 1 | 2 | 1 | 5/5 |
+| T02 | 4 | 4 | 3 | 4 | 5 | 4 | 1/5 |
+| T03 | 7 | 8 | 6 | 9 | 10 | 8 | 0/5 |
+| T04 | 8 | 7 | 7 | 8 | 10 | 8 | 0/5 |
+| T05 | 5 | 6 | 5 | 6 | 7 | 6 | 0/5 |
+| T06 | 6 | 8 | 6 | 9 | 10 | 8 | 0/5 |
+| T07 | 7 | 8 | 7 | 8 | 9 | 8 | 0/5 |
+| T08 | 9 | 8 | 7 | 9 | 11 | 9 | 0/5 |
+| T09 | 5 | 6 | 5 | 7 | 8 | 6 | 0/5 |
+| **Total de toques** | **52** | **56** | **47** | **61** | **72** | — | **6/45 (13,3%)** |
+
+&emsp;O tempo total de execução do roteiro acompanhou o mesmo padrão: P3 foi o mais rápido (301 s) e P5 o mais lento (584 s), com P1 (337 s), P2 (361 s) e P4 (409 s) em posições intermediárias. A correspondência entre maior tempo, mais toques, mais pedidos de auxílio e menor SUS reforça que P5 concentrou as dificuldades da rodada.
+
+&emsp;Quanto ao critério de eficiência do RNF10 — **≤ 3 toques em ≥ 85% das execuções bem-sucedidas** —, apenas 6 das 45 execuções (13,3%) ficaram dentro do limite: todas as cinco execuções de T01 e uma de T02. As demais tarefas exigiram, de forma consistente entre participantes, mais de três toques. Esse resultado decorre da própria natureza das tarefas: T02 envolve digitação de e-mail e senha, T03 exige seleção de tipo de espetáculo e faixa de preço, e T04 a T09 combinam rolagem, gestos horizontais e navegação entre telas. Portanto, o critério de eficiência **não foi atendido** tal como literalmente definido. Como o limite de três toques é realista apenas para ações pontuais de navegação, e não para tarefas que envolvem entrada de texto e múltiplas seleções, recomenda-se recalibrar a métrica (seção 9.3.2.6): contar separadamente os toques de navegação ou estabelecer um *baseline* de toques esperados por tarefa, em vez de aplicar um limite único a todo o roteiro.
+
+&emsp;Em síntese, confirma-se o atendimento ao critério de conclusão (100%) e à média SUS (≥ 68), mas a eficiência por toques não atinge o limiar do RNF10 com a métrica atual. As dificuldades de P4 e P5 devem ser tratadas como prioridade de melhoria, pois indicam menor autonomia na interação com determinados componentes.
 
 #### 9.3.2.2 Análise dos comportamentos observados
 
@@ -7649,6 +7741,8 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 - Dificuldade de P5 na seleção da faixa de preço.
 - Necessidade de ajuda leve para P4 nas etapas de preferências e filtros.
 - Experiência menos satisfatória para P5, refletida tanto nas dificuldades observadas quanto na pontuação SUS de 57,5.
+- Eficiência por toques abaixo do critério do RNF10: apenas 13,3% das execuções (6 de 45) foram concluídas em até três toques, concentradas em T01 e T02. As tarefas com digitação, seleção múltipla e gestos (T03–T09) superaram consistentemente o limite, evidenciando que a métrica de três toques não é adequada a todo o roteiro e precisa de recalibração.
+- Ausência de registro de idade e familiaridade tecnológica na planilha de campo, o que impede confirmar a vaga obrigatória do perfil 60+ com baixa familiaridade (seção 9.3.1.4).
 
 #### 9.3.2.6 Recomendações de melhoria
 
@@ -7656,19 +7750,21 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 &emsp;Os filtros devem receber maior destaque na hierarquia visual e apresentar estados de seleção mais evidentes, incluindo retorno perceptível após a aplicação. A seleção de faixa de preço deve ser revisada quanto à clareza dos rótulos, área de toque e representação do valor escolhido. Também se recomenda reforçar visualmente o botão de compra, assegurando contraste, posicionamento e identificação compatíveis com sua relevância no fluxo.
 
+&emsp;Recomenda-se, ainda, **recalibrar a métrica de toques do RNF10**. O limite único de três toques por execução não é adequado a tarefas que envolvem digitação (T02), múltiplas seleções (T03) ou gestos e rolagem (T04–T09), nas quais a contagem naturalmente supera o limiar — apenas 13,3% das execuções ficaram dentro dele. Sugere-se contar separadamente os toques estritamente de navegação ou definir um *baseline* de toques esperados por tarefa, comparando o desempenho observado a esse referencial. Os campos de idade e familiaridade tecnológica também devem ser incluídos na planilha de campo, de modo a confirmar a presença do perfil 60+ com baixa familiaridade (persona Carlos Nóbrega) exigido na seção 9.3.1.4.
+
 &emsp;Após a implementação dos ajustes, recomenda-se repetir as tarefas T03, T05, T06, T08 e T09 com o mesmo roteiro, pois elas abrangem os elementos que concentraram as dificuldades observadas. Uma nova aplicação do SUS permitirá verificar se as alterações reduzem a diferença entre participantes e elevam a média do grupo acima do limiar de 80,3 pontos.
 
 #### 9.3.2.7 Conclusão
 
-&emsp;Os resultados indicam que o Spotlight atendeu aos critérios de aceitação relativos à pontuação SUS e à conclusão das tarefas. A média SUS de 79,5 superou o critério mínimo de 68 pontos, e a taxa de conclusão de 100% superou o limiar de 85%. O resultado agregado permanece abaixo de 80,3 e, portanto, não recebe classificação A. Além disso, não é possível concluir o atendimento ao critério de eficiência em até três toques nem confirmar a participação do perfil 60+ com baixa familiaridade tecnológica, pois essas informações não constam nos dados consolidados.
+&emsp;Os resultados indicam que o Spotlight atendeu aos critérios de aceitação relativos à pontuação SUS e à conclusão das tarefas. A média SUS de 79,5 superou o critério mínimo de 68 pontos, e a taxa de conclusão de 100% superou o limiar de 85%. O resultado agregado permanece abaixo de 80,3 e, portanto, não recebe classificação A. O critério de eficiência em até três toques, agora calculável com os dados consolidados de toques, **não foi atendido**: apenas 13,3% das execuções ficaram dentro do limite, resultado atribuído à inadequação da métrica a tarefas com digitação, seleção múltipla e gestos — daí a recomendação de recalibrá-la (seção 9.3.2.6). Por fim, não é possível confirmar a participação do perfil 60+ com baixa familiaridade tecnológica, pois a idade e a familiaridade dos participantes não foram registradas na planilha de campo, embora o comportamento de P5 seja compatível com esse perfil.
 
 &emsp;Conclui-se que a solução possui uma base de interação funcional e compreensível. Os pontos críticos identificados não impediram o uso, mas afetaram a descobribilidade, a hierarquia visual e a autonomia em componentes de busca, filtros, faixa de preço, carrosséis e compra. Após a implementação dos ajustes, recomenda-se realizar nova rodada de validação com ênfase nas tarefas T03, T05, T06, T08 e T09, preservando o roteiro sempre que possível para permitir a comparação dos resultados.
 
 ## 9.4 Testes de Integração
 
-&emsp;Os testes de integração têm como objetivo validar as interações entre os componentes internos do Spotlight e os sistemas externos com os quais ele se comunica. Enquanto os testes unitários verificam o comportamento isolado de cada módulo, os testes de integração verificam que as fronteiras entre serviços, bancos de dados, filas de mensagens e APIs externas funcionam corretamente em conjunto.
+&emsp;Os testes de integração têm como objetivo validar as interações entre os componentes internos do Spotlight e os sistemas externos com os quais ele se comunica. Enquanto os testes unitários verificam o comportamento isolado de cada módulo, os testes de integração verificam que as fronteiras entre serviços, bancos de dados e APIs externas funcionam corretamente em conjunto.
 
-&emsp;A arquitetura SOA do Spotlight introduz múltiplos pontos de integração críticos: o API Gateway valida tokens com o Supabase Auth, os serviços de negócio persistem dados no PostgreSQL e no MongoDB, e o aplicativo mobile redireciona o usuário para a API da ticketeira parceira. A fila de telemetria com RabbitMQ é uma fronteira planejada para a Sprint 5. Cada uma dessas fronteiras é um ponto potencial de falha e, portanto, deve ser coberta por cenários de teste positivos e negativos.
+&emsp;A arquitetura SOA do Spotlight introduz múltiplos pontos de integração críticos: o API Gateway valida tokens com o Supabase Auth, os serviços de negócio persistem dados no PostgreSQL e no MongoDB, e o aplicativo mobile redireciona o usuário para a API da ticketeira parceira. A fronteira de telemetria com RabbitMQ, prevista em revisões anteriores, foi descartada na Sprint 5 (ver 8.3.3) e não compõe mais a matriz ativa. Cada uma das fronteiras remanescentes é um ponto potencial de falha e, portanto, deve ser coberta por cenários de teste positivos e negativos.
 
 ### 9.4.1 Planejamento
 
@@ -7760,7 +7856,7 @@ builder.Services.AddHttpClient("ticketeira")
 
 #### Escopo dos Testes de Integração
 
-Os testes cobrem seis fronteiras de integração definidas pela arquitetura do Spotlight:
+Os testes cobrem cinco fronteiras core de integração definidas pela arquitetura do Spotlight, mais uma fronteira complementar:
 
 | ID | Fronteira | Tipo | Usa VHS |
 |---|---|---|---|
@@ -7768,11 +7864,11 @@ Os testes cobrem seis fronteiras de integração definidas pela arquitetura do S
 | IT-02 | API Gateway → Supabase Auth (validação de token) | Externo | **Sim** |
 | IT-03 | Serviços SOA → Supabase PostgreSQL | Interno | Não |
 | IT-04 | Serviços SOA → MongoDB (telemetria) | Interno | Não |
-| IT-05 | Serviço do Usuário → Fila de Telemetria → MongoDB/Motor de Recomendação (Sprint 5) | Interno | Não |
+| IT-05 | ~~Serviço do Usuário → Fila de Telemetria → MongoDB/Motor de Recomendação~~ **(descartado na Sprint 5 — ver 8.3.3)** | Interno | Não aplicável |
 | IT-06 | App Mobile → API Ticketeira (link de compra) | Externo | **Sim** |
 | IT-07 | Serviço de Geolocalização → OpenStreetMap/Nominatim (contrato) | Externo | Não (contrato real em sandbox; complementa o fake unitário) |
 
-&emsp;As fronteiras IT-01 a IT-06 compõem o núcleo arquitetural do MVP; o **IT-07** é uma fronteira complementar planejada para validar o contrato de geocodificação contra o serviço real, além do `HttpMessageHandler` fake já usado nos testes unitários (seção 8.4).
+&emsp;As fronteiras IT-01 a IT-04 e IT-06 compõem o núcleo arquitetural do MVP; o **IT-07** é uma fronteira complementar planejada para validar o contrato de geocodificação contra o serviço real, além do `HttpMessageHandler` fake já usado nos testes unitários (seção 8.4).
 
 ---
 
@@ -7985,7 +8081,7 @@ dotnet test src/backend/services --filter "Category=Integration&Tag=PostgreSQL" 
 **Instruções de execução:**
 ```bash
 $env:RUN_MONGO_INTEGRATION_TESTS="true"
-dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.csproj --filter "Mongo|Telemetria"
+dotnet test src/backend/tests/Spotlight.User.Tests/Spotlight.User.Tests.csproj --filter "Mongo|Telemetria"
 ```
 
 ---
@@ -8014,7 +8110,7 @@ dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.cs
 | ID | Cenário | Procedimento | Resultado Esperado | Pós-condição |
 |---|---|---|---|---|
 | IT-04-N01 | Payload inválido não é gravado | Enviar `search_performed` sem `query`/`resultsCount` e com entidade incompatível | API retorna `400 Bad Request` e nenhum documento novo é inserido | Count da collection permanece igual ao valor anterior |
-| IT-04-N02 | MongoDB indisponível durante escrita | Configurar connection string indisponível e enviar evento válido | API retorna `202 Accepted` para não bloquear UX; falha é registrada em log | Evento pode ser perdido enquanto a fila da Sprint 5 não existir |
+| IT-04-N02 | MongoDB indisponível durante escrita | Configurar connection string indisponível e enviar evento válido | API retorna `202 Accepted` para não bloquear UX; falha é registrada em log | Evento pode ser perdido — limitação aceita conscientemente após o abandono do broker assíncrono na Sprint 5 (ver 8.3.3) |
 | IT-04-N03 | MongoDB não configurado | Subir serviço sem `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` ou `MONGODB_TELEMETRY_COLLECTION` | Endpoint retorna `503 Service Unavailable` com `Telemetria nao configurada.` | Readiness indica falha de configuração |
 
 **Pós-condições gerais:** Container MongoDB destruído ao final da suite via `IAsyncLifetime.DisposeAsync`.
@@ -8033,9 +8129,11 @@ dotnet test src/backend/tests/Spotlight.Usuario.Tests/Spotlight.Usuario.Tests.cs
 
 ---
 
-#### IT-05 — Fila de Telemetria ↔ MongoDB ↔ Motor de Recomendação (Planejado para Sprint 5)
+#### IT-05 — Fila de Telemetria ↔ MongoDB ↔ Motor de Recomendação (descartado na Sprint 5)
 
-**Descrição:** Valida o fluxo futuro de publicação e consumo de eventos de telemetria via fila. Este cenário não faz parte da implementação corrente da Sprint 4. A meta da Sprint 5 é inserir uma fila entre o Serviço do Usuário e o MongoDB, mantendo o schema atual da collection `interacoes`, adicionando retry/dead-letter e preparando o consumo posterior dos sinais comportamentais pelo motor de recomendação.
+> **Status:** **descartado.** O componente RabbitMQ foi formalmente abandonado na Sprint 5 (ver [8.3.3 — Decisao arquitetural: abandono do RabbitMQ](#decisao-arquitetural-abandono-do-rabbitmq)). A fronteira deixou de existir na arquitetura entregue e não é mais executada. Os cenários, ferramentas e pré-condições abaixo permanecem documentados **apenas como registro histórico** do desenho originalmente previsto e não compõem mais a matriz ativa de testes de integração; a integridade da telemetria é exercida pelo caso IT-04 (Serviços SOA ↔ MongoDB).
+
+**Descrição (registro histórico):** Validaria o fluxo de publicação e consumo de eventos de telemetria via fila. A meta original da Sprint 5 era inserir uma fila entre o Serviço do Usuário e o MongoDB, mantendo o schema atual da collection `interacoes`, adicionando retry/dead-letter e preparando o consumo posterior dos sinais comportamentais pelo motor de recomendação. Esse desenho foi descartado por penalizar a latência da recomendação em tempo próximo ao real (RNF02).
 
 **Ferramentas utilizadas:**
 - `xUnit` com `Testcontainers.RabbitMq` — instância isolada do RabbitMQ em container Docker
@@ -8090,7 +8188,7 @@ dotnet test src/backend/tests --filter "Category=Integration&Tag=RabbitMQ"
 
 **Rastreabilidade:** RF12, RF13, RF14, RF15 · RNF09 (100 eventos/s), RNF02 (recomendações em 2 s).
 
-**Status:** planejado para a Sprint 5 — a fila RabbitMQ e os consumidores não fazem parte da implementação corrente da Sprint 4.
+**Status:** **descartado na Sprint 5** — a fila RabbitMQ e os consumidores não foram implementados e foram formalmente removidos do escopo do MVP (ver 8.3.3). O caso permanece nesta seção apenas como registro histórico do desenho originalmente previsto.
 
 ---
 
@@ -8208,7 +8306,7 @@ dotnet test src/backend/services/catalogo \
 | IT-02: API Gateway ↔ Supabase Auth | RF01, RF02 | RNF05 (JWT, HTTPS), RNF03 (disponibilidade) | Autenticação é pré-requisito para todas as funcionalidades personalizadas; VHS garante isolamento do teste |
 | IT-03: Serviços SOA ↔ PostgreSQL | RF03, RF04, RF07, RF08, RF09, RF10, RF12, RF16 | RNF01 (tempo de carregamento), RNF06 (200 usuários) | Banco relacional é a fonte de verdade para catálogo, usuários e recomendações |
 | IT-04: Serviços SOA ↔ MongoDB | RF11, RF12, RF13, RF14 | RNF07 (logs), RNF02 (UX não bloqueada) | Telemetria comportamental alimenta o motor de ML; perda de eventos degrada a qualidade das recomendações ao longo do tempo |
-| IT-05: Fila de Telemetria ↔ MongoDB/Motor de Recomendação (Sprint 5) | RF12, RF13, RF14, RF15 | RNF09 (100 eventos/s), RNF02 (recomendações em 2 s) | Desacoplamento assíncrono será o pilar de resiliência futura; falha aqui pode reduzir atualização de sinais comportamentais |
+| ~~IT-05: Fila de Telemetria ↔ MongoDB/Motor de Recomendação~~ **(descartado na Sprint 5 — ver 8.3.3)** | — | RNF09 reclassificado como não aplicável | Fronteira removida da matriz ativa após o abandono do broker; a telemetria permanece atendida pelo caminho síncrono validado em IT-04 |
 | IT-06: Serviço de Catálogo ↔ Ticketeira | RF07 | RNF01, RNF03 | Redirecionamento para compra é o ponto final da conversão; VHS isola a dependência externa |
 
 &emsp;Em termos de **cobertura de requisitos**, os testes de integração planejados cobrem diretamente 15 dos 16 Requisitos Funcionais (RF01–RF15 integralmente; RF16 parcialmente via IT-01-P04) e 8 dos 12 Requisitos Não Funcionais (RNF01, RNF02, RNF03, RNF05, RNF06, RNF07, RNF08, RNF09).
@@ -8240,7 +8338,7 @@ dotnet test src/backend/services/catalogo \
 
 3. **Velocidade:** Chamadas reais ao Supabase Auth levam entre 200 ms e 800 ms por requisição. Com o VHS em cache-hit, a latência cai para menos de 5 ms, permitindo executar a suite completa em CI em menos de 60 segundos.
 
-&emsp;Para as fronteiras internas (IT-01, IT-03, IT-04, IT-05), o VHS não é utilizado porque os serviços são instanciados via `Testcontainers` no próprio ambiente de teste, garantindo isolamento e determinismo sem a necessidade de interceptar chamadas HTTP externas.
+&emsp;Para as fronteiras internas (IT-01, IT-03, IT-04), o VHS não é utilizado porque os serviços são instanciados via `Testcontainers` no próprio ambiente de teste, garantindo isolamento e determinismo sem a necessidade de interceptar chamadas HTTP externas.
 
 ---
 

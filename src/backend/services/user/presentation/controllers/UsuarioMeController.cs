@@ -15,6 +15,7 @@ namespace Spotlight.Usuario.Presentation.Controllers;
 [Authorize]
 public class UsuarioMeController : ControllerBase
 {
+    /// <summary>Retorna o perfil do usuário autenticado. Exige JWT (papel <c>cadastrado</c>).</summary>
     [HttpGet]
     [ProducesResponseType(typeof(UsuarioDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status401Unauthorized)]
@@ -27,6 +28,7 @@ public class UsuarioMeController : ControllerBase
         return Ok(await obter.ExecutarAsync(ExigirUsuario(usuarioContexto), cancellationToken));
     }
 
+    /// <summary>Atualiza dados básicos do perfil do usuário autenticado (nome, data de nascimento).</summary>
     [HttpPut]
     [ProducesResponseType(typeof(UsuarioDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status400BadRequest)]
@@ -41,6 +43,7 @@ public class UsuarioMeController : ControllerBase
         return Ok(await atualizar.ExecutarAsync(ExigirUsuario(usuarioContexto), body, cancellationToken));
     }
 
+    /// <summary>Retorna as preferências do usuário autenticado (gêneros, faixa de preço, horários).</summary>
     [HttpGet("preferencias")]
     [ProducesResponseType(typeof(PreferenciasDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status401Unauthorized)]
@@ -56,6 +59,7 @@ public class UsuarioMeController : ControllerBase
         return Ok(await obter.ExecutarAsync(usuarioId, cancellationToken));
     }
 
+    /// <summary>Substitui o conjunto de preferências do usuário autenticado.</summary>
     [HttpPut("preferencias")]
     [ProducesResponseType(typeof(PreferenciasDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status400BadRequest)]
@@ -73,6 +77,7 @@ public class UsuarioMeController : ControllerBase
         return Ok(await atualizar.ExecutarAsync(usuarioId, body, cancellationToken));
     }
 
+    /// <summary>Lista paginada das avaliações feitas pelo usuário autenticado.</summary>
     [HttpGet("avaliacoes")]
     [ProducesResponseType(typeof(ListaPaginadaDto<AvaliacaoUsuarioDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErroDto), StatusCodes.Status401Unauthorized)]
