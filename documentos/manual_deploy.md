@@ -5,6 +5,23 @@ EC2 da AWS usando Docker Compose. O fluxo foi pensado para o AWS Academy
 Learner Lab, onde serviços gerenciados como ECS/EKS podem ser limitados por
 permissoes de IAM.
 
+## Índice
+
+- [1. Visão geral da estratégia](#1-visão-geral-da-estratégia)
+- [2. Arquivos de deploy](#2-arquivos-de-deploy)
+- [3. Pré-requisitos](#3-pré-requisitos)
+- [4. Configurar credenciais temporárias da AWS](#4-configurar-credenciais-temporárias-da-aws)
+- [5. Criar a key pair da EC2](#5-criar-a-key-pair-da-ec2)
+- [6. Criar a stack CloudFormation](#6-criar-a-stack-cloudformation)
+- [7. Validar a EC2](#7-validar-a-ec2)
+- [8. Publicar a aplicação](#8-publicar-a-aplicação)
+- [9. Liberar MongoDB Atlas](#9-liberar-mongodb-atlas)
+- [10. Validar containers e endpoints](#10-validar-containers-e-endpoints)
+- [11. Operação e manutenção](#11-operação-e-manutenção)
+- [12. Problemas comuns](#12-problemas-comuns)
+- [13. Resultado esperado](#13-resultado-esperado)
+- [14. Observações de segurança](#14-observações-de-segurança)
+
 ## 1. Visão geral da estratégia
 
 A infraestrutura e criada por CloudFormation, e a aplicação e executada na EC2
