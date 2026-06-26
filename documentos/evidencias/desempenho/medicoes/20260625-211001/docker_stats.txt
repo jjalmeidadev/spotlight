@@ -1,0 +1,10 @@
+NAME                                  CPU %     MEM USAGE / LIMIT
+spotlight-loadtest-gateway-1          0.02%     65.91MiB / 7.603GiB
+spotlight-loadtest-recomendacao-1     0.03%     58.32MiB / 7.603GiB
+spotlight-loadtest-usuario-1          0.04%     67.61MiB / 7.603GiB
+spotlight-loadtest-geolocalizacao-1   0.01%     32.01MiB / 7.603GiB
+spotlight-loadtest-catalogo-1         15.04%    82.71MiB / 7.603GiB
+spotlight-loadtest-db-1               0.98%     273.9MiB / 7.603GiB
+spotlight-loadtest-mongo-1            0.95%     229.6MiB / 7.603GiB
+g04-recomendacao-1                    0.02%     47.64MiB / 7.603GiB
+g04-catalogo-1                        9.53%     54.04MiB / 7.603GiB
