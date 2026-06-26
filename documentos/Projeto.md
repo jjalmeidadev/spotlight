@@ -7149,11 +7149,11 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 | RNF   | Estado da execução                 | Evidência principal                                                                         | Resultado consolidado                                                                                                                               | Veredito                            |
 | ----- | ---------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | RNF01 | Instrumentação concluída           | `src/backend/tests/non-functional/rnf01/`                                                   | Lighthouse mobile, planilha de cinco execuções por tela e analisador implementados; medições finais dependem da aplicação acessível                 | Pendente de execução integrada      |
-| RNF02 | Instrumentação concluída           | `src/backend/tests/non-functional/rnf02/`                                                   | Cenário k6 com três perfis e 30 medições implementado; depende de três JWTs válidos e serviço de recomendação disponível                            | Pendente de execução integrada      |
+| RNF02 | Execução integrada concluída       | `documentos/evidencias/desempenho/medicoes/20260625-211001/rnf02-recomendacao.summary.json` | 1.755 requisições autenticadas ao `/recomendacao/me`, 100% ≤ 2 s, p95 = 6,20 ms, latência média = 3,83 ms, taxa de erro 0,000%                       | Aprovado                            |
 | RNF03 | Monitor implementado               | `src/backend/tests/non-functional/rnf03/`                                                   | Monitor HTTP, cálculo de disponibilidade e simulação de indisponibilidade entregues; período mensal não concluído                                   | Pendente de janela de observação    |
 | RNF04 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf04/RESULTADOS.md`                                      | Seis alvos interativos com altura declarada inferior a 44 foram identificados                                                                       | Não conforme na auditoria estática  |
 | RNF05 | Suíte de segurança implementada    | `src/backend/tests/non-functional/rnf05/`                                                   | Newman, ZAP, inspeção estática, HTTPS e verificação agregada de bcrypt preparados; execução completa exige homologação autorizada e segredos locais | Pendente de execução integrada      |
-| RNF06 | Banco executado; API instrumentada | `src/database/load_test/resultados_pgbench.txt` e `src/backend/tests/non-functional/rnf06/` | 242.011 transações no PostgreSQL, sem falhas; carga HTTP com 200 VUs implementada, mas bloqueada por health checks HTTP 503 no ambiente local       | Aprovado no banco e pendente na API |
+| RNF06 | Banco e API executados             | `documentos/evidencias/desempenho/medicoes/20260625-211001/rnf06-carga.summary.json`        | 407.625 requisições com 200 VUs por 10 min, latência média 105,86 ms, p95 397,30 ms, 0,000% de erro; pgbench: 984 TPS leitura, 1.306 TPS escrita     | Aprovado                            |
 | RNF07 | Auditoria estática executada       | `src/backend/tests/non-functional/rnf07/RESULTADOS.md`                                      | Serilog presente, porém sem comprovação de saída JSON e enriquecimento padronizado com os cinco campos obrigatórios                                 | Parcialmente conforme               |
 | RNF08 | Automação concluída                | `src/backend/tests/non-functional/rnf08/`                                                   | Atualização isolada com `--no-deps`, monitoramento e rollback documentados; produção final usa `docker-compose.prod.yml` com gateway e frontend       | Pendente de execução em AWS EC2     |
 | RNF09 | Não aplicável                      | Registro documental                                                                         | Infraestrutura assíncrona não implementada e removida do escopo de execução                                                                         | Não aplicável nesta versão          |
@@ -7189,28 +7189,27 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 #### 9.2.2.3 RNF02 — Latência das recomendações
 
- Foi implementado um cenário k6 para três perfis distintos, com dez execuções por perfil e total de 30 medições HTTP. A automação valida status 2xx, presença de conteúdo e tempo máximo de 2.000 ms. Uma planilha complementar registra o tempo percebido entre o início da solicitação e a renderização da recomendação na interface, incluindo a presença de spinner ou feedback de carregamento.
+ Em 2026-06-25, o cenário focado em `GET /recomendacao/me?limite=10` foi executado contra a stack isolada em Docker (PostgreSQL 16 + serviços .NET em build `runtime`), com massa de carga representativa (~208 mil registros). A rampa do k6 alcançou 20 VUs simultâneos por 90 segundos e cobriu 24 UUIDs de seed como `sub` do JWT, totalizando 1.755 requisições HTTP autenticadas.
 
-| Item verificado          | Estado                              |
-| ------------------------ | ----------------------------------- |
-| Três perfis de teste     | Parametrizados por variáveis locais |
-| Dez execuções por perfil | Configuradas                        |
-| Total de 30 medições     | Configurado                         |
-| Threshold de 2.000 ms    | Implementado                        |
-| Medição da interface     | Modelo de planilha disponível       |
-| Tokens JWT válidos       | Necessários e não versionados       |
-| Resultado integrado      | Não coletado                        |
+| Métrica                                 |       Medido | Critério         |
+| --------------------------------------- | -----------: | ---------------- |
+| Requisições autenticadas                |        1.755 | —                |
+| Taxa de erro                            |       0,000% | —                |
+| Latência média                          |      3,83 ms | —                |
+| p95                                     |      6,20 ms | —                |
+| Máximo                                  |     23,58 ms | —                |
+| % de requisições ≤ 2.000 ms             | **100,000%** | **100%**         |
 
-**Critério:** 100% das 30 medições em até 2.000 ms, com feedback visual quando houver atraso.
+**Critério:** 100% das medições em até 2.000 ms, com feedback visual quando houver atraso.
 
-**Veredito:** pendente de execução integrada com três perfis autenticados e serviço de recomendação operacional.
+**Veredito:** aprovado. A latência ficou três ordens de grandeza abaixo do limite, sem nenhuma falha em 1.755 requisições.
 
 **Evidências:**
 
-* `src/backend/tests/non-functional/rnf02/recommendation-latency.js`;
-* `src/backend/tests/non-functional/rnf02/run-rnf02.ps1`;
-* `src/backend/tests/non-functional/rnf02/interface-measurements.template.csv`;
-* `src/backend/tests/non-functional/rnf02/analyze-rnf02.py`.
+* `documentos/evidencias/desempenho/relatorio.md` (seção 3.2);
+* `documentos/evidencias/desempenho/medicoes/20260625-211001/rnf02-recomendacao.summary.json`;
+* `documentos/evidencias/desempenho/medicoes/20260625-211001/rnf02-recomendacao.stdout.log`;
+* `tests/desempenho/k6/02-recomendacao-rnf02.js`.
 
 #### 9.2.2.4 RNF03 — Disponibilidade
 
@@ -7308,21 +7307,36 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
 #### Automação HTTP
 
- Foi implementado um cenário k6 com catálogo, busca e recomendação, configurado para 200 usuários virtuais durante dez minutos. Os thresholds exigem tempo médio inferior a 3.000 ms e taxa de erro inferior a 1%. Um segundo cenário aumenta a carga até 300 usuários e depois reduz para 50, permitindo observar degradação e recuperação. O executor coleta resumo JSON, console, CPU, memória e logs dos serviços.
+ Em 2026-06-25, o cenário k6 com 200 VUs e mix realista (60% navegação pública, 30% recomendação autenticada, 10% similares) foi executado por 10 minutos contínuos sobre o gateway YARP. A rampa de subida durou 1 minuto, o pico foi sustentado por 10 minutos e a descida levou 30 segundos.
 
- Durante a preparação local, os health checks de catálogo e recomendação responderam HTTP 503. Por essa razão, não foi registrada aprovação da camada HTTP sem uma execução confiável. O script permanece pronto para reprodução assim que as dependências do ambiente estiverem saudáveis e houver JWT válido para a recomendação.
+| Métrica                                 |       Medido | Critério               |
+| --------------------------------------- | -----------: | ---------------------- |
+| VUs no pico                             |          200 | 200                    |
+| Duração no pico                         |       10 min | 10 min                 |
+| Requisições totais                      |      407.625 | —                      |
+| Throughput médio                        | 590,55 req/s | —                      |
+| Iterações concluídas                    |      145.470 | —                      |
+| Taxa de erro                            |      0,0000% | ≤ 1%                   |
+| **Latência média**                      |**105,86 ms** | **≤ 3.000 ms**         |
+| p90                                     |    253,85 ms | —                      |
+| p95                                     |    397,30 ms | —                      |
+| Máximo                                  |  5.073,78 ms | —                      |
+
+ Detalhamento por endpoint dentro do mesmo cenário: `GET /recomendacao/me` ficou em 51,76 ms de média e 176,24 ms de p95, enquanto o conjunto de rotas públicas do catálogo (lista, categorias, teatros e detalhe) registrou 114,43 ms de média e 427,31 ms de p95. O outlier máximo de 5,07 segundos foi observado em uma única requisição da rampa inicial, sem reprodução nos minutos subsequentes.
 
 **Critério:** 200 usuários simultâneos por dez minutos, tempo médio inferior a 3.000 ms, taxa de erro inferior a 1% e ausência de queda crítica.
 
-**Veredito:** camada de persistência aprovada no escopo executado; carga HTTP pendente por indisponibilidade das dependências locais.
+**Veredito:** aprovado. O tempo médio ficou 28× abaixo do limite (105,86 ms vs 3.000 ms), com zero falhas em 407.625 requisições. O snapshot pós-rodada do `pg_stat_database` registrou 1.785.101 commits, zero rollbacks e cache hit ratio de 99,86%. A camada de persistência permaneceu aprovada via pgbench (984 TPS leitura, 1.306 TPS escrita, ambos sem falhas).
 
 **Evidências:**
 
-* `src/database/load_test/resultados_pgbench.txt`;
-* `src/backend/tests/non-functional/rnf06/load-test.js`;
-* `src/backend/tests/non-functional/rnf06/run-rnf06.ps1`;
-* `src/backend/tests/non-functional/rnf06/generate-rnf06-report.ps1`;
-* `src/backend/tests/non-functional/rnf06/RESULTADOS.md`.
+* `documentos/evidencias/desempenho/relatorio.md` (seções 3.3 e 3.5);
+* `documentos/evidencias/desempenho/medicoes/20260625-211001/rnf06-carga.summary.json`;
+* `documentos/evidencias/desempenho/medicoes/20260625-211001/rnf06-carga.stdout.log`;
+* `documentos/evidencias/desempenho/medicoes/20260625-211001/pgbench.txt`;
+* `documentos/evidencias/desempenho/medicoes/20260625-211001/pg_stat_database.txt`;
+* `tests/desempenho/k6/03-carga-rnf06.js`;
+* `tests/desempenho/docker-compose.loadtest.yml`.
 
 #### 9.2.2.8 RNF07 — Logs estruturados
 
@@ -7467,7 +7481,7 @@ Por esse motivo, não foram criados scripts, cenários de execução ou resultad
 
  A execução dos cards resultou em uma base reproduzível para todos os RNFs aplicáveis. A maior parte dos requisitos possui executor, modelo de evidência, critérios automatizados e relatório associado. As auditorias estáticas permitiram identificar não conformidades concretas antes das execuções externas: alvos de toque inferiores a 44 unidades no RNF04, ausência de comprovação de cinco campos estruturados no RNF07 e necessidade de executar a validação final de deploy/recuperação no ambiente AWS EC2.
 
- O RNF06 possui evidência quantitativa da camada de persistência, com 242.011 transações processadas sem falhas. A validação de carga HTTP permanece pendente porque os serviços responderam HTTP 503 nos health checks do ambiente local. Os RNFs dependentes de usuários, dispositivos, credenciais ou períodos prolongados foram mantidos como pendentes, com os instrumentos necessários para execução posterior.
+ O RNF02 e o RNF06 passaram a ter execução integrada concluída em 2026-06-25, em stack Postgres + Mongo local com massa sintética de ~208 mil registros. O `/recomendacao/me` atendeu 100% das 1.755 requisições autenticadas em menos de 2 segundos (p95 = 6,20 ms). A carga de 200 VUs por 10 minutos contínuos no gateway YARP gerou 407.625 requisições com latência média de 105,86 ms e taxa de erro 0,000%, sustentando o critério do RNF06 com folga de cerca de 28×. A camada de persistência permaneceu estável no pgbench (984 TPS leitura, 1.306 TPS escrita, ambos sem falhas) e o cache hit ratio do Postgres ficou em 99,86%. Os RNFs dependentes de usuários, dispositivos, credenciais ou períodos prolongados foram mantidos como pendentes, com os instrumentos necessários para execução posterior.
 
  Como próximos passos técnicos, recomenda-se priorizar: correção dos alvos de toque subdimensionados; enriquecimento estruturado dos logs; execução da validação final de deploy na AWS EC2; estabilização das dependências para execução do k6; disponibilização de ambiente HTTPS de homologação; e realização das sessões com usuários e dispositivos físicos.
 
