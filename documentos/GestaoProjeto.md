@@ -118,6 +118,7 @@
   - [2.3 Sprint 3](#23-sprint-3)
   - [2.4 Sprint 4](#24-sprint-4)
   - [2.5 Sprint 5](#25-sprint-5)
+  - [2.6 Análise de evolução de métricas](#26-análise-de-evolução-de-métricas)
 - [3. Análise de Riscos](#3-análise-de-riscos)
   - [3.1 Riscos Identificados](#31-riscos-identificados)
   - [3.2 Mitigação de Riscos e Resultados](#32-mitigação-de-riscos-e-resultados)
@@ -1065,6 +1066,60 @@ Todas as tasks da Sprint 5 estão registradas no board do GitLab com descrição
 - Deploy deve ser tratado como entrega crítica do Dia 4, não do Dia 7.
 - Issues de documentação devem usar o tipo padronizado `DOCS`. Issues que hoje estejam como `DOCUMENTATION` devem ser revisadas para manter um padrão único no board.
 - O tipo da issue deve refletir o trabalho predominante: `DOCS` para documentação, `TEST` para execução ou automação de testes, `DEV` para implementação, `INFRA` para deploy/ambiente e `REVIEW` para revisão ou validação.
+
+---
+
+## 2.6 Análise de evolução de métricas
+
+Esta seção consolida a evolução quantitativa do trabalho ao longo das cinco sprints do Spotlight, atendendo à task T41 da Sprint 5. A análise usa como fonte o export de issues do GitLab `graduacao-2026-1b-t17-g04_work_items_2026-06-26.csv` e o painel de apoio `sprint_metrics_spotlight.html`, ambos gerados em 26/06/2026. Foram consideradas issues fechadas associadas aos milestones Sprint 01 a Sprint 05.
+
+Para a leitura de velocity, foi usada a escala de complexidade adotada no board: `SIZE_P = 1 ponto`, `SIZE_M = 2 pontos` e `SIZE_G = 3 pontos`. Itens residuais `SIZE_PP`, quando presentes no painel consolidado, foram agrupados como baixa complexidade; itens sem label de tamanho foram mantidos na contagem geral de issues, mas não aparecem na distribuição visual por complexidade. O lead time corresponde ao tempo médio, em dias, entre criação e fechamento das issues.
+
+| Sprint | Issues fechadas consideradas | Velocity consolidada | Lead time médio | Distribuição de complexidade |
+|---|---:|---:|---:|---|
+| Sprint 1 | 56 | 111 pts | 2,0 dias | 11 G, 33 M, 12 P |
+| Sprint 2 | 67 | 145 pts | 3,8 dias | 17 G, 44 M, 6 P |
+| Sprint 3 | 65 | 139 pts | 4,9 dias | 16 G, 42 M, 7 P |
+| Sprint 4 | 82 | 159 pts | 6,0 dias | 12 G, 54 M, 15 P |
+| Sprint 5 | 37 | 65 pts | 8,0 dias | 4 G, 20 M, 13 P |
+
+### 2.6.1 Velocity por sprint
+
+<p align="center">
+  <img src="./img/metricas-velocity-sprints.svg" alt="Gráfico de velocity por sprint">
+</p>
+
+A velocity cresceu de 111 pontos na Sprint 1 para 145 na Sprint 2, indicando ganho inicial de organização após o primeiro ciclo de entendimento do problema e estruturação do backlog. A Sprint 3 manteve patamar semelhante, com 139 pontos, mesmo com maior densidade técnica, o que sugere estabilização do ritmo de entrega. O pico ocorreu na Sprint 4, com 159 pontos, ciclo em que a equipe concentrou grande volume de implementação, integração e testes.
+
+Na Sprint 5, a velocity caiu para 65 pontos. Essa queda não representa, isoladamente, perda de produtividade: o escopo do ciclo final foi mais orientado a consolidação, revisão, evidências, deploy, apresentação e documentação final. Esse tipo de trabalho tende a gerar menos pontos fechados, mas aumenta o valor de entrega porque reduz risco de avaliação e torna o produto demonstrável.
+
+### 2.6.2 Lead time médio
+
+<p align="center">
+  <img src="./img/metricas-lead-time-sprints.svg" alt="Gráfico de lead time médio por sprint">
+</p>
+
+O lead time apresentou crescimento contínuo, saindo de 2,0 dias na Sprint 1 para 8,0 dias na Sprint 5. A tendência acompanha a mudança de natureza do projeto: as primeiras sprints tinham tarefas menores de entendimento, documentação inicial e prototipação; nas sprints intermediárias, as issues passaram a depender de banco, backend, frontend, integrações e revisão de merge requests; no fechamento, muitas tarefas ficaram condicionadas à disponibilidade de evidências finais, deploy e revisão cruzada.
+
+Esse aumento indica que, conforme o produto amadureceu, o fluxo de trabalho ficou mais interdependente. A equipe respondeu com práticas como matriz de dependências, SLA de revisão de MRs, checagem diária de documentação e definição de caminhos críticos. Mesmo assim, a Sprint 5 mostra que tarefas de encerramento precisam começar antes, pois dependem de outputs de quase todas as frentes.
+
+### 2.6.3 Distribuição de complexidade
+
+<p align="center">
+  <img src="./img/metricas-complexidade-sprints.svg" alt="Gráfico de distribuição de complexidade por sprint">
+</p>
+
+A distribuição de complexidade evidencia uma concentração consistente em tarefas `SIZE_M`, principalmente nas Sprints 2, 3 e 4. Isso mostra que o backlog foi majoritariamente composto por entregas intermediárias: grandes o suficiente para exigir ownership e revisão, mas ainda pequenas o bastante para serem fechadas dentro do ciclo. A Sprint 4 foi o ponto de maior volume, com 54 issues médias e 12 grandes, refletindo a fase de maior integração técnica do projeto.
+
+Na Sprint 5, a quantidade de tasks grandes caiu para 4, enquanto tarefas pequenas subiram proporcionalmente. Esse movimento é coerente com um ciclo de fechamento: ajustes documentais, evidências, correções pontuais, validações finais e pequenos reparos de integração tendem a substituir grandes blocos de implementação. A leitura qualitativa, portanto, é que a equipe reduziu escopo de desenvolvimento novo para priorizar acabamento e sustentação da entrega.
+
+### 2.6.4 Conclusões sobre o comportamento da equipe
+
+A evolução das métricas mostra três fases claras. A primeira, nas Sprints 1 e 2, foi de formação e ganho de ritmo, com aumento de velocity e lead time ainda baixo. A segunda, nas Sprints 3 e 4, foi de produção técnica intensa, marcada por volume alto, complexidade média elevada e maior dependência entre frentes. A terceira, na Sprint 5, foi de consolidação, com menor velocity, maior lead time e foco em evidências, deploy, testes e documentação final.
+
+O comportamento da equipe amadureceu junto com o produto. As métricas reforçam que o grupo aprendeu a transformar problemas de gestão em ações concretas: a matriz de dependências respondeu a gargalos de sequenciamento, o SLA de revisão reduziu risco de MRs parados, e a organização por frentes permitiu absorver um pico de trabalho na Sprint 4. Por outro lado, o aumento contínuo do lead time e a concentração de fechamento na Sprint 5 indicam que tarefas de validação, deploy e documentação final deveriam ser iniciadas antes em projetos futuros.
+
+Como conclusão, o projeto manteve uma trajetória de entrega consistente: alta capacidade de produção nas sprints intermediárias, redução deliberada de escopo novo no encerramento e esforço final voltado à qualidade, rastreabilidade e demonstração. Para próximos ciclos, recomenda-se antecipar atividades de evidência, limitar WIP em branches de integração e reservar capacidade explícita para deploy e revisão documental desde o planejamento inicial da última sprint.
 
 ---
 
