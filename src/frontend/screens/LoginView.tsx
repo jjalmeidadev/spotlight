@@ -2,13 +2,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
   ActivityIndicator,
-  ImageBackground,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { Usuario } from '../models/User';
@@ -20,17 +21,25 @@ type LoginViewProps = {
 };
 
 const backgroundImage = require('../../../assets/images/login-bg.png');
+const LOGIN_BACKGROUND_WIDTH = 430;
+const LOGIN_BACKGROUND_HEIGHT = 553;
+const LOGIN_BACKGROUND_ASPECT_RATIO = LOGIN_BACKGROUND_WIDTH / LOGIN_BACKGROUND_HEIGHT;
+const LOGIN_BACKGROUND_VISIBLE_WIDTH = 360;
+const LOGIN_BACKGROUND_SCALE = LOGIN_BACKGROUND_WIDTH / LOGIN_BACKGROUND_VISIBLE_WIDTH;
 
 export default function LoginView({ onLogin, onCadastroPress }: LoginViewProps) {
   const { email, senha, loading, error, setEmail, setSenha, entrar } = useLoginViewModel(onLogin);
+  const { width, height } = useWindowDimensions();
+  const backgroundWidth = width * LOGIN_BACKGROUND_SCALE;
+  const backgroundHeight = Math.min(height, backgroundWidth / LOGIN_BACKGROUND_ASPECT_RATIO);
 
   return (
-    <ImageBackground
-      resizeMode="cover"
-      source={backgroundImage}
-      style={styles.background}
-      imageStyle={styles.backgroundImage}
-    >
+    <View style={styles.background}>
+      <Image
+        resizeMode="cover"
+        source={backgroundImage}
+        style={[styles.backgroundImage, { width: backgroundWidth, height: backgroundHeight }]}
+      />
       <LinearGradient
         colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.65)', 'rgba(0,0,0,0.96)']}
         locations={[0.3, 0.65, 1]}
@@ -83,7 +92,7 @@ export default function LoginView({ onLogin, onCadastroPress }: LoginViewProps) 
           </View>
         </View>
       </KeyboardAvoidingView>
-    </ImageBackground>
+    </View>
   );
 }
 
@@ -108,9 +117,14 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: '#000000',
+    overflow: 'hidden',
   },
   backgroundImage: {
-    alignSelf: 'stretch',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    width: '100%',
   },
   gradient: {
     ...StyleSheet.absoluteFillObject,
