@@ -118,6 +118,9 @@
   - [2.3 Sprint 3](#23-sprint-3)
   - [2.4 Sprint 4](#24-sprint-4)
   - [2.5 Sprint 5](#25-sprint-5)
+    - [2.5.1 Planejamento da Sprint 5](#251-planejamento-da-sprint-5)
+    - [2.5.2 Retrospectiva da Sprint 5](#252-retrospectiva-da-sprint-5)
+    - [2.5.3 Análise dos Pontos Identificados](#253-análise-dos-pontos-identificados)
   - [2.6 Análise de evolução de métricas](#26-análise-de-evolução-de-métricas)
 - [3. Análise de Riscos](#3-análise-de-riscos)
   - [3.1 Riscos Identificados](#31-riscos-identificados)
@@ -1066,6 +1069,57 @@ Todas as tasks da Sprint 5 estão registradas no board do GitLab com descrição
 - Deploy deve ser tratado como entrega crítica do Dia 4, não do Dia 7.
 - Issues de documentação devem usar o tipo padronizado `DOCS`. Issues que hoje estejam como `DOCUMENTATION` devem ser revisadas para manter um padrão único no board.
 - O tipo da issue deve refletir o trabalho predominante: `DOCS` para documentação, `TEST` para execução ou automação de testes, `DEV` para implementação, `INFRA` para deploy/ambiente e `REVIEW` para revisão ou validação.
+
+---
+
+### 2.5.2 Retrospectiva da Sprint 5
+
+A Sprint 5 correspondeu ao ciclo final de consolidação do Spotlight, com foco na estabilização do produto, deploy em AWS EC2, revisão da pipeline de CI, execução e documentação de testes, gravação do vídeo demonstrativo e fechamento dos artefatos exigidos para a entrega. O board registrou 58 issues criadas para o ciclo, das quais aproximadamente 37 constavam como `Closed` no export consolidado, com as demais distribuídas entre `Waiting Review` e `Backlog`. A velocity consolidada foi de 65 pontos, usando a escala `SIZE_P = 1`, `SIZE_M = 2` e `SIZE_G = 3`, e o lead time médio chegou a 8,0 dias, maior valor observado entre as cinco sprints.
+
+O ciclo evidenciou um padrão típico de sprint de encerramento: menor volume de pontos fechados em comparação às sprints intermediárias, porém maior concentração em validação, documentação, revisão cruzada, evidências e preparação da demonstração final. A equipe manteve disciplina de configuração, com cerca de 26 MRs abertos na sprint e aproximadamente 98% dos commits seguindo Conventional Commits, mas encerrou o ciclo ainda com itens relevantes em revisão ou backlog, especialmente nas frentes de testes finais e consolidação documental.
+
+---
+
+### 2.5.3 Análise dos Pontos Identificados
+
+#### Pontos Fortes
+
+| Ponto forte | Evidência observada na Sprint 5 | Impacto no processo |
+|---|---|---|
+| Consolidação do ambiente de demonstração em nuvem | Deploy realizado na AWS EC2 por Leonardo, permitindo a gravação do vídeo demonstrativo e a validação do fluxo final em ambiente remoto. | Reduziu o risco de uma apresentação baseada apenas em execução local e fortaleceu a evidência de disponibilidade do sistema. |
+| Revisão da pipeline de CI | Pipeline de CI revisada e funcionando ao final da sprint. | Reduziu risco de regressão no fechamento do projeto e deu mais segurança para os MRs finais. |
+| Board final com volume e rastreabilidade suficientes | 58 issues criadas na Sprint 5, acima das 49 esperadas no planejamento anterior, com descrição, tamanho e tipo registrados no board. | Manteve rastreabilidade entre planejamento, execução e documentação mesmo com expansão do escopo final. |
+| Fechamento majoritário das issues planejadas | Aproximadamente 37 das 58 issues constavam como `Closed` no export consolidado, representando cerca de 64% de fechamento no recorte analisado. | Mostra avanço concreto do ciclo final, ainda que com pendências residuais em revisão e backlog. |
+| Disciplina de versionamento mantida | Aproximadamente 26 MRs abertos na sprint e cerca de 98% dos commits aderentes a Conventional Commits. | Preservou a qualidade de rastreabilidade no GitLab e facilitou a revisão dos artefatos finais. |
+| Tratamento mais estruturado dos riscos | A seção de riscos foi aprofundada com 4 novos riscos da Sprint 5 e estratégias de mitigação vinculadas ao planejamento do ciclo. | Corrigiu o ponto de melhoria apontado no feedback da Sprint 4, em que a análise de riscos ainda era genérica. |
+| Padronização do tipo de issues de documentação | A recomendação de substituir `DOCUMENTATION` por `DOCS` foi incorporada ao padrão de gestão do board. | Reduziu inconsistência de classificação das issues e tornou o board mais legível para análise final. |
+
+A Sprint 5 demonstrou maturidade operacional principalmente na capacidade de transformar o fechamento do projeto em entregas rastreáveis. O deploy em AWS EC2 e a pipeline revisada deram sustentação técnica para a demonstração final, enquanto o uso de MRs e commits padronizados manteve a rastreabilidade do repositório. A gestão também evoluiu em relação ao feedback anterior, pois os riscos deixaram de ser apenas genéricos e passaram a aparecer conectados ao planejamento, às dependências e às evidências esperadas.
+
+#### Pontos Fracos
+
+| Ponto fraco | Evidência observada na Sprint 5 | Consequência |
+|---|---|---|
+| Lead time mais alto do projeto | Lead time médio de 8,0 dias na Sprint 5, maior valor entre todas as sprints analisadas. | Indica que as issues finais permaneceram abertas por mais tempo, principalmente por dependerem de revisão, evidências e validações cruzadas. |
+| Fechamento parcial do board | Das 58 issues criadas, aproximadamente 37 estavam como `Closed`; cerca de 21 permaneceram entre `Waiting Review` e `Backlog`. | Mantém risco residual de ajustes finais no fechamento documental e nas evidências de teste. |
+| Pendências em testes finais | Celso encerrou com 1 issue em `Waiting Review` relacionada a testes automatizados de regras de negócio; Vitor encerrou com 4 issues em `Waiting Review` relacionadas a testes de funcionalidade, RNF de desempenho, RNF de segurança e Swagger. | Testes finais dependeram de revisão no encerramento, aumentando risco de evidência incompleta no artefato final. |
+| Pendências de integração e validação | Mariana Pereira encerrou com 2 issues em `Backlog` ou `Waiting Review`, relacionadas a testes de integração e validação frontend-backend. | Parte da validação integrada ainda dependia de consolidação no fechamento da sprint. |
+| Pendências de gestão/documentação final | Mariana Reis encerrou com 2 issues em `Backlog`, incluindo a retrospectiva da Sprint 5 e critérios do Escritório de Projetos; a issue #415, de consolidação do `Projeto.md`, também permaneceu aberta. | A documentação final ficou sujeita a complementações no encerramento, exigindo atenção adicional antes da entrega definitiva. |
+| Concentração de trabalho documental no ciclo final | A distribuição de complexidade da Sprint 5 foi de 4 `SIZE_G`, 20 `SIZE_M` e 13 `SIZE_P`, com predominância de issues documentais. | Aumentou o volume de revisão textual e de padronização do board nos últimos dias do projeto. |
+
+Os pontos negativos indicam que a sprint final concentrou trabalho de fechamento além da capacidade ideal de revisão. O lead time de 8,0 dias mostra que as issues permaneceram abertas por mais tempo, especialmente por dependerem de evidências, validações finais e revisão documental. Embora a equipe tenha conseguido disponibilizar ambiente, vídeo, CI e documentação essencial, parte dos artefatos ainda dependia de revisão ou consolidação no encerramento, o que torna a entrega funcional, mas com risco residual de ajustes finais em documentação e evidências de teste.
+
+#### Resultado das Ações de Melhoria da Sprint 4
+
+| Ação de melhoria | Status | Evidência | Observação |
+|---|---|---|---|
+| Aprofundar a análise de riscos do plano da Sprint 5 | Cumprida | A seção de riscos foi expandida com 4 novos riscos do ciclo final, incluindo crescimento de escopo, placeholders, instabilidade de deploy e evidências incompletas de testes. | Corrigiu o feedback da Sprint 4, que apontava apenas 3 riscos genéricos no planejamento anterior. |
+| Conectar ações de melhoria ao board | Cumprida | As ações de melhoria da Sprint 4 foram vinculadas a tasks do planejamento da Sprint 5, eliminando o uso genérico de "a definir" na coluna `Task vinculada`. | A retrospectiva passou a fechar o ciclo entre problema identificado, ação planejada e execução no Kanban. |
+| Padronizar o tipo das issues de documentação | Cumprida | O padrão `DOCS` foi adotado para issues de documentação, substituindo a inconsistência anterior causada pelo uso dominante de `DOCUMENTATION`. | A padronização melhora a leitura das métricas e reduz ambiguidade na classificação das issues. |
+| Reduzir risco de revisão acumulada no encerramento | Parcialmente cumprida | A sprint teve cerca de 26 MRs e pipeline revisada, mas ainda encerrou com aproximadamente 21 issues em `Waiting Review` ou `Backlog`. | Houve controle técnico melhor que em ciclos anteriores, mas o fechamento ainda concentrou revisão de testes e documentação final. |
+| Reequilibrar carga entre membros com menor volume na Sprint 4 | Parcialmente cumprida | O planejamento incluiu alocação explícita para Celso e Mariana Pereira, mas ambos ainda encerraram com pendências em testes e validação. | O risco foi tratado no planning, porém não totalmente eliminado na execução. |
+
+As ações da Sprint 4 foram incorporadas de forma mais consistente ao planejamento da Sprint 5, especialmente em riscos, rastreabilidade e padronização do board. O principal avanço foi transformar feedback qualitativo em controles verificáveis: riscos documentados, tasks vinculadas e padrão único para documentação. Ainda assim, o fechamento mostrou que os controles reduziram, mas não eliminaram, os gargalos de revisão e validação final. Assim, a Sprint 5 fecha o ciclo com melhora clara de gestão, mas também registra que atividades de evidência e revisão precisam começar antes em projetos futuros para evitar acúmulo no último ciclo.
 
 ---
 
