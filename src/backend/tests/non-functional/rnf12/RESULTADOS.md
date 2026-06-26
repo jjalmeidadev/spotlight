@@ -6,7 +6,7 @@ Todos os serviços do escopo devem executar em containers, permanecer isolados e
 
 ## Auditoria do repositório
 
-O Compose analisado contém quatro serviços:
+O escopo inicial do executor contém quatro serviços de domínio:
 
 - catálogo;
 - usuário;
@@ -15,7 +15,7 @@ O Compose analisado contém quatro serviços:
 
 Todos possuem Dockerfile, `restart: unless-stopped`, health check e participação na rede `spotlight_network`.
 
-O API Gateway possui projeto .NET, porém não possui Dockerfile nem entrada no `docker-compose.yml` analisado. Essa ausência deve aparecer como limitação da cobertura de containerização.
+A topologia final de produção está em `docker-compose.prod.yml` e inclui também frontend e API Gateway. A validação final da recuperação/containerização deve ser registrada no ambiente AWS EC2 conforme `documentos/manual_deploy.md`, usando a saída de `docker compose -f docker-compose.prod.yml ps` e os health checks públicos.
 
 ## Implementação entregue
 

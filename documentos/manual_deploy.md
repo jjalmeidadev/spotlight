@@ -253,6 +253,7 @@ Endpoints uteis:
 |---|---|
 | `http://<PUBLIC_IP>/` | Frontend Spotlight |
 | `http://<PUBLIC_IP>/api/health` | `Healthy` |
+| `http://<PUBLIC_IP>/swagger` | Swagger UI unificado do gateway |
 | `http://<PUBLIC_IP>/api/catalogo/health` | `Healthy` |
 | `http://<PUBLIC_IP>/api/usuario/health` | `Healthy` |
 | `http://<PUBLIC_IP>/api/usuario/health/ready` | `Healthy` |
@@ -322,6 +323,7 @@ Ao final do processo:
 - Docker e Docker Compose instalados.
 - Aplicacao publicada em `http://<PUBLIC_IP>/`.
 - Gateway disponivel em `http://<PUBLIC_IP>/api/health`.
+- Swagger unificado disponivel em `http://<PUBLIC_IP>/swagger`.
 - Todos os containers em estado `healthy`.
 
 ## 14. Observações de segurança
