@@ -47,8 +47,12 @@ test:frontend-typecheck:
   stage: test
   image: node:22-bullseye
   needs: []
+  cache:
+    key: "npm-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .npm/
   script:
-    - npm ci
+    - npm ci --no-audit --fund=false
     - npm run typecheck
 
 test:rnf-structure:
