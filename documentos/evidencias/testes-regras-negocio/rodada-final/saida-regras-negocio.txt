@@ -1,0 +1,27 @@
+Rodada final de testes automatizados de regras de negocio - card #375
+Execucao de referencia: 2026-06-24, 17:59-18:14 BRT
+Ambiente: Windows 11 + WSL2, .NET SDK 9.0.314, Docker Desktop 4.77.0
+
+Recorte principal:
+- Spotlight.Catalog.Tests: 32 aprovados, 0 reprovados, 0 ignorados
+- Spotlight.Recommendation.Tests: 47 aprovados, 0 reprovados, 0 ignorados
+- Spotlight.User.Tests: 49 aprovados, 0 reprovados, 0 ignorados
+- Total do recorte: 128 aprovados, 0 reprovados, 0 ignorados
+
+Solution completa da rodada final:
+- Spotlight.Catalog.Tests: 32 aprovados, 0 reprovados, 0 ignorados
+- Spotlight.Gateway.Tests: 2 aprovados, 0 reprovados, 0 ignorados
+- Spotlight.Geolocation.Tests: 9 aprovados, 0 reprovados, 0 ignorados
+- Spotlight.Recommendation.Tests: 47 aprovados, 0 reprovados, 0 ignorados
+- Spotlight.User.Tests: 49 aprovados, 0 reprovados, 0 ignorados
+- Total geral: 139 aprovados, 0 reprovados, 0 ignorados
+
+Regras criticas conferidas:
+- Avaliacao: nota valida no limite superior, notas invalidas rejeitadas, espetaculo inexistente nao cria avaliacao.
+- Banco: UNIQUE de avaliacao por usuario/espetaculo, CHECK de nota 0-5, trigger de criacao de usuario e policies RLS mapeadas.
+- Recomendacao: limite de resposta, preservacao de ranking, fallback ML.NET/Postgres e validacao de similares.
+- Usuario/telemetria: criacao/garantia de perfil, contexto autenticado, validacao de payload e idempotencia por event_id.
+
+Observacao operacional:
+- Os 5 testes Mongo de Spotlight.User.Tests dependem de Docker e RUN_MONGO_INTEGRATION_TESTS=true.
+- A primeira tentativa sem Docker gerou DockerUnavailableException; apos iniciar o Docker Desktop, Spotlight.User.Tests foi reexecutado com 49/49 aprovados.

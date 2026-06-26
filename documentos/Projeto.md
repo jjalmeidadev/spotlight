@@ -6661,16 +6661,18 @@ cd src/admin-web && npx playwright test --grep "RF16"
 
 &emsp;Em resumo: dos 16 RFs catalogados em 3.1, **14 têm pelo menos um sub-cenário validado nesta execução** (RF03 a RF16), **2 (RF01, RF02)** só foram exercitados nos contratos adjacentes (perfil/JWT e mapeamento de claims) por não haver Detox versionado; nenhum teste planejado para esta rodada falhou. Os achados negativos da bateria são, por desenho, validações de mensagens de erro e códigos HTTP, e todos seguiram o contrato.
 
-### Rodada complementar — regras de negócio (Sprint 5)
+### Rodada final — regras de negócio (Sprint 5)
 
-&emsp;Em complemento à bateria geral consolidada acima, na Sprint 5 foi executada uma rodada dedicada de testes automatizados de regras de negócio focada nos Services e UseCases do backend. O objetivo foi validar regras críticas em nível de aplicação, com cenários positivos, negativos e de borda, sem depender de banco real, autenticação externa ou serviços de terceiros. Essa abordagem complementa os testes funcionais planejados e reduz o risco de regressão em comportamentos centrais do sistema.
+&emsp;Em complemento à bateria geral consolidada acima, na Sprint 5 foi executada a **rodada final de testes automatizados de regras de negócio** prevista no card #375. O recorte focou os Services e UseCases do backend e a revisão das regras críticas implementadas no banco, cobrindo cenários positivos, negativos e de borda relacionados a avaliação de espetáculos, criação de usuário, policies RLS e validações de recomendação. A execução confirma que o comportamento de domínio permaneceu verde na mesma rodada final em que a solution completa atingiu 139/139 testes aprovados.
 
 #### Escopo executado
 
 | Serviço | Regra de negócio validada | Cenários cobertos |
 |---|---|---|
 | Catálogo | Avaliações de espetáculo devem aceitar notas dentro do intervalo permitido, rejeitar notas inválidas e não criar avaliação para espetáculo inexistente. | Nota limite `5`, comentário nulo, nota `null`, nota menor que `0`, nota maior que `5`, espetáculo inexistente. |
-| Recomendação | A API deve respeitar o limite de recomendações solicitado mesmo quando o modelo ML.NET retorna mais predições do que o permitido. | Modelo retorna 3 predições; backend recebe limite `2`; resposta final preserva ranking e retorna apenas 2 itens. |
+| Banco de dados | Regras críticas devem proteger unicidade, intervalo de nota, criação automática de perfil e acesso por RLS. | `UNIQUE (id_usuario, id_espetaculo)`, `CHECK (nota BETWEEN 0 AND 5)`, trigger `on_auth_user_created`, policies de `usuario`, `avaliacao`, `recomendacao`, `similaridade_item` e catálogo/admin. |
+| Usuário e telemetria | O backend deve garantir perfil de usuário, mapear contexto autenticado e evitar duplicidade de eventos. | Garantia de perfil quando há email, claims JWT mapeadas, payloads inválidos rejeitados, `event_id` duplicado sem duplicar documento no MongoDB. |
+| Recomendação | A API deve respeitar o limite de recomendações solicitado mesmo quando o modelo ML.NET retorna mais predições do que o permitido. | Modelo retorna 3 predições; backend recebe limite `2`; resposta final preserva ranking e retorna apenas 2 itens; fallback ML.NET/Postgres validado. |
 
 #### Casos adicionados ou reforçados
 
@@ -6680,6 +6682,18 @@ cd src/admin-web && npx playwright test --grep "RF16"
 | `CriarAvaliacao_ComNotaInvalida_LancaValidation` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Notas inválidas geram `ValidationException` antes de consultar espetáculo ou chamar o repositório de avaliação. |
 | `CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao` | `src/backend/tests/Spotlight.Catalog.Tests/CatalogoUseCasesTests.cs` | Espetáculo inexistente gera `NotFoundException` e nenhuma avaliação é persistida. |
 | `ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal` | `src/backend/tests/Spotlight.Recommendation.Tests/RecomendacaoUseCasesTests.cs` | Resultado final respeita o limite normalizado e mantém a ordem de ranking do modelo. |
+| `UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste` | `src/backend/tests/Spotlight.User.Tests/UsuarioUseCasesTests.cs` | Consulta de preferências garante o perfil quando o usuário autenticado possui email, cobrindo o contrato esperado após o trigger de cadastro. |
+| `PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento` | `src/backend/tests/Spotlight.User.Tests/TelemetriaMongoIntegrationTests.cs` | Reenvio do mesmo evento retorna sucesso assíncrono sem duplicar documento, validando idempotência operacional. |
+
+#### Mapeamento das regras críticas
+
+| Regra crítica do card | Cobertura registrada |
+|---|---|
+| Avaliação de espetáculo com `UNIQUE` por usuário/espetáculo | Constraint `UNIQUE (id_usuario, id_espetaculo)` mapeada em `src/database/README.md` (RN-BD-22) e fluxo de criação validado em `Spotlight.Catalog.Tests`. |
+| Nota de avaliação dentro do intervalo permitido | Testes `CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio` e `CriarAvaliacao_ComNotaInvalida_LancaValidation`; regra SQL `CHECK (nota BETWEEN 0 AND 5)` mapeada em RN-BD-23. |
+| Trigger de criação de usuário | Regra RN-BD-02 (`on_auth_user_created`, `public.handle_new_user()`) revisada; fluxo de garantia de perfil coberto nos testes de User. |
+| Policies RLS | Regras RN-BD-04, RN-BD-24, RN-BD-26, RN-BD-39 e RN-BD-40 revisadas no `src/database/README.md`, cobrindo perfil próprio, avaliações próprias, recomendações próprias, catálogo/admin e similaridade item-item. |
+| Validações de recomendação | Testes de limite, ranking e fallback em `Spotlight.Recommendation.Tests`, com destaque para `ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal`, `MlNetStrategy_*` e `PostgresStrategy_*`. |
 
 #### Evidência de execução
 
@@ -6697,9 +6711,24 @@ Resultado observado, já considerando os 4 testes novos somados à bateria regis
 |---|---:|---:|---:|
 | `Spotlight.Catalog.Tests` | 32 | 0 | 0 |
 | `Spotlight.Recommendation.Tests` | 47 | 0 | 0 |
+| `Spotlight.User.Tests` | 49 | 0 | 0 |
+| Recorte principal de regras de negócio | 128 | 0 | 0 |
 | `Spotlight.sln` | 139 | 0 | 0 |
 
 Os 5 testes de integração MongoDB condicionais do projeto `Spotlight.User.Tests` rodaram e passaram nesta execução porque havia Docker disponível e `RUN_MONGO_INTEGRATION_TESTS=true` (veja a subseção "Ambiente de execução" acima); sem Docker, o `MongoIntegrationFactAttribute` os manteria como ignorados — sem representar falha da suíte de regras de negócio.
+
+#### Evidências e logs
+
+&emsp;Os artefatos específicos desta rodada foram registrados em [`documentos/evidencias/testes-regras-negocio/rodada-final/`](./evidencias/testes-regras-negocio/rodada-final/):
+
+| Arquivo | Conteúdo |
+|---|---|
+| `README.md` | Contexto geral, comandos de reprodução, resumo quantitativo e regras críticas cobertas. |
+| `run-business-rules.bat` | Script padronizado para reexecutar `Catalog`, `Recommendation` e `User` no recorte de regras de negócio. |
+| `saida-regras-negocio.txt` | Log-resumo com os totais da execução e observação operacional sobre Docker/Testcontainers. |
+
+&emsp;Os TRX oficiais da execução completa permanecem em [`documentos/evidencias/testes-funcionais/rodada-final/`](./evidencias/testes-funcionais/rodada-final/), pois a rodada de regras de negócio usou a mesma execução final da bateria backend e apenas destacou o recorte revisado.
+
 
 #### Abrangência e limitações
 
