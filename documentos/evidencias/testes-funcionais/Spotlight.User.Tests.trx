@@ -1,0 +1,551 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e0c269c2-1df4-4ca1-9515-5c382d789c97" name="@MacBook-Pro-de-Rafael 2026-06-24 11:15:14" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-24T11:15:14.4348590-03:00" queuing="2026-06-24T11:15:14.4348590-03:00" start="2026-06-24T11:15:12.8830600-03:00" finish="2026-06-24T11:17:15.0447970-03:00" />
+  <TestSettings name="default" id="13a51694-4363-414c-b6e5-d5d598205fbb">
+    <Deployment runDeploymentRoot="_MacBook-Pro-de-Rafael_2026-06-24_11_15_14" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="15361f51-9cb3-47a9-addd-a96b92edd514" testId="9d3ff365-18d4-e8eb-4f0d-96788d62a73e" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0016790" startTime="2026-06-24T11:15:14.3039670-03:00" endTime="2026-06-24T11:15:14.3039680-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15361f51-9cb3-47a9-addd-a96b92edd514" />
+    <UnitTestResult executionId="864bf7e6-5965-4ca0-8302-82195cf08418" testId="c107860d-d4c7-dda5-5ec2-098e512ebf00" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0009155" startTime="2026-06-24T11:15:14.3648980-03:00" endTime="2026-06-24T11:15:14.3648980-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="864bf7e6-5965-4ca0-8302-82195cf08418" />
+    <UnitTestResult executionId="8951c368-6087-4419-b08a-593dfd505fe9" testId="347b0671-6bed-823e-5390-59c62d5844ed" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0027969" startTime="2026-06-24T11:15:14.3615740-03:00" endTime="2026-06-24T11:15:14.3615750-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8951c368-6087-4419-b08a-593dfd505fe9" />
+    <UnitTestResult executionId="74d98d70-dd2c-45b2-a4b0-538ceeba51a7" testId="58ce31e3-ccd9-fe46-ac80-48b5e8c1bbb9" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_SemServicoConfigurado_Retorna503" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0036561" startTime="2026-06-24T11:15:14.4315170-03:00" endTime="2026-06-24T11:15:14.4315170-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="74d98d70-dd2c-45b2-a4b0-538ceeba51a7" />
+    <UnitTestResult executionId="d0a535a7-06fe-459d-9915-14f9e0a775c6" testId="a5463f32-63bf-4cc6-cd4f-24451f27f8fb" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_AtualizarPreferencias_SemEmailNaoGarantePerfil" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0116737" startTime="2026-06-24T11:17:14.5653980-03:00" endTime="2026-06-24T11:17:14.5653990-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d0a535a7-06fe-459d-9915-14f9e0a775c6" />
+    <UnitTestResult executionId="2e3c0f8f-42f1-49f1-aa03-05eab016ea1e" testId="5eeb55cf-ff4e-d557-9829-061ab7095282" testName="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.CreateModels_PreservaNomeEOpcoesDosIndices" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0125047" startTime="2026-06-24T11:15:14.4491990-03:00" endTime="2026-06-24T11:15:14.4491990-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2e3c0f8f-42f1-49f1-aa03-05eab016ea1e" />
+    <UnitTestResult executionId="308a80cd-dd9c-49d1-9922-0bfb54ecd051" testId="a4da275e-3e1b-9025-7e9a-8f6ed792246e" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComEventoAnonimo_RetornaAccepted" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0051098" startTime="2026-06-24T11:15:14.3717990-03:00" endTime="2026-06-24T11:15:14.3718000-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="308a80cd-dd9c-49d1-9922-0bfb54ecd051" />
+    <UnitTestResult executionId="ce800f7a-a861-4a68-80c9-d884d474dbc7" testId="a208102a-18b7-f1cf-3431-0a8a41728608" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.3948570" startTime="2026-06-24T11:17:08.7716740-03:00" endTime="2026-06-24T11:17:08.7716740-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ce800f7a-a861-4a68-80c9-d884d474dbc7" />
+    <UnitTestResult executionId="1cd82bd0-0b24-4c91-bf45-89d494b22d5a" testId="db2ed03e-7238-a15e-71fe-91e70892ab57" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0011767" startTime="2026-06-24T11:15:14.3620380-03:00" endTime="2026-06-24T11:15:14.3620380-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1cd82bd0-0b24-4c91-bf45-89d494b22d5a" />
+    <UnitTestResult executionId="16b3d0c2-46fd-460c-9875-3baf4dc02fcb" testId="7bd179fb-c79e-dbb1-8beb-2610e3a6f7d7" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;&quot;)" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0003182" startTime="2026-06-24T11:15:14.3154280-03:00" endTime="2026-06-24T11:15:14.3154290-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="16b3d0c2-46fd-460c-9875-3baf4dc02fcb" />
+    <UnitTestResult executionId="e31153d5-86a3-4d96-9ee6-8a0c758ee819" testId="365db29e-9866-8248-0d15-74f9fdb63ba3" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0028541" startTime="2026-06-24T11:15:14.3135460-03:00" endTime="2026-06-24T11:15:14.3135460-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e31153d5-86a3-4d96-9ee6-8a0c758ee819" />
+    <UnitTestResult executionId="5a22fc55-4eb8-43d9-9788-8e57bd4c0743" testId="e7d1f324-35ed-3f55-b56b-9877e18f8f92" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0010686" startTime="2026-06-24T11:15:14.3996920-03:00" endTime="2026-06-24T11:15:14.3996920-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a22fc55-4eb8-43d9-9788-8e57bd4c0743" />
+    <UnitTestResult executionId="74238b8d-c909-4101-9a89-87bab427a532" testId="2d0384c9-01c8-154a-612e-4594cc03c618" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComPrecoNegativo_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0012830" startTime="2026-06-24T11:15:14.4010600-03:00" endTime="2026-06-24T11:15:14.4010600-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="74238b8d-c909-4101-9a89-87bab427a532" />
+    <UnitTestResult executionId="99732885-1782-4b3b-97a4-96a259d04e9a" testId="2ed75864-db08-ec03-4806-4749ef65f5d3" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataForaDaJanela_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0016095" startTime="2026-06-24T11:15:14.3943250-03:00" endTime="2026-06-24T11:15:14.3943250-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="99732885-1782-4b3b-97a4-96a259d04e9a" />
+    <UnitTestResult executionId="f299f14c-028b-4d01-aed7-d25bb13d9b8f" testId="6b41c000-731d-9d7e-ae9b-f40e84a05eed" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_SemUsuario_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0518651" startTime="2026-06-24T11:17:14.5446710-03:00" endTime="2026-06-24T11:17:14.5446710-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f299f14c-028b-4d01-aed7-d25bb13d9b8f" />
+    <UnitTestResult executionId="6a75a6fd-b3c5-4a8d-99ad-9cf7249adfc6" testId="681e40f0-fe56-7128-be16-a19d3d06b131" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPropertiesNaoObjeto_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0016580" startTime="2026-06-24T11:15:14.3736260-03:00" endTime="2026-06-24T11:15:14.3736260-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a75a6fd-b3c5-4a8d-99ad-9cf7249adfc6" />
+    <UnitTestResult executionId="966e5a9f-83d3-45d4-ac20-a12f3bb71884" testId="35cd8ccc-263c-ca1d-329e-d31f586fe946" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0042344" startTime="2026-06-24T11:15:14.3082980-03:00" endTime="2026-06-24T11:15:14.3082980-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="966e5a9f-83d3-45d4-ac20-a12f3bb71884" />
+    <UnitTestResult executionId="c9ac20ae-5f29-417c-bb96-9078d34f93af" testId="b34cee27-e661-ce48-14b3-bca5f012b2d2" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoCancelado_PropagaCancelamento" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0011259" startTime="2026-06-24T11:15:14.4250740-03:00" endTime="2026-06-24T11:15:14.4250740-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c9ac20ae-5f29-417c-bb96-9078d34f93af" />
+    <UnitTestResult executionId="e86dffe7-4c67-4890-ab5d-f744947f96bd" testId="e0d6ff0e-2ca6-dc3c-27c9-58426a347dcc" testName="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Ping_Returns_200" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0112602" startTime="2026-06-24T11:17:14.9070230-03:00" endTime="2026-06-24T11:17:14.9070230-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e86dffe7-4c67-4890-ab5d-f744947f96bd" />
+    <UnitTestResult executionId="12a9d91d-b5e9-4941-881c-88277594f8bf" testId="752788e6-3c62-5eef-0b0c-1e78a913be23" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0183982" startTime="2026-06-24T11:15:14.4207390-03:00" endTime="2026-06-24T11:15:14.4207390-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="12a9d91d-b5e9-4941-881c-88277594f8bf" />
+    <UnitTestResult executionId="6352ab8b-421e-4862-a163-814f2771b6a4" testId="2f701ffc-efee-bbef-1b2a-afe6e4bac240" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0013495" startTime="2026-06-24T11:15:14.3618740-03:00" endTime="2026-06-24T11:15:14.3618740-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6352ab8b-421e-4862-a163-814f2771b6a4" />
+    <UnitTestResult executionId="cc94c9d9-9d31-413f-ad41-b73642a5a56f" testId="a9274446-7e2e-6e3d-f239-8a2332223844" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0113873" startTime="2026-06-24T11:15:14.3867410-03:00" endTime="2026-06-24T11:15:14.3867410-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cc94c9d9-9d31-413f-ad41-b73642a5a56f" />
+    <UnitTestResult executionId="bc78b5bc-08c9-481c-a6b7-f69e59b72381" testId="16aaf508-ce9e-b215-7a37-fea8fcd5a0ab" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComClaimsDiretas_MapeiaIdentidade" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0027823" startTime="2026-06-24T11:17:14.5857650-03:00" endTime="2026-06-24T11:17:14.5857650-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bc78b5bc-08c9-481c-a6b7-f69e59b72381" />
+    <UnitTestResult executionId="b661b33a-e135-4557-9c62-66dee99e8dcd" testId="9358c74b-edf5-074c-06d5-223276e01324" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0010670" startTime="2026-06-24T11:15:14.4262480-03:00" endTime="2026-06-24T11:15:14.4262480-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b661b33a-e135-4557-9c62-66dee99e8dcd" />
+    <UnitTestResult executionId="a2556e5b-be91-4063-be0f-4db3c0102673" testId="81ec463e-b0d0-9f21-8fd1-fc8254aac633" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0041022" startTime="2026-06-24T11:15:14.3985510-03:00" endTime="2026-06-24T11:15:14.3985520-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a2556e5b-be91-4063-be0f-4db3c0102673" />
+    <UnitTestResult executionId="15328900-9fff-49b8-8aa0-70795e76ca04" testId="70f2cde3-1a99-2b4f-8072-eed4ea323ed7" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento" computerName="MacBook-Pro-de-Rafael" duration="00:00:01.9752898" startTime="2026-06-24T11:16:45.6793690-03:00" endTime="2026-06-24T11:16:45.6793700-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15328900-9fff-49b8-8aa0-70795e76ca04" />
+    <UnitTestResult executionId="a99f7911-d228-4a66-9205-851d6279b268" testId="954ab7e8-b980-0f5a-87b2-6909af1fd1b5" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComUsuarioAutenticado_AssociaUsuario" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0362117" startTime="2026-06-24T11:15:14.3021350-03:00" endTime="2026-06-24T11:15:14.3021360-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a99f7911-d228-4a66-9205-851d6279b268" />
+    <UnitTestResult executionId="833db19c-8ff0-49e6-be34-26cc7f29f97f" testId="d64f0cb4-9541-0a0d-9a65-17960a319325" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0014793" startTime="2026-06-24T11:15:14.3762180-03:00" endTime="2026-06-24T11:15:14.3762180-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="833db19c-8ff0-49e6-be34-26cc7f29f97f" />
+    <UnitTestResult executionId="f5645de3-c89c-4b4d-9da7-f9c257e3bb43" testId="78b22f64-e929-08e2-345a-1dd1e43af787" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataFutura_LancaValidation" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0010666" startTime="2026-06-24T11:15:14.4021860-03:00" endTime="2026-06-24T11:15:14.4021870-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f5645de3-c89c-4b4d-9da7-f9c257e3bb43" />
+    <UnitTestResult executionId="c5f97930-a054-42c0-be2c-14bf462bad3c" testId="e9ba8dc7-676b-5496-cf9d-c579c5998721" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;   &quot;)" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0013722" startTime="2026-06-24T11:15:14.3150550-03:00" endTime="2026-06-24T11:15:14.3150550-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c5f97930-a054-42c0-be2c-14bf462bad3c" />
+    <UnitTestResult executionId="181bb9ae-a471-4cd7-9b89-4a855c8603b9" testId="8c974096-6ebc-d8fa-b219-c99d7c25b011" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoNaoExiste_LancaNotFound" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0021557" startTime="2026-06-24T11:15:14.3106000-03:00" endTime="2026-06-24T11:15:14.3106000-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="181bb9ae-a471-4cd7-9b89-4a855c8603b9" />
+    <UnitTestResult executionId="800b0ec4-9ab0-4e33-a7e5-9b269e0be5b8" testId="cd943063-0ab7-12da-0bfa-4601d535c392" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoExiste_MapeiaPerfil" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0057421" startTime="2026-06-24T11:15:14.3926000-03:00" endTime="2026-06-24T11:15:14.3926010-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="800b0ec4-9ab0-4e33-a7e5-9b269e0be5b8" />
+    <UnitTestResult executionId="72b4edde-f8a2-42d5-9d52-88d79afdafe6" testId="2c996e59-787e-a99c-faad-3331ecdf793a" testName="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Health_Returns_200" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0068440" startTime="2026-06-24T11:17:14.8952350-03:00" endTime="2026-06-24T11:17:14.8952350-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="72b4edde-f8a2-42d5-9d52-88d79afdafe6" />
+    <UnitTestResult executionId="922bcfa9-9e12-49c3-97c8-8a4ebfc3ad78" testId="90d53235-a17d-9704-0984-10cb7ea771ee" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.5658495" startTime="2026-06-24T11:17:01.6812950-03:00" endTime="2026-06-24T11:17:01.6812960-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="922bcfa9-9e12-49c3-97c8-8a4ebfc3ad78" />
+    <UnitTestResult executionId="d5fd71d2-5b94-45b8-88f3-a6ef5a6e1e2e" testId="db2256bf-93be-2d07-0aef-da768c8e8799" testName="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.2864938" startTime="2026-06-24T11:17:14.8872190-03:00" endTime="2026-06-24T11:17:14.8872190-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d5fd71d2-5b94-45b8-88f3-a6ef5a6e1e2e" />
+    <UnitTestResult executionId="e5da9074-4901-4c7f-94ad-1d7a292b4942" testId="7601604b-1a4d-063d-9eb3-80d45afbc0dc" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0079726" startTime="2026-06-24T11:17:14.5826160-03:00" endTime="2026-06-24T11:17:14.5826160-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5da9074-4901-4c7f-94ad-1d7a292b4942" />
+    <UnitTestResult executionId="f908fb06-a57b-4810-bb53-dac8d1d774fd" testId="e362ff75-3c6c-9f32-2660-6d51c022945f" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoNaoExiste_LancaNotFound" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0017700" startTime="2026-06-24T11:15:14.3639000-03:00" endTime="2026-06-24T11:15:14.3639010-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f908fb06-a57b-4810-bb53-dac8d1d774fd" />
+    <UnitTestResult executionId="f7b0a186-45dd-4ae4-ba11-0c19af8cad4a" testId="5682444b-9aa5-df82-4dc9-4cb5f57f3753" testName="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.Definitions_IncluemIndicesOperacionaisDaTelemetria" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0144369" startTime="2026-06-24T11:15:14.4637750-03:00" endTime="2026-06-24T11:15:14.4637750-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f7b0a186-45dd-4ae4-ba11-0c19af8cad4a" />
+    <UnitTestResult executionId="b40faea0-09e0-410b-b61e-25d76855acdc" testId="25ae164f-8184-d65e-af50-ad57c63fa9fd" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataPriorizaNomeEDataDoJson" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0089536" startTime="2026-06-24T11:17:14.5745000-03:00" endTime="2026-06-24T11:17:14.5745000-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b40faea0-09e0-410b-b61e-25d76855acdc" />
+    <UnitTestResult executionId="6af27966-e1c5-491f-9994-f5ddd9d92688" testId="7d1f5634-4300-c3f1-c6ed-99e8f8bc3b38" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoExiste_MapeiaPreferencias" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0010965" startTime="2026-06-24T11:15:14.4238900-03:00" endTime="2026-06-24T11:15:14.4238900-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6af27966-e1c5-491f-9994-f5ddd9d92688" />
+    <UnitTestResult executionId="3e173274-3df5-4af0-8538-2c6806d00f71" testId="4b4ca175-0ddf-f27f-3e76-ae3397676e73" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEventoValido_ChamaRepositorio" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0015870" startTime="2026-06-24T11:15:14.3665600-03:00" endTime="2026-06-24T11:15:14.3665610-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e173274-3df5-4af0-8538-2c6806d00f71" />
+    <UnitTestResult executionId="5c126541-7475-4739-9265-6abd5873e014" testId="e18d3faf-08f1-8542-3a73-0bfbf727fa47" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort" computerName="MacBook-Pro-de-Rafael" duration="00:00:02.5818232" startTime="2026-06-24T11:16:54.5712770-03:00" endTime="2026-06-24T11:16:54.5712770-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5c126541-7475-4739-9265-6abd5873e014" />
+    <UnitTestResult executionId="f6888e32-2878-48d0-9168-333f7b9c7888" testId="3e23f7eb-bd0e-af31-c6aa-ab65fa5daf0d" testName="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.Startup_ComMongoConfigurado_CriaIndicesOperacionais" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.2907989" startTime="2026-06-24T11:17:14.4849120-03:00" endTime="2026-06-24T11:17:14.4849120-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f6888e32-2878-48d0-9168-333f7b9c7888" />
+    <UnitTestResult executionId="323cca35-49b6-462f-83ae-bc5f51e3481d" testId="d0b01bae-5ae8-5ba6-5077-880e54383c1a" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0194607" startTime="2026-06-24T11:15:14.2658250-03:00" endTime="2026-06-24T11:15:14.2658260-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="323cca35-49b6-462f-83ae-bc5f51e3481d" />
+    <UnitTestResult executionId="4c853c63-d02e-4661-88a3-dc027752cd6b" testId="3feb3dc4-1684-bb88-ae37-847499c698c6" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0018563" startTime="2026-06-24T11:15:14.4226930-03:00" endTime="2026-06-24T11:15:14.4226940-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4c853c63-d02e-4661-88a3-dc027752cd6b" />
+    <UnitTestResult executionId="0df42e60-5836-4323-8745-704f4147a3a0" testId="00aee90d-7568-8409-3afd-4ecba5a84ffb" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0408428" startTime="2026-06-24T11:15:14.3618220-03:00" endTime="2026-06-24T11:15:14.3618230-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0df42e60-5836-4323-8745-704f4147a3a0" />
+    <UnitTestResult executionId="f94749ca-a152-47ab-bec3-8b6ee64fb7a8" testId="3c1d0b36-f19a-b29a-451e-bfb50cb1edf4" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0013994" startTime="2026-06-24T11:15:14.4277270-03:00" endTime="2026-06-24T11:15:14.4277270-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f94749ca-a152-47ab-bec3-8b6ee64fb7a8" />
+    <UnitTestResult executionId="923c25a3-ea8b-4cdc-8e4c-f89db07bd91a" testId="a612c17b-077d-3959-67ad-97f32e2d579f" testName="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataInvalido_RetornaFallbacks" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0081873" startTime="2026-06-24T11:17:14.5535020-03:00" endTime="2026-06-24T11:17:14.5535020-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="923c25a3-ea8b-4cdc-8e4c-f89db07bd91a" />
+    <UnitTestResult executionId="80987246-a2b6-4dad-9ee3-8402319947b5" testId="8a3f1f64-6b67-616a-39d3-a5f7b5ad43c5" testName="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro" computerName="MacBook-Pro-de-Rafael" duration="00:00:00.0181931" startTime="2026-06-24T11:15:14.2470440-03:00" endTime="2026-06-24T11:15:14.2470840-03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="80987246-a2b6-4dad-9ee3-8402319947b5" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="7601604b-1a4d-063d-9eb3-80d45afbc0dc">
+      <Execution id="e5da9074-4901-4c7f-94ad-1d7a292b4942" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataInvalido_RetornaFallbacks" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="a612c17b-077d-3959-67ad-97f32e2d579f">
+      <Execution id="923c25a3-ea8b-4cdc-8e4c-f89db07bd91a" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioContextoHttp_ComMetadataInvalido_RetornaFallbacks" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataPriorizaNomeEDataDoJson" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="25ae164f-8184-d65e-af50-ad57c63fa9fd">
+      <Execution id="b40faea0-09e0-410b-b61e-25d76855acdc" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioContextoHttp_ComMetadataPriorizaNomeEDataDoJson" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_SemUsuario_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="6b41c000-731d-9d7e-ae9b-f40e84a05eed">
+      <Execution id="f299f14c-028b-4d01-aed7-d25bb13d9b8f" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioMeController_SemUsuario_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="e18d3faf-08f1-8542-3a73-0bfbf727fa47">
+      <Execution id="5c126541-7475-4739-9265-6abd5873e014" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_AtualizarPreferencias_SemEmailNaoGarantePerfil" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="a5463f32-63bf-4cc6-cd4f-24451f27f8fb">
+      <Execution id="d0a535a7-06fe-459d-9915-14f9e0a775c6" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioMeController_AtualizarPreferencias_SemEmailNaoGarantePerfil" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoNaoExiste_LancaNotFound" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="8c974096-6ebc-d8fa-b219-c99d7c25b011">
+      <Execution id="181bb9ae-a471-4cd7-9b89-4a855c8603b9" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterPreferencias_QuandoNaoExiste_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="90d53235-a17d-9704-0984-10cb7ea771ee">
+      <Execution id="922bcfa9-9e12-49c3-97c8-8a4ebfc3ad78" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="c107860d-d4c7-dda5-5ec2-098e512ebf00">
+      <Execution id="864bf7e6-5965-4ca0-8302-82195cf08418" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEventoValido_ChamaRepositorio" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="4b4ca175-0ddf-f27f-3e76-ae3397676e73">
+      <Execution id="3e173274-3df5-4af0-8538-2c6806d00f71" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComEventoValido_ChamaRepositorio" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.Startup_ComMongoConfigurado_CriaIndicesOperacionais" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="3e23f7eb-bd0e-af31-c6aa-ab65fa5daf0d">
+      <Execution id="f6888e32-2878-48d0-9168-333f7b9c7888" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="Startup_ComMongoConfigurado_CriaIndicesOperacionais" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.Definitions_IncluemIndicesOperacionaisDaTelemetria" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="5682444b-9aa5-df82-4dc9-4cb5f57f3753">
+      <Execution id="f7b0a186-45dd-4ae4-ba11-0c19af8cad4a" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests" name="Definitions_IncluemIndicesOperacionaisDaTelemetria" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="347b0671-6bed-823e-5390-59c62d5844ed">
+      <Execution id="8951c368-6087-4419-b08a-593dfd505fe9" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="365db29e-9866-8248-0d15-74f9fdb63ba3">
+      <Execution id="e31153d5-86a3-4d96-9ee6-8a0c758ee819" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPropertiesNaoObjeto_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="681e40f0-fe56-7128-be16-a19d3d06b131">
+      <Execution id="6a75a6fd-b3c5-4a8d-99ad-9cf7249adfc6" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComPropertiesNaoObjeto_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="70f2cde3-1a99-2b4f-8072-eed4ea323ed7">
+      <Execution id="15328900-9fff-49b8-8aa0-70795e76ca04" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="81ec463e-b0d0-9f21-8fd1-fc8254aac633">
+      <Execution id="a2556e5b-be91-4063-be0f-4db3c0102673" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="a208102a-18b7-f1cf-3431-0a8a41728608">
+      <Execution id="ce800f7a-a861-4a68-80c9-d884d474dbc7" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests" name="PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComEventoAnonimo_RetornaAccepted" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="a4da275e-3e1b-9025-7e9a-8f6ed792246e">
+      <Execution id="308a80cd-dd9c-49d1-9922-0bfb54ecd051" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaController_ComEventoAnonimo_RetornaAccepted" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="35cd8ccc-263c-ca1d-329e-d31f586fe946">
+      <Execution id="966e5a9f-83d3-45d4-ac20-a12f3bb71884" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="8a3f1f64-6b67-616a-39d3-a5f7b5ad43c5">
+      <Execution id="80987246-a2b6-4dad-9ee3-8402319947b5" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;&quot;)" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="7bd179fb-c79e-dbb1-8beb-2610e3a6f7d7">
+      <Execution id="16b3d0c2-46fd-460c-9875-3baf4dc02fcb" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComNomeVazio_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataForaDaJanela_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="2ed75864-db08-ec03-4806-4749ef65f5d3">
+      <Execution id="99732885-1782-4b3b-97a4-96a259d04e9a" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComDataForaDaJanela_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataFutura_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="78b22f64-e929-08e2-345a-1dd1e43af787">
+      <Execution id="f5645de3-c89c-4b4d-9da7-f9c257e3bb43" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComDataFutura_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="9358c74b-edf5-074c-06d5-223276e01324">
+      <Execution id="b661b33a-e135-4557-9c62-66dee99e8dcd" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoCancelado_PropagaCancelamento" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="b34cee27-e661-ce48-14b3-bca5f012b2d2">
+      <Execution id="c9ac20ae-5f29-417c-bb96-9078d34f93af" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_QuandoCancelado_PropagaCancelamento" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComPrecoNegativo_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="2d0384c9-01c8-154a-612e-4594cc03c618">
+      <Execution id="74238b8d-c909-4101-9a89-87bab427a532" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_ComPrecoNegativo_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Ping_Returns_200" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="e0d6ff0e-2ca6-dc3c-27c9-58426a347dcc">
+      <Execution id="e86dffe7-4c67-4890-ab5d-f744947f96bd" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.HealthEndpointsTests" name="Get_Ping_Returns_200" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="db2256bf-93be-2d07-0aef-da768c8e8799">
+      <Execution id="d5fd71d2-5b94-45b8-88f3-a6ef5a6e1e2e" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.HealthEndpointsTests" name="Get_HealthReady_Returns_503_SemBanco" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="a9274446-7e2e-6e3d-f239-8a2332223844">
+      <Execution id="cc94c9d9-9d31-413f-ad41-b73642a5a56f" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="db2ed03e-7238-a15e-71fe-91e70892ab57">
+      <Execution id="1cd82bd0-0b24-4c91-bf45-89d494b22d5a" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="00aee90d-7568-8409-3afd-4ecba5a84ffb">
+      <Execution id="0df42e60-5836-4323-8745-704f4147a3a0" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="3c1d0b36-f19a-b29a-451e-bfb50cb1edf4">
+      <Execution id="f94749ca-a152-47ab-bec3-8b6ee64fb7a8" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="d64f0cb4-9541-0a0d-9a65-17960a319325">
+      <Execution id="833db19c-8ff0-49e6-be34-26cc7f29f97f" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="9d3ff365-18d4-e8eb-4f0d-96788d62a73e">
+      <Execution id="15361f51-9cb3-47a9-addd-a96b92edd514" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="2f701ffc-efee-bbef-1b2a-afe6e4bac240">
+      <Execution id="6352ab8b-421e-4862-a163-814f2771b6a4" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="3feb3dc4-1684-bb88-ae37-847499c698c6">
+      <Execution id="4c853c63-d02e-4661-88a3-dc027752cd6b" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="752788e6-3c62-5eef-0b0c-1e78a913be23">
+      <Execution id="12a9d91d-b5e9-4941-881c-88277594f8bf" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.CreateModels_PreservaNomeEOpcoesDosIndices" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="5eeb55cf-ff4e-d557-9829-061ab7095282">
+      <Execution id="2e3c0f8f-42f1-49f1-aa03-05eab016ea1e" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.MongoTelemetryIndexesTests" name="CreateModels_PreservaNomeEOpcoesDosIndices" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Health_Returns_200" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="2c996e59-787e-a99c-faad-3331ecdf793a">
+      <Execution id="72b4edde-f8a2-42d5-9d52-88d79afdafe6" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.HealthEndpointsTests" name="Get_Health_Returns_200" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="d0b01bae-5ae8-5ba6-5077-880e54383c1a">
+      <Execution id="323cca35-49b6-462f-83ae-bc5f51e3481d" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComClaimsDiretas_MapeiaIdentidade" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="16aaf508-ce9e-b215-7a37-fea8fcd5a0ab">
+      <Execution id="bc78b5bc-08c9-481c-a6b7-f69e59b72381" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioContextoEControllerTests" name="UsuarioContextoHttp_ComClaimsDiretas_MapeiaIdentidade" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: &quot;   &quot;)" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="e9ba8dc7-676b-5496-cf9d-c579c5998721">
+      <Execution id="c5f97930-a054-42c0-be2c-14bf462bad3c" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="AtualizarUsuarioMe_ComNomeVazio_LancaValidation" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoNaoExiste_LancaNotFound" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="e362ff75-3c6c-9f32-2660-6d51c022945f">
+      <Execution id="f908fb06-a57b-4810-bb53-dac8d1d774fd" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterUsuarioMe_QuandoNaoExiste_LancaNotFound" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoExiste_MapeiaPerfil" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="cd943063-0ab7-12da-0bfa-4601d535c392">
+      <Execution id="800b0ec4-9ab0-4e33-a7e5-9b269e0be5b8" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterUsuarioMe_QuandoExiste_MapeiaPerfil" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComUsuarioAutenticado_AssociaUsuario" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="954ab7e8-b980-0f5a-87b2-6909af1fd1b5">
+      <Execution id="a99f7911-d228-4a66-9205-851d6279b268" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaController_ComUsuarioAutenticado_AssociaUsuario" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoExiste_MapeiaPreferencias" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="7d1f5634-4300-c3f1-c6ed-99e8f8bc3b38">
+      <Execution id="6af27966-e1c5-491f-9994-f5ddd9d92688" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="ObterPreferencias_QuandoExiste_MapeiaPreferencias" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_SemServicoConfigurado_Retorna503" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="58ce31e3-ccd9-fe46-ac80-48b5e8c1bbb9">
+      <Execution id="74d98d70-dd2c-45b2-a4b0-538ceeba51a7" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="TelemetriaController_SemServicoConfigurado_Retorna503" />
+    </UnitTest>
+    <UnitTest name="Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict" storage="/users/rafaelfigueiredocampos/documentos/inteli-geral/modulo_6/projeto/g04/src/backend/tests/spotlight.user.tests/bin/debug/net9.0/spotlight.user.tests.dll" id="e7d1f324-35ed-3f55-b56b-9877e18f8f92">
+      <Execution id="5a22fc55-4eb8-43d9-9788-8e57bd4c0743" />
+      <TestMethod codeBase="/Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Spotlight.Usuario.Tests.UsuarioUseCasesTests" name="UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="9d3ff365-18d4-e8eb-4f0d-96788d62a73e" executionId="15361f51-9cb3-47a9-addd-a96b92edd514" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c107860d-d4c7-dda5-5ec2-098e512ebf00" executionId="864bf7e6-5965-4ca0-8302-82195cf08418" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="347b0671-6bed-823e-5390-59c62d5844ed" executionId="8951c368-6087-4419-b08a-593dfd505fe9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="58ce31e3-ccd9-fe46-ac80-48b5e8c1bbb9" executionId="74d98d70-dd2c-45b2-a4b0-538ceeba51a7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a5463f32-63bf-4cc6-cd4f-24451f27f8fb" executionId="d0a535a7-06fe-459d-9915-14f9e0a775c6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5eeb55cf-ff4e-d557-9829-061ab7095282" executionId="2e3c0f8f-42f1-49f1-aa03-05eab016ea1e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4da275e-3e1b-9025-7e9a-8f6ed792246e" executionId="308a80cd-dd9c-49d1-9922-0bfb54ecd051" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a208102a-18b7-f1cf-3431-0a8a41728608" executionId="ce800f7a-a861-4a68-80c9-d884d474dbc7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="db2ed03e-7238-a15e-71fe-91e70892ab57" executionId="1cd82bd0-0b24-4c91-bf45-89d494b22d5a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7bd179fb-c79e-dbb1-8beb-2610e3a6f7d7" executionId="16b3d0c2-46fd-460c-9875-3baf4dc02fcb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="365db29e-9866-8248-0d15-74f9fdb63ba3" executionId="e31153d5-86a3-4d96-9ee6-8a0c758ee819" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e7d1f324-35ed-3f55-b56b-9877e18f8f92" executionId="5a22fc55-4eb8-43d9-9788-8e57bd4c0743" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2d0384c9-01c8-154a-612e-4594cc03c618" executionId="74238b8d-c909-4101-9a89-87bab427a532" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2ed75864-db08-ec03-4806-4749ef65f5d3" executionId="99732885-1782-4b3b-97a4-96a259d04e9a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6b41c000-731d-9d7e-ae9b-f40e84a05eed" executionId="f299f14c-028b-4d01-aed7-d25bb13d9b8f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="681e40f0-fe56-7128-be16-a19d3d06b131" executionId="6a75a6fd-b3c5-4a8d-99ad-9cf7249adfc6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="35cd8ccc-263c-ca1d-329e-d31f586fe946" executionId="966e5a9f-83d3-45d4-ac20-a12f3bb71884" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b34cee27-e661-ce48-14b3-bca5f012b2d2" executionId="c9ac20ae-5f29-417c-bb96-9078d34f93af" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e0d6ff0e-2ca6-dc3c-27c9-58426a347dcc" executionId="e86dffe7-4c67-4890-ab5d-f744947f96bd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="752788e6-3c62-5eef-0b0c-1e78a913be23" executionId="12a9d91d-b5e9-4941-881c-88277594f8bf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2f701ffc-efee-bbef-1b2a-afe6e4bac240" executionId="6352ab8b-421e-4862-a163-814f2771b6a4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a9274446-7e2e-6e3d-f239-8a2332223844" executionId="cc94c9d9-9d31-413f-ad41-b73642a5a56f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16aaf508-ce9e-b215-7a37-fea8fcd5a0ab" executionId="bc78b5bc-08c9-481c-a6b7-f69e59b72381" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9358c74b-edf5-074c-06d5-223276e01324" executionId="b661b33a-e135-4557-9c62-66dee99e8dcd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="81ec463e-b0d0-9f21-8fd1-fc8254aac633" executionId="a2556e5b-be91-4063-be0f-4db3c0102673" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="70f2cde3-1a99-2b4f-8072-eed4ea323ed7" executionId="15328900-9fff-49b8-8aa0-70795e76ca04" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="954ab7e8-b980-0f5a-87b2-6909af1fd1b5" executionId="a99f7911-d228-4a66-9205-851d6279b268" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d64f0cb4-9541-0a0d-9a65-17960a319325" executionId="833db19c-8ff0-49e6-be34-26cc7f29f97f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="78b22f64-e929-08e2-345a-1dd1e43af787" executionId="f5645de3-c89c-4b4d-9da7-f9c257e3bb43" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e9ba8dc7-676b-5496-cf9d-c579c5998721" executionId="c5f97930-a054-42c0-be2c-14bf462bad3c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8c974096-6ebc-d8fa-b219-c99d7c25b011" executionId="181bb9ae-a471-4cd7-9b89-4a855c8603b9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cd943063-0ab7-12da-0bfa-4601d535c392" executionId="800b0ec4-9ab0-4e33-a7e5-9b269e0be5b8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2c996e59-787e-a99c-faad-3331ecdf793a" executionId="72b4edde-f8a2-42d5-9d52-88d79afdafe6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="90d53235-a17d-9704-0984-10cb7ea771ee" executionId="922bcfa9-9e12-49c3-97c8-8a4ebfc3ad78" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="db2256bf-93be-2d07-0aef-da768c8e8799" executionId="d5fd71d2-5b94-45b8-88f3-a6ef5a6e1e2e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7601604b-1a4d-063d-9eb3-80d45afbc0dc" executionId="e5da9074-4901-4c7f-94ad-1d7a292b4942" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e362ff75-3c6c-9f32-2660-6d51c022945f" executionId="f908fb06-a57b-4810-bb53-dac8d1d774fd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5682444b-9aa5-df82-4dc9-4cb5f57f3753" executionId="f7b0a186-45dd-4ae4-ba11-0c19af8cad4a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="25ae164f-8184-d65e-af50-ad57c63fa9fd" executionId="b40faea0-09e0-410b-b61e-25d76855acdc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7d1f5634-4300-c3f1-c6ed-99e8f8bc3b38" executionId="6af27966-e1c5-491f-9994-f5ddd9d92688" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b4ca175-0ddf-f27f-3e76-ae3397676e73" executionId="3e173274-3df5-4af0-8538-2c6806d00f71" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e18d3faf-08f1-8542-3a73-0bfbf727fa47" executionId="5c126541-7475-4739-9265-6abd5873e014" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3e23f7eb-bd0e-af31-c6aa-ab65fa5daf0d" executionId="f6888e32-2878-48d0-9168-333f7b9c7888" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d0b01bae-5ae8-5ba6-5077-880e54383c1a" executionId="323cca35-49b6-462f-83ae-bc5f51e3481d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3feb3dc4-1684-bb88-ae37-847499c698c6" executionId="4c853c63-d02e-4661-88a3-dc027752cd6b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="00aee90d-7568-8409-3afd-4ecba5a84ffb" executionId="0df42e60-5836-4323-8745-704f4147a3a0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c1d0b36-f19a-b29a-451e-bfb50cb1edf4" executionId="f94749ca-a152-47ab-bec3-8b6ee64fb7a8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a612c17b-077d-3959-67ad-97f32e2d579f" executionId="923c25a3-ea8b-4cdc-8e4c-f89db07bd91a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8a3f1f64-6b67-616a-39d3-a5f7b5ad43c5" executionId="80987246-a2b6-4dad-9ee3-8402319947b5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados que não estão em uma lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos os resultados carregados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="49" executed="49" passed="49" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.17]   Discovering: Spotlight.User.Tests
+[xUnit.net 00:00:00.27]   Discovered:  Spotlight.User.Tests
+[xUnit.net 00:00:00.27]   Starting:    Spotlight.User.Tests
+[testcontainers.org 00:00:00.26] Connected to Docker:
+  Host: unix:///var/run/docker.sock
+  Server Version: 29.2.1
+  Kernel Version: 6.12.76-linuxkit
+  API Version: 1.53
+  Operating System: Docker Desktop
+  Total Memory: 7.66 GB
+  Labels: 
+    com.docker.desktop.address=unix:///Users/rafaelfigueiredocampos/Library/Containers/com.docker.docker/Data/docker-cli.sock
+[testcontainers.org 00:00:00.66] Docker container d4478489c257 created
+[testcontainers.org 00:00:00.85] Start Docker container d4478489c257
+[testcontainers.org 00:00:01.26] Wait for Docker container d4478489c257 to complete readiness checks
+[testcontainers.org 00:00:02.35] Docker container d4478489c257 ready
+[testcontainers.org 00:00:02.43] Searching Docker registry credential in CredsStore
+[testcontainers.org 00:00:02.43] Searching Docker registry credential in CredHelpers
+[testcontainers.org 00:00:02.43] Searching Docker registry credential in Auths
+[testcontainers.org 00:00:02.43] Searching Docker registry credential in Auths
+[testcontainers.org 00:00:08.87] Docker registry credential https://index.docker.io/v1/ not found
+[testcontainers.org 00:01:21.93] Docker image mongo:7.0 created
+[testcontainers.org 00:01:23.07] Docker container 5a64992944f5 created
+[testcontainers.org 00:01:23.10] Start Docker container 5a64992944f5
+[testcontainers.org 00:01:23.45] Wait for Docker container 5a64992944f5 to complete readiness checks
+[testcontainers.org 00:01:28.63] Docker container 5a64992944f5 ready
+[11:16:44 DBG] Hosting starting
+[11:16:44 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:16:44 DBG] Hosting started
+[11:16:44 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 235
+[11:16:44 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:16:45 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:16:45 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:16:45 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 188.3972ms
+[11:16:45 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:16:45 INF] HTTP POST /telemetria responded 202 in 279.5151 ms
+[11:16:45 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 315.9032ms
+[11:16:45 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 235
+[11:16:45 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:16:45 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:16:45 WRN] Falha ao persistir evento de telemetria evt_duplicado_159f675429b8489aa3ff85e6734fd6d8. A requisicao sera aceita para nao bloquear a experiencia do usuario.
+MongoDB.Driver.MongoWriteException: A write operation resulted in an error. WriteError: { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_f226d5d15ada4bb5b67a6491e98181cc.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_159f675429b8489aa3ff85e6734fd6d8" }" }.
+ ---&gt; MongoDB.Driver.MongoBulkWriteException`1[MongoDB.Bson.BsonDocument]: A bulk write operation resulted in one or more errors. WriteErrors: [ { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_f226d5d15ada4bb5b67a6491e98181cc.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_159f675429b8489aa3ff85e6734fd6d8" }" } ].
+   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
+   --- End of inner exception stack trace ---
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 85
+[11:16:45 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:16:45 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 26.381ms
+[11:16:45 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:16:45 INF] HTTP POST /telemetria responded 202 in 29.7284 ms
+[11:16:45 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 31.8161ms
+[11:16:45 DBG] Hosting stopping
+[11:16:45 DBG] Hosting stopping
+[11:16:45 DBG] Hosting stopped
+[11:16:45 DBG] Hosting stopped
+[testcontainers.org 00:01:30.56] Delete Docker container 5a64992944f5
+[testcontainers.org 00:01:31.30] Docker container 81d2c747610d created
+[testcontainers.org 00:01:31.32] Start Docker container 81d2c747610d
+[testcontainers.org 00:01:31.69] Wait for Docker container 81d2c747610d to complete readiness checks
+[testcontainers.org 00:01:36.85] Docker container 81d2c747610d ready
+[11:16:51 DBG] Hosting starting
+[11:16:52 WRN] Nao foi possivel garantir os indices MongoDB de telemetria no startup.
+System.TimeoutException: A timeout occurred after 200ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "4", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 4, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "Heartbeat", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", HeartbeatException: "MongoDB.Driver.MongoConnectionException: An exception occurred while opening a connection to the server.
+ ---&gt; System.Net.Sockets.SocketException (61): Connection refused 127.0.0.1:1
+   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.Connect(Socket socket, EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.CreateStream(EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.Open(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.InitializeConnection(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.Heartbeat(CancellationToken cancellationToken)", LastHeartbeatTimestamp: "2026-06-24T14:16:51.8514990Z", LastUpdateTimestamp: "2026-06-24T14:16:51.8515000Z" }] }.
+   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.CreateIndexesOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)
+   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.MongoIndexManager.CreateManyAsync(IClientSessionHandle session, IEnumerable`1 models, CreateManyIndexesOptions options, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
+   at Spotlight.Usuario.Infrastructure.Persistence.MongoTelemetryIndexInitializer.StartAsync(CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/infrastructure/persistence/MongoTelemetryIndexInitializer.cs:line 84
+[11:16:52 DBG] Hosting started
+[11:16:52 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 244
+[11:16:52 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:16:52 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:16:54 WRN] Falha ao persistir evento de telemetria evt_mongo_indisponivel_0023fed44f8d4cd3a6f736062ee2ad7a. A requisicao sera aceita para nao bloquear a experiencia do usuario.
+System.TimeoutException: A timeout occurred after 2000ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "5", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 5, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "Heartbeat", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", HeartbeatException: "MongoDB.Driver.MongoConnectionException: An exception occurred while opening a connection to the server.
+ ---&gt; System.Net.Sockets.SocketException (61): Connection refused 127.0.0.1:1
+   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.Connect(Socket socket, EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.CreateStream(EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.Open(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.InitializeConnection(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.Heartbeat(CancellationToken cancellationToken)", LastHeartbeatTimestamp: "2026-06-24T14:16:53.6759050Z", LastUpdateTimestamp: "2026-06-24T14:16:53.6759070Z" }] }.
+   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.RetryableWriteContext.InitializeAsync(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.RetryableWriteContext.CreateAsync(IWriteBinding binding, Boolean retryRequested, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.BulkMixedWriteOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)
+   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 85
+[11:16:54 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:16:54 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 2017.6634ms
+[11:16:54 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:16:54 INF] HTTP POST /telemetria responded 202 in 2044.4512 ms
+[11:16:54 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 2050.1459ms
+[11:16:54 DBG] Hosting stopping
+[11:16:54 DBG] Hosting stopped
+[11:16:54 DBG] Hosting stopping
+[11:16:54 DBG] Hosting stopped
+[testcontainers.org 00:01:39.44] Delete Docker container 81d2c747610d
+[testcontainers.org 00:01:40.24] Docker container bc7e4733b2b2 created
+[testcontainers.org 00:01:40.26] Start Docker container bc7e4733b2b2
+[testcontainers.org 00:01:40.71] Wait for Docker container bc7e4733b2b2 to complete readiness checks
+[testcontainers.org 00:01:45.92] Docker container bc7e4733b2b2 ready
+[11:17:00 DBG] Hosting starting
+[11:17:01 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:17:01 DBG] Hosting started
+[11:17:01 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 298
+[11:17:01 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:17:01 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:17:01 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:17:01 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 59.9498ms
+[11:17:01 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:17:01 INF] HTTP POST /telemetria responded 202 in 70.3162 ms
+[11:17:01 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 72.0046ms
+[11:17:01 DBG] Hosting stopping
+[11:17:01 DBG] Hosting stopping
+[11:17:01 DBG] Hosting stopped
+[11:17:01 DBG] Hosting stopped
+[testcontainers.org 00:01:46.49] Delete Docker container bc7e4733b2b2
+[testcontainers.org 00:01:47.48] Docker container 4548d432e925 created
+[testcontainers.org 00:01:47.52] Start Docker container 4548d432e925
+[testcontainers.org 00:01:48.05] Wait for Docker container 4548d432e925 to complete readiness checks
+[testcontainers.org 00:01:53.24] Docker container 4548d432e925 ready
+[11:17:08 DBG] Hosting starting
+[11:17:08 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:17:08 DBG] Hosting started
+[11:17:08 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 232
+[11:17:08 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:17:08 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:17:08 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 9.144ms
+[11:17:08 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:17:08 ERR] HTTP POST /telemetria responded 500 in 19.3312 ms
+Spotlight.Usuario.Domain.Entities.ValidationException: Dados de entrada inválidos.
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.Validar(Nullable`1 usuarioId, RegistrarTelemetriaRequest request) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 181
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 59
+   at Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar(RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/presentation/controllers/TelemetriaController.cs:line 38
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.&lt;InvokeActionMethodAsync&gt;g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.&lt;InvokeNextActionFilterAsync&gt;g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State&amp; next, Scope&amp; scope, Object&amp; state, Boolean&amp; isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.&lt;InvokeFilterPipelineAsync&gt;g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.&lt;InvokeAsync&gt;g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.&lt;InvokeAsync&gt;g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.&lt;Invoke&gt;g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+[11:17:08 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 400 null application/json 37.6229ms
+[11:17:08 DBG] Hosting stopping
+[11:17:08 DBG] Hosting stopped
+[11:17:08 DBG] Hosting stopping
+[11:17:08 DBG] Hosting stopped
+[testcontainers.org 00:01:53.64] Delete Docker container 4548d432e925
+[testcontainers.org 00:01:54.42] Docker container 3a94ac92929d created
+[testcontainers.org 00:01:54.45] Start Docker container 3a94ac92929d
+[testcontainers.org 00:01:54.93] Wait for Docker container 3a94ac92929d to complete readiness checks
+[testcontainers.org 00:01:59.07] Docker container 3a94ac92929d ready
+[11:17:13 DBG] Hosting starting
+[11:17:14 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:17:14 DBG] Hosting started
+[11:17:14 DBG] Hosting stopping
+[11:17:14 DBG] Hosting stopped
+[11:17:14 DBG] Hosting stopping
+[11:17:14 DBG] Hosting stopped
+[testcontainers.org 00:01:59.36] Delete Docker container 3a94ac92929d
+[11:17:14 DBG] Hosting starting
+[11:17:14 DBG] Hosting started
+[11:17:14 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
+[11:17:14 INF] Executing endpoint 'Health checks'
+[11:17:14 DBG] Running health checks
+[11:17:14 DBG] Running health check postgres
+[11:17:14 ERR] Health check postgres with status Unhealthy completed after 1.7149ms with message 'Connection string do banco nao configurada.'
+[11:17:14 DBG] Health check processing with combined status Unhealthy completed after 15.5351ms
+[11:17:14 INF] Executed endpoint 'Health checks'
+[11:17:14 ERR] HTTP GET /health/ready responded 503 in 28.3848 ms
+[11:17:14 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 30.2552ms
+[11:17:14 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[11:17:14 INF] Executing endpoint 'Health checks'
+[11:17:14 DBG] Running health checks
+[11:17:14 DBG] Health check processing with combined status Healthy completed after 0.5645ms
+[11:17:14 INF] Executed endpoint 'Health checks'
+[11:17:14 INF] HTTP GET /health responded 200 in 2.4250 ms
+[11:17:14 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 3.7207ms
+[11:17:14 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[11:17:14 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User)'
+[11:17:14 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Usuario.Presentation.Controllers.PingController (Spotlight.User).
+[11:17:14 INF] Executing OkObjectResult, writing value of type '&lt;&gt;f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[11:17:14 INF] Executed action Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User) in 2.4298ms
+[11:17:14 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User)'
+[11:17:14 INF] HTTP GET /api/ping responded 200 in 8.4160 ms
+[11:17:14 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 8.6748ms
+[11:17:14 DBG] Hosting stopping
+[11:17:14 DBG] Hosting stopped
+[11:17:14 DBG] Hosting stopping
+[11:17:14 DBG] Hosting stopped
+[xUnit.net 00:02:01.03]   Finished:    Spotlight.User.Tests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

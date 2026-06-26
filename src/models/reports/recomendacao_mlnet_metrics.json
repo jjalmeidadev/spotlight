@@ -41,6 +41,6 @@
     "Metricas": "src/models/reports/recomendacao_mlnet_metrics.json",
     "Relatorio": "src/models/reports/README_modelo_classificacao_recomendacao.md",
     "Exemplos": "src/models/reports/recomendacao_mlnet_exemplos.csv",
-    "Treinamento": "src/backend/ml-engine/training/Spotlight.Recomendacao.ModelTraining"
+    "Treinamento": "src/backend/ml-engine/training/Spotlight.Recommendation.ModelTraining"
   }
 }

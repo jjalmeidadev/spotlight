@@ -75,7 +75,7 @@ services:
   catalogo:
     <<: *dotnet-dev
     build:
-      context: ./src/backend/services/catalogo
+      context: ./src/backend/services/catalog
       dockerfile: Dockerfile
       target: dev
     environment:
@@ -87,14 +87,14 @@ services:
     ports:
       - "${CATALOGO_PORT:-5001}:8080"
     volumes:
-      - ./src/backend/services/catalogo:/src
+      - ./src/backend/services/catalog:/src
       - nuget_packages:/root/.nuget/packages
     healthcheck: *health-ready-dev
 
   usuario:
     <<: *dotnet-dev
     build:
-      context: ./src/backend/services/usuario
+      context: ./src/backend/services/user
       dockerfile: Dockerfile
       target: dev
     environment:
@@ -109,14 +109,14 @@ services:
     ports:
       - "${USUARIO_PORT:-5002}:8080"
     volumes:
-      - ./src/backend/services/usuario:/src
+      - ./src/backend/services/user:/src
       - nuget_packages:/root/.nuget/packages
     healthcheck: *health-ready-dev
 
   recomendacao:
     <<: *dotnet-dev
     build:
-      context: ./src/backend/services/recomendacao
+      context: ./src/backend/services/recommendation
       dockerfile: Dockerfile
       target: dev
     environment:
@@ -137,7 +137,7 @@ services:
     ports:
       - "${RECOMENDACAO_PORT:-5003}:8080"
     volumes:
-      - ./src/backend/services/recomendacao:/src
+      - ./src/backend/services/recommendation:/src
       - recomendacao_model_artifacts_dev:/app/model-artifacts
       - nuget_packages:/root/.nuget/packages
     healthcheck: *health-ready-dev
@@ -145,7 +145,7 @@ services:
   geolocalizacao:
     <<: *dotnet-dev
     build:
-      context: ./src/backend/services/geolocalizacao
+      context: ./src/backend/services/geolocation
       dockerfile: Dockerfile
       target: dev
     environment:
@@ -156,7 +156,7 @@ services:
     ports:
       - "${GEOLOCALIZACAO_PORT:-5004}:8080"
     volumes:
-      - ./src/backend/services/geolocalizacao:/src
+      - ./src/backend/services/geolocation:/src
       - nuget_packages:/root/.nuget/packages
     healthcheck: *health-ready-dev
 

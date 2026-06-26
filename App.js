@@ -1,11 +1,12 @@
 import React from 'react';
 import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import AdminDashboardScreen from './src/frontend/screens/AdminDashboardScreen';
-import CadastroView from './src/frontend/screens/CadastroView';
+import SignupView from './src/frontend/screens/SignupView';
 import CatalogView from './src/frontend/screens/CatalogView';
-import DetalhesView from './src/frontend/screens/DetalhesView';
+import DetailsView from './src/frontend/screens/DetailsView';
 import LoadingScreen from './src/frontend/screens/LoadingScreen';
 import LoginView from './src/frontend/screens/LoginView';
 import PreferenceSelectionScreen from './src/frontend/screens/PreferenceSelectionScreen';
@@ -16,9 +17,19 @@ import {
 } from './src/frontend/repositories/PreferenceRepository';
 
 export default function App() {
+	return (
+		<SafeAreaProvider>
+			<AppContent />
+		</SafeAreaProvider>
+	);
+}
+
+function AppContent() {
 	const [screen, setScreen] = React.useState('loading');
 	const [espetaculoId, setEspetaculoId] = React.useState('16');
 	const [userName, setUserName] = React.useState('Leonardo');
+	const [userEmail, setUserEmail] = React.useState('');
+	const [userType, setUserType] = React.useState('cadastrado');
 	const [accessToken, setAccessToken] = React.useState(null);
 	const [userLocationAddress, setUserLocationAddress] = React.useState(null);
 
@@ -49,9 +60,20 @@ export default function App() {
 
 	async function handleLogin(usuario) {
 		setUserName(usuario.nome);
+		setUserEmail(usuario.email);
+		setUserType(usuario.tipoUsuario ?? 'cadastrado');
 		setAccessToken(usuario.accessToken ?? null);
 		setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
 		await direcionarAposAutenticacao(usuario);
+	}
+
+	function handleLogout() {
+		setAccessToken(null);
+		setUserName('');
+		setUserEmail('');
+		setUserType('cadastrado');
+		setUserLocationAddress(null);
+		setScreen('login');
 	}
 
 	async function direcionarAposAutenticacao(usuario) {
@@ -71,8 +93,8 @@ export default function App() {
 			const preferencias = await obterPreferenciasUsuario(usuario.accessToken);
 			setScreen(preferenciasEstaoCompletas(preferencias) ? 'catalogo' : 'preferencias');
 		} catch (error) {
-			console.log('Nao foi possivel verificar preferencias salvas:', error);
-			setScreen('catalogo');
+			console.warn(error);
+			setScreen('preferencias');
 		}
 	}
 
@@ -101,7 +123,7 @@ export default function App() {
 
 	if (screen === 'cadastro') {
 		return (
-			<CadastroView
+			<SignupView
 				onBackPress={() => setScreen('login')}
 				onCadastro={async (usuario) => {
 					if (usuario.requerConfirmacaoEmail) {
@@ -114,9 +136,11 @@ export default function App() {
 					}
 
 					setUserName(usuario.nome);
+					setUserEmail(usuario.email);
+					setUserType(usuario.tipoUsuario ?? 'cadastrado');
 					setAccessToken(usuario.accessToken ?? null);
 					setUserLocationAddress(usuario.localizacao?.formattedAddress ?? null);
-					await direcionarAposAutenticacao(usuario);
+					setScreen(usuario.tipoUsuario === 'administrador' ? 'dashboard' : 'preferencias');
 				}}
 			/>
 		);
@@ -138,8 +162,13 @@ export default function App() {
 		return (
 			<CatalogView
 				accessToken={accessToken}
+				profileEmail={userEmail}
 				profileName={userName}
+				isAdmin={userType === 'administrador'}
 				userLocationAddress={userLocationAddress}
+				onAdminPress={() => setScreen('dashboard')}
+				onLogout={handleLogout}
+				onProfileUpdated={setUserName}
 				onItemPress={(item) => {
 					setEspetaculoId(item.id);
 					setScreen('detalhes');
@@ -150,7 +179,7 @@ export default function App() {
 
 	if (screen === 'detalhes') {
 		return (
-			<DetalhesView
+			<DetailsView
 				accessToken={accessToken}
 				espetaculoId={espetaculoId}
 				onClose={() => setScreen('catalogo')}
@@ -161,7 +190,16 @@ export default function App() {
 	}
 
 	if (screen === 'dashboard') {
-		return <AdminDashboardScreen />;
+		return (
+			<AdminDashboardScreen
+				accessToken={accessToken}
+				profileEmail={userEmail}
+				profileName={userName}
+				onOpenCatalog={() => setScreen('catalogo')}
+				onLogout={handleLogout}
+				onProfileUpdated={setUserName}
+			/>
+		);
 	}
 
 	if (screen === 'email-confirmado') {
@@ -183,10 +221,6 @@ export default function App() {
 	return (
 		<LoginView
 			onCadastroPress={() => setScreen('cadastro')}
-			onDevModePress={() => {
-				setUserName('Professor');
-				setScreen('catalogo');
-			}}
 			onLogin={handleLogin}
 		/>
 	);

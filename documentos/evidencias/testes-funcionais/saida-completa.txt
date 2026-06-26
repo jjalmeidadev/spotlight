@@ -1,348 +1,402 @@
   Determinando os projetos a serem restaurados...
   Todos os projetos estão atualizados para restauração.
-  Spotlight.Geolocalizacao -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\geolocalizacao\bin\Debug\net9.0\Spotlight.Geolocalizacao.dll
-  Spotlight.Recomendacao -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\recomendacao\bin\Debug\net9.0\Spotlight.Recomendacao.dll
-  Spotlight.Usuario -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\bin\Debug\net9.0\Spotlight.Usuario.dll
-  Spotlight.Catalogo -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\catalogo\bin\Debug\net9.0\Spotlight.Catalogo.dll
-  Spotlight.Gateway -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\api-gateway\bin\Debug\net9.0\Spotlight.Gateway.dll
-  Spotlight.Geolocalizacao.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll
-Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocalizacao.Tests\bin\Debug\net9.0\Spotlight.Geolocalizacao.Tests.dll (.NETCoreApp,Version=v9.0)
-  Spotlight.Recomendacao.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll
-  Spotlight.Gateway.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll
-  Spotlight.Catalogo.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Catalogo.Tests\bin\Debug\net9.0\Spotlight.Catalogo.Tests.dll
-Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recomendacao.Tests\bin\Debug\net9.0\Spotlight.Recomendacao.Tests.dll (.NETCoreApp,Version=v9.0)
-Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Catalogo.Tests\bin\Debug\net9.0\Spotlight.Catalogo.Tests.dll (.NETCoreApp,Version=v9.0)
-Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll (.NETCoreApp,Version=v9.0)
-  Spotlight.Usuario.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Usuario.Tests\bin\Debug\net9.0\Spotlight.Usuario.Tests.dll
-Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Usuario.Tests\bin\Debug\net9.0\Spotlight.Usuario.Tests.dll (.NETCoreApp,Version=v9.0)
+  Spotlight.Recommendation -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/recommendation/bin/Debug/net9.0/Spotlight.Recommendation.dll
+  Spotlight.Gateway -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/api-gateway/bin/Debug/net9.0/Spotlight.Gateway.dll
+  Spotlight.Geolocation -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/geolocation/bin/Debug/net9.0/Spotlight.Geolocation.dll
+  Spotlight.Catalog -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/catalog/bin/Debug/net9.0/Spotlight.Catalog.dll
+  Spotlight.User -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/bin/Debug/net9.0/Spotlight.User.dll
+  Spotlight.User.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll (.NETCoreApp,Version=v9.0)
+  Spotlight.Gateway.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Gateway.Tests/bin/Debug/net9.0/Spotlight.Gateway.Tests.dll
+  Spotlight.Catalog.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Catalog.Tests/bin/Debug/net9.0/Spotlight.Catalog.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Gateway.Tests/bin/Debug/net9.0/Spotlight.Gateway.Tests.dll (.NETCoreApp,Version=v9.0)
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Catalog.Tests/bin/Debug/net9.0/Spotlight.Catalog.Tests.dll (.NETCoreApp,Version=v9.0)
+  Spotlight.Recommendation.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Recommendation.Tests/bin/Debug/net9.0/Spotlight.Recommendation.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Recommendation.Tests/bin/Debug/net9.0/Spotlight.Recommendation.Tests.dll (.NETCoreApp,Version=v9.0)
 1 arquivos de teste no total corresponderam ao padrão especificado.
 1 arquivos de teste no total corresponderam ao padrão especificado.
 1 arquivos de teste no total corresponderam ao padrão especificado.
 1 arquivos de teste no total corresponderam ao padrão especificado.
-1 arquivos de teste no total corresponderam ao padrão especificado.
-[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
-[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
-[xUnit.net 00:00:00.47]   Discovering: Spotlight.Geolocalizacao.Tests
-[xUnit.net 00:00:00.60]   Discovered:  Spotlight.Geolocalizacao.Tests
-[xUnit.net 00:00:00.60]   Starting:    Spotlight.Geolocalizacao.Tests
-[xUnit.net 00:00:00.47]   Discovering: Spotlight.Gateway.Tests
-[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
-[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
-[xUnit.net 00:00:00.62]   Discovered:  Spotlight.Gateway.Tests
-[xUnit.net 00:00:00.63]   Starting:    Spotlight.Gateway.Tests
-[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
-[xUnit.net 00:00:01.00]   Finished:    Spotlight.Geolocalizacao.Tests
-[xUnit.net 00:00:00.37]   Discovering: Spotlight.Catalogo.Tests
-[xUnit.net 00:00:00.33]   Discovering: Spotlight.Recomendacao.Tests
-[xUnit.net 00:00:00.51]   Discovered:  Spotlight.Recomendacao.Tests
-[xUnit.net 00:00:00.57]   Discovered:  Spotlight.Catalogo.Tests
-[xUnit.net 00:00:00.58]   Starting:    Spotlight.Catalogo.Tests
-[xUnit.net 00:00:00.53]   Starting:    Spotlight.Recomendacao.Tests
-[xUnit.net 00:00:00.40]   Discovering: Spotlight.Usuario.Tests
-  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiNaoRetornaLugar_LancaNotFound [154 ms]
-  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ArredondaCoordenadasEUsaCache [75 ms]
-  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComDisplayNameVazio_LancaNotFound [1 ms]
-  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_ComEnderecoVazio_LancaValidation [8 ms]
-  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_NormalizaEnderecoEUsaCache [7 ms]
-  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComCoordenadasInvalidas_LancaValidation [2 ms]
-  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiFalha_LancaConflict [1 ms]
-Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
-
-Execução de Teste Bem-sucedida.
-Total de testes: 7
-     Aprovados: 7
-Tempo total: 4,1860 Segundos
-[xUnit.net 00:00:00.55]   Discovered:  Spotlight.Usuario.Tests
-[xUnit.net 00:00:00.57]   Starting:    Spotlight.Usuario.Tests
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoBaseControllerTests.Obter_DeveRetornarContratoBaseDaApiDeRecomendacao [30 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10) [52 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10) [< 1 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 20, limiteEsperado: 20) [< 1 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 999, limiteEsperado: 50) [< 1 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: -5, limiteEsperado: 10) [< 1 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 51, limiteEsperado: 50) [7 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10) [1 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ExcluirEspetaculo_QuandoNaoExiste_LancaNotFound [21 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao [13 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_ComTituloMuitoLongo_NaoChamaRepositorio [10 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: 5,1) [7 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: -0,1) [< 1 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: null) [< 1 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_ComDadosValidos_CriaEBuscaDetalhe [18 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterEspetaculo_QuandoExiste_MapeiaDetalheCompleto [3 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado [37 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil [8 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComPrecoNegativo_LancaValidation [14 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro [13 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias [9 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation [7 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: "   ") [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: "") [< 1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation [35 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo [51 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEventoValido_ChamaRepositorio [5 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComUsuarioAutenticado_AssociaUsuario [121 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoExiste_MapeiaPreferencias [12 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoExiste_MapeiaPerfil [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoCancelado_PropagaCancelamento [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoNaoExiste_LancaNotFound [< 1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComEventoAnonimo_RetornaAccepted [5 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataFutura_LancaValidation [1 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_SemServicoConfigurado_Retorna503 [3 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataForaDaJanela_LancaValidation [2 ms]
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound [< 1 ms]
-[19:11:56 INF] User profile is available. Using 'C:\Users\Inteli\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
-[19:11:57 INF] Loading proxy data from config.
-[19:11:57 DBG] Destination 'd1' has been added.
-[19:11:57 DBG] New client created for cluster 'catalogo'.
-[19:11:57 DBG] Cluster 'catalogo' has been added.
-[19:11:57 DBG] Destination 'd1' has been added.
-[19:11:57 DBG] New client created for cluster 'geolocalizacao'.
-[19:11:57 DBG] Cluster 'geolocalizacao' has been added.
-[19:11:57 DBG] Destination 'd1' has been added.
-[19:11:57 DBG] New client created for cluster 'recomendacao'.
-[19:11:57 DBG] Cluster 'recomendacao' has been added.
-[19:11:57 DBG] Destination 'd1' has been added.
-[19:11:57 DBG] New client created for cluster 'usuario'.
-[19:11:57 DBG] Cluster 'usuario' has been added.
-[19:11:57 DBG] Route 'catalogo' has been added.
-[19:11:57 DBG] Route 'geolocalizacao' has been added.
-[19:11:57 DBG] Route 'recomendacao' has been added.
-[19:11:57 DBG] Route 'usuario' has been added.
-[19:11:57 DBG] Hosting starting
-[19:11:57 DBG] Hosting starting
-[19:11:57 DBG] Hosting started
-[19:11:57 DBG] Hosting started
-[19:11:57 DBG] Hosting starting
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
-[19:11:57 INF] Sincronizacao de artefatos do Supabase Storage desabilitada.
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
-[19:11:57 INF] Executing endpoint 'Health checks'
-[19:11:57 DBG] Running health checks
-[19:11:57 DBG] Hosting started
-[19:11:57 DBG] Health check processing with combined status Healthy completed after 2.6218ms
-[19:11:57 INF] Executing endpoint 'Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalogo)'
-[19:11:57 INF] Executed endpoint 'Health checks'
-[19:11:57 INF] HTTP GET /health responded 200 in 69.6174 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 117.2243ms
-[19:11:57 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Catalogo.Presentation.Controllers.PingController (Spotlight.Catalogo).
-[19:11:57 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
-[19:11:57 INF] Executing endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'
-[19:11:57 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Gateway.Controllers.PingController (Spotlight.Gateway).
-[19:11:57 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType0`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
-[19:11:57 INF] Executed action Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalogo) in 71.7389ms
-[19:11:57 INF] Executed endpoint 'Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalogo)'
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterEspetaculo_QuandoNaoExiste_LancaNotFound [1 ms]
+[xUnit.net 00:00:00.31] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.8)
+[xUnit.net 00:00:01.47]   Discovering: Spotlight.User.Tests
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.07] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.8)
+[xUnit.net 00:00:01.91]   Discovered:  Spotlight.User.Tests
+[xUnit.net 00:00:01.93]   Starting:    Spotlight.User.Tests
+[xUnit.net 00:00:01.06]   Discovering: Spotlight.Gateway.Tests
+[xUnit.net 00:00:01.08]   Discovering: Spotlight.Catalog.Tests
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.8)
+[xUnit.net 00:00:01.22]   Discovered:  Spotlight.Gateway.Tests
+[xUnit.net 00:00:01.24]   Starting:    Spotlight.Gateway.Tests
+[xUnit.net 00:00:01.28]   Discovered:  Spotlight.Catalog.Tests
+[xUnit.net 00:00:01.42]   Starting:    Spotlight.Catalog.Tests
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterTeatro_QuandoNaoExiste_LancaNotFound [20 ms]
+  Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_ComClaimSubValida_RetornaGuid [89 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarSessoes_QuandoEspetaculoExiste_MapeiaSessoes [78 ms]
+  Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_SemHttpContext_RetornaNull [40 ms]
+  Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_ComNameIdentifierValido_RetornaGuid [2 ms]
+  Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_ComClaimInvalida_RetornaNull [< 1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_ComDadosValidos_CriaEBuscaDetalhe [41 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado [49 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ExcluirEspetaculo_QuandoNaoExiste_LancaNotFound [3 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterEspetaculo_QuandoNaoExiste_LancaNotFound [4 ms]
   Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarAvaliacoes_QuandoEspetaculoNaoExiste_LancaNotFound [4 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_QuandoDetalheNaoExisteAposCriacao_LancaInvalidOperation [2 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao [102 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarCategoriasETeatros_MapeiamListasSimples [12 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaValida_RetornaAvaliacaoCriada [49 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterEspetaculo_QuandoExiste_MapeiaDetalheCompleto [2 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_ComDadosParciaisValidos_AtualizaEBuscaDetalhe [9 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao [1 ms]
+[xUnit.net 00:00:00.91]   Discovering: Spotlight.Recommendation.Tests
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: null) [7 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: -0,1) [5 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: 5,1) [< 1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_QuandoDetalheNaoExisteAposAtualizar_LancaNotFound [4 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_ComTituloMuitoLongo_NaoChamaRepositorio [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ExcluirEspetaculo_QuandoExiste_ChamaRepositorioSemErro [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarAvaliacoes_NormalizaPaginacaoEMapeiaUsuario [9 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterTeatro_QuandoExiste_MapeiaTodosOsCampos [2 ms]
   Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_QuandoRepositorioNaoAtualiza_LancaNotFound [1 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado [22 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarCategoriasETeatros_MapeiamListasSimples [10 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaValida_RetornaAvaliacaoCriada [7 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarSessoes_QuandoEspetaculoExiste_MapeiaSessoes [2 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarAvaliacoes_NormalizaPaginacaoEMapeiaUsuario [4 ms]
-  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterTeatro_QuandoNaoExiste_LancaNotFound [2 ms]
-[19:11:57 INF] HTTP GET /api/ping responded 200 in 150.8720 ms
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10) [< 1 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 25, limiteEsperado: 25) [< 1 ms]
-  Aprovado [19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 194.8052ms
-Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres [21 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista [5 ms]
-  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet [8 ms]
-[19:11:57 INF] Executing endpoint 'Health checks'
-[19:11:57 DBG] Running health checks
-[19:11:57 INF] Executed action Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway) in 62.8021ms
-[19:11:57 INF] Executed endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'
-[19:11:57 INF] HTTP GET /api/ping responded 200 in 84.5232 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 89.6033ms
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
-[19:11:57 INF] Executing endpoint 'Health checks'
-[19:11:57 DBG] Running health checks
-[19:11:57 DBG] Hosting stopping
-[19:11:57 DBG] Hosting stopping
-[19:11:57 DBG] Hosting stopped
-[19:11:57 DBG] Hosting stopped
-[19:11:57 DBG] Health check processing with combined status Healthy completed after 6.013ms
-[19:11:57 DBG] Hosting starting
-[19:11:57 DBG] Health check processing with combined status Healthy completed after 4.5253ms
-[19:11:57 INF] Executed endpoint 'Health checks'
-[19:11:57 INF] HTTP GET /health responded 200 in 17.6041 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 20.5365ms
-[xUnit.net 00:00:02.91]   Finished:    Spotlight.Gateway.Tests
-[19:11:57 INF] Executed endpoint 'Health checks'
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
-[19:11:57 INF] HTTP GET /health responded 200 in 115.6589 ms
-[19:11:57 INF] Executing endpoint 'Health checks'
-[19:11:57 DBG] Running health checks
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 153.2046ms
-[19:11:57 DBG] Running health check postgres
-[19:11:57 ERR] Health check postgres with status Unhealthy completed after 2.3933ms with message 'Connection string do banco n�o configurada.'
-[19:11:57 DBG] Health check processing with combined status Unhealthy completed after 18.2672ms
-[19:11:57 INF] Executed endpoint 'Health checks'
-[19:11:57 ERR] HTTP GET /health/ready responded 503 in 26.1066 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 28.6373ms
-[19:11:57 DBG] Hosting stopping
-[19:11:57 DBG] Hosting stopping
-[19:11:57 DBG] Hosting stopped
-[19:11:57 DBG] Hosting stopped
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
-[19:11:57 INF] Executing endpoint 'Health checks'
-[19:11:57 DBG] Running health checks
-[19:11:57 DBG] Running health check postgres
-[xUnit.net 00:00:02.45]   Finished:    Spotlight.Catalogo.Tests
-[19:11:57 ERR] Health check postgres with status Unhealthy completed after 3.5059ms with message 'Connection string do banco n�o configurada.'
-[19:11:57 DBG] Health check processing with combined status Unhealthy completed after 19.1699ms
-[19:11:57 INF] Executed endpoint 'Health checks'
-[19:11:57 ERR] HTTP GET /health/ready responded 503 in 32.4062 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 39.521ms
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
-[19:11:57 INF] Executing endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recomendacao)'
-[19:11:57 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Recomendacao.Presentation.Controllers.PingController (Spotlight.Recomendacao).
-[19:11:57 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
-[19:11:57 DBG] Hosting started
-[19:11:57 INF] Executed action Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recomendacao) in 44.1537ms
-[19:11:57 INF] Executed endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recomendacao)'
-[19:11:57 INF] HTTP GET /api/ping responded 200 in 62.9603 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 64.2696ms
-  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [1 s]
-  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_Health_Returns_200 [26 ms]
-  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [37 ms]
-[19:11:57 DBG] Hosting stopping
-[19:11:57 DBG] Hosting stopping[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
-
-[19:11:57 DBG] Hosting stopped
-[19:11:57 DBG] Hosting stopped
-[xUnit.net 00:00:02.50]   Finished:    Spotlight.Recomendacao.Tests
-AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
-  Aprovado Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Health_Returns_200 [2 s]
-  Aprovado Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [98 ms]
-Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
+[xUnit.net 00:00:01.30]   Discovered:  Spotlight.Recommendation.Tests
+[xUnit.net 00:00:01.32]   Starting:    Spotlight.Recommendation.Tests
+  Aprovado Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.CreateModels_PreservaNomeEOpcoesDosIndices [208 ms]
+  Aprovado Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.Definitions_IncluemIndicesOperacionaisDaTelemetria [42 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoBaseControllerTests.Obter_DeveRetornarContratoBaseDaApiDeRecomendacao [44 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.UsuarioContextoHttp_ComSubInvalido_RetornaNull [49 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10) [92 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 25, limiteEsperado: 25) [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 51, limiteEsperado: 50) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoRepositorioFalhaAoEnriquecer_FazFallbackELogaWarning [103 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.RecomendacaoMeController_SemUsuario_LancaValidation [23 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.RecomendacaoStrategyFactory_QuandoModeloDesabilitado_RetornaStrategyPostgres [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: -100, esperado: 10) [5 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: null, esperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: -1, esperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 1, esperado: 1) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 25, esperado: 25) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 50, esperado: 50) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 51, esperado: 50) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 0, esperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 2147483647, esperado: 50) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.UsuarioContextoHttp_ComNameIdentifierValido_RetornaGuid [14 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.RecomendacaoMeController_ComUsuarioValido_RetornaOkComLista [13 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10) [37 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 999, limiteEsperado: 50) [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 20, limiteEsperado: 20) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: -5, limiteEsperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet [5 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres [7 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista [4 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal [131 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_ComPredicoesDuplicadas_PreservaRankingDoModelo [179 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloLancaExcecao_FazFallbackELogaWarning [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_FiltraPredicoesSemEspetaculoMasMantemDemais [4 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_QuandoRepositorioRetornaListaVazia_RetornaListaVazia [5 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloRetornaPredicoesEEspetaculosExistem_UsaRankingDoModelo [8 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_EnvelopaResultadoDaStrategyEmListaDto [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloRetornaPredicoesVazias_FazFallbackParaPostgres [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloLancaOperationCanceledException_NaoFazFallbackEPropaga [135 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_RepassaUsuarioIdECancellationTokenParaStrategy [64 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_MapeiaEntidadeParaDtoIncluindoMidias [36 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoNenhumaPredicaoTemEspetaculoConhecido_FazFallbackParaPostgres [24 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_QuandoPreProcessadoVazio_UsaFallbackUserBased [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_PreservaOrdemDoRepositorio [12 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarSessoes_QuandoEspetaculoNaoExiste_LancaNotFoundENaoListaSessoes [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio [3 ms]
+[testcontainers.org 00:00:01.46] Connected to Docker:
+  Host: unix:///var/run/docker.sock
+  Server Version: 29.2.1
+  Kernel Version: 6.12.76-linuxkit
+  API Version: 1.53
+  Operating System: Docker Desktop
+  Total Memory: 7.66 GB
+  Labels: 
+    com.docker.desktop.address=unix:///Users/rafaelfigueiredocampos/Library/Containers/com.docker.docker/Data/docker-cli.sock
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.RecomendacaoStrategyFactory_QuandoModeloHabilitado_RetornaStrategyMlNet [33 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_RepassaUsuarioLimiteECancellationTokenParaModelo [9 ms]
+[11:17:50 INF] User profile is available. Using '/Users/rafaelfigueiredocampos/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+[testcontainers.org 00:00:02.98] Docker container 9f3f1ec2c0d6 created
+[11:17:50 INF] Loading proxy data from config.
+[11:17:51 DBG] Destination 'd1' has been added.
+[11:17:51 DBG] New client created for cluster 'catalogo'.
+[11:17:51 DBG] Cluster 'catalogo' has been added.
+[11:17:51 DBG] Destination 'd1' has been added.
+[11:17:51 DBG] New client created for cluster 'geolocalizacao'.
+[11:17:51 DBG] Cluster 'geolocalizacao' has been added.
+[11:17:51 DBG] Destination 'd1' has been added.
+[11:17:51 DBG] New client created for cluster 'recomendacao'.
+[11:17:51 DBG] Cluster 'recomendacao' has been added.
+[11:17:51 DBG] Destination 'd1' has been added.
+[11:17:51 DBG] New client created for cluster 'usuario'.
+[11:17:51 DBG] Cluster 'usuario' has been added.
+[11:17:51 DBG] Hosting starting
+[11:17:51 DBG] Hosting starting
+[testcontainers.org 00:00:03.46] Start Docker container 9f3f1ec2c0d6
+[11:17:51 INF] Sincronizacao de artefatos do Supabase Storage desabilitada.
+[11:17:51 INF] User profile is available. Using '/Users/rafaelfigueiredocampos/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+[11:17:51 DBG] Route 'catalogo' has been added.
+[11:17:51 DBG] Route 'geolocalizacao' has been added.
+[11:17:51 DBG] Route 'recomendacao' has been added.
+[11:17:51 DBG] Route 'usuario' has been added.
+[11:17:51 DBG] Hosting starting
+[11:17:51 DBG] Hosting started
+[11:17:51 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
+[11:17:51 DBG] Hosting started
+[11:17:51 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[11:17:51 DBG] Hosting started
+[11:17:51 INF] Executing endpoint 'Health checks'
+[11:17:51 DBG] Running health checks
+[11:17:51 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[11:17:51 DBG] Running health check postgres
+[11:17:51 ERR] Health check postgres with status Unhealthy completed after 2.5464ms with message 'Connection string do banco não configurada.'
+[11:17:51 DBG] Health check processing with combined status Unhealthy completed after 34.8163ms
+[11:17:51 INF] Executed endpoint 'Health checks'
+[11:17:52 ERR] HTTP GET /health/ready responded 503 in 305.7484 ms
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 366.934ms
+  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [3 s]
+[11:17:52 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[11:17:52 INF] Executing endpoint 'Health checks'
+[11:17:52 DBG] Running health checks
+[11:17:52 DBG] Health check processing with combined status Healthy completed after 0.4856ms
+[11:17:52 INF] Executed endpoint 'Health checks'
+[11:17:52 INF] HTTP GET /health responded 200 in 14.6605 ms
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 18.301ms
+[11:17:52 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[11:17:52 INF] Executing endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recommendation)'
+[11:17:52 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Recomendacao.Presentation.Controllers.PingController (Spotlight.Recommendation).
+[11:17:52 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[11:17:52 INF] Executing endpoint 'Health checks'
+[11:17:52 DBG] Running health checks
+[11:17:52 INF] Executing endpoint 'Health checks'
+[11:17:52 DBG] Running health checks
+[11:17:52 DBG] Health check processing with combined status Healthy completed after 36.5765ms
+[11:17:52 INF] Executed action Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recommendation) in 132.9273ms
+[11:17:52 INF] Executed endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recommendation)'
+[11:17:52 INF] HTTP GET /api/ping responded 200 in 159.1745 ms
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 160.3954ms
+[11:17:52 DBG] Hosting stopping
+[11:17:52 DBG] Hosting stopped
+[11:17:52 DBG] Hosting stopping
+[11:17:52 DBG] Hosting stopped
+[xUnit.net 00:00:05.53]   Finished:    Spotlight.Recommendation.Tests
+[testcontainers.org 00:00:04.36] Wait for Docker container 9f3f1ec2c0d6 to complete readiness checks
+[11:17:52 DBG] Health check processing with combined status Healthy completed after 8.5569ms
+[11:17:52 INF] Executed endpoint 'Health checks'
+[11:17:52 INF] HTTP GET /health responded 200 in 390.1394 ms
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 463.4329ms
+[11:17:52 INF] Executed endpoint 'Health checks'
+[11:17:52 INF] HTTP GET /health responded 200 in 534.9068 ms
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 602.0122ms
+[11:17:52 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[11:17:52 INF] Executing endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'
+  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_Health_Returns_200 [5 s]
+[11:17:52 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[11:17:52 INF] Executing endpoint 'Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalog)'
+[11:17:52 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Gateway.Controllers.PingController (Spotlight.Gateway).
+  Aprovado Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Health_Returns_200 [5 s]
+[11:17:52 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType0`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[11:17:52 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Catalogo.Presentation.Controllers.PingController (Spotlight.Catalog).
+[11:17:52 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Health_Returns_200 [22 ms]
+  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [164 ms]
 
 Execução de Teste Bem-sucedida.
-Total de testes: 20
-     Aprovados: 20
-Tempo total: 5,6101 Segundos
-[19:11:57 INF] Executing endpoint 'Health checks'
-[19:11:57 DBG] Running health checks
-AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
-Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
+Total de testes: 47
+     Aprovados: 47
+Tempo total: 10,0434 Segundos
+[11:17:52 INF] Executed action Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalog) in 72.0783ms
+[11:17:52 INF] Executed endpoint 'Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalog)'
+[11:17:52 INF] HTTP GET /api/ping responded 200 in 107.7781 ms
+[11:17:52 INF] Executed action Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway) in 85.4422ms
+[11:17:52 INF] Executed endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'
+[11:17:52 INF] HTTP GET /api/ping responded 200 in 117.5322 ms
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 122.965ms
+[11:17:52 DBG] Hosting stopping
+[11:17:52 DBG] Hosting stopped
+[11:17:52 DBG] Hosting stopping
+[11:17:52 DBG] Hosting stopped
+[11:17:52 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 112.4826ms
+[11:17:52 INF] Executing endpoint 'Health checks'
+[11:17:52 DBG] Running health checks
+[11:17:52 DBG] Running health check postgres
+[11:17:52 ERR] Health check postgres with status Unhealthy completed after 2.4001ms with message 'Connection string do banco não configurada.'
+[xUnit.net 00:00:07.02]   Finished:    Spotlight.Gateway.Tests
+[11:17:52 DBG] Health check processing with combined status Unhealthy completed after 20.8918ms
+[11:17:52 INF] Executed endpoint 'Health checks'
+[11:17:52 ERR] HTTP GET /health/ready responded 503 in 74.8158 ms
+[11:17:52 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 79.9067ms
+[11:17:52 DBG] Hosting stopping
+[11:17:52 DBG] Hosting stopped
+[11:17:52 DBG] Hosting stopping
+[11:17:52 DBG] Hosting stopped
+[xUnit.net 00:00:07.01]   Finished:    Spotlight.Catalog.Tests
+  Aprovado Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [129 ms]
 
 Execução de Teste Bem-sucedida.
 Total de testes: 2
      Aprovados: 2
-[19:11:57 DBG] Health check processing with combined status Healthy completed after 4.8704ms
-Tempo total: 5,7839 Segundos
-[19:11:57 INF] Executed endpoint 'Health checks'
-[19:11:57 INF] HTTP GET /health responded 200 in 65.8424 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 106.3508ms
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
-[19:11:57 INF] Executing endpoint 'Health checks'
-[19:11:57 DBG] Running health checks
-[19:11:57 DBG] Running health check postgres
-[19:11:57 ERR] Health check postgres with status Unhealthy completed after 1.7825ms with message 'Connection string do banco nao configurada.'
-  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Health_Returns_200 [1 s]
-  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [46 ms]
-  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [67 ms]
-[19:11:57 DBG] Health check processing with combined status Unhealthy completed after 12.4216ms
-[19:11:57 INF] Executed endpoint 'Health checks'
-[19:11:57 ERR] HTTP GET /health/ready responded 503 in 19.3696 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 23.0626ms
-[19:11:57 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
-[19:11:57 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.Usuario)'
-[19:11:57 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Usuario.Presentation.Controllers.PingController (Spotlight.Usuario).
-[19:11:57 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
-AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
-Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
+Tempo total: 10,9767 Segundos
+  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [116 ms]
+  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [83 ms]
 
-[19:11:57 INF] Executed action Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.Usuario) in 19.247ms
-[19:11:57 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.Usuario)'
-[19:11:57 INF] HTTP GET /api/ping responded 200 in 35.7152 ms
-[19:11:57 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 37.0528ms
 Execução de Teste Bem-sucedida.
-Total de testes: 16
-     Aprovados: 16
-[19:11:57 DBG] Hosting stopping
-[19:11:57 DBG] Hosting stopped
-[19:11:57 DBG] Hosting stopping
-[19:11:57 DBG] Hosting stopped
-Tempo total: 5,7502 Segundos
-  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation [1 ms]
-  Aprovado Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.Definitions_IncluemIndicesOperacionaisDaTelemetria [12 ms]
-  Aprovado Spotlight.Usuario.Tests.MongoTelemetryIndexesTests.CreateModels_PreservaNomeEOpcoesDosIndices [8 ms]
-  Aprovado Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Health_Returns_200 [1 s]
-  Aprovado Spotlight.Usuario.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [29 ms]
-  Aprovado Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [41 ms]
-[testcontainers.org 00:00:00.32] Connected to Docker:
-  Host: npipe://./pipe/docker_engine
-  Server Version: 29.5.3
-  Kernel Version: 6.6.87.2-microsoft-standard-WSL2
-  API Version: 1.54
-  Operating System: Docker Desktop
-  Total Memory: 7.60 GB
-  Labels: 
-    com.docker.desktop.address=npipe://\\.\pipe\docker_cli
-[testcontainers.org 00:00:01.07] Docker container a501ab1640d1 created
-[testcontainers.org 00:00:01.23] Start Docker container a501ab1640d1
-[testcontainers.org 00:00:01.66] Wait for Docker container a501ab1640d1 to complete readiness checks
-[testcontainers.org 00:00:02.80] Docker container a501ab1640d1 ready
-[testcontainers.org 00:00:03.24] Docker container f7fe2b5ec03a created
-[testcontainers.org 00:00:03.29] Start Docker container f7fe2b5ec03a
-[testcontainers.org 00:00:03.73] Wait for Docker container f7fe2b5ec03a to complete readiness checks
-[testcontainers.org 00:00:10.29] Docker container f7fe2b5ec03a ready
-[19:12:08 DBG] Hosting starting
-[19:12:09 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
-[19:12:09 DBG] Hosting started
-[19:12:09 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 299
-[19:12:09 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:09 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.Usuario).
-[19:12:09 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
-[19:12:09 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario) in 194.7766ms
-[19:12:09 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:09 INF] HTTP POST /telemetria responded 202 in 228.7144 ms
-[19:12:09 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 239.3136ms
-[19:12:09 DBG] Hosting stopping
-[19:12:09 DBG] Hosting stopping
-[19:12:09 DBG] Hosting stopped
-[19:12:09 DBG] Hosting stopped
-[testcontainers.org 00:00:11.35] Delete Docker container f7fe2b5ec03a
-  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo [1 s]
-[testcontainers.org 00:00:12.14] Docker container a126c9662625 created
-[testcontainers.org 00:00:12.16] Start Docker container a126c9662625
-[testcontainers.org 00:00:12.74] Wait for Docker container a126c9662625 to complete readiness checks
-[testcontainers.org 00:00:19.20] Docker container a126c9662625 ready
-[19:12:17 DBG] Hosting starting
-[19:12:17 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
-[19:12:17 DBG] Hosting started
-[19:12:17 DBG] Hosting stopping
-[19:12:17 DBG] Hosting stopping
-[19:12:17 DBG] Hosting stopped
-[19:12:17 DBG] Hosting stopped
-[testcontainers.org 00:00:19.53] Delete Docker container a126c9662625
-  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.Startup_ComMongoConfigurado_CriaIndicesOperacionais [296 ms]
-[testcontainers.org 00:00:20.31] Docker container 4546fdfefd6a created
-[testcontainers.org 00:00:20.36] Start Docker container 4546fdfefd6a
-[testcontainers.org 00:00:20.80] Wait for Docker container 4546fdfefd6a to complete readiness checks
-[testcontainers.org 00:00:27.29] Docker container 4546fdfefd6a ready
-[19:12:25 DBG] Hosting starting
-[19:12:25 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
-[19:12:25 DBG] Hosting started
-[19:12:25 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 232
-[19:12:25 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:25 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.Usuario).
-[19:12:25 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario) in 6.7726ms
-[19:12:25 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:25 ERR] HTTP POST /telemetria responded 500 in 14.0310 ms
-Spotlight.Usuario.Domain.Entities.ValidationException: Dados de entrada inv�lidos.
-   at Spotlight.Usuario.Application.UseCases.TelemetriaService.Validar(Nullable`1 usuarioId, RegistrarTelemetriaRequest request) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\application\usecases\TelemetriaService.cs:line 181
-   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\application\usecases\TelemetriaService.cs:line 59
-   at Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar(RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\presentation\controllers\TelemetriaController.cs:line 38
+Total de testes: 32
+     Aprovados: 32
+Tempo total: 11,0576 Segundos
+[testcontainers.org 00:00:05.66] Docker container 9f3f1ec2c0d6 ready
+[testcontainers.org 00:00:06.00] Docker container e568c748f72e created
+[testcontainers.org 00:00:06.02] Start Docker container e568c748f72e
+[testcontainers.org 00:00:06.65] Wait for Docker container e568c748f72e to complete readiness checks
+[testcontainers.org 00:00:12.90] Docker container e568c748f72e ready
+[11:18:01 DBG] Hosting starting
+[11:18:02 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:18:02 DBG] Hosting started
+[11:18:02 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 235
+[11:18:02 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:02 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:18:02 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:18:02 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 251.2251ms
+[11:18:02 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:02 INF] HTTP POST /telemetria responded 202 in 373.1211 ms
+[11:18:02 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 418.1178ms
+[11:18:02 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 235
+[11:18:02 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:02 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:18:02 WRN] Falha ao persistir evento de telemetria evt_duplicado_4ae2b49c6df64777ab03744cd141ff33. A requisicao sera aceita para nao bloquear a experiencia do usuario.
+MongoDB.Driver.MongoWriteException: A write operation resulted in an error. WriteError: { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_5bcee61a6c174a0ba23d0c267f09e4d3.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_4ae2b49c6df64777ab03744cd141ff33" }" }.
+ ---> MongoDB.Driver.MongoBulkWriteException`1[MongoDB.Bson.BsonDocument]: A bulk write operation resulted in one or more errors. WriteErrors: [ { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_5bcee61a6c174a0ba23d0c267f09e4d3.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_4ae2b49c6df64777ab03744cd141ff33" }" } ].
+   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
+   --- End of inner exception stack trace ---
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 85
+[11:18:02 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:18:02 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 37.732ms
+[11:18:02 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:02 INF] HTTP POST /telemetria responded 202 in 42.4264 ms
+[11:18:02 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 46.5477ms
+[11:18:02 DBG] Hosting stopping
+[11:18:02 DBG] Hosting stopping
+[11:18:02 DBG] Hosting stopped
+[11:18:02 DBG] Hosting stopped
+[testcontainers.org 00:00:15.11] Delete Docker container e568c748f72e
+  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento [3 s]
+[testcontainers.org 00:00:15.89] Docker container a28d018f142a created
+[testcontainers.org 00:00:15.91] Start Docker container a28d018f142a
+[testcontainers.org 00:00:16.33] Wait for Docker container a28d018f142a to complete readiness checks
+[testcontainers.org 00:00:21.53] Docker container a28d018f142a ready
+[11:18:09 DBG] Hosting starting
+[11:18:09 WRN] Nao foi possivel garantir os indices MongoDB de telemetria no startup.
+System.TimeoutException: A timeout occurred after 200ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "4", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 4, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "Heartbeat", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", HeartbeatException: "MongoDB.Driver.MongoConnectionException: An exception occurred while opening a connection to the server.
+ ---> System.Net.Sockets.SocketException (61): Connection refused 127.0.0.1:1
+   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.Connect(Socket socket, EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.CreateStream(EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.Open(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.InitializeConnection(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.Heartbeat(CancellationToken cancellationToken)", LastHeartbeatTimestamp: "2026-06-24T14:18:09.6341590Z", LastUpdateTimestamp: "2026-06-24T14:18:09.6341600Z" }] }.
+   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.CreateIndexesOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)
+   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.MongoIndexManager.CreateManyAsync(IClientSessionHandle session, IEnumerable`1 models, CreateManyIndexesOptions options, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
+   at Spotlight.Usuario.Infrastructure.Persistence.MongoTelemetryIndexInitializer.StartAsync(CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/infrastructure/persistence/MongoTelemetryIndexInitializer.cs:line 84
+[11:18:09 DBG] Hosting started
+[11:18:09 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 244
+[11:18:09 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:09 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:18:11 WRN] Falha ao persistir evento de telemetria evt_mongo_indisponivel_60211fa06b844097a92568d7dd54c51e. A requisicao sera aceita para nao bloquear a experiencia do usuario.
+System.TimeoutException: A timeout occurred after 2000ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "5", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 5, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "Heartbeat", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", HeartbeatException: "MongoDB.Driver.MongoConnectionException: An exception occurred while opening a connection to the server.
+ ---> System.Net.Sockets.SocketException (61): Connection refused 127.0.0.1:1
+   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.Connect(Socket socket, EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.TcpStreamFactory.CreateStream(EndPoint endPoint, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at MongoDB.Driver.Core.Connections.BinaryConnection.OpenHelper(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Connections.BinaryConnection.Open(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.InitializeConnection(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Servers.ServerMonitor.Heartbeat(CancellationToken cancellationToken)", LastHeartbeatTimestamp: "2026-06-24T14:18:11.4120620Z", LastUpdateTimestamp: "2026-06-24T14:18:11.4120630Z" }] }.
+   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)
+   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.RetryableWriteContext.InitializeAsync(CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.RetryableWriteContext.CreateAsync(IWriteBinding binding, Boolean retryRequested, CancellationToken cancellationToken)
+   at MongoDB.Driver.Core.Operations.BulkMixedWriteOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)
+   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
+   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 85
+[11:18:11 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:18:11 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 2015.4504ms
+[11:18:11 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:11 INF] HTTP POST /telemetria responded 202 in 2030.8911 ms
+[11:18:11 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 2034.3605ms
+[11:18:11 DBG] Hosting stopping
+[11:18:11 DBG] Hosting stopped
+[11:18:11 DBG] Hosting stopping
+[11:18:11 DBG] Hosting stopped
+[testcontainers.org 00:00:24.02] Delete Docker container a28d018f142a
+  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort [2 s]
+[testcontainers.org 00:00:24.73] Docker container 01ee8867de59 created
+[testcontainers.org 00:00:24.75] Start Docker container 01ee8867de59
+[testcontainers.org 00:00:25.13] Wait for Docker container 01ee8867de59 to complete readiness checks
+[testcontainers.org 00:00:30.33] Docker container 01ee8867de59 ready
+[11:18:18 DBG] Hosting starting
+[11:18:18 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:18:18 DBG] Hosting started
+[11:18:18 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 298
+[11:18:18 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:18 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:18:18 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
+[11:18:18 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 56.2454ms
+[11:18:18 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:18 INF] HTTP POST /telemetria responded 202 in 66.1603 ms
+[11:18:18 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 68.1821ms
+[11:18:18 DBG] Hosting stopping
+[11:18:18 DBG] Hosting stopped
+[11:18:18 DBG] Hosting stopping
+[11:18:18 DBG] Hosting stopped
+[testcontainers.org 00:00:30.78] Delete Docker container 01ee8867de59
+  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadValido_PersisteDocumentoNoMongo [443 ms]
+[testcontainers.org 00:00:31.52] Docker container 7a5bc9bc87c1 created
+[testcontainers.org 00:00:31.55] Start Docker container 7a5bc9bc87c1
+[testcontainers.org 00:00:31.98] Wait for Docker container 7a5bc9bc87c1 to complete readiness checks
+[testcontainers.org 00:00:37.17] Docker container 7a5bc9bc87c1 ready
+[11:18:25 DBG] Hosting starting
+[11:18:25 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:18:25 DBG] Hosting started
+[11:18:25 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 232
+[11:18:25 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:25 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.User).
+[11:18:25 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User) in 7.0899ms
+[11:18:25 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.User)'
+[11:18:25 ERR] HTTP POST /telemetria responded 500 in 15.8646 ms
+Spotlight.Usuario.Domain.Entities.ValidationException: Dados de entrada inválidos.
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.Validar(Nullable`1 usuarioId, RegistrarTelemetriaRequest request) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 181
+   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/application/usecases/TelemetriaService.cs:line 59
+   at Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar(RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/presentation/controllers/TelemetriaController.cs:line 38
    at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
@@ -359,107 +413,123 @@ Spotlight.Usuario.Domain.Entities.ValidationException: Dados de entrada inv�li
    at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
    at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
    at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
-[19:12:25 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 400 null application/json 27.51ms
-[19:12:25 DBG] Hosting stopping
-[19:12:25 DBG] Hosting stopped
-[19:12:25 DBG] Hosting stopping
-[19:12:25 DBG] Hosting stopped
-[testcontainers.org 00:00:27.54] Delete Docker container 4546fdfefd6a
-  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento [238 ms]
-[testcontainers.org 00:00:28.37] Docker container a651b799245e created
-[testcontainers.org 00:00:28.41] Start Docker container a651b799245e
-[testcontainers.org 00:00:28.79] Wait for Docker container a651b799245e to complete readiness checks
-[testcontainers.org 00:00:34.15] Docker container a651b799245e ready
-[19:12:32 DBG] Hosting starting
-[19:12:32 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
-[19:12:32 DBG] Hosting started
-[19:12:32 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 236
-[19:12:32 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:32 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.Usuario).
-[19:12:32 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
-[19:12:32 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario) in 10.8619ms
-[19:12:32 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:32 INF] HTTP POST /telemetria responded 202 in 17.7339 ms
-[19:12:32 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 20.6688ms
-[19:12:32 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 236
-[19:12:32 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:32 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.Usuario).
-[19:12:32 WRN] Falha ao persistir evento de telemetria evt_duplicado_f9ccaef3b30c4e4f8a6d14af484d4074. A requisicao sera aceita para nao bloquear a experiencia do usuario.
-MongoDB.Driver.MongoWriteException: A write operation resulted in an error. WriteError: { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_e2ce0465f12547a59fd27cbb1a0c1ade.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_f9ccaef3b30c4e4f8a6d14af484d4074" }" }.
- ---> MongoDB.Driver.MongoBulkWriteException`1[MongoDB.Bson.BsonDocument]: A bulk write operation resulted in one or more errors. WriteErrors: [ { Category : "DuplicateKey", Code : 11000, Message : "E11000 duplicate key error collection: spotlight_telemetry_tests_e2ce0465f12547a59fd27cbb1a0c1ade.interacoes index: ux_event_id dup key: { event_id: "evt_duplicado_f9ccaef3b30c4e4f8a6d14af484d4074" }" } ].
-   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
-   --- End of inner exception stack trace ---
-   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
-   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\application\usecases\TelemetriaService.cs:line 85
-[19:12:32 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
-[19:12:32 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario) in 16.8158ms
-[19:12:32 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:32 INF] HTTP POST /telemetria responded 202 in 17.3322 ms
-[19:12:32 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 18.5809ms
-[19:12:32 DBG] Hosting stopping
-[19:12:32 DBG] Hosting stopped
-[19:12:32 DBG] Hosting stopping
-[19:12:32 DBG] Hosting stopped
-[testcontainers.org 00:00:34.44] Delete Docker container a651b799245e
-  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComEventIdDuplicado_Retorna202MasNaoDuplicaDocumento [265 ms]
-[testcontainers.org 00:00:35.27] Docker container 2ef4e9decb3a created
-[testcontainers.org 00:00:35.30] Start Docker container 2ef4e9decb3a
-[testcontainers.org 00:00:35.74] Wait for Docker container 2ef4e9decb3a to complete readiness checks
-[testcontainers.org 00:00:42.25] Docker container 2ef4e9decb3a ready
-[19:12:40 DBG] Hosting starting
-[19:12:40 WRN] Nao foi possivel garantir os indices MongoDB de telemetria no startup.
-System.TimeoutException: A timeout occurred after 200ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "6", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 6, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "ServerInitialDescription", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", LastHeartbeatTimestamp: null, LastUpdateTimestamp: "2026-06-12T22:12:40.7039902Z" }] }.
-   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)
-   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)
-   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Operations.CreateIndexesOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)
-   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionImpl`1.MongoIndexManager.CreateManyAsync(IClientSessionHandle session, IEnumerable`1 models, CreateManyIndexesOptions options, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
-   at Spotlight.Usuario.Infrastructure.Persistence.MongoTelemetryIndexInitializer.StartAsync(CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\infrastructure\persistence\MongoTelemetryIndexInitializer.cs:line 84
-[19:12:40 DBG] Hosting started
-[19:12:40 INF] Request starting HTTP/1.1 POST http://localhost/telemetria - application/json; charset=utf-8 245
-[19:12:40 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:40 INF] Route matched with {action = "Registrar", controller = "Telemetria"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Registrar(Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaRequest, System.Threading.CancellationToken) on controller Spotlight.Usuario.Presentation.Controllers.TelemetriaController (Spotlight.Usuario).
-[19:12:41 WRN] Falha ao persistir evento de telemetria evt_mongo_indisponivel_e4982f211fcc4c57a67131a3c81f0e1f. A requisicao sera aceita para nao bloquear a experiencia do usuario.
-System.TimeoutException: A timeout occurred after 200ms selecting a server using CompositeServerSelector{ Selectors = WritableServerSelector, LatencyLimitingServerSelector{ AllowedLatencyRange = 00:00:00.0150000 }, OperationsCountServerSelector }. Client view of cluster state is { ClusterId : "6", Type : "Unknown", State : "Disconnected", Servers : [{ ServerId: "{ ClusterId : 6, EndPoint : "127.0.0.1:1" }", EndPoint: "127.0.0.1:1", ReasonChanged: "ServerInitialDescription", State: "Disconnected", ServerVersion: , TopologyVersion: , Type: "Unknown", LastHeartbeatTimestamp: null, LastUpdateTimestamp: "2026-06-12T22:12:40.7039902Z" }] }.
-   at MongoDB.Driver.Core.Clusters.Cluster.ThrowTimeoutException(IServerSelector selector, ClusterDescription description)
-   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedHelper.HandleCompletedTask(Task completedTask)
-   at MongoDB.Driver.Core.Clusters.Cluster.WaitForDescriptionChangedAsync(IServerSelector selector, ClusterDescription description, Task descriptionChangedTask, TimeSpan timeout, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Clusters.Cluster.SelectServerAsync(IServerSelector selector, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Clusters.IClusterExtensions.SelectServerAndPinIfNeededAsync(IClusterInternal cluster, ICoreSessionHandle session, IServerSelector selector, IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Bindings.WritableServerBinding.GetWriteChannelSourceAsync(IReadOnlyCollection`1 deprioritizedServers, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Operations.RetryableWriteContext.InitializeAsync(CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Operations.RetryableWriteContext.CreateAsync(IWriteBinding binding, Boolean retryRequested, CancellationToken cancellationToken)
-   at MongoDB.Driver.Core.Operations.BulkMixedWriteOperation.ExecuteAsync(IWriteBinding binding, CancellationToken cancellationToken)
-   at MongoDB.Driver.OperationExecutor.ExecuteWriteOperationAsync[TResult](IWriteBinding binding, IWriteOperation`1 operation, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionImpl`1.ExecuteWriteOperationAsync[TResult](IClientSessionHandle session, IWriteOperation`1 operation, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionImpl`1.BulkWriteAsync(IClientSessionHandle session, IEnumerable`1 requests, BulkWriteOptions options, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionImpl`1.UsingImplicitSessionAsync[TResult](Func`2 funcAsync, CancellationToken cancellationToken)
-   at MongoDB.Driver.MongoCollectionBase`1.InsertOneAsync(TDocument document, InsertOneOptions options, Func`3 bulkWriteAsync)
-   at Spotlight.Usuario.Application.UseCases.TelemetriaService.RegistrarAsync(Nullable`1 usuarioId, RegistrarTelemetriaRequest request, CancellationToken cancellationToken) in C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\usuario\application\usecases\TelemetriaService.cs:line 85
-[19:12:41 INF] Executing ObjectResult, writing value of type 'Spotlight.Usuario.Application.Dtos.RegistrarTelemetriaResponse'.
-[19:12:41 INF] Executed action Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario) in 221.0135ms
-[19:12:41 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.TelemetriaController.Registrar (Spotlight.Usuario)'
-[19:12:41 INF] HTTP POST /telemetria responded 202 in 230.3629 ms
-[19:12:41 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 202 null application/json; charset=utf-8 233.6142ms
-[19:12:41 DBG] Hosting stopping
-[19:12:41 DBG] Hosting stopped
-[19:12:41 DBG] Hosting stopping
-[19:12:41 DBG] Hosting stopped
-[testcontainers.org 00:00:42.87] Delete Docker container 2ef4e9decb3a
-[xUnit.net 00:00:46.30]   Finished:    Spotlight.Usuario.Tests
-  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComMongoIndisponivel_Retorna202BestEffort [604 ms]
-AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
-Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\tf-solution.trx
+[11:18:25 INF] Request finished HTTP/1.1 POST http://localhost/telemetria - 400 null application/json 28.0849ms
+[11:18:25 DBG] Hosting stopping
+[11:18:25 DBG] Hosting stopping
+[11:18:25 DBG] Hosting stopped
+[11:18:25 DBG] Hosting stopped
+[testcontainers.org 00:00:37.54] Delete Docker container 7a5bc9bc87c1
+  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.PostTelemetria_ComPayloadInvalido_Retorna400ENaoGravaDocumento [362 ms]
+[testcontainers.org 00:00:38.29] Docker container 8ce96fad3168 created
+[testcontainers.org 00:00:38.31] Start Docker container 8ce96fad3168
+[testcontainers.org 00:00:38.73] Wait for Docker container 8ce96fad3168 to complete readiness checks
+[testcontainers.org 00:00:43.90] Docker container 8ce96fad3168 ready
+[11:18:32 DBG] Hosting starting
+[11:18:32 INF] Indices MongoDB de telemetria garantidos na collection interacoes.
+[11:18:32 DBG] Hosting started
+[11:18:32 DBG] Hosting stopping
+[11:18:32 DBG] Hosting stopped
+[11:18:32 DBG] Hosting stopping
+[11:18:32 DBG] Hosting stopped
+[testcontainers.org 00:00:44.31] Delete Docker container 8ce96fad3168
+  Aprovado Spotlight.Usuario.Tests.TelemetriaMongoIntegrationTests.Startup_ComMongoConfigurado_CriaIndicesOperacionais [402 ms]
+[11:18:32 DBG] Hosting starting
+[11:18:32 DBG] Hosting started
+[11:18:32 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
+[11:18:32 INF] Executing endpoint 'Health checks'
+[11:18:32 DBG] Running health checks
+[11:18:32 DBG] Running health check postgres
+[11:18:32 ERR] Health check postgres with status Unhealthy completed after 2.8328ms with message 'Connection string do banco nao configurada.'
+[11:18:32 DBG] Health check processing with combined status Unhealthy completed after 18.5893ms
+[11:18:33 INF] Executed endpoint 'Health checks'
+[11:18:33 ERR] HTTP GET /health/ready responded 503 in 39.8370 ms
+[11:18:33 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 42.0586ms
+[11:18:33 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[11:18:33 INF] Executing endpoint 'Health checks'
+[11:18:33 DBG] Running health checks
+[11:18:33 DBG] Health check processing with combined status Healthy completed after 0.6414ms
+[11:18:33 INF] Executed endpoint 'Health checks'
+[11:18:33 INF] HTTP GET /health responded 200 in 3.7354 ms
+[11:18:33 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 5.7565ms
+[11:18:33 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[11:18:33 INF] Executing endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User)'
+[11:18:33 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Usuario.Presentation.Controllers.PingController (Spotlight.User).
+[11:18:33 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[11:18:33 INF] Executed action Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User) in 3.302ms
+[11:18:33 INF] Executed endpoint 'Spotlight.Usuario.Presentation.Controllers.PingController.Get (Spotlight.User)'
+[11:18:33 INF] HTTP GET /api/ping responded 200 in 9.9738 ms
+[11:18:33 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 10.2075ms
+[11:18:33 DBG] Hosting stopping
+[11:18:33 DBG] Hosting stopped
+[11:18:33 DBG] Hosting stopping
+[11:18:33 DBG] Hosting stopped
+  Aprovado Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_SemUsuario_LancaValidation [11 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataInvalido_RetornaFallbacks [9 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_AtualizarPreferencias_SemEmailNaoGarantePerfil [9 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComMetadataPriorizaNomeEDataDoJson [6 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioMeController_ObterPreferencias_GarantePerfilQuandoEmailExiste [22 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioContextoEControllerTests.UsuarioContextoHttp_ComClaimsDiretas_MapeiaIdentidade [7 ms]
+  Aprovado Spotlight.Usuario.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [344 ms]
+  Aprovado Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Health_Returns_200 [10 ms]
+  Aprovado Spotlight.Usuario.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [13 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoRepositorioFalha_RetornaEventIdSemPropagarErro [2 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComEnderecoVazio_LancaValidationAntesDoBanco [5 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComUsuarioAutenticado_AssociaUsuario [2 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEnumsInvalidos_LancaValidationAntesDoRepositorio [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComRegrasDoEventoInvalidas_LancaValidation [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoNaoExiste_LancaNotFound [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_QuandoRepositorioNaoAtualiza_LancaNotFound [3 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: "   ") [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeVazio_LancaValidation(nome: "") [< 1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComMetadadosAcimaDoLimite_LancaValidation [2 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioUpdateDto_AceitaPayloadComLocalizacao_MasIgnoraOCampo [6 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComIdentificadoresAcimaDoLimite_AcumulaErros [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_ComCoordenadasInvalidas_LancaValidation [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoNaoExiste_LancaNotFound [2 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComNomeAcimaDoLimite_LancaValidation [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComEventoValido_ChamaRepositorio [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_ComEventoAnonimo_RetornaAccepted [5 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPropertiesNaoObjeto_LancaValidation [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComPayloadInvalido_LancaValidationAntesDoRepositorio [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ListarAvaliacoesUsuario_NormalizaPaginacaoEMapeiaResultado [9 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterUsuarioMe_QuandoExiste_MapeiaPerfil [2 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataForaDaJanela_LancaValidation [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_QuandoUsuarioNaoExiste_LancaNotFound [2 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.UsuarioLocalizacao_SemDataSourceConfigurado_LancaConflict [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComPrecoNegativo_LancaValidation [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComDataFutura_LancaValidation [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasPreenchidas_SubstituiPreferencias [8 ms]
+[xUnit.net 00:00:49.14]   Finished:    Spotlight.User.Tests
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarPreferencias_ComListasNulas_NormalizaParaListasVazias [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.ObterPreferencias_QuandoExiste_MapeiaPreferencias [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_QuandoCancelado_PropagaCancelamento [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaService_ComCamposComEspacos_NormalizaAntesDePersistir [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.AtualizarUsuarioMe_ComDadosValidos_AtualizaEBuscaPerfil [1 ms]
+  Aprovado Spotlight.Usuario.Tests.UsuarioUseCasesTests.TelemetriaController_SemServicoConfigurado_Retorna503 [1 ms]
 
 Execução de Teste Bem-sucedida.
-Total de testes: 38
-     Aprovados: 38
-Tempo total: 49,4011 Segundos
+Total de testes: 49
+     Aprovados: 49
+Tempo total: 51,8067 Segundos
+  Spotlight.Geolocation.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Geolocation.Tests/bin/Debug/net9.0/Spotlight.Geolocation.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Geolocation.Tests/bin/Debug/net9.0/Spotlight.Geolocation.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.12]   Discovering: Spotlight.Geolocation.Tests
+[xUnit.net 00:00:00.17]   Discovered:  Spotlight.Geolocation.Tests
+[xUnit.net 00:00:00.18]   Starting:    Spotlight.Geolocation.Tests
+[xUnit.net 00:00:00.37]   Finished:    Spotlight.Geolocation.Tests
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComCoordenadasInvalidas_LancaValidation [24 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoHttpClientFalha_LancaConflict [8 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_ComEnderecoVazio_LancaValidation [< 1 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ArredondaCoordenadasEUsaCache [64 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoRespostaVazia_PropagaJsonException [6 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComDisplayNameVazio_LancaNotFound [1 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiNaoRetornaLugar_LancaNotFound [1 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiFalha_LancaConflict [< 1 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_NormalizaEnderecoEUsaCache [5 ms]
+
+Execução de Teste Bem-sucedida.
+Total de testes: 9
+     Aprovados: 9
+Tempo total: 1,5915 Segundos

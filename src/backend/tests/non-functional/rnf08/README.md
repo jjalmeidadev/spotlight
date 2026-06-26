@@ -26,4 +26,4 @@ powershell -ExecutionPolicy Bypass -File src/backend/tests/non-functional/rnf08/
 - demais serviços disponíveis durante a atualização;
 - atualização com `--no-deps`;
 - rollback documentado em caso de falha;
-- gateway citado como limitação quando não estiver no Compose.
+- gateway e frontend validados no deploy final pelo `docker-compose.prod.yml` e pelo roteiro de `documentos/manual_deploy.md`.

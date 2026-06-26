@@ -115,6 +115,8 @@
 - [1. Introdução](#1-introdução)
   - [1.1 Objetivo do Documento](#11-objetivo-do-documento)
 - [2. Visão Geral do GitFlow](#2-visão-geral-do-gitflow)
+  - [2.1 Estrutura operacional do Gitflow](#21-estrutura-operacional-do-gitflow)
+  - [2.2 Regras de uso](#22-regras-de-uso)
 - [3. Fluxo Gitflow e Políticas de Código](#3-fluxo-gitflow-e-políticas-de-código)
   - [3.1 Estrutura e Regras de Branches](#31-estrutura-e-regras-de-branches)
   - [3.2 Controle de versão e etiquetagem](#32-controle-de-versão-e-etiquetagem)
@@ -130,8 +132,14 @@
   - [5.1 A Descrição](#51-a-descrição)
   - [5.2 Definition of Ready (DoR) e Definition of Done (DoD)](#52-definition-of-ready-dor-e-definition-of-done-dod)
 - [6. Cerimônias e Melhoria Contínua](#6-cerimônias-e-melhoria-contínua)
+  - [6.1 Daily Meetings](#61-daily-meetings)
+  - [6.2 Sprint Planning](#62-sprint-planning)
+  - [6.3 Retrospectives](#63-retrospectives)
 - [7. Métricas de Desempenho do Processo](#7-métricas-de-desempenho-do-processo)
 - [8. Alinhamento com PMO e Gestão de Riscos](#8-alinhamento-com-pmo-e-gestão-de-riscos)
+  - [8.1 Governança e Rastreabilidade](#81-governança-e-rastreabilidade)
+  - [8.2 Controle de Escopo](#82-controle-de-escopo)
+  - [8.3 Monitoramento de Riscos](#83-monitoramento-de-riscos)
 
 # Políticas de Versionamento, Gestão de Tarefas e Alinhamento com o PMO
 
@@ -167,20 +175,25 @@ GitFlow é um modelo de branching projetado para organizar e estruturar o desenv
 
 Esse modelo melhora a colaboração, aumenta a visibilidade das mudanças e garante maior rastreabilidade, permitindo que a equipe trabalhe simultaneamente em novas funcionalidades, correções e releases sem comprometer a estabilidade do código principal.
 
-### Estrutura operacional do Gitflow
+### 2.1 Estrutura operacional do Gitflow
 
 | Branch | Finalidade | Origem | Destino |
 |--------|----------|--------|--------|
 | main | Versão estável em produção | release / hotfix | - |
 | develop | Integração das funcionalidades | main | main |
-| feature/* | Desenvolvimento de novas funcionalidades | develop | develop |
+| feat/* | Desenvolvimento de novas funcionalidades | develop | develop |
+| fix/* | Correção de bugs fora do fluxo emergencial | develop | develop |
+| docs/* | Alterações de documentação | develop | develop |
+| test/* | Criação ou manutenção de testes | develop | develop |
+| chore/* | Ajustes de configuração, dependências ou manutenção sem mudança funcional | develop | develop |
 | release/* | Preparação para entrega | develop | main e develop |
 | hotfix/* | Correções urgentes em produção | main | main e develop |
 
-### Regras de uso
+### 2.2 Regras de uso
 
 - Nenhuma alteração deve ser feita diretamente na branch main
-- Todas as funcionalidades devem ser desenvolvidas em branches do tipo feature/*
+- Todas as funcionalidades devem ser desenvolvidas em branches do tipo feat/*
+- Alterações de documentação, testes e manutenção devem usar, respectivamente, branches `docs/*`, `test/*` e `chore/*`
 - Toda integração deve ocorrer via Merge Request (MR)
 - Após aprovação, a branch deve ser mesclada na develop
 - Após o merge, a branch deve ser excluída
@@ -197,7 +210,11 @@ Esse modelo melhora a colaboração, aumenta a visibilidade das mudanças e gara
 
 #### 3.1.2 Branches de Suporte
 
-- **feature/***: Criadas a partir da `develop` para desenvolver novas funcionalidades, melhorias ou ajustes.
+- **feat/***: Criadas a partir da `develop` para desenvolver novas funcionalidades, melhorias ou ajustes.
+- **fix/***: Criadas a partir da `develop` para corrigir defeitos sem urgência de produção.
+- **docs/***: Criadas a partir da `develop` para alterações de documentação.
+- **test/***: Criadas a partir da `develop` para criação, manutenção ou reorganização de testes.
+- **chore/***: Criadas a partir da `develop` para manutenção de configuração, dependências, scripts ou estrutura sem alteração direta de comportamento do produto.
 - **release/***: Criadas a partir da `develop` quando o backlog da sprint está completo e validado internamente. Usadas para estabilização final, correções de bugs e ajustes de documentação.  
   **Não são permitidas novas funcionalidades** nesta branch.
 - **hotfix/***: Criadas diretamente a partir da `main` para corrigir problemas críticos em produção que não podem aguardar a próxima sprint.
@@ -217,9 +234,11 @@ Após aprovação de uma release ou hotfix, deve-se criar uma tag de versão.
 
 | Tipo              | Padrão                          | Exemplo                              |
 |-------------------|---------------------------------|--------------------------------------|
-| Feature           | `feat/<descrição>`              | `feat/integracao-rabbitmq`           |
+| Feature           | `feat/<descrição>`              | `feat/recomendacao-home`             |
 | Fix / Bugfix      | `fix/<descrição>`               | `fix/correcao-login`                 |
 | Documentation     | `docs/<descrição>`              | `docs/atualizacao-readme`            |
+| Test              | `test/<descrição>`              | `test/cobertura-usuario`             |
+| Chore             | `chore/<descrição>`             | `chore/ajuste-pipeline`              |
 | Release           | `release/x.y.z`                 | `release/1.0.0`                      |
 | Hotfix            | `hotfix/<descrição>`            | `hotfix/correcao-producao`           |
 
@@ -234,13 +253,13 @@ O fluxo de criação e utilização das branches segue as seguintes etapas:
    git pull origin develop
 
 2. Criar uma nova branch de trabalho:
-   git checkout -b feature/nome-da-funcionalidade
+   git checkout -b feat/nome-da-funcionalidade
 
 3. Realizar commits seguindo padrão semântico:
    feat: descrição da funcionalidade
 
 4. Enviar a branch para o repositório remoto:
-   git push origin feature/nome-da-funcionalidade
+   git push origin feat/nome-da-funcionalidade
 
 5. Abrir um Merge Request (MR) para a branch develop
 
@@ -253,12 +272,12 @@ O fluxo de criação e utilização das branches segue as seguintes etapas:
 A seguir, um exemplo prático da criação de uma funcionalidade no projeto:
 
 git checkout develop  
-git checkout -b feature/recomendacao  
+git checkout -b feat/recomendacao  
 
 git add .  
 git commit -m "feat: implementação inicial do sistema de recomendação"  
 
-git push origin feature/recomendacao  
+git push origin feat/recomendacao  
 
 → abertura de Merge Request  
 → revisão por outro integrante  
@@ -281,7 +300,7 @@ Todas as integrações de código devem ocorrer **exclusivamente via Pull/Merge 
 
 A quantidade de revisões necessárias varia conforme o tipo de branch:
 
-- **feature/** → Mínimo de **1 aprovação**
+- **feat/**, **fix/**, **docs/**, **test/** e **chore/** → Mínimo de **1 aprovação**
 - **release/** e **hotfix/** → Mínimo de **2 aprovações**
 
 ### Critérios Adicionais para Release e Hotfix
@@ -335,14 +354,43 @@ O ciclo completo de uma feature deve seguir o fluxo abaixo, garantindo rastreabi
 | 6. Revisão | Reviewer analisa código/documentação, solicita ajustes se necessário e aprova quando os critérios forem atendidos. | Comentários resolvidos, aprovação registrada e pipeline verde quando aplicável. |
 | 7. Merge e fechamento | Realizar merge na `develop`, fechar issue e remover branch se aplicável. | Issue em `Closed`, MR merged e histórico rastreável no GitLab. |
 
-Exemplo aplicado:
+Exemplo aplicado ao ciclo completo de uma feature:
 
 ```text
-Issue: #293 - Validar integração final frontend-backend-recomendação
-Branch: feat/integra-frontend-recomendacao-fluxo
-Commit: fix: estabiliza onboarding e recomendacoes iniciais #293
-MR: Closes #293, com validação do fluxo de cadastro, preferências, recomendação e telemetria.
-Resultado: funcionalidade integrada na develop após revisão.
+Issue: #293 - Integrar fluxo de recomendação no frontend
+Responsável: integrante definido na Sprint Planning
+
+DoR:
+- Requisito funcional validado com o Product Owner
+- Endpoint de recomendação disponível no backend
+- Protótipo da tela aprovado
+- Critérios de aceite descritos no card
+
+Branch:
+feat/integra-frontend-recomendacao-fluxo
+
+Commits:
+feat: adiciona consumo de recomendacoes no catalogo #293
+test: adiciona validacao do fluxo de recomendacao #293
+docs: atualiza evidencias da integracao #293
+
+Validação local:
+- npm.cmd run build:web
+- dotnet test .\src\backend\Spotlight.sln --no-restore
+- Teste manual do cadastro, preferências e recomendação inicial
+
+Merge Request:
+Título: feat: integra fluxo de recomendação no frontend
+Descrição: Closes #293, com escopo, validação executada, evidências e riscos.
+Reviewer: integrante diferente do autor
+
+DoD:
+- Pipeline verde
+- Aprovação registrada no MR
+- Card vinculado ao MR
+- Merge realizado na develop
+- Branch removida após merge
+- Issue movida para Closed
 ```
 
 ## 4. Políticas de Kanban e Fluxo de Trabalho
@@ -461,7 +509,7 @@ Realizadas ao final de cada sprint para avaliar o processo. Devem identificar:
 
 ### 8.1 Governança e Rastreabilidade
 
-Todas as decisões de projeto são documentadas na pasta `docs/`. O Gitflow atua como principal ferramenta de controle de versão, garantindo que features, metas de sprint e MRs estejam perfeitamente amarrados e auditáveis.
+Todas as decisões de projeto são documentadas na pasta `documentos/`. O Gitflow atua como principal ferramenta de controle de versão, garantindo que features, metas de sprint e MRs estejam perfeitamente amarrados e auditáveis.
 
 ### 8.2 Controle de Escopo
 

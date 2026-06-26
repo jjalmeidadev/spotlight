@@ -1,8 +1,7 @@
 import { PreferenceOption, PreferenceSelection } from '@/frontend/models/Preference';
-import { getApiBaseUrl } from '@/frontend/config/api';
+import { fetchJson, getApiErrorMessage } from '@/frontend/repositories/http';
 
-const API_BASE_URL = getApiBaseUrl();
-const REQUEST_TIMEOUT_MS = 10000;
+const PREFERENCE_TIMEOUT_MS = 20000;
 
 export type PreferenceOptions = {
   priceRanges: PreferenceOption[];
@@ -40,27 +39,19 @@ export async function salvarPreferenciasUsuario(
     throw new Error('Token de acesso ausente para salvar preferencias.');
   }
 
-  const url = `${API_BASE_URL}/usuario/me/preferencias`;
   const requestPayload = toApiPayload(selection);
 
-  console.log('Salvando preferencias do usuario:', {
-    url,
-    generos: requestPayload.generosFavoritos.length,
-    faixaPrecoMax: requestPayload.faixaPrecoMax,
-  });
-
-  const response = await fetchWithTimeout(url, {
+  const { response, payload: responsePayload } = await fetchJson<any>('/usuario/me/preferencias', {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(requestPayload),
-  }, 'salvar preferencias');
-
-  const responsePayload = await parseJsonResponse(response);
-
-  console.log('Resposta ao salvar preferencias:', response.status, responsePayload);
+    operation: 'salvar preferencias',
+    retries: 1,
+    timeoutMs: PREFERENCE_TIMEOUT_MS,
+  });
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(responsePayload, 'Nao foi possivel salvar suas preferencias.'));
@@ -74,18 +65,15 @@ export async function obterPreferenciasUsuario(accessToken: string | null | unde
     return null;
   }
 
-  const url = `${API_BASE_URL}/usuario/me/preferencias`;
-
-  const response = await fetchWithTimeout(url, {
+  const { response, payload: responsePayload } = await fetchJson<any>('/usuario/me/preferencias', {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
-  }, 'verificar preferencias');
-
-  const responsePayload = await parseJsonResponse(response);
-
-  console.log('Resposta ao buscar preferencias:', response.status, responsePayload);
+    operation: 'verificar preferencias',
+    retries: 1,
+    timeoutMs: PREFERENCE_TIMEOUT_MS,
+  });
 
   if (!response.ok) {
     throw new Error(getApiErrorMessage(responsePayload, 'Nao foi possivel carregar suas preferencias.'));
@@ -123,43 +111,5 @@ function getPriceRangeMax(priceRangeId: string | null) {
       return 200;
     default:
       return null;
-  }
-}
-
-function getApiErrorMessage(payload: any, fallback: string) {
-  const details = typeof payload?.details === 'string'
-    ? ` (${payload.details})`
-    : '';
-
-  return `${payload?.error ?? fallback}${details}`;
-}
-
-async function parseJsonResponse(response: Response) {
-  const text = await response.text();
-
-  if (!text.trim()) {
-    return {};
-  }
-
-  return JSON.parse(text);
-}
-
-async function fetchWithTimeout(url: string, init: RequestInit, operation: string) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  try {
-    return await fetch(url, {
-      ...init,
-      signal: controller.signal,
-    });
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Tempo esgotado ao ${operation}. Verifique se o app esta na mesma rede do backend.`);
-    }
-
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
   }
 }

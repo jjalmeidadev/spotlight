@@ -106,9 +106,9 @@
   <img src="documentos/img/bottom.png" alt="bottom">
 </p>
 
-# Spotlight <nome do projeto>
+# Spotlight
 
-## Dora <nome do grupo>
+## Grupo 04 - Dora
 
 ## 📝 Descrição
 
@@ -133,78 +133,200 @@ da Aventura — levando o público certo ao espetáculo certo.
 
 ## 📝 Links
 
-<a href="/documentos/Projeto.md">Link para a documentação geral</a> do projeto.
+A pasta `documentos/` concentra a documentação do produto, do processo e das evidências de validação:
+
+- [Índice da documentação](documentos/Index.md): ponto de entrada para navegar pelos documentos do projeto.
+- [Documentação geral do projeto](documentos/Projeto.md): visão completa do Spotlight, incluindo negócio, arquitetura, requisitos, implementação, testes e implantação.
+- [Manual de instalação](documentos/Manual-instalacao.md): guia detalhado para preparar ambiente, configurar variáveis, banco de dados e execução local.
+- [Manual de deploy AWS EC2](documentos/manual_deploy.md): guia operacional do deploy final em nuvem comercial usando CloudFormation, EC2 e Docker Compose.
+- [Gestão de projeto](documentos/GestaoProjeto.md): acompanhamento evolutivo das sprints, retrospectivas, planejamento e gestão das entregas.
+- [Gestão de projeto e configuração](documentos/Gestao_Projeto_Configuracao.md): políticas de versionamento, GitFlow, critérios de tarefas e alinhamento com o processo do projeto.
+- [Projeto visual](documentos/ProjetoVisual.md): diretrizes de design, wireframes, mockups, identidade visual e decisões de interface.
+- [Documentação SOA](documentos/Documentacao_soa.md): descrição da arquitetura orientada a serviços e da integração com API externa de geolocalização.
+- [Guia de padrões de desenvolvimento](documentos/GuiaPadroesDesenvolvimento.md): convenções de código, organização de diretórios, nomenclatura e práticas de desenvolvimento.
+- [Evidências de testes funcionais](documentos/evidencias/testes-funcionais/README.md): comandos, saídas e artefatos `.trx` usados para registrar a execução dos testes.
+- [Vídeo demonstrativo final da Sprint 5](https://drive.google.com/drive/folders/10Zdn87V9-GyspVk1HmN2RcQyfkOT5F4z?usp=sharing): demonstração da versão consolidada da aplicação.
 
 ## 📁 Estrutura de pastas
 
-O app Expo fica na raiz do repositório; a interface vive em `src/frontend`.
+O repositório mantém o app Expo na raiz por requisito de execução do React Native/Expo, os componentes de interface em `src/frontend`, os serviços .NET em `src/backend`, os testes em `src/backend/tests` e a documentação em `documentos`.
 
 ```text
-📦g04
- ┣ 📂documentos
- ┃ ┣ 📂img
- ┃ ┣ 📜Gestao_Projeto_Configuracao.md
- ┃ ┣ 📜GestaoProjeto.md
- ┃ ┣ 📜Index.md
- ┃ ┣ 📜Manual-instalacao.md
- ┃ ┣ 📜Projeto.md
- ┃ ┗ 📜ProjetoVisual.md
- ┣ 📂src
- ┃ ┣ 📂aad
- ┃ ┣ 📂backend
- ┃ ┣ 📂database
- ┃ ┣ 📂dataset
- ┃ ┣ 📂frontend
- ┃ ┗ 📂models
- ┣ 📜app.json
- ┣ 📜assets
- ┣ 📜babel.config.js
- ┣ 📜expo-env.d.ts
- ┣ 📜package.json
- ┣ 📜tsconfig.json
- ┣ 📜.gitignore
- ┗ 📜README.md
+📦 g04
+ ┣ 📂 .githook                        hooks locais de validação de commits
+ ┣ 📂 assets                          fontes e imagens usadas pelo app Expo
+ ┣ 📂 deploy
+ ┃ ┣ 📂 aws                           scripts CloudFormation/EC2 para deploy em AWS
+ ┃ ┗ 📂 nginx                         configuração do Nginx para produção
+ ┣ 📂 documentos
+ ┃ ┣ 📂 evidencias
+ ┃ ┃ ┗ 📂 testes-funcionais           registros e saídas dos testes funcionais
+ ┃ ┣ 📂 img                           imagens, diagramas e mockups da documentação
+ ┃ ┣ 📄 Documentacao_soa.md
+ ┃ ┣ 📄 GestaoProjeto.md
+ ┃ ┣ 📄 Gestao_Projeto_Configuracao.md
+ ┃ ┣ 📄 GuiaPadroesDesenvolvimento.md
+ ┃ ┣ 📄 Index.md
+ ┃ ┣ 📄 Manual-instalacao.md
+ ┃ ┣ 📄 Projeto.md
+ ┃ ┗ 📄 ProjetoVisual.md
+ ┣ 📂 src
+ ┃ ┣ 📂 aad                           artefatos de arquitetura e análise de dados
+ ┃ ┣ 📂 backend
+ ┃ ┃ ┣ 📂 api-gateway                 gateway HTTP dos serviços
+ ┃ ┃ ┣ 📂 contracts                   DTOs e contratos compartilhados
+ ┃ ┃ ┣ 📂 ml-engine                   preparação, treino e inferência do modelo
+ ┃ ┃ ┣ 📂 scripts                     scripts auxiliares do backend
+ ┃ ┃ ┣ 📂 services                    serviços catalog, user, recommendation e geolocation
+ ┃ ┃ ┣ 📂 tests                       testes automatizados xUnit e RNFs
+ ┃ ┃ ┃ ┣ 📂 Spotlight.*.Tests         testes unitários e de integração por serviço
+ ┃ ┃ ┃ ┗ 📂 non-functional            roteiros, scripts e resultados de RNFs
+ ┃ ┃ ┣ 📄 run-all.ps1
+ ┃ ┃ ┗ 📄 Spotlight.sln
+ ┃ ┣ 📂 database
+ ┃ ┃ ┣ 📂 load_test                   scripts de carga
+ ┃ ┃ ┣ 📂 migrations                  migrations incrementais
+ ┃ ┃ ┗ 📄 *.sql                       scripts SQL de schema, seed e rollback
+ ┃ ┣ 📂 dataset                       bases de apoio para recomendação
+ ┃ ┣ 📂 frontend                      telas, componentes, hooks, tema e repositórios do app
+ ┃ ┗ 📂 models                        artefatos e projetos de treinamento do modelo
+ ┣ 📄 .gitlab-ci.yml                  pipeline de CI do GitLab
+ ┣ 📄 App.js                          entrada principal do Expo
+ ┣ 📄 Dockerfile.frontend             build do frontend para dev e produção
+ ┣ 📄 docker-compose.yml              Compose dos serviços backend atuais
+ ┣ 📄 docker-compose.dev.yml          Compose full-stack para desenvolvimento
+ ┣ 📄 docker-compose.prod.yml         Compose full-stack para produção
+ ┣ 📄 package.json
+ ┣ 📄 package-lock.json
+ ┗ 📄 README.md
 ```
 
-Dentre os arquivos presentes na raiz do projeto, definem-se:
+Diretórios e arquivos gerados localmente, como `node_modules/`, `dist/`, `.expo/`, `TestResults/`, `bin/`, `obj/`, `__pycache__/` e `*.pyc`, não fazem parte da estrutura essencial do repositório.
 
-- <b>readme.md</b>: arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
+## ⚙️ Instalação e execução
 
-- <b>documentos</b>: aqui estarão todos os documentos do projeto. Há também uma pasta denominada <b>outros</b> onde podem estar presentes documentos complementares à documentação principal.
+### Pré-requisitos
 
-- <b>imagens</b>: imagens relacionadas ao projeto como um todo (por exemplo imagens do sistema, do grupo, logotipos e afins).
+O ambiente usado para validar estes comandos foi:
 
+- Node.js `v24.11.1` e npm `11.6.2`
+- .NET SDK com suporte a `net9.0` (validado com SDK `10.0.202`)
+- Docker `29.2.1` com Docker Compose `v5.1.0`
 
-- <b>src</b>: nesta pasta encontra-se o código fonte do sistema, incluindo o backend em `src/backend` e o frontend em `src/frontend`, além dos notebooks, scripts e datasets.
+Em Windows/PowerShell, caso a política de execução bloqueie os shims `npm` ou `npx`, use `npm.cmd` e `npx.cmd`.
 
-## 📱 Configuração do Expo
+### Configuração inicial
 
-Configuração principal do Expo na raiz do projeto:
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+npm.cmd ci
+dotnet restore .\src\backend\Spotlight.sln
+```
 
-```bash
-npm install
-npm start
+Depois de copiar o `.env`, preencha os valores reais antes de executar fluxos integrados. As variáveis mais importantes são `DATABASE_CONNECTION_STRING`, `SUPABASE_JWT_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_API_BASE_URL`, `MONGODB_CONNECTION_STRING`, `MONGODB_DATABASE` e `MONGODB_TELEMETRY_COLLECTION`.
+
+### Execução local sem Docker
+
+Frontend Expo:
+
+```powershell
+npm.cmd run web
+```
+
+Backend completo em terminais separados:
+
+```powershell
+dotnet run --project .\src\backend\api-gateway\Spotlight.Gateway.csproj
+dotnet run --project .\src\backend\services\catalog\Spotlight.Catalog.csproj
+dotnet run --project .\src\backend\services\user\Spotlight.User.csproj
+dotnet run --project .\src\backend\services\recommendation\Spotlight.Recommendation.csproj
+dotnet run --project .\src\backend\services\geolocation\Spotlight.Geolocation.csproj
+```
+
+Portas padrão:
+
+- Gateway: `http://localhost:5000`
+- Catálogo: `http://localhost:5001`
+- Usuário: `http://localhost:5002`
+- Recomendação: `http://localhost:5003`
+- Geolocalização: `http://localhost:5004`
+
+### Execução com Docker
+
+Desenvolvimento full-stack:
+
+```powershell
+docker compose -f docker-compose.dev.yml up --build
+```
+
+Produção full-stack:
+
+```powershell
+docker compose -f docker-compose.prod.yml up --build
+```
+
+Somente serviços backend de domínio, sem gateway e sem frontend, usando o Compose legado/compacto:
+
+```powershell
+docker compose up --build
+```
+
+### Deploy final em AWS EC2
+
+O deploy final previsto para a entrega usa AWS EC2 com Docker Compose. O passo a passo oficial está em [documentos/manual_deploy.md](documentos/manual_deploy.md) e cobre criação da key pair, stack CloudFormation, publicação do código, envio seguro do `.env`, validação de containers, health checks e operação básica.
+
+Resumo dos comandos principais:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\create-keypair.ps1 -KeyName spotlight-ec2-key
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\deploy-stack.ps1 -KeyName spotlight-ec2-key -InstanceType t3.small
+powershell -ExecutionPolicy Bypass -File .\deploy\aws\publish-app.ps1 -PublicIp <PUBLIC_IP> -KeyPath .\.codex-tmp\spotlight-ec2-key.pem -EnvFile .\.env
+```
+
+Após a publicação, os principais pontos de validação são `http://<PUBLIC_IP>/`, `http://<PUBLIC_IP>/api/health` e `http://<PUBLIC_IP>/swagger`.
+
+### Validação
+
+Comandos executados e validados nesta atualização:
+
+```powershell
+npm.cmd ci
+npm.cmd run build:web
+dotnet restore .\src\backend\Spotlight.sln
+dotnet test .\src\backend\Spotlight.sln --no-restore
+docker compose -f docker-compose.dev.yml config --quiet
+docker compose -f docker-compose.prod.yml config --quiet
 ```
 
 ## 🗃 Histórico de lançamentos
 
-* 0.1.0 - 30/04/2024
-    * Entendimento do projeto e do negócio
-    * Especificação de requisitos funcionais e não funcionais
-    * Base de dados para modelo de recomendação
-    * Gestão de projeto e configuração
-* 0.2.0 - DD/MM/2024
-    * Artefato
-    * Artefato
-* 0.3.0 - DD/MM/2024
-    * Artefato
-    * Artefato
-* 0.4.0 - DD/MM/2024
-    * Artefato
-    * Artefato
-* 0.5.0 - DD/MM/2024
-    * Artefato
-    * Artefato
+* 0.1.0 - 30/04/2026
+    * Entendimento do Projeto e do Negócio
+    * Especificação de Requisitos Funcionais e Não Funcionais
+    * Base de Dados para Modelo de Recomendação
+    * Gestão de Projeto e Configuração
+* 0.2.0 - 15/05/2026
+    * Modelagem de Dados
+    * Modelo de Recomendação Baseado em Filtragem
+    Colaborativa
+    * Projeto Visual da Solução
+    * Solução Técnica (Design)
+    * Gestão de Projetos Evolutiva
+* 0.3.0 - 29/05/2026
+    * Implementação do Banco de Dados
+    * Desenvolvimento do Projeto
+    * Planejamento de Testes
+    * Gestão de Projetos Evolutiva
+* 0.4.0 - 12/06/2026
+    * Evolução do Banco de Dados
+    * Desenvolvimento do Projeto
+    * Execução de Testes
+    * Gestão de Projetos Evolutiva
+* 0.5.0 - 25/06/2026
+    * Desenvolvimento do Projeto
+    * Execução de Testes
+    * Gestão de Projetos Evolutiva
+    * Versão Final do Projeto
 
 ## 📋 Licença/License
 

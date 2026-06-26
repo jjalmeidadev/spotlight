@@ -79,7 +79,7 @@ services:
   catalogo:
     <<: *dotnet-prod
     build:
-      context: ./src/backend/services/catalogo
+      context: ./src/backend/services/catalog
       dockerfile: Dockerfile
       target: runtime
     environment:
@@ -93,7 +93,7 @@ services:
   usuario:
     <<: *dotnet-prod
     build:
-      context: ./src/backend/services/usuario
+      context: ./src/backend/services/user
       dockerfile: Dockerfile
       target: runtime
     environment:
@@ -110,7 +110,7 @@ services:
   recomendacao:
     <<: *dotnet-prod
     build:
-      context: ./src/backend/services/recomendacao
+      context: ./src/backend/services/recommendation
       dockerfile: Dockerfile
       target: runtime
     environment:
@@ -135,7 +135,7 @@ services:
   geolocalizacao:
     <<: *dotnet-prod
     build:
-      context: ./src/backend/services/geolocalizacao
+      context: ./src/backend/services/geolocation
       dockerfile: Dockerfile
       target: runtime
     environment:

@@ -1,12 +1,11 @@
 import { Platform } from 'react-native';
-import { getApiBaseUrl } from '@/frontend/config/api';
+import { API_BASE_URL, fetchWithTimeout } from '@/frontend/repositories/http';
 
-const API_BASE_URL = getApiBaseUrl();
 const TELEMETRY_PATH = '/usuario/telemetria';
 const TELEMETRY_ENABLED = process.env.EXPO_PUBLIC_TELEMETRY_ENABLED !== 'false';
-const TELEMETRY_TIMEOUT_MS = 5000;
-const TELEMETRY_BACKOFF_MS = 60_000;
-const MAX_FAILURES_BEFORE_BACKOFF = 2;
+const TELEMETRY_TIMEOUT_MS = 2500;
+const TELEMETRY_BACKOFF_MS = 120_000;
+const MAX_FAILURES_BEFORE_BACKOFF = 1;
 
 type TelemetryEntity = {
   type: 'espetaculo' | 'sessao' | 'teatro' | 'categoria' | 'busca';
@@ -104,7 +103,7 @@ export function emitTelemetryEvent(
     }
 
     if (__DEV__) {
-      if (!warningLogged) {
+      if (!warningLogged && !isExpectedNetworkIssue(error)) {
         console.warn('Telemetria indisponivel; eventos pausados temporariamente.', error);
         warningLogged = true;
       }
@@ -124,34 +123,24 @@ async function sendTelemetryEvent(
     headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), TELEMETRY_TIMEOUT_MS);
-
-  let response: Response;
-
-  try {
-    response = await fetch(`${API_BASE_URL}${TELEMETRY_PATH}`, {
-      method: 'POST',
-      headers,
-      signal: controller.signal,
-      body: JSON.stringify({
-        eventId: createTelemetryId('evt'),
-        eventType: event.eventType,
-        source: 'mobile',
-        sessionId,
-        occurredAt: new Date().toISOString(),
-        screen: event.screen,
-        entity: event.entity,
-        properties: event.properties,
-        device: {
-          platform: Platform.OS,
-        },
-        anonymousId: accessToken ? undefined : anonymousId,
-      }),
-    });
-  } finally {
-    clearTimeout(timeout);
-  }
+  const response = await fetchWithTimeout(`${API_BASE_URL}${TELEMETRY_PATH}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      eventId: createTelemetryId('evt'),
+      eventType: event.eventType,
+      source: 'mobile',
+      sessionId,
+      occurredAt: new Date().toISOString(),
+      screen: event.screen,
+      entity: event.entity,
+      properties: event.properties,
+      device: {
+        platform: Platform.OS,
+      },
+      anonymousId: accessToken ? undefined : anonymousId,
+    }),
+  }, 'enviar telemetria', TELEMETRY_TIMEOUT_MS);
 
   if (!response.ok) {
     throw new Error(`Telemetria retornou HTTP ${response.status}.`);
@@ -161,4 +150,8 @@ async function sendTelemetryEvent(
 function createTelemetryId(prefix: string) {
   const randomPart = Math.random().toString(36).slice(2, 10);
   return `${prefix}_${Date.now().toString(36)}_${randomPart}`;
+}
+
+function isExpectedNetworkIssue(error: unknown) {
+  return error instanceof Error && /tempo esgotado|falha de rede/i.test(error.message);
 }
