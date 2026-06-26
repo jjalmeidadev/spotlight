@@ -5376,6 +5376,10 @@ Como parte da finalizacao das features pendentes, o aplicativo mobile foi revisa
 | Alternancia de visao | Usuarios administradores podem alternar entre a navegacao normal do aplicativo e a visao administrativa sem novo login. | `App.js`, `src/frontend/screens/CatalogView.tsx`, `src/frontend/screens/AdminDashboardScreen.tsx` |
 | Higiene de entrega | Remocao de logs de depuracao, botao de modo desenvolvedor, rotulos mockados no grafico de sessoes e mensagens auxiliares nao necessarias na interface final. | `App.js`, `src/frontend/screens/LoginView.tsx`, `src/frontend/screens/AdminDashboardScreen.tsx` |
 
+Como evidencia da entrega final da Sprint 5, foi gravado um video demonstrativo com a aplicacao em execucao e o ambiente de desenvolvimento visivel para auditoria da versao consolidada.
+
+**Link do video demonstrativo final:** [Video Demonstrativo Sprint 5](https://drive.google.com/drive/folders/10Zdn87V9-GyspVk1HmN2RcQyfkOT5F4z?usp=sharing)
+
 #### Validações executadas
 
 | Comando | Resultado |

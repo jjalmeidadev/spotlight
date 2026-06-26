@@ -145,6 +145,7 @@ A pasta `documentos/` concentra a documentação do produto, do processo e das e
 - [Documentação SOA](documentos/Documentacao_soa.md): descrição da arquitetura orientada a serviços e da integração com API externa de geolocalização.
 - [Guia de padrões de desenvolvimento](documentos/GuiaPadroesDesenvolvimento.md): convenções de código, organização de diretórios, nomenclatura e práticas de desenvolvimento.
 - [Evidências de testes funcionais](documentos/evidencias/testes-funcionais/README.md): comandos, saídas e artefatos `.trx` usados para registrar a execução dos testes.
+- [Vídeo demonstrativo final da Sprint 5](https://drive.google.com/drive/folders/10Zdn87V9-GyspVk1HmN2RcQyfkOT5F4z?usp=sharing): demonstração da versão consolidada da aplicação.
 
 ## 📁 Estrutura de pastas
 
