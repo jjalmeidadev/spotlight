@@ -1,0 +1,22 @@
+[
+  {
+    "name": "catalogo",
+    "healthUrl": "http://localhost:5001/health/ready",
+    "dockerfile": "src/backend/services/catalog/Dockerfile"
+  },
+  {
+    "name": "usuario",
+    "healthUrl": "http://localhost:5002/health/ready",
+    "dockerfile": "src/backend/services/user/Dockerfile"
+  },
+  {
+    "name": "recomendacao",
+    "healthUrl": "http://localhost:5003/health/ready",
+    "dockerfile": "src/backend/services/recommendation/Dockerfile"
+  },
+  {
+    "name": "geolocalizacao",
+    "healthUrl": "http://localhost:5004/health",
+    "dockerfile": "src/backend/services/geolocation/Dockerfile"
+  }
+]

@@ -1,0 +1,42 @@
+########## pgbench: catalogo_leitura.sql ##########
+pgbench (16.13)
+transaction type: /pgbench/catalogo_leitura.sql
+scaling factor: 1
+query mode: simple
+number of clients: 20
+number of threads: 4
+maximum number of tries: 1
+duration: 30 s
+number of transactions actually processed: 29483
+number of failed transactions: 0 (0.000%)
+latency average = 20.307 ms
+initial connection time = 457.954 ms
+tps = 984.884201 (without initial connection time)
+statement latencies in milliseconds and failures:
+         0.005           0  \set esp random(1, 2000)
+         0.002           0  \set uid random(1, 5000)
+         4.019           0  SELECT id_espetaculo, titulo, popularidade
+         3.271           0  SELECT id_espetaculo, titulo
+         4.078           0  SELECT id_espetaculo, titulo
+         4.304           0  SELECT id_sessao, data, horario, preco_minimo
+         4.314           0  SELECT id_espetaculo, score_recomendacao
+
+########## pgbench: avaliacao_escrita.sql ##########
+pgbench (16.13)
+transaction type: /pgbench/avaliacao_escrita.sql
+scaling factor: 1
+query mode: simple
+number of clients: 20
+number of threads: 4
+maximum number of tries: 1
+duration: 30 s
+number of transactions actually processed: 28301
+number of failed transactions: 0 (0.000%)
+latency average = 15.304 ms
+initial connection time = 8374.550 ms
+tps = 1306.888569 (without initial connection time)
+statement latencies in milliseconds and failures:
+         0.006           0  \set esp random(1, 2000)
+         0.002           0  \set uid random(1, 5000)
+        15.197           0  INSERT INTO avaliacao (id_usuario, id_espetaculo, nota, comentario)
+

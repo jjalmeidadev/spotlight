@@ -1,0 +1,193 @@
+ Image grafana/k6:0.49.0 Pulling 
+ 619be1103602 Pulling fs layer 0B
+ 4f4fb700ef54 Pulling fs layer 0B
+ 604978bea0c7 Pulling fs layer 0B
+ cd4f844ad014 Pulling fs layer 0B
+ 619be1103602 Downloading 1.049MB
+ 619be1103602 Downloading 1.049MB
+ 4f4fb700ef54 Downloading 32B
+ 619be1103602 Downloading 2.097MB
+ 4f4fb700ef54 Download complete 0B
+ 604978bea0c7 Download complete 0B
+ cd4f844ad014 Downloading 1.049MB
+ 619be1103602 Downloading 3.146MB
+ cd4f844ad014 Downloading 1.049MB
+ 619be1103602 Download complete 0B
+ cd4f844ad014 Downloading 2.097MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 3.146MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 4.194MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 5.243MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 6.291MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 7.34MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 8.389MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 9.437MB
+ 619be1103602 Extracting 1B
+ cd4f844ad014 Downloading 10.49MB
+ 619be1103602 Pull complete 0B
+ 1c172c3535ad Download complete 0B
+ cd4f844ad014 Downloading 11.53MB
+ cd4f844ad014 Downloading 12.58MB
+ 604978bea0c7 Pull complete 0B
+ cd4f844ad014 Downloading 13.63MB
+ cd4f844ad014 Downloading 14.68MB
+ cd4f844ad014 Downloading 15.73MB
+ cd4f844ad014 Downloading 17.83MB
+ cd4f844ad014 Downloading 18.87MB
+ cd4f844ad014 Downloading 19.92MB
+ cd4f844ad014 Downloading 20.97MB
+ cd4f844ad014 Downloading 23.07MB
+ cd4f844ad014 Downloading 24.12MB
+ cd4f844ad014 Downloading 25.6MB
+ cd4f844ad014 Download complete 0B
+ cd4f844ad014 Extracting 1B
+ cd4f844ad014 Extracting 1B
+ cd4f844ad014 Extracting 1B
+ cd4f844ad014 Extracting 1B
+ cd4f844ad014 Extracting 1B
+ cd4f844ad014 Extracting 1B
+ cd4f844ad014 Extracting 1B
+ 4f4fb700ef54 Pull complete 0B
+ cd4f844ad014 Pull complete 0B
+ Image grafana/k6:0.49.0 Pulled 
+ Container spotlight-loadtest-k6-run-a36ab24daa9f Creating 
+ Container spotlight-loadtest-k6-run-a36ab24daa9f Created 
+
+          /\      |‾‾| /‾‾/   /‾‾/   
+     /\  /  \     |  |/  /   /  /    
+    /  \/    \    |     (   /   ‾‾\  
+   /          \   |  |\  \ |  (‾)  | 
+  / __________ \  |__| \__\ \_____/ .io
+
+     execution: local
+        script: /scripts/01-smoke.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 1 looping VUs for 30s (gracefulStop: 30s)
+
+
+running (0m01.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   3% ] 1 VUs  01.0s/30s
+
+running (0m02.0s), 1/1 VUs, 1 complete and 0 interrupted iterations
+default   [   7% ] 1 VUs  02.0s/30s
+
+running (0m03.0s), 1/1 VUs, 2 complete and 0 interrupted iterations
+default   [  10% ] 1 VUs  03.0s/30s
+
+running (0m04.0s), 1/1 VUs, 3 complete and 0 interrupted iterations
+default   [  13% ] 1 VUs  04.0s/30s
+
+running (0m05.0s), 1/1 VUs, 4 complete and 0 interrupted iterations
+default   [  17% ] 1 VUs  05.0s/30s
+
+running (0m06.0s), 1/1 VUs, 5 complete and 0 interrupted iterations
+default   [  20% ] 1 VUs  06.0s/30s
+
+running (0m07.0s), 1/1 VUs, 6 complete and 0 interrupted iterations
+default   [  23% ] 1 VUs  07.0s/30s
+
+running (0m08.0s), 1/1 VUs, 7 complete and 0 interrupted iterations
+default   [  27% ] 1 VUs  08.0s/30s
+
+running (0m09.0s), 1/1 VUs, 8 complete and 0 interrupted iterations
+default   [  30% ] 1 VUs  09.0s/30s
+
+running (0m10.0s), 1/1 VUs, 9 complete and 0 interrupted iterations
+default   [  33% ] 1 VUs  10.0s/30s
+
+running (0m11.0s), 1/1 VUs, 10 complete and 0 interrupted iterations
+default   [  37% ] 1 VUs  11.0s/30s
+
+running (0m12.0s), 1/1 VUs, 11 complete and 0 interrupted iterations
+default   [  40% ] 1 VUs  12.0s/30s
+
+running (0m13.0s), 1/1 VUs, 12 complete and 0 interrupted iterations
+default   [  43% ] 1 VUs  13.0s/30s
+
+running (0m14.0s), 1/1 VUs, 13 complete and 0 interrupted iterations
+default   [  47% ] 1 VUs  14.0s/30s
+
+running (0m15.0s), 1/1 VUs, 14 complete and 0 interrupted iterations
+default   [  50% ] 1 VUs  15.0s/30s
+
+running (0m16.0s), 1/1 VUs, 15 complete and 0 interrupted iterations
+default   [  53% ] 1 VUs  16.0s/30s
+
+running (0m17.0s), 1/1 VUs, 16 complete and 0 interrupted iterations
+default   [  57% ] 1 VUs  17.0s/30s
+
+running (0m18.0s), 1/1 VUs, 17 complete and 0 interrupted iterations
+default   [  60% ] 1 VUs  18.0s/30s
+
+running (0m19.0s), 1/1 VUs, 18 complete and 0 interrupted iterations
+default   [  63% ] 1 VUs  19.0s/30s
+
+running (0m20.0s), 1/1 VUs, 19 complete and 0 interrupted iterations
+default   [  67% ] 1 VUs  20.0s/30s
+
+running (0m21.0s), 1/1 VUs, 20 complete and 0 interrupted iterations
+default   [  70% ] 1 VUs  21.0s/30s
+
+running (0m22.0s), 1/1 VUs, 21 complete and 0 interrupted iterations
+default   [  73% ] 1 VUs  22.0s/30s
+
+running (0m23.0s), 1/1 VUs, 21 complete and 0 interrupted iterations
+default   [  77% ] 1 VUs  23.0s/30s
+
+running (0m24.0s), 1/1 VUs, 22 complete and 0 interrupted iterations
+default   [  80% ] 1 VUs  24.0s/30s
+
+running (0m25.0s), 1/1 VUs, 23 complete and 0 interrupted iterations
+default   [  83% ] 1 VUs  25.0s/30s
+
+running (0m26.0s), 1/1 VUs, 24 complete and 0 interrupted iterations
+default   [  87% ] 1 VUs  26.0s/30s
+
+running (0m27.0s), 1/1 VUs, 25 complete and 0 interrupted iterations
+default   [  90% ] 1 VUs  27.0s/30s
+
+running (0m28.0s), 1/1 VUs, 26 complete and 0 interrupted iterations
+default   [  93% ] 1 VUs  28.0s/30s
+
+running (0m29.0s), 1/1 VUs, 27 complete and 0 interrupted iterations
+default   [  97% ] 1 VUs  29.0s/30s
+
+running (0m30.0s), 1/1 VUs, 28 complete and 0 interrupted iterations
+default ↓ [ 100% ] 1 VUs  30s
+
+     ✓ gateway /health 200
+     ✓ catalogo lista 200
+     ✓ catalogo detalhe 200 ou 404
+     ✓ categorias 200
+     ✓ recomendacao/me 200
+     ✓ similares 200 ou 404
+
+   ✓ checks.........................: 100.00% ✓ 174      ✗ 0  
+     data_received..................: 263 kB  8.7 kB/s
+     data_sent......................: 28 kB   940 B/s
+     http_req_blocked...............: avg=13.5µs   min=1.56µs   med=3.19µs   max=1.65ms   p(90)=5.5µs    p(95)=7.37µs  
+     http_req_connecting............: avg=1.91µs   min=0s       med=0s       max=332.76µs p(90)=0s       p(95)=0s      
+   ✓ http_req_duration..............: avg=6.34ms   min=653.53µs med=4.22ms   max=225.31ms p(90)=8.79ms   p(95)=10.45ms 
+       { expected_response:true }...: avg=6.34ms   min=653.53µs med=4.22ms   max=225.31ms p(90)=8.79ms   p(95)=10.45ms 
+   ✓ http_req_failed................: 0.00%   ✓ 0        ✗ 174
+     http_req_receiving.............: avg=221.24µs min=47.14µs  med=133.95µs max=5.98ms   p(90)=348.28µs p(95)=464.34µs
+     http_req_sending...............: avg=20.43µs  min=6.35µs   med=13.65µs  max=216.93µs p(90)=33.28µs  p(95)=69.35µs 
+     http_req_tls_handshaking.......: avg=0s       min=0s       med=0s       max=0s       p(90)=0s       p(95)=0s      
+     http_req_waiting...............: avg=6.1ms    min=492.65µs med=4.03ms   max=223.3ms  p(90)=8.1ms    p(95)=10.11ms 
+     http_reqs......................: 174     5.769472/s
+     iteration_duration.............: avg=1.04s    min=1.01s    med=1.02s    max=1.34s    p(90)=1.04s    p(95)=1.04s   
+     iterations.....................: 29      0.961579/s
+     vus............................: 1       min=1      max=1
+     vus_max........................: 1       min=1      max=1
+
+
+running (0m30.2s), 0/1 VUs, 29 complete and 0 interrupted iterations
+default ✓ [ 100% ] 1 VUs  30s

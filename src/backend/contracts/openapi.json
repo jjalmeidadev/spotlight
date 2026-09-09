@@ -1,0 +1,2178 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Spotlight API",
+    "version": "0.1.0",
+    "description": "Especificação das rotas do backend Spotlight (Catálogo, Usuário e Recomendação), servindo como fonte da verdade para implementação, Swagger e integração com o frontend. Baseado no modelo de dados em src/database/01_create_database.sql. As convenções (envelope de resposta, erros, paginação, autenticação) precisam ser ratificadas pela equipe antes da implementação."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "API Gateway (encaminha para Catálogo:5001, Usuário:5002, Recomendação:5003)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Catálogo",
+      "description": "Espetáculos, categorias, teatros, sessões e avaliações."
+    },
+    {
+      "name": "Usuário",
+      "description": "Perfil, preferências e histórico de avaliações do usuário autenticado."
+    },
+    {
+      "name": "Recomendação",
+      "description": "Recomendações personalizadas e espetáculos similares."
+    }
+  ],
+  "paths": {
+    "/catalogo/espetaculos": {
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Listar espetáculos do catálogo (público)",
+        "description": "Lista espetáculos com filtros e paginação.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca por título."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "em_cartaz",
+                "em_breve",
+                "encerrado"
+              ]
+            }
+          },
+          {
+            "name": "genero",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoriaId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "ordenarPor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "popularidade",
+                "nota_media",
+                "titulo"
+              ],
+              "default": "popularidade"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de espetáculos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Espetaculo"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Catálogo"
+        ],
+        "operationId": "criarEspetaculo",
+        "summary": "Criar um espetáculo (administrador)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EspetaculoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Espetáculo criado.",
+            "headers": {
+              "Location": {
+                "description": "URI do recurso criado.",
+                "schema": {
+                  "type": "string",
+                  "example": "/catalogo/espetaculos/12"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspetaculoDetalhe"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/catalogo/espetaculos/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/EspetaculoId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Detalhar um espetáculo (público)",
+        "description": "Retorna o espetáculo com categorias, atores e sessões.",
+        "responses": {
+          "200": {
+            "description": "Detalhe do espetáculo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspetaculoDetalhe"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Atualizar um espetáculo (administrador)",
+        "description": "Atualiza um espetáculo. Envia apenas os campos que mudam.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EspetaculoUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Espetáculo atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspetaculoDetalhe"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Excluir um espetáculo (administrador)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Excluído com sucesso (sem body)."
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/catalogo/espetaculos/{id}/sessoes": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/EspetaculoId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Listar sessões de um espetáculo (público)",
+        "responses": {
+          "200": {
+            "description": "Sessões do espetáculo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Sessao"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/catalogo/espetaculos/{id}/avaliacoes": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/EspetaculoId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Listar avaliações de um espetáculo (público)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de avaliações.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Avaliacao"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Salvar avaliacao de um espetaculo (cadastrado)",
+        "description": "Cria ou atualiza a avaliacao do usuario para o espetaculo. A constraint UNIQUE (id_usuario, id_espetaculo) garante uma unica avaliacao ativa por usuario/espetaculo.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvaliacaoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Avaliacao criada ou atualizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvaliacaoCriada"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/catalogo/categorias": {
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Listar categorias (público)",
+        "responses": {
+          "200": {
+            "description": "Categorias.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Categoria"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/catalogo/teatros": {
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Listar teatros (público)",
+        "responses": {
+          "200": {
+            "description": "Teatros.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Teatro"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/catalogo/teatros/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID do teatro."
+        }
+      ],
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Detalhar um teatro (público)",
+        "responses": {
+          "200": {
+            "description": "Detalhe do teatro.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Teatro"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/usuario/me": {
+      "get": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Obter o perfil do usuário autenticado (cadastrado)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Atualizar o próprio perfil (cadastrado)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/usuario/me/localizacao": {
+      "put": {
+        "tags": [
+          "UsuÃ¡rio"
+        ],
+        "summary": "Atualizar localizacao consentida do usuario autenticado (cadastrado)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Localizacao"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Localizacao atualizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Localizacao atualizada com sucesso."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/usuario/me/preferencias": {
+      "get": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Obter preferências do usuário (cadastrado)",
+        "description": "Mapeia o campo perfil_preferencias (JSONB).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preferências.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preferencias"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Atualizar preferências (cadastrado)",
+        "description": "Usado no onboarding e em ajustes.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preferencias"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferências atualizadas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preferencias"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/usuario/me/avaliacoes": {
+      "get": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Histórico de avaliações do usuário (cadastrado)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avaliações do usuário (paginadas).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AvaliacaoUsuario"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/usuario/telemetria": {
+      "post": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Registrar evento de telemetria do aplicativo",
+        "description": "Registra eventos comportamentais do app mobile na colecao interacoes do MongoDB. O header Authorization e opcional: se enviado e valido, o evento e associado ao usuario autenticado; se ausente, anonymousId e obrigatorio.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetriaEventoCreate"
+              },
+              "examples": {
+                "visualizacaoEspetaculo": {
+                  "summary": "Visualizacao de espetaculo",
+                  "value": {
+                    "eventId": "evt_01HX9F7M9XK2",
+                    "eventType": "show_viewed",
+                    "source": "mobile",
+                    "sessionId": "sess_01HX9F7M8T",
+                    "occurredAt": "2026-06-09T14:32:00Z",
+                    "screen": "Detalhes",
+                    "entity": {
+                      "type": "espetaculo",
+                      "id": "42"
+                    },
+                    "properties": {
+                      "durationMs": 23000,
+                      "origin": "catalog"
+                    },
+                    "device": {
+                      "platform": "ios",
+                      "appVersion": "1.0.0"
+                    },
+                    "anonymousId": "anon_01HX9F7M8T"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Evento aceito para persistencia.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetriaEventoAceito"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Erro503"
+          }
+        }
+      }
+    },
+    "/recomendacao/me": {
+      "get": {
+        "tags": [
+          "Recomendação"
+        ],
+        "summary": "Recomendações personalizadas (cadastrado)",
+        "description": "Recomendações ordenadas por score. Lê predições pré-processadas (tabela recomendacao).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limite"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de recomendações.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Recomendacao"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Erro401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Erro403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/geolocalizacao/geocoding": {
+      "get": {
+        "tags": [
+          "Geolocalizacao"
+        ],
+        "summary": "Geocodificar endereco via OpenStreetMap/Nominatim",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Localizacao resolvida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Localizacao"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Erro409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/geolocalizacao/geocoding/reverse": {
+      "get": {
+        "tags": [
+          "Geolocalizacao"
+        ],
+        "summary": "Geocodificacao reversa via OpenStreetMap/Nominatim",
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": -90,
+              "maximum": 90
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": -180,
+              "maximum": 180
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Localizacao resolvida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Localizacao"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Erro400"
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Erro409"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    },
+    "/recomendacao/espetaculos/{id}/similares": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/EspetaculoId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Recomendação"
+        ],
+        "summary": "Espetáculos similares (público)",
+        "description": "Espetáculos similares a um dado espetáculo (item-item). Rota pública. A similaridade é GLOBAL (igual para todos os usuários) e NÃO vem da tabela recomendacao (por-usuário, com RLS). Os dados vêm de uma estrutura dedicada de similaridade global (tabela proposta similaridade_item, leitura pública, populada em batch pelo k-NN) — ainda a criar no schema.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limite"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de similares.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Similar"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Erro404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Erro500"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT emitido pelo Supabase Auth. Níveis no campo tipo_usuario: visitante, cadastrado, administrador."
+      }
+    },
+    "parameters": {
+      "Page": {
+        "name": "page",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      "PageSize": {
+        "name": "pageSize",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "Limite": {
+        "name": "limite",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50,
+          "default": 10
+        }
+      },
+      "EspetaculoId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "ID do espetáculo."
+      }
+    },
+    "responses": {
+      "Erro400": {
+        "description": "Requisição inválida (validação).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            },
+            "example": {
+              "error": "Dados de entrada inválidos.",
+              "traceId": "00-abc123-def456-00",
+              "details": {
+                "titulo": [
+                  "O título é obrigatório."
+                ],
+                "duracao": [
+                  "A duração deve ser maior que zero."
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Erro401": {
+        "description": "Não autenticado (token ausente/inválido).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            }
+          }
+        }
+      },
+      "Erro403": {
+        "description": "Autenticado, mas sem permissão.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            }
+          }
+        }
+      },
+      "Erro404": {
+        "description": "Recurso não encontrado.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            },
+            "example": {
+              "error": "Espetáculo 999 não encontrado.",
+              "traceId": "00-abc123-def456-00"
+            }
+          }
+        }
+      },
+      "Erro409": {
+        "description": "Conflito de regra de negocio.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            },
+            "example": {
+              "error": "Conflito de regra de negocio.",
+              "traceId": "00-abc123-def456-00"
+            }
+          }
+        }
+      },
+      "Erro503": {
+        "description": "Servico temporariamente indisponivel.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            },
+            "example": {
+              "error": "Telemetria nao configurada.",
+              "traceId": "00-abc123-def456-00"
+            }
+          }
+        }
+      },
+      "Erro500": {
+        "description": "Erro interno.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erro"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Erro": {
+        "description": "Envelope de erro padrão. IMPLEMENTAÇÃO: o ErrorHandlingMiddleware atual trata apenas exceções não capturadas (500 com error e traceId). O envelope para 400/401/403/404/409 (incl. details) é alvo do contrato e ainda precisa ser implementado.",
+        "type": "object",
+        "required": [
+          "error",
+          "traceId"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Mensagem legível do erro."
+          },
+          "traceId": {
+            "type": "string",
+            "example": "00-abc123-def456-00"
+          },
+          "details": {
+            "type": "object",
+            "description": "Presente em erros de validação (400). Mensagens por campo.",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "example": 20
+          },
+          "totalItems": {
+            "type": "integer",
+            "example": 137
+          },
+          "totalPages": {
+            "type": "integer",
+            "example": 7
+          }
+        }
+      },
+      "StatusEspetaculo": {
+        "type": "string",
+        "enum": [
+          "em_cartaz",
+          "em_breve",
+          "encerrado"
+        ]
+      },
+      "Espetaculo": {
+        "type": "object",
+        "description": "Resumo de espetáculo usado em listas.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 12
+          },
+          "titulo": {
+            "type": "string",
+            "example": "O Auto da Compadecida"
+          },
+          "genero": {
+            "type": "string",
+            "nullable": true,
+            "example": "Comédia"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEspetaculo"
+          },
+          "faixaEtaria": {
+            "type": "string",
+            "nullable": true,
+            "example": "Livre"
+          },
+          "classificacaoIndicativa": {
+            "type": "string",
+            "nullable": true,
+            "example": "L"
+          },
+          "duracao": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Minutos.",
+            "example": 120
+          },
+          "notaMedia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 4.7
+          },
+          "popularidade": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 8123.5
+          }
+        }
+      },
+      "CategoriaResumo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 3
+          },
+          "nome": {
+            "type": "string",
+            "example": "Teatro Popular"
+          }
+        }
+      },
+      "AtorResumo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 5
+          },
+          "nome": {
+            "type": "string",
+            "example": "João Silva"
+          },
+          "papel": {
+            "type": "string",
+            "example": "João Grilo"
+          },
+          "ordemExibicao": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "TeatroResumo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 2
+          },
+          "nome": {
+            "type": "string",
+            "example": "Teatro Aventura"
+          },
+          "cidade": {
+            "type": "string",
+            "example": "Campinas"
+          },
+          "estado": {
+            "type": "string",
+            "example": "SP"
+          }
+        }
+      },
+      "Sessao": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 88
+          },
+          "data": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-06-10"
+          },
+          "horario": {
+            "type": "string",
+            "example": "20:00"
+          },
+          "precoMinimo": {
+            "type": "number",
+            "format": "float",
+            "example": 40
+          },
+          "precoMaximo": {
+            "type": "number",
+            "format": "float",
+            "example": 120
+          },
+          "disponibilidade": {
+            "type": "integer",
+            "example": 230
+          },
+          "linkCompra": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://..."
+          },
+          "teatro": {
+            "$ref": "#/components/schemas/TeatroResumo"
+          }
+        }
+      },
+      "EspetaculoDetalhe": {
+        "type": "object",
+        "description": "Detalhe de espetáculo, com relacionamentos.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 12
+          },
+          "titulo": {
+            "type": "string",
+            "example": "O Auto da Compadecida"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true,
+            "example": "Adaptação da obra de Ariano Suassuna..."
+          },
+          "genero": {
+            "type": "string",
+            "nullable": true,
+            "example": "Comédia"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEspetaculo"
+          },
+          "faixaEtaria": {
+            "type": "string",
+            "nullable": true,
+            "example": "Livre"
+          },
+          "classificacaoIndicativa": {
+            "type": "string",
+            "nullable": true,
+            "example": "L"
+          },
+          "duracao": {
+            "type": "integer",
+            "nullable": true,
+            "example": 120
+          },
+          "produtora": {
+            "type": "string",
+            "nullable": true,
+            "example": "Aventura Produções"
+          },
+          "notaMedia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 4.7
+          },
+          "popularidade": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 8123.5
+          },
+          "categorias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoriaResumo"
+            }
+          },
+          "atores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AtorResumo"
+            }
+          },
+          "sessoes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sessao"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-01T14:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-20T09:30:00Z"
+          }
+        }
+      },
+      "Categoria": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 3
+          },
+          "nome": {
+            "type": "string",
+            "example": "Teatro Popular"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Teatro": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 2
+          },
+          "nome": {
+            "type": "string",
+            "example": "Teatro Aventura"
+          },
+          "endereco": {
+            "type": "string",
+            "example": "Rua X, 100"
+          },
+          "cidade": {
+            "type": "string",
+            "example": "Campinas"
+          },
+          "estado": {
+            "type": "string",
+            "example": "SP"
+          },
+          "capacidade": {
+            "type": "integer",
+            "example": 800
+          },
+          "acessibilidade": {
+            "type": "boolean",
+            "example": true
+          },
+          "parceiroNamingRights": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          }
+        }
+      },
+      "Avaliacao": {
+        "type": "object",
+        "description": "Avaliação listada no catálogo (inclui o usuário).",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 41
+          },
+          "nota": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 5,
+            "example": 5
+          },
+          "comentario": {
+            "type": "string",
+            "nullable": true,
+            "example": "Imperdível!"
+          },
+          "usuario": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "a1b2c3d4-0000-0000-0000-000000000000"
+              },
+              "nome": {
+                "type": "string",
+                "example": "Maria"
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-18T20:10:00Z"
+          }
+        }
+      },
+      "AvaliacaoUsuario": {
+        "type": "object",
+        "description": "Avaliação no histórico do usuário (inclui o espetáculo).",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 41
+          },
+          "nota": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 5,
+            "example": 4.5
+          },
+          "comentario": {
+            "type": "string",
+            "nullable": true
+          },
+          "espetaculo": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 12
+              },
+              "titulo": {
+                "type": "string",
+                "example": "O Auto da Compadecida"
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-18T20:10:00Z"
+          }
+        }
+      },
+      "AvaliacaoCriada": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 41
+          },
+          "nota": {
+            "type": "number",
+            "format": "float",
+            "example": 4.5
+          },
+          "comentario": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-26T19:00:00Z"
+          }
+        }
+      },
+      "AvaliacaoCreate": {
+        "type": "object",
+        "required": [
+          "nota"
+        ],
+        "properties": {
+          "nota": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 5,
+            "example": 4.5
+          },
+          "comentario": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AtorInput": {
+        "type": "object",
+        "required": [
+          "atorId"
+        ],
+        "properties": {
+          "atorId": {
+            "type": "integer",
+            "example": 5
+          },
+          "papel": {
+            "type": "string",
+            "example": "João Grilo"
+          },
+          "ordemExibicao": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "EspetaculoCreate": {
+        "type": "object",
+        "required": [
+          "titulo"
+        ],
+        "properties": {
+          "titulo": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true
+          },
+          "genero": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "faixaEtaria": {
+            "type": "string",
+            "maxLength": 50,
+            "nullable": true
+          },
+          "duracao": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true,
+            "description": "Minutos."
+          },
+          "classificacaoIndicativa": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "produtora": {
+            "type": "string",
+            "maxLength": 150,
+            "nullable": true
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusEspetaculo"
+              }
+            ],
+            "default": "em_breve"
+          },
+          "categoriaIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "example": [
+              3,
+              7
+            ]
+          },
+          "atores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AtorInput"
+            }
+          }
+        }
+      },
+      "EspetaculoUpdate": {
+        "type": "object",
+        "description": "Mesmos campos do create, todos opcionais. Envia apenas o que muda.",
+        "properties": {
+          "titulo": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true
+          },
+          "genero": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "faixaEtaria": {
+            "type": "string",
+            "maxLength": 50,
+            "nullable": true
+          },
+          "duracao": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true
+          },
+          "classificacaoIndicativa": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "produtora": {
+            "type": "string",
+            "maxLength": 150,
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEspetaculo"
+          },
+          "categoriaIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "atores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AtorInput"
+            }
+          }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "a1b2c3d4-0000-0000-0000-000000000000"
+          },
+          "nome": {
+            "type": "string",
+            "example": "Maria Souza"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "maria@exemplo.com"
+          },
+          "dataNascimento": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "example": "1995-04-12"
+          },
+          "localizacao": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Localizacao"
+              }
+            ],
+            "nullable": true
+          },
+          "tipoUsuario": {
+            "type": "string",
+            "enum": [
+              "visitante",
+              "cadastrado",
+              "administrador"
+            ],
+            "example": "cadastrado"
+          },
+          "dataCadastro": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-01T10:00:00Z"
+          }
+        }
+      },
+      "UsuarioUpdate": {
+        "type": "object",
+        "description": "Campos opcionais do próprio perfil. Localização é gerenciada por PUT /usuario/me/localizacao e não é aceita neste schema — ver schema Localizacao usado por aquela rota.",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "dataNascimento": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "Localizacao": {
+        "type": "object",
+        "required": [
+          "formattedAddress",
+          "latitude",
+          "longitude",
+          "placeId",
+          "provider"
+        ],
+        "properties": {
+          "formattedAddress": {
+            "type": "string",
+            "example": "Rua Caetanopolis, Sao Paulo, SP"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "example": -23.5470245
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "example": -46.7542871
+          },
+          "placeId": {
+            "type": "string",
+            "example": "8893681"
+          },
+          "provider": {
+            "type": "string",
+            "example": "openstreetmap_nominatim"
+          }
+        }
+      },
+      "Preferencias": {
+        "type": "object",
+        "description": "Mapeia perfil_preferencias (JSONB).",
+        "properties": {
+          "generosFavoritos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Comédia",
+              "Musical"
+            ]
+          },
+          "categoriasFavoritas": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "example": [
+              3,
+              7
+            ]
+          },
+          "faixaPrecoMax": {
+            "type": "number",
+            "format": "float",
+            "example": 150
+          }
+        }
+      },
+      "TelemetriaEntity": {
+        "type": "object",
+        "required": [
+          "type",
+          "id"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "espetaculo",
+              "sessao",
+              "teatro",
+              "categoria",
+              "busca"
+            ],
+            "example": "espetaculo"
+          },
+          "id": {
+            "type": "string",
+            "example": "42"
+          }
+        }
+      },
+      "TelemetriaEventoCreate": {
+        "type": "object",
+        "description": "Evento de telemetria gerado pelo aplicativo. Se Authorization nao for enviado, anonymousId e obrigatorio.",
+        "required": [
+          "eventType",
+          "source",
+          "sessionId"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "Identificador idempotente gerado pelo cliente. Se omitido, o backend gera um identificador.",
+            "example": "evt_01HX9F7M9XK2"
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "session_started",
+              "screen_viewed",
+              "show_card_clicked",
+              "show_viewed",
+              "search_performed",
+              "favorite_toggled",
+              "purchase_clicked",
+              "session_ended"
+            ],
+            "example": "show_viewed"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "mobile"
+            ],
+            "example": "mobile"
+          },
+          "sessionId": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "sess_01HX9F7M8T"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-06-09T14:32:00Z"
+          },
+          "screen": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "Detalhes"
+          },
+          "entity": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TelemetriaEntity"
+              }
+            ],
+            "nullable": true
+          },
+          "properties": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "Metadados livres do evento. Nao deve conter dados sensiveis."
+          },
+          "device": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "Metadados do dispositivo/app. Nao deve conter dados sensiveis."
+          },
+          "anonymousId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "anon_01HX9F7M8T"
+          }
+        }
+      },
+      "TelemetriaEventoAceito": {
+        "type": "object",
+        "required": [
+          "eventId",
+          "status"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "example": "evt_01HX9F7M9XK2"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted"
+            ],
+            "example": "accepted"
+          }
+        }
+      },
+      "EspetaculoRecomendado": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 12
+          },
+          "titulo": {
+            "type": "string",
+            "example": "O Auto da Compadecida"
+          },
+          "genero": {
+            "type": "string",
+            "nullable": true,
+            "example": "Comédia"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEspetaculo"
+          },
+          "notaMedia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 4.7
+          },
+          "midias": {
+            "type": "array",
+            "description": "Mídias do espetáculo (capas, banners) ordenadas por ordemExibicao.",
+            "items": {
+              "$ref": "#/components/schemas/EspetaculoMidia"
+            }
+          }
+        }
+      },
+      "EspetaculoMidia": {
+        "type": "object",
+        "description": "Arquivo associado ao espetáculo no Supabase Storage.",
+        "properties": {
+          "tipoMidia": {
+            "type": "string",
+            "example": "capa"
+          },
+          "storageBucket": {
+            "type": "string",
+            "example": "espetaculos"
+          },
+          "storagePath": {
+            "type": "string",
+            "example": "12/capa.jpg"
+          },
+          "altText": {
+            "type": "string",
+            "nullable": true,
+            "example": "Cartaz de O Auto da Compadecida"
+          },
+          "ordemExibicao": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "Recomendacao": {
+        "type": "object",
+        "properties": {
+          "espetaculo": {
+            "$ref": "#/components/schemas/EspetaculoRecomendado"
+          },
+          "score": {
+            "type": "number",
+            "format": "double",
+            "example": 0.934512
+          },
+          "tipoAlgoritmo": {
+            "type": "string",
+            "example": "SVD"
+          },
+          "motivo": {
+            "type": "string",
+            "nullable": true,
+            "example": "Por que você gostou de outras comédias populares."
+          },
+          "dataGeracao": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-25T03:00:00Z"
+          }
+        }
+      },
+      "Similar": {
+        "type": "object",
+        "properties": {
+          "espetaculo": {
+            "$ref": "#/components/schemas/EspetaculoRecomendado"
+          },
+          "score": {
+            "type": "number",
+            "format": "double",
+            "example": 0.81234
+          },
+          "tipoAlgoritmo": {
+            "type": "string",
+            "example": "k-NN"
+          }
+        }
+      }
+    }
+  }
+}
