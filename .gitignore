@@ -1,45 +1,66 @@
-# Dependencies
+*.csv
+!src/dataset/
+!src/dataset/*.csv
+!src/models/reports/recomendacao_mlnet_exemplos.csv
+*.xls
+*.xlsx
 node_modules/
-
-# Environment variables
+/.expo/
+npm-debug.log*
 .env
+.env.*
+!.env.example
+**/.data-protection-keys/
+
+# Configurações locais do Claude Code
+.claude/
+
+# .NET test and coverage artifacts
+TestResults/
+**/bin/
+**/obj/
+
+# Python cache artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Artefatos gerados por notebooks e análises locais
+src/aad/*.png
+src/aad/*.jpg
+src/aad/*.jpeg
+src/aad/*.svg
+src/aad/*.pdf
+src/aad/.ipynb_checkpoints/
+src/database/*.csv
+
+# Environment & Secrets (AIOX)
 .env.local
 .env.*.local
-
-# Expo
-.expo/
-dist/
-web-build/
-
-# Native
-*.orig.*
-*.jks
-*.p8
-*.p12
 *.key
-*.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# Debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
 *.pem
 
-# Editor
-.vscode/
+# Dependencies (AIOX)
+node_modules
+
+# Build & Logs (AIOX)
+dist/
+build/
+*.log
+logs/
+
+# IDE & OS (AIOX)
+.DS_Store
+Thumbs.db
 .idea/
+*.swp
 
-# TypeScript
-*.tsbuildinfo
-
-# .NET
-bin/
-obj/
-*.user
-
+# AIOX Local (AIOX)
+.aiox-core/local/
+.claude/
+.aiox/install-log.txt
+.github
+.aiox-core
+.AGENTS.md
+.codex
+.codex-tmp/

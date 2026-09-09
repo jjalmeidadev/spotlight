@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Spotlight EC2 host for Docker Compose on AWS Academy Learner Lab.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: spotlight
+    Description: Prefix used for resource names and tags.
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Existing EC2 key pair used to SSH into the instance.
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC where the instance and security group will be created.
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public subnet for the EC2 instance.
+
+  InstanceType:
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t2.micro
+      - t2.small
+      - t2.medium
+    Description: EC2 size. t3.small is the recommended minimum for this compose stack.
+
+  SSHLocation:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: CIDR allowed to access SSH. Prefer your public IP as x.x.x.x/32.
+    AllowedPattern: ^(([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2})$
+
+  HTTPLocation:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: CIDR allowed to access HTTP.
+    AllowedPattern: ^(([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2})$
+
+  RootVolumeSize:
+    Type: Number
+    Default: 30
+    MinValue: 20
+    MaxValue: 100
+    Description: Root EBS volume size in GiB.
+
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+    Description: Amazon Linux 2023 AMI from the AWS public SSM parameter store.
+
+Resources:
+  SpotlightSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub ${ProjectName} HTTP and SSH access
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - Description: SSH from the configured CIDR
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+        - Description: HTTP public access
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref HTTPLocation
+      SecurityGroupEgress:
+        - Description: Allow outbound traffic for package installs and external APIs
+          IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-sg
+        - Key: Project
+          Value: !Ref ProjectName
+
+  SpotlightInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref SpotlightSecurityGroup
+          SubnetId: !Ref SubnetId
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: !Ref RootVolumeSize
+            VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: !Sub ${ProjectName}-ec2
+        - Key: Project
+          Value: !Ref ProjectName
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euxo pipefail
+          exec > >(tee /var/log/spotlight-bootstrap.log | logger -t spotlight-bootstrap -s 2>/dev/console) 2>&1
+
+          dnf update -y
+          dnf install -y docker git tar gzip jq shadow-utils
+
+          systemctl enable --now docker
+          usermod -aG docker ec2-user || true
+
+          mkdir -p /opt/spotlight/app /opt/spotlight/releases
+          chown -R ec2-user:ec2-user /opt/spotlight
+
+          if ! docker compose version >/dev/null 2>&1; then
+            dnf install -y docker-compose-plugin || true
+          fi
+
+          if ! docker compose version >/dev/null 2>&1; then
+            mkdir -p /usr/local/lib/docker/cli-plugins
+            curl -fsSL "https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64" \
+              -o /usr/local/lib/docker/cli-plugins/docker-compose
+            chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+          fi
+
+          cat >/etc/profile.d/spotlight-docker.sh <<'EOF'
+          export DOCKER_BUILDKIT=1
+          export COMPOSE_DOCKER_CLI_BUILD=1
+          EOF
+
+          cat >/usr/local/bin/spotlight-compose <<'EOF'
+          #!/bin/bash
+          set -euo pipefail
+          cd /opt/spotlight/app
+          export DOCKER_BUILDKIT=1
+          export COMPOSE_DOCKER_CLI_BUILD=1
+          exec docker compose -f docker-compose.prod.yml "$@"
+          EOF
+          chmod +x /usr/local/bin/spotlight-compose
+
+Outputs:
+  InstanceId:
+    Description: EC2 instance id.
+    Value: !Ref SpotlightInstance
+
+  PublicIp:
+    Description: Public IPv4 address.
+    Value: !GetAtt SpotlightInstance.PublicIp
+
+  PublicDnsName:
+    Description: Public DNS name.
+    Value: !GetAtt SpotlightInstance.PublicDnsName
+
+  PublicUrl:
+    Description: Application URL after docker compose is published.
+    Value: !Sub http://${SpotlightInstance.PublicIp}/
+
+  ApiHealthUrl:
+    Description: API Gateway health endpoint through the frontend Nginx proxy.
+    Value: !Sub http://${SpotlightInstance.PublicIp}/api/health
+
+  SshCommand:
+    Description: SSH command template. Adjust the local key path if needed.
+    Value: !Sub ssh -i .codex-tmp/${KeyName}.pem ec2-user@${SpotlightInstance.PublicIp}

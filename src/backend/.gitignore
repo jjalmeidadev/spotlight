@@ -1,0 +1,21 @@
+# Build .NET
+bin/
+obj/
+*.user
+
+# Variáveis de ambiente (segredos)
+.env
+
+# Logs
+*.log
+
+# .NET test and coverage artifacts
+TestResults/
+
+# Configurações locais dos testes de RNFs
+src/backend/tests/non-functional/.env.rnf
+
+# Resultados temporários gerados pelos testes
+src/backend/tests/non-functional/**/results/
+src/backend/tests/non-functional/**/reports/
+src/backend/tests/non-functional/**/tmp/

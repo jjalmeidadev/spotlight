@@ -1,0 +1,100 @@
+services:
+  catalog:
+    build:
+      context: ./src/backend/services/catalog
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+    ports:
+      - "5001:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - spotlight_network
+
+  recommendation:
+    build:
+      context: ./src/backend/services/recommendation
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      RecommendationModel__Enabled: ${RECOMMENDATION_MODEL_ENABLED:-false}
+      RecommendationModel__ModelPath: /app/model-artifacts/recomendacao_incrementada_mlnet.zip
+      RecommendationModel__CandidateCsvPath: /app/model-artifacts/recomendacao_balanceado.csv
+      RecommendationModel__SimilaritiesPath: /app/model-artifacts/item_similarities.json
+      SupabaseModelArtifacts__Enabled: ${SUPABASE_MODEL_ARTIFACTS_ENABLED:-false}
+      SupabaseModelArtifacts__Bucket: ${SUPABASE_MODEL_BUCKET:-ml-artifacts}
+      SupabaseModelArtifacts__TargetDirectory: /app/model-artifacts
+    ports:
+      - "5003:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - spotlight_network
+
+  geolocation:
+    build:
+      context: ./src/backend/services/geolocation
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      NOMINATIM_BASE_URL: https://nominatim.openstreetmap.org
+      NOMINATIM_USER_AGENT: spotlight-inteli-g04/1.0
+    ports:
+      - "5004:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - spotlight_network
+
+  user:
+    build:
+      context: ./src/backend/services/user
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      MONGODB_CONNECTION_STRING: ${MONGODB_CONNECTION_STRING}
+      MONGODB_DATABASE: ${MONGODB_DATABASE}
+      MONGODB_TELEMETRY_COLLECTION: ${MONGODB_TELEMETRY_COLLECTION}
+    ports:
+      - "5002:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - spotlight_network
+
+networks:
+  spotlight_network:
+    driver: bridge

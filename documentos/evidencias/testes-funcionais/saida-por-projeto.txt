@@ -1,0 +1,50 @@
+=== Spotlight.Catalog.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Catalog -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/catalog/bin/Debug/net9.0/Spotlight.Catalog.dll
+  Spotlight.Catalog.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Catalog.Tests/bin/Debug/net9.0/Spotlight.Catalog.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Catalog.Tests/bin/Debug/net9.0/Spotlight.Catalog.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Arquivo de resultados: /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/documentos/evidencias/testes-funcionais/Spotlight.Catalog.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:    32, Ignorado:     0, Total:    32, Duração: 1 s - Spotlight.Catalog.Tests.dll (net9.0)
+=== Spotlight.Gateway.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Gateway -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/api-gateway/bin/Debug/net9.0/Spotlight.Gateway.dll
+  Spotlight.Gateway.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Gateway.Tests/bin/Debug/net9.0/Spotlight.Gateway.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Gateway.Tests/bin/Debug/net9.0/Spotlight.Gateway.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Arquivo de resultados: /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/documentos/evidencias/testes-funcionais/Spotlight.Gateway.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:     2, Ignorado:     0, Total:     2, Duração: 983 ms - Spotlight.Gateway.Tests.dll (net9.0)
+=== Spotlight.Geolocation.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Geolocation -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/geolocation/bin/Debug/net9.0/Spotlight.Geolocation.dll
+  Spotlight.Geolocation.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Geolocation.Tests/bin/Debug/net9.0/Spotlight.Geolocation.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Geolocation.Tests/bin/Debug/net9.0/Spotlight.Geolocation.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Arquivo de resultados: /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/documentos/evidencias/testes-funcionais/Spotlight.Geolocation.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:     9, Ignorado:     0, Total:     9, Duração: 128 ms - Spotlight.Geolocation.Tests.dll (net9.0)
+=== Spotlight.Recommendation.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.Recommendation -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/recommendation/bin/Debug/net9.0/Spotlight.Recommendation.dll
+  Spotlight.Recommendation.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Recommendation.Tests/bin/Debug/net9.0/Spotlight.Recommendation.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.Recommendation.Tests/bin/Debug/net9.0/Spotlight.Recommendation.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Arquivo de resultados: /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/documentos/evidencias/testes-funcionais/Spotlight.Recommendation.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:    47, Ignorado:     0, Total:    47, Duração: 807 ms - Spotlight.Recommendation.Tests.dll (net9.0)
+=== Spotlight.User.Tests ===
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Spotlight.User -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/services/user/bin/Debug/net9.0/Spotlight.User.dll
+  Spotlight.User.Tests -> /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll
+Execução de teste para /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/src/backend/tests/Spotlight.User.Tests/bin/Debug/net9.0/Spotlight.User.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Arquivo de resultados: /Users/rafaelfigueiredocampos/Documentos/inteli-geral/modulo_6/Projeto/g04/documentos/evidencias/testes-funcionais/Spotlight.User.Tests.trx
+
+Aprovado!  – Com falha:     0, Aprovado:    49, Ignorado:     0, Total:    49, Duração: 2 m - Spotlight.User.Tests.dll (net9.0)

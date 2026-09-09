@@ -47,6 +47,8 @@ src/database/
 ├── 01_create_database.sql   — criação de tabelas, tipos ENUM, índices, RLS e trigger do Auth
 ├── 02_initial_data.sql      — seed com dados iniciais (categorias, teatros, atores, espetáculos e sessões)
 ├── 03_rollback.sql          — desfaz completamente a execução do 01_create_database.sql
+├── diagnostico_seed_catalogo.sql — diagnóstico não destrutivo para ambientes Supabase parcialmente populados
+├── supabase_storage_espetaculos.md — convenção de Storage para mídias dos espetáculos
 ├── migrations/              — alterações incrementais ao schema após o setup inicial
 │   ├── 04_trigger_updated_at_espetaculo.sql           — trigger BEFORE UPDATE em espetaculo.updated_at
 │   ├── 04_trigger_updated_at_espetaculo_rollback.sql
@@ -58,14 +60,22 @@ src/database/
 │   ├── 07_constraints_sessao_usuario_rollback.sql
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao.sql    — função is_tipo_algoritmo_valido + UNIQUE em recomendacao
 │   ├── 08_tipo_algoritmo_e_unique_recomendacao_rollback.sql
+│   ├── 09_espetaculo_midia.sql                        — tabela public.espetaculo_midia + policies do bucket espetaculos quando storage existir
+│   ├── 09_espetaculo_midia_rollback.sql
 │   ├── 09_rastreabilidade_transacoes.sql              — tabela auditoria + trigger genérica de auditoria nas tabelas transacionais
 │   ├── 09_rastreabilidade_transacoes_rollback.sql
+│   ├── 10_seed_catalogo_incremental.sql                — seed incremental idempotente de catálogo por chaves naturais
 │   ├── 10_supabase_storage_buckets.sql                 — bucket privado ml-artifacts no Supabase Storage
 │   ├── 10_supabase_storage_buckets_rollback.sql
+│   ├── 11_seed_recomendacao_incremental.sql            — seed incremental de avaliações, recomendações e similaridades por título
 │   ├── 12_controle_acesso_administrativo_catalogo.sql — escrita no catálogo restrita a administradores
 │   ├── 12_controle_acesso_administrativo_catalogo_rollback.sql
 │   ├── 13_rls_similaridade_item_avaliacao.sql          — escrita administrativa em similaridade_item e UPDATE próprio em avaliacao
-│   └── 13_rls_similaridade_item_avaliacao_rollback.sql
+│   ├── 13_rls_similaridade_item_avaliacao_rollback.sql
+│   ├── 14_admin_metadata_usuario.sql                   — permite criar administradores via raw_app_meta_data do Supabase Auth
+│   ├── 14_admin_metadata_usuario_rollback.sql
+│   ├── 15_bloqueia_autopromocao_usuario.sql            — trigger que bloqueia autopromoção de usuários comuns
+│   └── 15_bloqueia_autopromocao_usuario_rollback.sql
 ├── load_test/               — massa sintética e teste de carga (pgbench)
 │   ├── massa_carga.sql                                — gera ~208 mil linhas de dados de carga
 │   ├── massa_carga_rollback.sql                       — remove apenas os dados de carga
@@ -76,7 +86,7 @@ src/database/
 └── README.md                — este arquivo
 ```
 
-> Cada migration tem um arquivo `_rollback.sql` correspondente. As migrations são aplicadas **manualmente** via SQL Editor do Supabase ou `psql` após o setup inicial (`01_create_database.sql` + `02_initial_data.sql`) e respeitam a ordem numérica. Veja a seção [Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais) para detalhes.
+> Cada migration de schema tem um arquivo `_rollback.sql` correspondente. Os seeds incrementais (`10_seed_catalogo_incremental.sql` e `11_seed_recomendacao_incremental.sql`) são scripts idempotentes de correção/carga e não possuem rollback par. As migrations são aplicadas **manualmente** via SQL Editor do Supabase ou `psql` após o setup inicial (`01_create_database.sql` + `02_initial_data.sql`) e respeitam a ordem numérica e as dependências descritas nos cabeçalhos dos arquivos. Veja a seção [Estratégia de Migrations Incrementais](#estratégia-de-migrations-incrementais) para detalhes.
 
 ---
 
@@ -153,7 +163,7 @@ SITE_URL=http://localhost:3000
 5. Aguarde a confirmação de sucesso
 6. Cole e execute `02_initial_data.sql`
 
-**Validação:** Acesse **Table Editor** e confirme que as 10 tabelas aparecem no schema `public`.
+**Validação:** Acesse **Table Editor** e confirme que as 11 tabelas do bootstrap aparecem no schema `public`.
 
 > Atenção: o `01_create_database.sql` é um script de criação para ambiente limpo. Ele não apaga estruturas existentes. Para resetar um ambiente de desenvolvimento, execute primeiro `03_rollback.sql` e depois rode novamente `01_create_database.sql` e `02_initial_data.sql`.
 
@@ -236,9 +246,10 @@ psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME \
  public | espetaculo_categoria  | table | postgres
  public | recomendacao          | table | postgres
  public | sessao                | table | postgres
+ public | similaridade_item     | table | postgres
  public | teatro                | table | postgres
  public | usuario               | table | postgres
-(10 rows)
+(11 rows)
 ```
 
 ### 5.4 Rollback (desfaz tudo)
@@ -263,6 +274,25 @@ Na organização das tasks, essa ordem corresponde a:
 ```
 T1 — criação do schema  →  T2 — carga inicial de dados
 ```
+
+Após o bootstrap, aplique manualmente as migrations em `src/database/migrations/` conforme a necessidade do ambiente e respeitando as dependências:
+
+```text
+04_trigger_updated_at_espetaculo.sql
+05_timestamptz.sql
+06_indexes.sql
+07_constraints_sessao_usuario.sql
+08_tipo_algoritmo_e_unique_recomendacao.sql
+09_espetaculo_midia.sql
+09_rastreabilidade_transacoes.sql
+10_supabase_storage_buckets.sql
+12_controle_acesso_administrativo_catalogo.sql
+13_rls_similaridade_item_avaliacao.sql
+14_admin_metadata_usuario.sql
+15_bloqueia_autopromocao_usuario.sql
+```
+
+Em ambientes Supabase parcialmente populados, rode `diagnostico_seed_catalogo.sql` antes de seeds incrementais. Quando for necessário recompor dados de catálogo sem depender de IDs fixos, use `10_seed_catalogo_incremental.sql` e depois `11_seed_recomendacao_incremental.sql`, observando os pré-requisitos no cabeçalho de cada arquivo.
 
 ---
 
@@ -377,7 +407,7 @@ docker compose up -d db
 Ao final da implantação, o ambiente estará pronto quando:
 
 - o PostgreSQL/Supabase estiver acessível pelo Supabase SQL Editor, DBeaver, `psql` ou container Docker;
-- o script `01_create_database.sql` tiver criado as 10 tabelas do schema `public`;
+- o script `01_create_database.sql` tiver criado as 11 tabelas de bootstrap do schema `public`;
 - o script `02_initial_data.sql` tiver populado os dados iniciais sem erros de integridade referencial;
 - as consultas de validação retornarem registros em `usuario`, `espetaculo` e `sessao`.
 
@@ -393,13 +423,13 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 
 | Item | Quantidade |
 |---|---:|
-| Tabelas | 12 |
+| Tabelas | 13 |
 | Tipos enumerados | 2 |
-| Funções | 5 |
-| Triggers | 10 |
-| Índices explícitos | 20 |
+| Funções | 6 |
+| Triggers | 11 |
+| Índices explícitos | 21 |
 
-> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `13`). As funções somam `public.handle_new_user()` (01), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08), `public.registrar_auditoria()` (09) e `public.is_admin()` (12). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04) e os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional.
+> A contagem reflete o estado após a aplicação das migrations incrementais em `src/database/migrations/` (até a `15`). As funções somam `public.handle_new_user()` (01, substituída pela `14`), `public.set_updated_at()` (04), `public.is_tipo_algoritmo_valido()` (08), `public.registrar_auditoria()` (09), `public.is_admin()` (12) e `public.bloquear_autopromocao_usuario()` (15). Os triggers somam `on_auth_user_created` (01), `trg_espetaculo_updated_at` (04), os 8 triggers de auditoria `trg_auditoria_*` (09), um por tabela transacional, e `trg_bloqueia_autopromocao_usuario` (15).
 
 #### Tabelas do Modelo
 
@@ -416,7 +446,8 @@ O banco de dados modela o domínio de um sistema de consulta, avaliação e reco
 | 9 | `avaliacao` | Avaliações de usuários sobre espetáculos. |
 | 10 | `recomendacao` | Recomendações personalizadas geradas para usuários. |
 | 11 | `similaridade_item` | Similaridade item-item entre espetáculos (global, leitura pública), populada em batch pelos algoritmos de recomendação. |
-| 12 | `auditoria` | Trilha de rastreabilidade: registra toda escrita (`INSERT`/`UPDATE`/`DELETE`) nas tabelas transacionais, agrupável por transação. Adicionada na migration `09`. |
+| 12 | `espetaculo_midia` | Metadados das imagens dos espetáculos no Supabase Storage (`bucket`, `path`, tipo de mídia, texto alternativo e ordem). Adicionada na migration `09_espetaculo_midia.sql`. |
+| 13 | `auditoria` | Trilha de rastreabilidade: registra toda escrita (`INSERT`/`UPDATE`/`DELETE`) nas tabelas transacionais, agrupável por transação. Adicionada na migration `09_rastreabilidade_transacoes.sql`. |
 
 #### Tipos Enumerados
 
@@ -454,6 +485,8 @@ Entidade principal.
 | `usuario: atualização do próprio perfil` | `UPDATE` | Permite atualização apenas do próprio perfil: `auth.uid() = id_usuario`. |
 | `usuario: inserção via trigger de auth` | `INSERT` | Permite inserção via trigger com `WITH CHECK (true)`. |
 
+> A trigger `trg_bloqueia_autopromocao_usuario`, criada na migration `15_bloqueia_autopromocao_usuario.sql`, complementa a policy de `UPDATE`: usuários autenticados não administradores não podem alterar diretamente o campo `tipo_usuario`.
+
 #### Colunas
 
 | Coluna | Tipo | Nulo? | Default | PK / FK | Restrições | Descrição |
@@ -463,7 +496,7 @@ Entidade principal.
 | `email` | `VARCHAR(255)` | Não | - | - | `UNIQUE`, `chk_email_formato` | E-mail do usuário. Deve ser único e seguir formato válido. |
 | `data_nascimento` | `DATE` | Sim | - | - | - | Data de nascimento do usuário. |
 | `localizacao` | `JSONB` | Sim | - | - | - | Localização consentida do usuário, gerada pelo `NominatimGeocodingService` via `PUT /usuario/me/localizacao`. Estrutura serializada em camelCase (`JsonSerializerDefaults.Web`) — ver detalhes abaixo. |
-| `data_cadastro` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de criação do perfil. |
+| `data_cadastro` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de criação do perfil. |
 | `tipo_usuario` | `tipo_usuario_enum` | Não | `'cadastrado'` | - | Valores do ENUM | Tipo do usuário no sistema. |
 | `nivel_acesso` | `JSONB` | Não | `'{}'::JSONB` | - | - | Estrutura flexível para permissões, papéis ou escopos adicionais. |
 | `perfil_preferencias` | `JSONB` | Não | `'{}'::JSONB` | - | - | Preferências do usuário para personalização e recomendação. |
@@ -549,7 +582,11 @@ Não há índices explícitos além dos índices automáticos criados pela chave
 |---|---|---|
 | `public.handle_new_user()` | Function | Insere automaticamente um perfil em `usuario` após a criação de um registro em `auth.users`. |
 | `public.is_admin()` | Function | Retorna se `auth.uid()` pertence a um usuário com `tipo_usuario = 'administrador'`; usada pelas policies administrativas do catálogo. |
+| `public.bloquear_autopromocao_usuario()` | Function | Impede que usuários comuns alterem diretamente `tipo_usuario`; administradores continuam autorizados por `public.is_admin()`. |
 | `on_auth_user_created` | Trigger | Executada `AFTER INSERT ON auth.users`, chama `public.handle_new_user()`. |
+| `trg_bloqueia_autopromocao_usuario` | Trigger | Executada `BEFORE UPDATE OF tipo_usuario ON public.usuario`, chama `public.bloquear_autopromocao_usuario()`. |
+
+> Desde a migration `14_admin_metadata_usuario.sql`, `public.handle_new_user()` lê `raw_app_meta_data.tipoUsuario` ou `raw_app_meta_data.tipo_usuario` para permitir criação de usuários administradores por fluxo administrativo do Supabase. Valores fora de `cadastrado`/`administrador` continuam sendo normalizados para `cadastrado`.
 
 ### 3. Tabela `categoria`
 
@@ -619,7 +656,7 @@ Entidade principal.
 | `id_ator` | `SERIAL` | Não | Sequência automática | PK | - | Identificador único do ator. |
 | `nome` | `VARCHAR(150)` | Não | - | - | - | Nome do ator. |
 | `biografia` | `TEXT` | Sim | - | - | - | Texto biográfico do ator. |
-| `created_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de cadastro do ator. |
+| `created_at` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de cadastro do ator. |
 
 #### Constraints
 
@@ -669,7 +706,7 @@ Entidade principal.
 | `capacidade` | `INTEGER` | Sim | - | - | `CHECK (capacidade > 0)` | Capacidade máxima de público. |
 | `acessibilidade` | `BOOLEAN` | Não | `FALSE` | - | - | Indica se o teatro possui recursos de acessibilidade. |
 | `parceiro_naming_rights` | `VARCHAR(200)` | Sim | - | - | - | Nome de parceiro comercial associado ao naming rights. |
-| `created_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de cadastro do teatro. |
+| `created_at` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de cadastro do teatro. |
 
 #### Constraints
 
@@ -724,8 +761,8 @@ Entidade principal.
 | `popularidade` | `NUMERIC(10,4)` | Não | `0` | - | - | Métrica numérica de popularidade. |
 | `nota_media` | `NUMERIC(3,2)` | Não | `0` | - | `CHECK (nota_media BETWEEN 0 AND 5)` | Nota média consolidada das avaliações. |
 | `id_admin` | `UUID` | Sim | - | FK | Referencia `usuario(id_usuario) ON DELETE SET NULL` | Usuário administrador responsável pelo cadastro ou gestão. |
-| `created_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de criação do registro. |
-| `updated_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora da última atualização. |
+| `created_at` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de criação do registro. |
+| `updated_at` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora da última atualização. |
 
 #### Constraints
 
@@ -746,6 +783,8 @@ Entidade principal.
 | Referenciada por | `sessao(id_espetaculo)` | Um espetáculo pode possuir várias sessões. |
 | Referenciada por | `avaliacao(id_espetaculo)` | Um espetáculo pode receber várias avaliações. |
 | Referenciada por | `recomendacao(id_espetaculo)` | Um espetáculo pode aparecer em várias recomendações. |
+| Referenciada por | `similaridade_item(id_espetaculo_origem/id_espetaculo_similar)` | Um espetáculo pode aparecer em relações de similaridade item-item. |
+| Referenciada por | `espetaculo_midia(id_espetaculo)` | Um espetáculo pode possuir várias mídias no Supabase Storage. |
 
 #### Índices
 
@@ -754,10 +793,16 @@ Entidade principal.
 | `idx_espetaculo_status` | `status` | Otimiza filtros por status do espetáculo. |
 | `idx_espetaculo_nota_media` | `nota_media DESC` | Otimiza rankings por nota média. |
 | `idx_espetaculo_popularidade` | `popularidade DESC` | Otimiza rankings por popularidade. |
+| `idx_espetaculo_titulo_trgm` | `titulo` (GIN trigram) | Acelera buscas `ILIKE '%termo%'`; criado na migration `06_indexes.sql`. |
+| `idx_espetaculo_genero` | `genero` | Otimiza filtro por gênero; criado na migration `06_indexes.sql`. |
+| `idx_espetaculo_status_popularidade` | `status, popularidade DESC` | Cobre filtro por status com ordenação por popularidade; criado na migration `06_indexes.sql`. |
 
 #### Triggers e Functions
 
-Não há triggers ou functions associadas diretamente.
+| Objeto | Tipo | Descrição |
+|---|---|---|
+| `public.set_updated_at()` | Function | Atualiza automaticamente `updated_at` para `NOW()`. |
+| `trg_espetaculo_updated_at` | Trigger | Executada `BEFORE UPDATE ON espetaculo`; chama `public.set_updated_at()`. |
 
 ### 7. Tabela `espetaculo_categoria`
 
@@ -887,7 +932,7 @@ Entidade transacional / agenda de apresentações.
 | `preco_maximo` | `NUMERIC(10,2)` | Sim | - | - | `CHECK (preco_maximo >= 0)` | Maior preço disponível para a sessão. |
 | `disponibilidade` | `INTEGER` | Não | `0` | - | `CHECK (disponibilidade >= 0)` | Quantidade disponível de ingressos ou assentos. |
 | `link_compra` | `TEXT` | Sim | - | - | - | URL para compra de ingressos. |
-| `created_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de criação da sessão. |
+| `created_at` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de criação da sessão. |
 
 #### Constraints
 
@@ -898,6 +943,7 @@ Entidade transacional / agenda de apresentações.
 | Check implícito | Check | `preco_maximo >= 0` |
 | Check implícito | Check | `disponibilidade >= 0` |
 | `chk_preco_intervalo` | Check | `preco_maximo IS NULL OR preco_minimo IS NULL OR preco_maximo >= preco_minimo` |
+| `uq_sessao_espetaculo_teatro_data_horario` | Unique | `(id_espetaculo, id_teatro, data, horario)` |
 | FK implícita | Foreign Key | `id_espetaculo -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
 | FK implícita | Foreign Key | `id_teatro -> teatro(id_teatro) ON DELETE RESTRICT` |
 
@@ -915,6 +961,7 @@ Entidade transacional / agenda de apresentações.
 | `idx_sessao_espetaculo` | `id_espetaculo` | Otimiza consultas de sessões por espetáculo. |
 | `idx_sessao_data` | `data` | Otimiza consultas por data. |
 | `idx_sessao_teatro` | `id_teatro` | Otimiza consultas de sessões por teatro. |
+| `idx_sessao_espetaculo_data_horario` | `id_espetaculo, data, horario` | Cobre consulta de sessões de um espetáculo já ordenadas por data/horário; criado na migration `06_indexes.sql`. |
 
 #### Triggers e Functions
 
@@ -948,7 +995,7 @@ Entidade transacional / associativa com atributos.
 | `id_espetaculo` | `INTEGER` | Não | - | FK | Referencia `espetaculo(id_espetaculo) ON DELETE CASCADE` | Espetáculo avaliado. |
 | `nota` | `NUMERIC(4,2)` | Não | - | - | `CHECK (nota BETWEEN 0 AND 5)` | Nota atribuída pelo usuário. |
 | `comentario` | `TEXT` | Sim | - | - | - | Comentário textual opcional. |
-| `created_at` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora da avaliação. |
+| `created_at` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora da avaliação. |
 
 #### Constraints
 
@@ -1005,7 +1052,7 @@ Entidade transacional / saída de algoritmo de recomendação.
 | `tipo_algoritmo` | `VARCHAR(50)` | Não | - | - | `chk_tipo_algoritmo` | Algoritmo utilizado para gerar a recomendação. |
 | `score_recomendacao` | `NUMERIC(8,6)` | Não | - | - | `CHECK (score_recomendacao >= 0)` | Pontuação calculada pelo algoritmo. |
 | `motivo_recomendacao` | `TEXT` | Sim | - | - | - | Explicação textual da recomendação. |
-| `data_geracao` | `TIMESTAMP` | Não | `NOW()` | - | - | Data e hora de geração da recomendação. |
+| `data_geracao` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de geração da recomendação. |
 | `prioridade_manual` | `BOOLEAN` | Não | `FALSE` | - | - | Indica se houve priorização editorial ou manual. |
 | `referencia_origem_id` | `VARCHAR(50)` | Sim | - | - | - | Identificador externo ou referência da origem da recomendação. |
 
@@ -1015,7 +1062,7 @@ Entidade transacional / saída de algoritmo de recomendação.
 |---|---|---|
 | `recomendacao_pkey` | Primary Key | `id_recomendacao` |
 | Check implícito | Check | `score_recomendacao >= 0` |
-| `chk_tipo_algoritmo` | Check | `tipo_algoritmo IN ('k-NN', 'SVD', 'k-means')` |
+| `chk_tipo_algoritmo` | Check | `public.is_tipo_algoritmo_valido(tipo_algoritmo)` (após migration `08_...`; a versão inicial usava lista literal) |
 | FK implícita | Foreign Key | `id_usuario -> usuario(id_usuario) ON DELETE CASCADE` |
 | FK implícita | Foreign Key | `id_espetaculo -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
 
@@ -1097,7 +1144,69 @@ Entidade transacional / saída global de algoritmo de recomendação item-item.
 
 A constraint `chk_tipo_algoritmo_similaridade` delega a validação à função `public.is_tipo_algoritmo_valido(TEXT)` — mesma função usada por `recomendacao`. Centralizar a lista de algoritmos aceitos em um único lugar evita divergência entre as duas tabelas.
 
-### 13. Tabela `auditoria`
+### 13. Tabela `espetaculo_midia`
+
+#### Descrição
+
+Armazena metadados das mídias dos espetáculos já enviadas ao Supabase Storage. A tabela não guarda binários: registra apenas `bucket`, `path`, tipo de mídia, texto alternativo e ordem de exibição. Adicionada na migration [`09_espetaculo_midia.sql`](migrations/09_espetaculo_midia.sql).
+
+#### Tipo de Tabela
+
+Tabela de metadados / associação com Storage.
+
+#### Políticas de Row Level Security
+
+| Política | Operação | Regra |
+|---|---|---|
+| `espetaculo_midia: leitura publica` | `SELECT` | Permite leitura pública: `USING (true)`. |
+| `espetaculo_midia: escrita por administradores` | `ALL` | Restringe inserção, atualização e remoção a usuários com `tipo_usuario = 'administrador'`. |
+
+#### Colunas
+
+| Coluna | Tipo | Nulo? | Default | PK / FK | Restrições | Descrição |
+|---|---|---|---|---|---|---|
+| `id_midia` | `SERIAL` | Não | Sequência automática | PK | - | Identificador único da mídia. |
+| `id_espetaculo` | `INTEGER` | Não | - | FK | Referencia `espetaculo(id_espetaculo) ON DELETE CASCADE` | Espetáculo associado à mídia. |
+| `tipo_midia` | `VARCHAR(40)` | Não | - | - | `chk_espetaculo_midia_tipo` | Tipo de uso da imagem no catálogo/detalhe. |
+| `storage_bucket` | `VARCHAR(100)` | Não | `'espetaculos'` | - | `uq_espetaculo_midia_bucket_path` | Bucket do Supabase Storage. |
+| `storage_path` | `TEXT` | Não | - | - | `uq_espetaculo_midia_bucket_path` | Caminho do objeto dentro do bucket. |
+| `alt_text` | `TEXT` | Sim | - | - | - | Texto alternativo para acessibilidade. |
+| `ordem_exibicao` | `INTEGER` | Não | `1` | - | `CHECK (ordem_exibicao > 0)` | Ordem da mídia dentro do tipo. |
+| `created_at` | `TIMESTAMPTZ` | Não | `NOW()` | - | - | Data e hora de criação do registro. |
+
+#### Constraints
+
+| Nome | Tipo | Definição |
+|---|---|---|
+| `espetaculo_midia_pkey` | Primary Key | `id_midia` |
+| `chk_espetaculo_midia_tipo` | Check | `tipo_midia IN ('catalog_card','catalog_hero_background','catalog_hero_artwork','detail_image')` |
+| Check implícito | Check | `ordem_exibicao > 0` |
+| `uq_espetaculo_midia_tipo_ordem` | Unique | `(id_espetaculo, tipo_midia, ordem_exibicao)` |
+| `uq_espetaculo_midia_bucket_path` | Unique | `(storage_bucket, storage_path)` |
+| FK implícita | Foreign Key | `id_espetaculo -> espetaculo(id_espetaculo) ON DELETE CASCADE` |
+
+#### Relacionamentos
+
+| Tipo | Tabela / Coluna | Cardinalidade |
+|---|---|---|
+| FK | `espetaculo(id_espetaculo)` <- `espetaculo_midia(id_espetaculo)` | Um espetáculo pode possuir várias mídias. |
+| Referência externa | Supabase Storage bucket `espetaculos` | `storage_bucket` + `storage_path` apontam para objetos armazenados fora do schema `public`. |
+
+#### Índices
+
+| Índice | Colunas | Objetivo |
+|---|---|---|
+| `idx_espetaculo_midia_espetaculo_tipo` | `id_espetaculo, tipo_midia` | Otimiza consulta das mídias de um espetáculo por tipo de uso. |
+
+Também são criados índices automáticos pela chave primária e pelas constraints `UNIQUE`.
+
+#### Triggers e Functions
+
+Não há triggers ou functions associadas diretamente.
+
+> A migration também tenta garantir o bucket público `espetaculos` e suas policies no schema `storage` quando esse schema está disponível. Em Docker local com apenas `00_supabase_compat.sql`, esse bloco é ignorado. A convenção completa de paths está em [`supabase_storage_espetaculos.md`](supabase_storage_espetaculos.md).
+
+### 14. Tabela `auditoria`
 
 #### Descrição
 
@@ -1158,7 +1267,7 @@ A tabela é **desacoplada por design** — não declara chaves estrangeiras. O v
 
 Alimentada pela função de trigger genérica `public.registrar_auditoria()` (`SECURITY DEFINER`), instalada como 8 triggers `AFTER INSERT OR UPDATE OR DELETE` — uma por tabela transacional: `usuario`, `espetaculo`, `teatro`, `ator`, `sessao`, `avaliacao`, `recomendacao` e `similaridade_item`. A função recebe o nome da coluna de PK da tabela auditada como argumento (`TG_ARGV[0]`) para preencher `registro_id`. Detalhes operacionais na seção [Rastreabilidade de Transações](#rastreabilidade-de-transações).
 
-### 14. Relacionamentos Gerais do Modelo
+### 15. Relacionamentos Gerais do Modelo
 
 | Relacionamento | Cardinalidade | Implementação |
 |---|---|---|
@@ -1172,8 +1281,10 @@ Alimentada pela função de trigger genérica `public.registrar_auditoria()` (`S
 | `espetaculo` -> `avaliacao` | 1:N | `avaliacao.id_espetaculo`. |
 | `usuario` -> `recomendacao` | 1:N | `recomendacao.id_usuario`. |
 | `espetaculo` -> `recomendacao` | 1:N | `recomendacao.id_espetaculo`. |
+| `espetaculo` -> `similaridade_item` | 1:N | `similaridade_item.id_espetaculo_origem` e `similaridade_item.id_espetaculo_similar`. |
+| `espetaculo` -> `espetaculo_midia` | 1:N | `espetaculo_midia.id_espetaculo`. |
 
-### 15. Índices Criados
+### 16. Índices Criados
 
 A tabela abaixo consolida todos os índices explícitos do schema. Os marcados com `*` foram adicionados pelas migrations incrementais (`src/database/migrations/`).
 
@@ -1199,10 +1310,11 @@ A tabela abaixo consolida todos os índices explícitos do schema. Os marcados c
 | `idx_auditoria_tabela_registro` * | `auditoria` | `tabela, registro_id` | `09_rastreabilidade_transacoes.sql` | Histórico de um registro específico. |
 | `idx_auditoria_registrado_em` * | `auditoria` | `registrado_em DESC` | `09_rastreabilidade_transacoes.sql` | Varredura cronológica da trilha. |
 | `idx_auditoria_usuario` * | `auditoria` | `id_usuario_responsavel` | `09_rastreabilidade_transacoes.sql` | Operações atribuídas a um ator. |
+| `idx_espetaculo_midia_espetaculo_tipo` * | `espetaculo_midia` | `id_espetaculo, tipo_midia` | `09_espetaculo_midia.sql` | Otimiza consulta das mídias de um espetáculo por tipo de uso. |
 
-Além desses 20 índices nomeados, o PostgreSQL cria automaticamente índices para:
+Além desses 21 índices nomeados, o PostgreSQL cria automaticamente índices para:
 - Toda chave primária declarada.
-- Toda constraint `UNIQUE`, incluindo a `uq_sessao_espetaculo_teatro_data_horario` (`id_espetaculo, id_teatro, data, horario`) adicionada em `07_constraints_sessao_usuario.sql` e a `uq_similaridade_item` (`id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo`) presente desde o schema inicial.
+- Toda constraint `UNIQUE`, incluindo a `uq_sessao_espetaculo_teatro_data_horario` (`id_espetaculo, id_teatro, data, horario`) adicionada em `07_constraints_sessao_usuario.sql`, a `uq_similaridade_item` (`id_espetaculo_origem, id_espetaculo_similar, tipo_algoritmo`) presente desde o schema inicial e as constraints `uq_espetaculo_midia_tipo_ordem` e `uq_espetaculo_midia_bucket_path` de `espetaculo_midia`.
 
 ## Regras de Negócio Implementadas no Banco de Dados
 
@@ -1228,7 +1340,7 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-16 | A capacidade do teatro, quando informada, deve ser maior que zero. | Constraint `CHECK`. | `teatro.capacidade CHECK (capacidade > 0)` |
 | RN-BD-17 | Um teatro com sessões associadas não pode ser excluído. | Chave estrangeira com `ON DELETE RESTRICT`. | `sessao.id_teatro -> teatro(id_teatro)` |
 | RN-BD-18 | Toda sessão deve estar vinculada a um espetáculo e a um teatro. | Chaves estrangeiras obrigatórias (`NOT NULL`). | `sessao.id_espetaculo`, `sessao.id_teatro` |
-| RN-BD-19 | A exclusão de um espetáculo deve remover suas sessões, avaliações, recomendações e associações de catálogo. | Chaves estrangeiras com `ON DELETE CASCADE`. | `sessao`, `avaliacao`, `recomendacao`, `espetaculo_categoria`, `espetaculo_ator` |
+| RN-BD-19 | A exclusão de um espetáculo deve remover suas sessões, avaliações, recomendações, similaridades, mídias e associações de catálogo. | Chaves estrangeiras com `ON DELETE CASCADE`. | `sessao`, `avaliacao`, `recomendacao`, `similaridade_item`, `espetaculo_midia`, `espetaculo_categoria`, `espetaculo_ator` |
 | RN-BD-20 | Preços de sessão não podem ser negativos e o preço máximo não pode ser menor que o preço mínimo. | Constraints `CHECK`. | `sessao.preco_minimo`, `sessao.preco_maximo`, `chk_preco_intervalo` |
 | RN-BD-21 | A disponibilidade de uma sessão não pode ser negativa. | Constraint `CHECK` e valor padrão. | `sessao.disponibilidade DEFAULT 0 CHECK (disponibilidade >= 0)` |
 | RN-BD-22 | Cada usuário pode avaliar um mesmo espetáculo apenas uma vez. | Constraint `UNIQUE`. | `avaliacao(id_usuario, id_espetaculo)` |
@@ -1239,7 +1351,7 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-27 | O algoritmo de recomendação deve pertencer à lista de algoritmos aceitos. | Constraint `CHECK`. | `chk_tipo_algoritmo` |
 | RN-BD-28 | O score de recomendação não pode ser negativo. | Constraint `CHECK`. | `recomendacao.score_recomendacao CHECK (score_recomendacao >= 0)` |
 | RN-BD-29 | Recomendações devem ser removidas quando o usuário ou o espetáculo associado forem excluídos. | Chaves estrangeiras com `ON DELETE CASCADE`. | `recomendacao.id_usuario`, `recomendacao.id_espetaculo` |
-| RN-BD-30 | Dados de catálogo e agenda devem ser públicos para consulta. | Políticas de Row Level Security com `USING (true)`. | Políticas de `SELECT` em `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao` e `avaliacao` |
+| RN-BD-30 | Dados de catálogo, agenda, avaliações públicas e mídias de espetáculos devem ser públicos para consulta. | Políticas de Row Level Security com `USING (true)`. | Políticas de `SELECT` em `categoria`, `ator`, `teatro`, `espetaculo`, `espetaculo_categoria`, `espetaculo_ator`, `sessao`, `avaliacao` e `espetaculo_midia` |
 | RN-BD-31 | Toda atualização em `espetaculo` deve registrar automaticamente a hora da modificação em `updated_at`, independente da aplicação setar o campo. | Função genérica reutilizável `public.set_updated_at()` + trigger `BEFORE UPDATE`. A função pode ser ligada a outras tabelas no futuro. | `04_trigger_updated_at_espetaculo.sql` — `public.set_updated_at()`, `trg_espetaculo_updated_at` |
 | RN-BD-32 | Não pode haver mais de uma sessão para o mesmo espetáculo, no mesmo teatro, na mesma data e horário. | Constraint `UNIQUE` composta. | `07_constraints_sessao_usuario.sql` — `uq_sessao_espetaculo_teatro_data_horario` |
 | RN-BD-33 | A data de nascimento, quando informada, deve estar entre 1900-01-01 e a data atual; `NULL` continua aceito para perfis sem cadastro de data. | Constraint `CHECK` (semântica three-valued logic do SQL ignora `NULL`). | `07_constraints_sessao_usuario.sql` — `ck_usuario_data_nascimento` |
@@ -1250,6 +1362,10 @@ Esta seção consolida as regras de negócio que devem ser garantidas diretament
 | RN-BD-38 | A trilha de auditoria só pode ser lida por administradores. | Política de Row Level Security restrita a `tipo_usuario = 'administrador'`; inserções via trigger `SECURITY DEFINER`. | `09_rastreabilidade_transacoes.sql` — política `auditoria: leitura por administradores` |
 | RN-BD-39 | Somente administradores podem inserir, atualizar ou excluir dados do catálogo e da agenda; a leitura pública existente deve ser preservada. | Função `public.is_admin()` e policies RLS separadas para `INSERT`, `UPDATE` e `DELETE` nas sete tabelas do catálogo. | `12_controle_acesso_administrativo_catalogo.sql` — `espetaculo`, `teatro`, `ator`, `categoria`, `espetaculo_categoria`, `espetaculo_ator` e `sessao` |
 | RN-BD-40 | Somente administradores podem inserir, atualizar ou excluir similaridades item-item; autores podem atualizar apenas as próprias avaliações sem alterar a titularidade. | Policies RLS com `public.is_admin()` em `similaridade_item` e `auth.uid() = id_usuario` em `USING` e `WITH CHECK` de `avaliacao`. | `13_rls_similaridade_item_avaliacao.sql` |
+| RN-BD-41 | Cada mídia de espetáculo deve ter tipo conhecido, ordem positiva e path único dentro do bucket. | Tabela `espetaculo_midia` com CHECKs, UNIQUEs e FK com `ON DELETE CASCADE`; policies permitem leitura pública e escrita administrativa. | `09_espetaculo_midia.sql` — `chk_espetaculo_midia_tipo`, `uq_espetaculo_midia_tipo_ordem`, `uq_espetaculo_midia_bucket_path` |
+| RN-BD-42 | Usuários administradores podem ser criados por fluxo administrativo do Supabase Auth sem promover cadastros comuns por padrão. | `public.handle_new_user()` lê `raw_app_meta_data.tipoUsuario` ou `raw_app_meta_data.tipo_usuario`, aceita apenas `cadastrado`/`administrador` e normaliza demais valores para `cadastrado`. | `14_admin_metadata_usuario.sql` |
+| RN-BD-43 | Usuários comuns não podem se autopromover alterando diretamente `usuario.tipo_usuario`. | Trigger `BEFORE UPDATE OF tipo_usuario` bloqueia alterações feitas por usuário autenticado que não seja administrador. | `15_bloqueia_autopromocao_usuario.sql` — `public.bloquear_autopromocao_usuario()`, `trg_bloqueia_autopromocao_usuario` |
+| RN-BD-44 | Artefatos de modelo de recomendação devem ficar em bucket privado separado das mídias públicas do catálogo. | Bucket Supabase Storage `ml-artifacts` privado, com limite de 100 MiB e MIME types permitidos para zip, json, csv e texto. | `10_supabase_storage_buckets.sql` |
 
 > **Sobre a decisão `VARCHAR + CHECK + função` no lugar de `ENUM` para `tipo_algoritmo`:** ENUMs nativos do PostgreSQL exigem `ALTER TYPE ... ADD VALUE` para incluir novos valores, operação que adquire lock na tabela. O time optou por `VARCHAR(50)` + constraint `CHECK` que chama a função `public.is_tipo_algoritmo_valido()`. Adicionar um algoritmo passa a ser um `CREATE OR REPLACE FUNCTION`, sem reescrita de constraint em duas tabelas e sem impacto operacional.
 
@@ -1282,8 +1398,8 @@ Esta seção documenta o comportamento esperado dos quatro índices criados em `
 
 - **Query:** `SELECT * FROM sessao WHERE id_espetaculo = 1 ORDER BY data, horario`
 - **Índice:** `idx_sessao_espetaculo_data_horario` (B-tree composto)
-- **Plano esperado em produção:** `Index Scan using idx_sessao_espetaculo_data_horario` — o índice composto cobre o filtro e a ordenação sem sort adicional.
-- **Observação:** elimina o custo de sort em espetáculos com muitas sessões.
+- **Plano esperado em produção:** `Index Scan using idx_sessao_espetaculo_data_horario` — o índice composto cobre o filtro e, quando o otimizador estima que o `Index Scan` é mais barato, entrega as linhas já ordenadas sem um nó de `Sort` separado.
+- **Observação:** elimina o custo de sort em espetáculos com **muitas** sessões. **Ressalva de evidência:** na massa sintética do teste de carga (~20 mil sessões distribuídas por poucos espetáculos), o planner escolheu `Bitmap Heap Scan` com um `Sort` por cima — o caminho "sem sort" depende da seletividade do filtro por espetáculo e do volume por chave; o plano `Index Scan` ordenado se confirma quando há muitas sessões para um mesmo espetáculo. O `EXPLAIN ANALYZE` real dessa query no volume testado deve ser anexado em vez de assumir o plano ideal.
 
 > Os planos acima foram validados com `EXPLAIN` no ambiente Supabase com dados de seed. Com volume reduzido o PostgreSQL opta por `Seq Scan`, que é o comportamento correto — o otimizador escolhe automaticamente o índice quando o volume justificar.
 
@@ -1315,8 +1431,8 @@ A pasta [`src/database/migrations/`](migrations/) contém alterações increment
 ### Princípios
 
 1. **`01_create_database.sql` é imutável para alterações incrementais.** Qualquer mudança de schema posterior ao bootstrap deve ser feita via migration nova em `migrations/`. O arquivo original só é editado em cenários de reset completo (ambiente de desenvolvimento).
-2. **Cada migration tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação).
-3. **Ordem importa.** A numeração dupla (`04_`, `05_`, `06_`, `07_`, `08_`, `09_`, `10_`, `11_`, `12_`, `13_`) define a ordem obrigatória de aplicação. Migrations seguintes podem depender de objetos criados pelas anteriores (a migration `08`, por exemplo, depende de `recomendacao` e `similaridade_item` existirem desde `01`; a `12` depende de `usuario` e das tabelas públicas do catálogo; a `13` depende de `public.is_admin()` criada ou validada pela `12`).
+2. **Cada migration de schema tem um rollback par.** O arquivo de reversão tem o mesmo prefixo numérico + sufixo `_rollback.sql` e desfaz idempotentemente o que a migration aplicou. O rollback deve incluir avisos quando a reversão for destrutiva (perda de informação, dependências externas, mudança de comportamento da aplicação). Os scripts `10_seed_catalogo_incremental.sql` e `11_seed_recomendacao_incremental.sql` são seeds incrementais idempotentes e não possuem rollback par.
+3. **Ordem importa.** A numeração (`04_` a `15_`) define a ordem obrigatória de aplicação, mas existem prefixos repetidos para frentes distintas (`09_espetaculo_midia.sql`/`09_rastreabilidade_transacoes.sql` e `10_seed_catalogo_incremental.sql`/`10_supabase_storage_buckets.sql`). Nesses casos, respeite também o cabeçalho do arquivo e as dependências funcionais: `09_espetaculo_midia.sql` depende do catálogo seedado; `11_seed_recomendacao_incremental.sql` depende do catálogo completo e da `08`; a `12` depende de `usuario` e das tabelas públicas do catálogo; a `13` depende de `public.is_admin()` criada ou validada pela `12`; a `15` também depende de `public.is_admin()`.
 4. **Aplicação manual.** As migrations **não** são executadas automaticamente pelo Docker — apenas `01` e `02` rodam na inicialização do volume. Migrations em `migrations/` precisam ser aplicadas explicitamente via SQL Editor do Supabase ou via `psql`.
 
 ### Como aplicar uma migration
@@ -1334,6 +1450,15 @@ A pasta [`src/database/migrations/`](migrations/) contém alterações increment
 psql -h <host> -p <porta> -U postgres -d postgres \
   -f src/database/migrations/NN_*.sql
 ```
+
+Para ambientes parcialmente populados, use primeiro:
+
+```bash
+psql -h <host> -p <porta> -U postgres -d postgres \
+  -f src/database/diagnostico_seed_catalogo.sql
+```
+
+Esse diagnóstico é não destrutivo e ajuda a confirmar se os seeds incrementais são necessários antes de aplicá-los.
 
 ### Como reverter
 
@@ -1491,6 +1616,22 @@ Execution Time: 0.249 ms          -- índice composto cobre filtro + ordenação
 ->  Bitmap Index Scan on idx_recomendacao_usuario
       Index Cond: (id_usuario = '...')
 ```
+
+> **Cobertura de evidência por índice.** Dos quatro índices da migration `06`, três foram comprovados em plano sob volume: `idx_espetaculo_status_popularidade` (acima), `idx_espetaculo_genero` (`Index Scan` para filtro de gênero) e `idx_recomendacao_usuario` (acima). O índice GIN trigram `idx_espetaculo_titulo_trgm` **não** foi exercitado em `EXPLAIN ANALYZE` porque a massa sintética usa títulos homogêneos (`"Espetáculo Carga N"`), sem termo seletivo que justifique o `Bitmap Index Scan` — é hoje o índice menos comprovado em execução. Para evidenciá-lo, gerar a massa com títulos variados e reexecutar a busca por título com um termo seletivo.
+
+### Meta de desempenho (vínculo com RNF)
+
+Os números acima são lidos contra uma meta explícita de desempenho da camada de dados, derivada do **RNF06** (resposta fim-a-fim ≤ 3 s sob 200 usuários simultâneos, seção 3.2 do `Projeto.md`): como o banco é apenas uma fração do tempo total da requisição, o orçamento de latência reservado a ele é **≤ 50 ms por query** sob carga, com **0 falhas** e throughput mínimo compatível com o pico esperado.
+
+| Métrica | Meta (camada de dados) | Medido (pgbench) | Resultado |
+|---|---|---|---|
+| Latência média por query (leitura) | ≤ 50 ms | ~1,3–1,6 ms | ✅ atende com folga |
+| Latência média de escrita + auditoria | ≤ 50 ms | 3,77 ms | ✅ atende |
+| Throughput de leitura | ≥ 500 tx/s | 2.681 tx/s | ✅ atende |
+| Throughput de escrita | ≥ 500 tx/s | 5.306 tx/s | ✅ atende |
+| Taxa de falhas | 0% | 0,000% | ✅ atende |
+
+> **Ressalva metodológica:** o pgbench reporta latência **média** por statement; a meta acima é definida sobre essa média. Uma meta de **p95** por endpoint exige captura do percentil na próxima rodada (`pgbench` com `--latency-limit` / análise do log por transação) e fica registrada como evolução do teste de carga.
 
 ### Análise
 

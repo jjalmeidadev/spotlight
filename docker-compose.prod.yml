@@ -1,0 +1,155 @@
+name: spotlight-prod
+
+x-dotnet-prod: &dotnet-prod
+  restart: unless-stopped
+  expose:
+    - "8080"
+  read_only: true
+  tmpfs:
+    - /tmp
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  networks:
+    - backend
+
+x-health-ready: &health-ready
+  test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health/ready || exit 1"]
+  interval: 30s
+  timeout: 5s
+  retries: 5
+  start_period: 20s
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: runtime
+      args:
+        EXPO_PUBLIC_SUPABASE_URL: ${EXPO_PUBLIC_SUPABASE_URL:?Configure EXPO_PUBLIC_SUPABASE_URL no .env}
+        EXPO_PUBLIC_SUPABASE_ANON_KEY: ${EXPO_PUBLIC_SUPABASE_ANON_KEY:?Configure EXPO_PUBLIC_SUPABASE_ANON_KEY no .env}
+        EXPO_PUBLIC_API_BASE_URL: ${PROD_EXPO_PUBLIC_API_BASE_URL:-/api}
+        EXPO_PUBLIC_AUTH_REDIRECT_URL: ${EXPO_PUBLIC_AUTH_REDIRECT_URL:-}
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    depends_on:
+      gateway:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - public
+      - backend
+
+  gateway:
+    <<: *dotnet-prod
+    build:
+      context: ./src/backend/api-gateway
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    depends_on:
+      catalogo:
+        condition: service_healthy
+      usuario:
+        condition: service_healthy
+      recomendacao:
+        condition: service_healthy
+      geolocalizacao:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  catalogo:
+    <<: *dotnet-prod
+    build:
+      context: ./src/backend/services/catalog
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING:?Configure DATABASE_CONNECTION_STRING no .env}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:?Configure SUPABASE_JWT_SECRET no .env}
+      SUPABASE_AUTH_JWKS_URL: ${SUPABASE_AUTH_JWKS_URL:-}
+    healthcheck: *health-ready
+
+  usuario:
+    <<: *dotnet-prod
+    build:
+      context: ./src/backend/services/user
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING:?Configure DATABASE_CONNECTION_STRING no .env}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:?Configure SUPABASE_JWT_SECRET no .env}
+      SUPABASE_AUTH_JWKS_URL: ${SUPABASE_AUTH_JWKS_URL:-}
+      MONGODB_CONNECTION_STRING: ${MONGODB_CONNECTION_STRING:?Configure MONGODB_CONNECTION_STRING no .env}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-spotlight_telemetry}
+      MONGODB_TELEMETRY_COLLECTION: ${MONGODB_TELEMETRY_COLLECTION:-interacoes}
+    healthcheck: *health-ready
+
+  recomendacao:
+    <<: *dotnet-prod
+    build:
+      context: ./src/backend/services/recommendation
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      DATABASE_CONNECTION_STRING: ${DATABASE_CONNECTION_STRING:?Configure DATABASE_CONNECTION_STRING no .env}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:?Configure SUPABASE_JWT_SECRET no .env}
+      SUPABASE_AUTH_JWKS_URL: ${SUPABASE_AUTH_JWKS_URL:-}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      RecommendationModel__Enabled: ${RECOMMENDATION_MODEL_ENABLED:-false}
+      RecommendationModel__ModelPath: /app/model-artifacts/recomendacao_incrementada_mlnet.zip
+      RecommendationModel__CandidateCsvPath: /app/model-artifacts/recomendacao_balanceado.csv
+      RecommendationModel__SimilaritiesPath: /app/model-artifacts/item_similarities.json
+      SupabaseModelArtifacts__Enabled: ${SUPABASE_MODEL_ARTIFACTS_ENABLED:-false}
+      SupabaseModelArtifacts__Bucket: ${SUPABASE_MODEL_BUCKET:-ml-artifacts}
+      SupabaseModelArtifacts__TargetDirectory: /app/model-artifacts
+    volumes:
+      - recomendacao_model_artifacts:/app/model-artifacts
+    healthcheck: *health-ready
+
+  geolocalizacao:
+    <<: *dotnet-prod
+    build:
+      context: ./src/backend/services/geolocation
+      dockerfile: Dockerfile
+      target: runtime
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      NOMINATIM_BASE_URL: ${NOMINATIM_BASE_URL:-https://nominatim.openstreetmap.org}
+      NOMINATIM_USER_AGENT: ${NOMINATIM_USER_AGENT:-spotlight-inteli-g04/1.0}
+    healthcheck: *health-ready
+
+networks:
+  public:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  recomendacao_model_artifacts:

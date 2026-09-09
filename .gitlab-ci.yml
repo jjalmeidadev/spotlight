@@ -1,0 +1,144 @@
+image: mcr.microsoft.com/dotnet/sdk:9.0
+
+stages:
+  - build
+  - test
+  - publish
+
+variables:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget/packages"
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  key: "nuget-$CI_COMMIT_REF_SLUG"
+  paths:
+    - .nuget/packages/
+    - .npm/
+
+build:
+  stage: build
+  script:
+    - dotnet restore src/backend/Spotlight.sln
+    - >-
+      dotnet build src/backend/Spotlight.sln
+      --no-restore
+      --configuration Release
+
+test:unit:
+  stage: test
+  needs:
+    - build
+  script:
+    - >-
+      dotnet test src/backend/Spotlight.sln
+      --configuration Release
+      --filter "Category!=Integration"
+      --results-directory TestResults
+      --logger "trx;LogFilePrefix=results"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - TestResults/*.trx
+
+test:frontend-typecheck:
+  stage: test
+  image: node:22-bullseye
+  needs: []
+  cache:
+    key: "npm-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .npm/
+  script:
+    - npm ci --no-audit --fund=false
+    - npm run typecheck
+
+test:rnf-structure:
+  stage: test
+  needs: []
+  script:
+    - >-
+      bash src/backend/tests/non-functional/scripts/validate-structure.sh
+      | tee rnf-structure-validation.txt
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - rnf-structure-validation.txt
+
+train:model-artifacts:
+  stage: test
+  needs:
+    - build
+  script:
+    - >-
+      dotnet restore
+      src/backend/ml-engine/training/Spotlight.Recommendation.ModelTraining/Spotlight.Recommendation.ModelTraining.csproj
+    - >-
+      dotnet run
+      --project src/backend/ml-engine/training/Spotlight.Recommendation.ModelTraining/Spotlight.Recommendation.ModelTraining.csproj
+      --configuration Release
+      --
+      --postgres-csv src/dataset/recomendacao_balanceado.csv
+      --mongo-json src/dataset/interacoes_mongo_exemplo.jsonl
+      --artifacts-dir src/models/artifacts
+      --reports-dir src/models/reports
+    - test -f src/models/artifacts/recomendacao_incrementada_mlnet.zip
+    - test -f src/models/artifacts/item_similarities.json
+    - test -f src/dataset/recomendacao_balanceado.csv
+  artifacts:
+    when: on_success
+    expire_in: 1 week
+    paths:
+      - src/models/artifacts/recomendacao_incrementada_mlnet.zip
+      - src/models/artifacts/item_similarities.json
+      - src/models/reports/recomendacao_mlnet_metrics.json
+      - src/models/reports/README_modelo_classificacao_recomendacao.md
+      - src/models/reports/recomendacao_mlnet_exemplos.csv
+
+publish:model-artifacts:
+  stage: publish
+  needs:
+    - job: train:model-artifacts
+      artifacts: true
+    - job: test:unit
+      artifacts: false
+  image:
+    name: curlimages/curl:8.10.1
+    entrypoint: [""]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: on_success
+    - when: never
+  variables:
+    SUPABASE_MODEL_BUCKET: "ml-artifacts"
+    SUPABASE_MODEL_PREFIX: "models/recomendacao/$CI_COMMIT_SHORT_SHA"
+    SUPABASE_MODEL_ALIAS_PREFIX: "models/recomendacao/current"
+  script:
+    - test -n "$SUPABASE_URL"
+    - test -n "$SUPABASE_SERVICE_ROLE_KEY"
+    - test -f src/models/artifacts/recomendacao_incrementada_mlnet.zip
+    - test -f src/models/artifacts/item_similarities.json
+    - test -f src/dataset/recomendacao_balanceado.csv
+    - |
+      upload_artifact() {
+        local source_file="$1"
+        local object_path="$2"
+        local content_type="$3"
+        curl --fail --show-error --silent \
+          --request POST \
+          --header "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+          --header "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+          --header "x-upsert: true" \
+          --header "Content-Type: ${content_type}" \
+          --data-binary "@${source_file}" \
+          "${SUPABASE_URL%/}/storage/v1/object/${SUPABASE_MODEL_BUCKET}/${object_path}"
+      }
+    - upload_artifact src/models/artifacts/recomendacao_incrementada_mlnet.zip "${SUPABASE_MODEL_PREFIX}/recomendacao_incrementada_mlnet.zip" "application/zip"
+    - upload_artifact src/models/artifacts/item_similarities.json "${SUPABASE_MODEL_PREFIX}/item_similarities.json" "application/json"
+    - upload_artifact src/dataset/recomendacao_balanceado.csv "${SUPABASE_MODEL_PREFIX}/recomendacao_balanceado.csv" "text/csv"
+    - upload_artifact src/models/artifacts/recomendacao_incrementada_mlnet.zip "${SUPABASE_MODEL_ALIAS_PREFIX}/recomendacao_incrementada_mlnet.zip" "application/zip"
+    - upload_artifact src/models/artifacts/item_similarities.json "${SUPABASE_MODEL_ALIAS_PREFIX}/item_similarities.json" "application/json"
+    - upload_artifact src/dataset/recomendacao_balanceado.csv "${SUPABASE_MODEL_ALIAS_PREFIX}/recomendacao_balanceado.csv" "text/csv"

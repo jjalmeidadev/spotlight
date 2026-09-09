@@ -1,0 +1,5 @@
+ datname  | numbackends | xact_commit | xact_rollback | blks_read | blks_hit | tup_returned | tup_fetched | tup_inserted 
+----------+-------------+-------------+---------------+-----------+----------+--------------+-------------+--------------
+ postgres |          16 |     1785101 |             0 |     32422 | 22985265 |    248927824 |     7813361 |       490008
+(1 row)
+

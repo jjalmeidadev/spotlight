@@ -1,0 +1,272 @@
+  Determinando os projetos a serem restaurados...
+  C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recommendation.Tests\Spotlight.Recommendation.Tests.csproj restaurado (em 5,16 seg).
+  C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Catalog.Tests\Spotlight.Catalog.Tests.csproj restaurado (em 5,15 seg).
+  C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.User.Tests\Spotlight.User.Tests.csproj restaurado (em 5,15 seg).
+  C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocation.Tests\Spotlight.Geolocation.Tests.csproj restaurado (em 5,16 seg).
+  6 de 10 projetos estão atualizados para restauração.
+  Spotlight.Recommendation -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\recommendation\bin\Debug\net9.0\Spotlight.Recommendation.dll
+  Spotlight.Geolocation -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\geolocation\bin\Debug\net9.0\Spotlight.Geolocation.dll
+  Spotlight.Gateway -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\api-gateway\bin\Debug\net9.0\Spotlight.Gateway.dll
+  Spotlight.Catalog -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\catalog\bin\Debug\net9.0\Spotlight.Catalog.dll
+  Spotlight.Gateway.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Gateway.Tests\bin\Debug\net9.0\Spotlight.Gateway.Tests.dll (.NETCoreApp,Version=v9.0)
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 1 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 2 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+  Spotlight.Catalog.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Catalog.Tests\bin\Debug\net9.0\Spotlight.Catalog.Tests.dll
+  Spotlight.Recommendation.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recommendation.Tests\bin\Debug\net9.0\Spotlight.Recommendation.Tests.dll
+  Spotlight.Geolocation.Tests -> C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocation.Tests\bin\Debug\net9.0\Spotlight.Geolocation.Tests.dll
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Geolocation.Tests\bin\Debug\net9.0\Spotlight.Geolocation.Tests.dll (.NETCoreApp,Version=v9.0)
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 3 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Recommendation.Tests\bin\Debug\net9.0\Spotlight.Recommendation.Tests.dll (.NETCoreApp,Version=v9.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Execução de teste para C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\tests\Spotlight.Catalog.Tests\bin\Debug\net9.0\Spotlight.Catalog.Tests.dll (.NETCoreApp,Version=v9.0)
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 4 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+1 arquivos de teste no total corresponderam ao padrão especificado.
+1 arquivos de teste no total corresponderam ao padrão especificado.
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 5 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+[xUnit.net 00:00:00.41]   Discovering: Spotlight.Geolocation.Tests
+[xUnit.net 00:00:00.42]   Discovering: Spotlight.Gateway.Tests
+[xUnit.net 00:00:00.55]   Discovered:  Spotlight.Geolocation.Tests
+[xUnit.net 00:00:00.56]   Starting:    Spotlight.Geolocation.Tests
+[xUnit.net 00:00:00.52]   Discovered:  Spotlight.Gateway.Tests
+[xUnit.net 00:00:00.52]   Starting:    Spotlight.Gateway.Tests
+[xUnit.net 00:00:01.13]   Finished:    Spotlight.Geolocation.Tests
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 6 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.16)
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComCoordenadasInvalidas_LancaValidation [246 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoHttpClientFalha_LancaConflict [13 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_ComEnderecoVazio_LancaValidation [2 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ArredondaCoordenadasEUsaCache [156 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoRespostaVazia_PropagaJsonException [25 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.ReverseGeocode_ComDisplayNameVazio_LancaNotFound [2 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiNaoRetornaLugar_LancaNotFound [2 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_QuandoApiFalha_LancaConflict [1 ms]
+  Aprovado Spotlight.Geolocalizacao.Tests.NominatimGeocodingServiceTests.Geocode_NormalizaEnderecoEUsaCache [9 ms]
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\rodada-final\tf-solution.trx
+
+Execução de Teste Bem-sucedida.
+Total de testes: 9
+     Aprovados: 9
+Tempo total: 3,6755 Segundos
+[xUnit.net 00:00:00.43]   Discovering: Spotlight.Catalog.Tests
+[xUnit.net 00:00:00.62]   Discovered:  Spotlight.Catalog.Tests
+[xUnit.net 00:00:00.63]   Starting:    Spotlight.Catalog.Tests
+[xUnit.net 00:00:00.55]   Discovering: Spotlight.Recommendation.Tests
+[xUnit.net 00:00:00.70]   Discovered:  Spotlight.Recommendation.Tests
+[xUnit.net 00:00:00.71]   Starting:    Spotlight.Recommendation.Tests
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterTeatro_QuandoNaoExiste_LancaNotFound [59 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarSessoes_QuandoEspetaculoExiste_MapeiaSessoes [76 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_ComDadosValidos_CriaEBuscaDetalhe [45 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarEspetaculos_NormalizaFiltrosEPaginacao_MapeiaResultado [21 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ExcluirEspetaculo_QuandoNaoExiste_LancaNotFound [3 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterEspetaculo_QuandoNaoExiste_LancaNotFound [2 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarAvaliacoes_QuandoEspetaculoNaoExiste_LancaNotFound [10 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_QuandoDetalheNaoExisteAposCriacao_LancaInvalidOperation [6 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarEspetaculo_ComCamposInvalidos_AcumulaErrosDeValidacao [6 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarCategoriasETeatros_MapeiamListasSimples [9 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaValida_RetornaAvaliacaoCriada [12 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterEspetaculo_QuandoExiste_MapeiaDetalheCompleto [3 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_ComDadosParciaisValidos_AtualizaEBuscaDetalhe [3 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoBaseControllerTests.Obter_DeveRetornarContratoBaseDaApiDeRecomendacao [80 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_QuandoEspetaculoNaoExiste_LancaNotFoundENaoCriaAvaliacao [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10) [70 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 25, limiteEsperado: 25) [< 1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: null) [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: -0,1) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemExiste_NormalizaLimiteEMapeiaResultado(limite: 51, limiteEsperado: 50) [< 1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaInvalida_LancaValidation(nota: 5,1) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 0, limiteEsperado: 10) [18 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_QuandoDetalheNaoExisteAposAtualizar_LancaNotFound [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_ComTituloMuitoLongo_NaoChamaRepositorio [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ExcluirEspetaculo_QuandoExiste_ChamaRepositorioSemErro [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarAvaliacoes_NormalizaPaginacaoEMapeiaUsuario [4 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ObterTeatro_QuandoExiste_MapeiaTodosOsCampos [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 999, limiteEsperado: 50) [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.AtualizarEspetaculo_QuandoRepositorioNaoAtualiza_LancaNotFound [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.ListarSessoes_QuandoEspetaculoNaoExiste_LancaNotFoundENaoListaSessoes [1 ms]
+  Aprovado Spotlight.Catalogo.Tests.CatalogoUseCasesTests.CriarAvaliacao_ComNotaLimiteEComentarioNulo_RepassaDadosParaRepositorio [2 ms]
+  Aprovado   Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_ComClaimSubValida_RetornaGuid [324 ms]
+Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: null, limiteEsperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: 20, limiteEsperado: 20) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_NormalizaLimiteEMapeiaResultado(limite: -5, limiteEsperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.RecomendacaoStrategyFactory_QuandoModeloHabilitado_EscolheStrategyMlNet [10 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_QuandoModeloHabilitado_UsaRankingDoModeloEEnriqueceNoPostgres [6 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoRepositorioFalhaAoEnriquecer_FazFallbackELogaWarning [118 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.RecomendacaoStrategyFactory_QuandoModeloDesabilitado_RetornaStrategyPostgres [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: -100, esperado: 10) [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: null, esperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: -1, esperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 1, esperado: 1) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 25, esperado: 25) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 50, esperado: 50) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 51, esperado: 50) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 0, esperado: 10) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_NormalizaLimite(entrada: 2147483647, esperado: 50) [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarSimilares_QuandoOrigemNaoExiste_LancaNotFoundENaoLista [4 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoUseCasesTests.ListarRecomendacoesMe_QuandoModeloRetornaMaisItensQueOLimite_CortaResultadoFinal [19 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_ComPredicoesDuplicadas_PreservaRankingDoModelo [35 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloLancaExcecao_FazFallbackELogaWarning [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_FiltraPredicoesSemEspetaculoMasMantemDemais [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_QuandoRepositorioRetornaListaVazia_RetornaListaVazia [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloRetornaPredicoesEEspetaculosExistem_UsaRankingDoModelo [4 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_EnvelopaResultadoDaStrategyEmListaDto [2 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloRetornaPredicoesVazias_FazFallbackParaPostgres [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoModeloLancaOperationCanceledException_NaoFazFallbackEPropaga [4 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.ListarPersonalizadasAsync_RepassaUsuarioIdECancellationTokenParaStrategy [4 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_MapeiaEntidadeParaDtoIncluindoMidias [2 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_QuandoNenhumaPredicaoTemEspetaculoConhecido_FazFallbackParaPostgres [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_QuandoPreProcessadoVazio_UsaFallbackUserBased [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.PostgresStrategy_PreservaOrdemDoRepositorio [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.RecomendacaoStrategyFactory_QuandoModeloHabilitado_RetornaStrategyMlNet [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoServiceTests.MlNetStrategy_RepassaUsuarioLimiteECancellationTokenParaModelo [1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.UsuarioContextoHttp_ComSubInvalido_RetornaNull [203 ms]
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 7 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+  Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_SemHttpContext_RetornaNull [< 1 ms]
+  Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_ComNameIdentifierValido_RetornaGuid [< 1 ms]
+  Aprovado Spotlight.Catalogo.Tests.UsuarioContextoHttpTests.UsuarioId_ComClaimInvalida_RetornaNull [< 1 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.RecomendacaoMeController_SemUsuario_LancaValidation [11 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.UsuarioContextoHttp_ComNameIdentifierValido_RetornaGuid [7 ms]
+  Aprovado Spotlight.Recomendacao.Tests.RecomendacaoControllerAndContextTests.RecomendacaoMeController_ComUsuarioValido_RetornaOkComLista [8 ms]
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 8 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+[17:59:05 DBG] Hosting starting
+[17:59:05 INF] Sincronizacao de artefatos do Supabase Storage desabilitada.
+[17:59:05 DBG] Hosting started
+[17:59:05 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
+[17:59:05 INF] Executing endpoint 'Health checks'
+[17:59:05 DBG] Running health checks
+[17:59:05 DBG] Running health check postgres
+[17:59:05 ERR] Health check postgres with status Unhealthy completed after 1.9784ms with message 'Connection string do banco n�o configurada.'
+[17:59:05 DBG] Health check processing with combined status Unhealthy completed after 18.2383ms
+[17:59:05 INF] Executed endpoint 'Health checks'
+[17:59:05 ERR] HTTP GET /health/ready responded 503 in 61.8745 ms
+[17:59:05 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 83.8702ms
+[17:59:05 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[17:59:05 INF] Executing endpoint 'Health checks'
+[17:59:05 DBG] Running health checks
+[17:59:05 DBG] Health check processing with combined status Healthy completed after 0.2078ms
+[17:59:05 INF] Executed endpoint 'Health checks'
+[17:59:05 INF] HTTP GET /health responded 200 in 2.7776 ms
+[17:59:05 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 4.5302ms
+[17:59:05 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[17:59:05 INF] Executing endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recommendation)'
+[17:59:05 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Recomendacao.Presentation.Controllers.PingController (Spotlight.Recommendation).
+[17:59:05 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[17:59:05 INF] Executed action Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recommendation) in 19.3478ms
+[17:59:05 INF] Executed endpoint 'Spotlight.Recomendacao.Presentation.Controllers.PingController.Get (Spotlight.Recommendation)'
+[17:59:05 INF] HTTP GET /api/ping responded 200 in 31.1024 ms
+[17:59:05 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 31.8317ms
+[17:59:05 DBG] Hosting stopping
+[17:59:05 DBG] Hosting stopping
+[17:59:05 DBG] Hosting stopped
+[17:59:05 DBG] Hosting stopped
+[xUnit.net 00:00:03.71]   Finished:    Spotlight.Recommendation.Tests
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 9 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [2 s]
+  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Health_Returns_200 [8 ms]
+  Aprovado Spotlight.Recomendacao.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [35 ms]
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\rodada-final\tf-solution.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\rodada-final\tf-solution.trx
+
+Execução de Teste Bem-sucedida.
+Total de testes: 47
+     Aprovados: 47
+Tempo total: 6,2572 Segundos
+[17:59:06 DBG] Hosting starting
+[17:59:06 INF] User profile is available. Using 'C:\Users\Inteli\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[17:59:06 DBG] Hosting started
+[17:59:06 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[17:59:06 INF] Executing endpoint 'Health checks'
+[17:59:06 DBG] Running health checks
+[17:59:06 DBG] Health check processing with combined status Healthy completed after 2.9782ms
+[17:59:06 INF] Executed endpoint 'Health checks'
+[17:59:06 INF] HTTP GET /health responded 200 in 149.5407 ms
+[17:59:06 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 173.3313ms
+  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_Health_Returns_200 [4 s]
+[17:59:06 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[17:59:06 INF] Executing endpoint 'Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalog)'
+[17:59:06 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Catalogo.Presentation.Controllers.PingController (Spotlight.Catalog).
+[17:59:06 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType2`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[17:59:07 INF] Executed action Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalog) in 30.6018ms
+[17:59:07 INF] Executed endpoint 'Spotlight.Catalogo.Presentation.Controllers.PingController.Get (Spotlight.Catalog)'
+[17:59:07 INF] HTTP GET /api/ping responded 200 in 49.2777 ms
+[17:59:07 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 53.4437ms
+[17:59:07 INF] Request starting HTTP/1.1 GET http://localhost/health/ready - null null
+[17:59:07 INF] Executing endpoint 'Health checks'
+[17:59:07 DBG] Running health checks
+[17:59:07 DBG] Running health check postgres
+[17:59:07 ERR] Health check postgres with status Unhealthy completed after 1.3175ms with message 'Connection string do banco n�o configurada.'
+[17:59:07 DBG] Health check processing with combined status Unhealthy completed after 11.2018ms
+[17:59:07 INF] Executed endpoint 'Health checks'
+[17:59:07 ERR] HTTP GET /health/ready responded 503 in 17.7628 ms
+[17:59:07 INF] Request finished HTTP/1.1 GET http://localhost/health/ready - 503 null text/plain 18.6613ms
+[17:59:07 DBG] Hosting stopping
+[17:59:07 DBG] Hosting stopping
+[17:59:07 DBG] Hosting stopped
+[17:59:07 DBG] Hosting stopped
+[xUnit.net 00:00:04.91]   Finished:    Spotlight.Catalog.Tests
+  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [59 ms]
+  Aprovado Spotlight.Catalogo.Tests.HealthEndpointsTests.Get_HealthReady_Returns_503_SemBanco [20 ms]
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\rodada-final\tf-solution.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\rodada-final\tf-solution.trx
+
+Execução de Teste Bem-sucedida.
+Total de testes: 32
+     Aprovados: 32
+Tempo total: 7,2068 Segundos
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): warning MSB3026: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Iniciando nova tentativa 10 em 1000ms. The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): error MSB3027: não foi possível copiar "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". Número de novas tentativas 10 excedido. Falha. O arquivo é bloqueado por: ".NET Host (27876)" [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+C:\Program Files\dotnet\sdk\9.0.314\Microsoft.Common.CurrentVersion.targets(4916,5): error MSB3021: Não é possível copiar o arquivo "obj\Debug\net9.0\Spotlight.User.dll" para "bin\Debug\net9.0\Spotlight.User.dll". The process cannot access the file 'C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\bin\Debug\net9.0\Spotlight.User.dll' because it is being used by another process. [C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\src\backend\services\user\Spotlight.User.csproj]
+[18:03:26 INF] User profile is available. Using 'C:\Users\Inteli\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[18:03:26 INF] Loading proxy data from config.
+[18:03:26 DBG] Destination 'd1' has been added.
+[18:03:26 DBG] New client created for cluster 'catalogo'.
+[18:03:26 DBG] Cluster 'catalogo' has been added.
+[18:03:26 DBG] Destination 'd1' has been added.
+[18:03:26 DBG] New client created for cluster 'geolocalizacao'.
+[18:03:26 DBG] Cluster 'geolocalizacao' has been added.
+[18:03:26 DBG] Destination 'd1' has been added.
+[18:03:26 DBG] New client created for cluster 'recomendacao'.
+[18:03:26 DBG] Cluster 'recomendacao' has been added.
+[18:03:26 DBG] Destination 'd1' has been added.
+[18:03:26 DBG] New client created for cluster 'usuario'.
+[18:03:26 DBG] Cluster 'usuario' has been added.
+[18:03:26 DBG] Route 'catalogo' has been added.
+[18:03:26 DBG] Route 'geolocalizacao' has been added.
+[18:03:26 DBG] Route 'recomendacao' has been added.
+[18:03:26 DBG] Route 'usuario' has been added.
+[18:03:26 DBG] Hosting starting
+[18:03:26 DBG] Hosting started
+[18:03:27 INF] Request starting HTTP/1.1 GET http://localhost/health - null null
+[18:03:27 INF] Executing endpoint 'Health checks'
+[18:03:27 DBG] Running health checks
+[18:03:27 DBG] Health check processing with combined status Healthy completed after 2.5386ms
+[18:03:27 INF] Executed endpoint 'Health checks'
+[18:03:27 INF] HTTP GET /health responded 200 in 73.0775 ms
+[18:03:27 INF] Request finished HTTP/1.1 GET http://localhost/health - 200 null text/plain 112.0736ms
+[18:03:27 INF] Request starting HTTP/1.1 GET http://localhost/api/ping - null null
+[18:03:27 INF] Executing endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'
+[18:03:27 INF] Route matched with {action = "Get", controller = "Ping"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Get() on controller Spotlight.Gateway.Controllers.PingController (Spotlight.Gateway).
+  Aprovado Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Health_Returns_200 [4 m 25 s]
+[18:03:27 INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType0`2[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[18:03:27 INF] Executed action Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway) in 32.521ms
+[18:03:27 INF] Executed endpoint 'Spotlight.Gateway.Controllers.PingController.Get (Spotlight.Gateway)'
+[18:03:27 INF] HTTP GET /api/ping responded 200 in 59.4197 ms
+[18:03:27 INF] Request finished HTTP/1.1 GET http://localhost/api/ping - 200 null application/json; charset=utf-8 63.3144ms
+[18:03:27 DBG] Hosting stopping
+[18:03:27 DBG] Hosting stopping
+[18:03:27 DBG] Hosting stopped
+[18:03:27 DBG] Hosting stopped
+[xUnit.net 00:04:26.38]   Finished:    Spotlight.Gateway.Tests
+  Aprovado Spotlight.Gateway.Tests.HealthEndpointsTests.Get_Ping_Returns_200 [70 ms]
+AVISO: sobrescrevendo o arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\rodada-final\tf-solution.trx
+Arquivo de resultados: C:\Users\Inteli\OneDrive\Documentos\GitHub\Modulo6\g04\documentos\evidencias\testes-funcionais\rodada-final\tf-solution.trx
+
+Execução de Teste Bem-sucedida.
+Total de testes: 2
+     Aprovados: 2
+Tempo total: 4,4851 Minutos
